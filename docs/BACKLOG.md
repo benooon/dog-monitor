@@ -70,7 +70,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 ## Phase 4 — Custom model
 
 - [~] ios: Opt-in labeled data capture (save short clips with the user's right/wrong feedback for training). (in progress 2026-11-10)
-- [ ] docs: Create ML training guide plus scripts to export labeled data, and a slot in the app to load an updated `.mlmodel`.
+- [~] docs: Create ML training guide plus scripts to export labeled data, and a slot in the app to load an updated `.mlmodel`. (in progress 2026-11-10)
 
 ## Phase 5 — Product
 
