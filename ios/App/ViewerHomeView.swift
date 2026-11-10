@@ -90,6 +90,7 @@ struct ViewerHomeView: View {
             .onChange(of: model.household) { statusChanged() }
             .onChange(of: model.realtime?.dogStates) { statusChanged() }
             .onChange(of: model.realtime?.presence) { statusChanged() }
+            .onChange(of: featuredDogPhoto, initial: true) { publishDogPhoto() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Activity", systemImage: "clock") {
@@ -288,6 +289,7 @@ struct ViewerHomeView: View {
     /// Fresh realtime state or a changed camera list: refresh the widget and any Live Activities.
     private func statusChanged() {
         publishWidgetStatus()
+        publishDogPhoto()
         let dogStates = model.realtime?.dogStates ?? [:]
         let presence = model.realtime?.presence ?? [:]
         let householdCameras = model.household.map { Set($0.cameras.map(\.id)) }
@@ -379,6 +381,20 @@ struct ViewerHomeView: View {
         }
         DogStatusStore.save(snapshots)
         WidgetCenter.shared.reloadTimelines(ofKind: DogStatusStore.widgetKind)
+    }
+
+    /// The photo of the dog the widgets show (the household's first dog), once it has loaded.
+    private var featuredDogPhoto: UIImage? {
+        model.household?.dogs.first.flatMap { model.dogPhotos.image(for: $0) }
+    }
+
+    /// Hands the dog's face to the widget and the Live Activity (app group), or takes it back
+    /// when the photo is removed.
+    private func publishDogPhoto() {
+        guard !model.isDemo, let household = model.household else { return }
+        if SharedDogPhoto.update(dog: household.dogs.first, image: featuredDogPhoto) {
+            WidgetCenter.shared.reloadTimelines(ofKind: DogStatusStore.widgetKind)
+        }
     }
 
     /// Shows or hides the camera's Live Activity (Lock Screen and Dynamic Island).

@@ -1,5 +1,6 @@
 import DogMonitorCore
 import SwiftUI
+import UIKit
 import WidgetKit
 
 /// Home and Lock Screen widget with the dog's last known state. The app writes the state into
@@ -19,6 +20,8 @@ struct DogStatusWidget: Widget {
 struct DogStatusEntry: TimelineEntry {
     let date: Date
     let snapshot: DogStatusSnapshot?
+    /// The dog's face from the app group, nil before the dog has a photo.
+    var photo: UIImage?
 }
 
 struct DogStatusProvider: TimelineProvider {
@@ -28,17 +31,18 @@ struct DogStatusProvider: TimelineProvider {
 
     func getSnapshot(in context: Context, completion: @escaping (DogStatusEntry) -> Void) {
         let snapshot = DogStatusSnapshot.featured(in: DogStatusStore.load())
-        completion(DogStatusEntry(date: .now, snapshot: snapshot ?? (context.isPreview ? .placeholder : nil)))
+        completion(DogStatusEntry(date: .now, snapshot: snapshot ?? (context.isPreview ? .placeholder : nil), photo: SharedDogPhoto.image()))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<DogStatusEntry>) -> Void) {
         let snapshot = DogStatusSnapshot.featured(in: DogStatusStore.load())
         let now = Date.now
-        var entries = [DogStatusEntry(date: now, snapshot: snapshot)]
+        let photo = SharedDogPhoto.image()
+        var entries = [DogStatusEntry(date: now, snapshot: snapshot, photo: photo)]
         // One more entry when the snapshot goes stale, so the widget stops showing it as current.
         if let snapshot, !snapshot.isStale(at: now) {
             let staleAt = snapshot.updatedAt.addingTimeInterval(DogStatusSnapshot.staleAfter + 1)
-            entries.append(DogStatusEntry(date: staleAt, snapshot: snapshot))
+            entries.append(DogStatusEntry(date: staleAt, snapshot: snapshot, photo: photo))
         }
         completion(Timeline(entries: entries, policy: .never))
     }
@@ -89,10 +93,14 @@ struct DogStatusWidgetView: View {
             .accessibilityElement(children: .combine)
         default:
             VStack(alignment: .leading, spacing: 4) {
-                Image(systemName: state.symbol)
-                    .font(.title)
-                    .foregroundStyle(state.isAlerting ? Color.orange : Color.accentColor)
-                    .accessibilityHidden(true)
+                if let photo = entry.photo {
+                    DogFace(photo: photo, symbol: state.symbol, tint: tint(state), size: 48)
+                } else {
+                    Image(systemName: state.symbol)
+                        .font(.title)
+                        .foregroundStyle(tint(state))
+                        .accessibilityHidden(true)
+                }
                 Spacer(minLength: 0)
                 Text(verbatim: snapshot.title)
                     .font(.headline)
@@ -107,6 +115,10 @@ struct DogStatusWidgetView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
         }
+    }
+
+    private func tint(_ state: DogState) -> Color {
+        state.isAlerting ? .orange : .accentColor
     }
 
     private func statusText(_ snapshot: DogStatusSnapshot, state: DogState) -> Text {
@@ -142,3 +154,4 @@ extension DogStatusSnapshot {
 } timeline: {
     DogStatusEntry(date: .now, snapshot: .placeholder)
 }
+

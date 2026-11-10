@@ -1,6 +1,7 @@
 import ActivityKit
 import DogMonitorCore
 import SwiftUI
+import UIKit
 import WidgetKit
 
 /// The dog's state and the camera's status on the Lock Screen and in the Dynamic Island.
@@ -8,16 +9,14 @@ import WidgetKit
 struct CameraLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: CameraActivityAttributes.self) { context in
-            LiveActivityLockScreenView(attributes: context.attributes, content: context.state)
+            LiveActivityLockScreenView(attributes: context.attributes, content: context.state, photo: SharedDogPhoto.image())
         } dynamicIsland: { context in
             let attributes = context.attributes
             let content = context.state
+            let photo = SharedDogPhoto.image()
             return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Image(systemName: content.displayState.symbol)
-                        .font(.title2)
-                        .foregroundStyle(content.tint)
-                        .accessibilityHidden(true)
+                    DogFace(photo: photo, symbol: content.displayState.symbol, tint: content.tint)
                 }
                 DynamicIslandExpandedRegion(.center) {
                     Text(verbatim: attributes.title)
@@ -34,8 +33,12 @@ struct CameraLiveActivityWidget: Widget {
                     }
                 }
             } compactLeading: {
-                Image(systemName: "pawprint.fill")
-                    .accessibilityHidden(true)
+                if let photo {
+                    DogPhotoCircle(photo: photo)
+                } else {
+                    Image(systemName: "pawprint.fill")
+                        .accessibilityHidden(true)
+                }
             } compactTrailing: {
                 Image(systemName: content.displayState.symbol)
                     .foregroundStyle(content.tint)
@@ -54,15 +57,12 @@ struct CameraLiveActivityWidget: Widget {
 struct LiveActivityLockScreenView: View {
     let attributes: CameraActivityAttributes
     let content: CameraLiveActivityContent
+    /// The dog's face from the app group; nil shows the state symbol instead.
+    var photo: UIImage?
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: content.displayState.symbol)
-                .font(.title2)
-                .foregroundStyle(content.tint)
-                .frame(width: 44, height: 44)
-                .background(content.tint.opacity(0.15), in: Circle())
-                .accessibilityHidden(true)
+            DogFace(photo: photo, symbol: content.displayState.symbol, tint: content.tint)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: attributes.title)
                     .font(.headline)
