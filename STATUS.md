@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 73f71d88d2b7dbc5aeea808b8973e7d68b967252
-- message: core+ios: camera health warnings, heat-based frame rate, power and heat events
-- time (UTC): 2026-11-10T12:13:30Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42811675719
+- commit: fe6b082938cf6ae0679a9012144bb1ddd201b93b
+- message: docs: claim household members task
+- time (UTC): 2026-11-10T12:21:45Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42813886401
 
 | job | result | log |
 |---|---|---|
