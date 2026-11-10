@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 6b76fd13a1b11c04ffab95857dd3c42bb7877d3c
-- message: docs: fix ci-results fetch command for shallow clones
-- time (UTC): 2026-11-10T06:48:13Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42770834896
+- commit: 02bebbd49cb9530e23539a6e79fb2566bd340d43
+- message: docs: claim DogMonitorCore package task
+- time (UTC): 2026-11-10T06:53:00Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42771357062
 
 | job | result | log |
 |---|---|---|
