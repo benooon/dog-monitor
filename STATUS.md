@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 682dff2a94e77cff48f76505f4c63fa7b39cfd85
-- message: docs: claim onboarding redesign
-- time (UTC): 2026-11-10T17:59:19Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42869056841
+- commit: f5ebf0bee30071e8205ca9f13b320fe0c4d3b2b3
+- message: ios: live view on the design system (glass control bar with sound, talk and Lock Screen; Live pill; connection problems as ContentUnavailableView)
+- time (UTC): 2026-11-10T18:12:11Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42869173820
 
 | job | result | log |
 |---|---|---|
