@@ -1,8 +1,8 @@
-npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
 
-added 225 packages, and audited 226 packages in 38s
+added 225 packages, and audited 226 packages in 34s
 
 73 packages are looking for funding
   run `npm fund` for details
@@ -27,20 +27,19 @@ Run `npm audit` for details.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/runner/work/dog-monitor/dog-monitor/backend[39m
 
- [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 716[2mms[22m[39m
- [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 555[2mms[22m[39m
- [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2633[2mms[22m[39m
+ [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 634[2mms[22m[39m
+ [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 599[2mms[22m[39m
+ [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2641[2mms[22m[39m
    [32m✓[39m JwtService [2m(2)[22m
      [33m[2m✓[22m[39m rejects expired tokens[33m 2104[2mms[22m[39m
- [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 228[2mms[22m[39m
- [32m✓[39m test/config.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
- [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 879[2mms[22m[39m
+   [32m✓[39m database schema [2m(5)[22m
+     [33m[2m✓[22m[39m allows one notification pref per user, camera (or all cameras) and type[33m 553[2mms[22m[39m
+ [32m✓[39m test/config.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 73[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
 [2m      Tests [22m [1m[32m42 passed[39m[22m[90m (42)[39m
-[2m   Start at [22m 07:54:06
-[2m   Duration [22m 7.68s[2m (tests 65%, import 32%, transform 3%)[22m
-
-[2m    Isolate [22m [33m6 workers spawned[39m[2m · ~91ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~455ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[2m   Start at [22m 07:56:41
+[2m   Duration [22m 8.21s[2m (tests 70%, import 27%, transform 2%)[22m
 
