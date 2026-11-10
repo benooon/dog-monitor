@@ -47,6 +47,26 @@ backend/                 Node.js + TypeScript API server, deployed to Railway
 - No new third-party dependency unless it clearly saves a lot of work. Record each one in DECISIONS.md.
 - UI strings: English and Hebrew (String Catalog). The layout must work in RTL.
 
+## Design and UI quality (Apple-level bar)
+
+The app must look and feel like a first-party Apple app. Vendored skills in `.claude/skills/` encode the rules; read the relevant `SKILL.md` before touching UI:
+
+- **Every SwiftUI change:** `swiftui-pro` (modern API, data flow, HIG) and `swiftui-design-principles` (spacing grid, type, restraint).
+- **New components/screens:** `swiftui-ui-patterns`. **Glass surfaces and floating controls:** `swiftui-liquid-glass`.
+- **Accessibility (not optional):** `ios-accessibility` — VoiceOver labels, Dynamic Type to AX5, Reduce Motion, 44pt targets.
+- **Any user-facing text:** `writing-for-interfaces`, with the voice below.
+
+House rules:
+
+- Use the tokens in `ios/App/Design/` (`DS.Spacing`, `DS.Radius`, `DS.Motion`) and its components (`GlassCard`, `.glassSurface()`, `PrimaryButton`, `StatusPill`). No magic numbers, no hard-coded colors; system semantic colors and the asset-catalog accent only.
+- Native first: `NavigationStack`, `List`/`Form` where they fit, `ContentUnavailableView` for empty/error states, `Label`, SF Symbols with `symbolEffect`, `sensoryFeedback` for haptics, `contentTransition(.numericText())` for changing numbers.
+- Liquid Glass on iOS 26+ for floating chrome (camera overlay, live view controls, primary actions), always gated with `#if compiler(>=6.2)` + `#available(iOS 26, *)` and a material fallback — the deployment target stays iOS 17.
+- Every screen has an RTL (Hebrew) and a dark-mode `#Preview`.
+
+### Voice
+
+Dog Monitor is **calm, warm and brief** — a friend watching your dog, not an alarm system. Short sentences, plain words, no exclamation marks, no jargon ("stream", "SFU", "token" never reach the UI). Errors say what happened and what to do next. Name the dog when we know it. Word list: *camera* (the phone at home), *watch live* (not "stream"), *pair* (connect a camera), *invite* (add family), *household* (not "home"/"family" in settings).
+
 ## Verification
 
 - This Linux sandbox usually has **no Swift toolchain and no Xcode**. Swift code is verified by CI on a macOS runner, so write it carefully, keep each commit small, and check CI results on your next loop.
