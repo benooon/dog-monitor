@@ -329,11 +329,13 @@ private struct CameraCard: View {
                             Text(label)
                         } icon: {
                             Image(systemName: dogState.symbol)
+                                .contentTransition(.symbolEffect(.replace))
+                                // A slow pulse while the dog needs attention; still with Reduce Motion.
+                                .symbolEffect(.pulse, options: .repeating, isActive: dogState.isAlerting && !reduceMotion)
                         }
                         .font(.subheadline)
                         .foregroundStyle(dogState.isAlerting ? Color.orange : Color.secondary)
                         .transition(.opacity)
-                        .id(dogState)
                     }
                 }
                 .animation(DS.Motion.animation(DS.Motion.standard, reduceMotion: reduceMotion), value: dogState)
