@@ -75,7 +75,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 ## Phase 5 — Product
 
 - [x] backend: Subscription entitlements for StoreKit 2: verify signed App Store transactions (x5c chain to the Apple root), store the household plan, `GET /subscription`, and enforce the free-tier camera limit.
-- [ ] backend: App Store Server Notifications V2 endpoint (renewals, expirations, refunds) so premium stays right even when the owner's app is not opened. Uses the same signed-payload verifier.
+- [~] backend: App Store Server Notifications V2 endpoint (renewals, expirations, refunds) so premium stays right even when the owner's app is not opened. Uses the same signed-payload verifier. (in progress 2026-11-10)
 - [ ] ios: StoreKit 2 subscription (free tier limits vs premium). Backend is ready: set `appAccountToken` to the household id, POST each verified `jwsRepresentation` to `/subscription/apple` (after purchase, on `Transaction.updates` and from `currentEntitlements` on launch), read `GET /subscription` for plan/limits, and handle 409 `camera_limit_reached` in pairing with an upgrade prompt. Add a `.storekit` config for local testing.
 - [ ] ios: Live Activity while a camera is active, and a home screen widget with the dog's current state.
 - [ ] ios: iPad layout for viewer mode.
