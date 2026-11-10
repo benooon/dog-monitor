@@ -173,6 +173,23 @@ final class LocalizationTests: XCTestCase {
         "Premium lets your household pair up to %lld cameras.",
         "New cameras need Premium. Family members can still join with this code.",
         "This household has no room for another camera. The owner can get Premium on the Household screen.",
+        "Activity",
+        "Couldn't load activity",
+        "Nothing matches these filters yet.",
+        "Show everything",
+        "No activity yet",
+        "Barking, visits to the door and other moments show up here.",
+        "All cameras",
+        "Filter",
+        "Today",
+        "Yesterday",
+        "Was this right?",
+        "Yes",
+        "No",
+        "Started",
+        "Lasted",
+        "Clips aren't set up yet.",
+        "Couldn't load the clip.",
     ]
 
     private func bundle(for language: String) throws -> Bundle {
