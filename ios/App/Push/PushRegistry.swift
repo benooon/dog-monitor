@@ -59,7 +59,10 @@ final class PushRegistry {
         let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
         if let deviceId {
             do {
-                _ = try await api.updateDevice(id: deviceId, UpdateDeviceRequest(appVersion: appVersion, apnsToken: token))
+                _ = try await api.updateDevice(
+                    id: deviceId,
+                    UpdateDeviceRequest(appVersion: appVersion, apnsToken: token, timeZone: TimeZone.current.identifier)
+                )
                 return
             } catch APIError.http(status: 404, _), APIError.http(status: 409, _) {
                 // Removed or revoked on the server: register again below.
@@ -74,7 +77,8 @@ final class PushRegistry {
                 role: .viewer,
                 model: UIDevice.current.model,
                 appVersion: appVersion,
-                apnsToken: token
+                apnsToken: token,
+                timeZone: TimeZone.current.identifier
             ))
             UserDefaults.standard.set(device.id.uuidString, forKey: Self.deviceIdKey)
         } catch {

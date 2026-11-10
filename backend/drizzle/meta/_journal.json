@@ -29,6 +29,13 @@
       "when": 1794300225071,
       "tag": "0003_device_dog_state",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794300538955,
+      "tag": "0004_device_time_zone",
+      "breakpoints": true
     }
   ]
 }

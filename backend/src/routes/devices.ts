@@ -5,6 +5,7 @@ import { devices } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
 import { LIMITS } from "../households/limits.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
+import { isValidTimeZone } from "../notifications/quiet-hours.js";
 
 const idParams = {
   type: "object",
@@ -13,6 +14,7 @@ const idParams = {
 } as const;
 
 const optionalFields = {
+  timeZone: { type: ["string", "null"], minLength: 1, maxLength: 64 },
   model: { type: ["string", "null"], maxLength: 100 },
   appVersion: { type: ["string", "null"], maxLength: 50 },
   apnsToken: { type: ["string", "null"], pattern: "^[0-9a-fA-F]{32,200}$" },
@@ -24,9 +26,10 @@ interface RegisterBody {
   model?: string | null;
   appVersion?: string | null;
   apnsToken?: string | null;
+  timeZone?: string | null;
 }
 
-type UpdateBody = Partial<Pick<RegisterBody, "name" | "model" | "appVersion" | "apnsToken">> & {
+type UpdateBody = Partial<Pick<RegisterBody, "name" | "model" | "appVersion" | "apnsToken" | "timeZone">> & {
   /** ISO time until which this phone gets no pushes, or null to unmute. */
   mutedUntil?: string | null;
 };
@@ -75,6 +78,9 @@ export async function deviceRoutes(app: FastifyInstance, opts: { db: Database })
     },
     async (request, reply) => {
       const { householdId } = request.household!;
+      if (request.body.timeZone && !isValidTimeZone(request.body.timeZone)) {
+        return reply.code(400).send({ error: "invalid_time_zone" });
+      }
       if (request.body.role === "camera") {
         const [row] = await db
           .select({ n: count() })
@@ -94,6 +100,7 @@ export async function deviceRoutes(app: FastifyInstance, opts: { db: Database })
           model: request.body.model ?? null,
           appVersion: request.body.appVersion ?? null,
           apnsToken: request.body.apnsToken ?? null,
+          timeZone: request.body.timeZone ?? null,
         })
         .returning();
       return reply.code(201).send(deviceDto(device!));
@@ -118,6 +125,9 @@ export async function deviceRoutes(app: FastifyInstance, opts: { db: Database })
       },
     },
     async (request, reply) => {
+      if (request.body.timeZone && !isValidTimeZone(request.body.timeZone)) {
+        return reply.code(400).send({ error: "invalid_time_zone" });
+      }
       const device = await loadDevice(request, reply);
       if (!device) return reply;
       const isOwnDevice = device.userId === request.user!.userId;

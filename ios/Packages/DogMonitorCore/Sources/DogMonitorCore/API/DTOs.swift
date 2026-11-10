@@ -217,13 +217,23 @@ public struct RegisterDeviceRequest: Codable, Sendable, Hashable {
     public var model: String?
     public var appVersion: String?
     public var apnsToken: String?
+    /// IANA time zone of the phone, for quiet hours.
+    public var timeZone: String?
 
-    public init(name: String, role: DeviceRole, model: String? = nil, appVersion: String? = nil, apnsToken: String? = nil) {
+    public init(
+        name: String,
+        role: DeviceRole,
+        model: String? = nil,
+        appVersion: String? = nil,
+        apnsToken: String? = nil,
+        timeZone: String? = nil
+    ) {
         self.name = name
         self.role = role
         self.model = model
         self.appVersion = appVersion
         self.apnsToken = apnsToken
+        self.timeZone = timeZone
     }
 }
 
@@ -235,19 +245,23 @@ public struct UpdateDeviceRequest: Codable, Sendable, Hashable {
     public var apnsToken: String?
     /// No pushes to this phone until then ("Mute 1h").
     public var mutedUntil: Date?
+    /// IANA time zone of the phone, for quiet hours.
+    public var timeZone: String?
 
     public init(
         name: String? = nil,
         model: String? = nil,
         appVersion: String? = nil,
         apnsToken: String? = nil,
-        mutedUntil: Date? = nil
+        mutedUntil: Date? = nil,
+        timeZone: String? = nil
     ) {
         self.name = name
         self.model = model
         self.appVersion = appVersion
         self.apnsToken = apnsToken
         self.mutedUntil = mutedUntil
+        self.timeZone = timeZone
     }
 }
 

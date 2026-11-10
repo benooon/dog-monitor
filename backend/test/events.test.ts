@@ -151,6 +151,39 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
     expect(apns.sent).toHaveLength(2);
   });
 
+  it("holds back non-urgent pushes during quiet hours in the phone's time zone", async () => {
+    const quiet = await buildTestApp(h, { apns, now: () => Date.parse("2026-11-10T21:00:00Z") }); // 23:00 in Jerusalem
+    try {
+      const { camera, owner, ownerPhone } = await setup();
+      const tz = await quiet.app.inject({ method: "PATCH", url: `/devices/${ownerPhone}`, headers: owner.auth, payload: { timeZone: "Asia/Jerusalem" } });
+      expect(tz.json().timeZone).toBe("Asia/Jerusalem");
+      expect(
+        (await quiet.app.inject({ method: "PATCH", url: `/devices/${ownerPhone}`, headers: owner.auth, payload: { timeZone: "Mars/Base" } })).statusCode,
+      ).toBe(400);
+      for (const eventType of ["atDoor", "prolongedBarking"] as const) {
+        await h.db.insert(notificationPrefs).values({ userId: owner.userId, deviceId: null, eventType, enabled: true, quietStart: "22:00", quietEnd: "07:00" });
+      }
+
+      await quiet.app.inject({
+        method: "POST",
+        url: "/events",
+        headers: camera.auth,
+        payload: { id: "66666666-6666-4666-8666-666666666666", type: "atDoor", startedAt: "2026-11-10T21:00:00.000Z" },
+      });
+      expect(apns.sent).toHaveLength(0); // owner is in quiet hours; member has atDoor off by default
+
+      await quiet.app.inject({
+        method: "POST",
+        url: "/events",
+        headers: camera.auth,
+        payload: { id: "77777777-7777-4777-8777-777777777777", type: "prolongedBarking", startedAt: "2026-11-10T21:00:00.000Z" },
+      });
+      expect(apns.sent.map((n) => n.deviceToken).sort()).toEqual([tokenA, tokenB]); // time-sensitive gets through
+    } finally {
+      await quiet.app.close();
+    }
+  });
+
   it("clears tokens APNs reports as dead", async () => {
     const { camera, memberPhone } = await setup();
     apns.respond = (n) => (n.deviceToken === tokenB ? { status: 410, reason: "Unregistered" } : { status: 200 });

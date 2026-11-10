@@ -4,7 +4,8 @@ import type { Database } from "../db/client.js";
 import { devices, dogs, events, notificationPrefs, type EventType } from "../db/schema.js";
 import { isDeadToken, type ApnsSender } from "./apns.js";
 import type { MediaStorage } from "../storage/storage.js";
-import { buildEventPayload, enabledByDefault } from "./payload.js";
+import { buildEventPayload, enabledByDefault, interruptionLevel } from "./payload.js";
+import { inQuietHours } from "./quiet-hours.js";
 
 /** Long enough to open a notification a while after it arrived. */
 export const SNAPSHOT_URL_TTL_SECONDS = 6 * 60 * 60;
@@ -21,14 +22,14 @@ export interface EventNotification {
 export interface NotifyResult {
   sent: number;
   failed: number;
-  /** Viewers who turned this event type off. */
+  /** Viewers who turned this event type off, or are in quiet hours. */
   muted: number;
 }
 
 /**
  * Fans an event out as APNs pushes to the household's viewer devices, honoring each user's
  * `notification_prefs` (a per-camera row beats an all-cameras row, which beats the type default).
- * Quiet hours are not applied yet (no user time zone stored; see BACKLOG).
+ * Quiet hours (in each phone's time zone) hold back everything except time-sensitive alerts.
  */
 export class EventNotifier {
   constructor(
@@ -36,6 +37,7 @@ export class EventNotifier {
     private readonly apns: ApnsSender | undefined,
     private readonly log: FastifyBaseLogger,
     private readonly storage?: MediaStorage,
+    private readonly now: () => Date = () => new Date(),
   ) {}
 
   async notify(event: EventNotification): Promise<NotifyResult> {
@@ -47,7 +49,7 @@ export class EventNotifier {
 
     const [camera] = await this.db.select({ name: devices.name }).from(devices).where(eq(devices.id, event.cameraId));
     const recipients = await this.db
-      .select({ id: devices.id, userId: devices.userId, apnsToken: devices.apnsToken })
+      .select({ id: devices.id, userId: devices.userId, apnsToken: devices.apnsToken, timeZone: devices.timeZone })
       .from(devices)
       .where(
         and(
@@ -63,13 +65,24 @@ export class EventNotifier {
 
     const userIds = [...new Set(recipients.map((r) => r.userId!))];
     const prefs = await this.db
-      .select({ userId: notificationPrefs.userId, deviceId: notificationPrefs.deviceId, enabled: notificationPrefs.enabled })
+      .select({
+        userId: notificationPrefs.userId,
+        deviceId: notificationPrefs.deviceId,
+        enabled: notificationPrefs.enabled,
+        quietStart: notificationPrefs.quietStart,
+        quietEnd: notificationPrefs.quietEnd,
+      })
       .from(notificationPrefs)
       .where(and(inArray(notificationPrefs.userId, userIds), eq(notificationPrefs.eventType, event.type)));
-    const wants = (userId: string) => {
+    const now = this.now();
+    // Time-sensitive alerts (prolonged barking, camera offline...) still come through quiet hours.
+    const quietable = interruptionLevel(event.type) !== "time-sensitive";
+    const wants = (userId: string, timeZone: string | null) => {
       const forCamera = prefs.find((p) => p.userId === userId && p.deviceId === event.cameraId);
       const forAll = prefs.find((p) => p.userId === userId && p.deviceId === null);
-      return (forCamera ?? forAll)?.enabled ?? enabledByDefault(event.type);
+      const pref = forCamera ?? forAll;
+      if (!(pref?.enabled ?? enabledByDefault(event.type))) return false;
+      return !(quietable && pref && inQuietHours(now, timeZone, pref.quietStart, pref.quietEnd));
     };
 
     const [dog] = await this.db
@@ -96,7 +109,7 @@ export class EventNotifier {
     const apns = this.apns;
     await Promise.all(
       recipients.map(async (recipient) => {
-        if (!wants(recipient.userId!)) {
+        if (!wants(recipient.userId!, recipient.timeZone)) {
           result.muted += 1;
           return;
         }

@@ -69,7 +69,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(deviceRoutes, { db: services.db });
     await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter });
     await app.register(deviceSelfRoutes, { db: services.db });
-    const notifier = new EventNotifier(services.db, services.apns, app.log, services.storage);
+    const clock = services.now ?? Date.now;
+    const notifier = new EventNotifier(services.db, services.apns, app.log, services.storage, () => new Date(clock()));
     await app.register(cameraEventRoutes, { db: services.db, notifier });
     await app.register(cameraMediaRoutes, { db: services.db, storage: services.storage });
     await app.register(viewerMediaRoutes, { db: services.db, storage: services.storage });
