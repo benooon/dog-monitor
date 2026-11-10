@@ -127,6 +127,11 @@ struct ViewerHomeView: View {
                     errorLabel(message)
                 }
             }
+            if let dogName = model.dogAlertsAppliedFor {
+                Section {
+                    dogAlertsNote(dogName)
+                }
+            }
             Section("Cameras") {
                 let cameras = model.household?.cameras ?? []
                 if cameras.isEmpty && model.household != nil {
@@ -182,6 +187,12 @@ struct ViewerHomeView: View {
                 VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
                     if let message = model.errorMessage {
                         errorLabel(message)
+                    }
+                    if let dogName = model.dogAlertsAppliedFor {
+                        dogAlertsNote(dogName)
+                            .padding(.horizontal, DS.Spacing.l)
+                            .padding(.vertical, DS.Spacing.s)
+                            .background(Color(.secondarySystemGroupedBackground), in: Self.gridCardShape)
                     }
                     if cameras.isEmpty && model.household != nil {
                         noCameras
@@ -312,6 +323,36 @@ struct ViewerHomeView: View {
             }
         }
     }
+
+    /// A family member's alerts were just set from the dog's profile: say so once, and open
+    /// Notifications on tap.
+    private func dogAlertsNote(_ dogName: String) -> some View {
+        HStack(spacing: DS.Spacing.s) {
+            Button {
+                showsNotifications = true
+            } label: {
+                Label {
+                    Text("Alerts follow \(dogName)'s profile. You can change them in Notifications.")
+                        .foregroundStyle(.primary)
+                } icon: {
+                    Image(systemName: "bell.badge")
+                        .foregroundStyle(.tint)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+            Button("Dismiss", systemImage: "xmark") {
+                model.dismissDogAlertsNote()
+            }
+            .labelStyle(.iconOnly)
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
+            .frame(minWidth: Self.minimumTapTarget, minHeight: Self.minimumTapTarget)
+        }
+    }
+
+    /// Smallest tappable size (HIG).
+    private static let minimumTapTarget: CGFloat = 44
 
     private func errorLabel(_ message: String) -> some View {
         Label {

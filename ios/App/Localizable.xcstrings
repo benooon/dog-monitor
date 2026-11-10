@@ -3127,6 +3127,26 @@
           }
         }
       }
+    },
+    "Alerts follow %@'s profile. You can change them in Notifications.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ההתראות מותאמות לפרופיל של %@. אפשר לשנות אותן בהתראות."
+          }
+        }
+      }
+    },
+    "Dismiss": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סגירה"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

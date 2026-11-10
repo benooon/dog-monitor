@@ -15,6 +15,9 @@ final class ViewerSessionModel {
     private(set) var snapshots: [UUID: URL] = [:]
     /// The dogs' photos, shared by every screen that shows a dog.
     private(set) var dogPhotos: DogPhotoStore
+    /// The dog whose alert style was just applied to this family member's notifications, for a
+    /// one-line note on the home screen (nil once dismissed).
+    private(set) var dogAlertsAppliedFor: String?
     /// Realtime presence + watch signals, while the viewer home is shown.
     private(set) var realtime: ViewerRealtime?
     /// Premium purchases and plan, for the household owner only.
@@ -73,6 +76,13 @@ final class ViewerSessionModel {
         if let dogs = household?.dogs {
             await dogPhotos.load(dogs, api: api)
         }
+        if let household, let dog = await MemberDogAlerts.applyIfNeeded(household: household, api: api) {
+            dogAlertsAppliedFor = dog.name
+        }
+    }
+
+    func dismissDogAlertsNote() {
+        dogAlertsAppliedFor = nil
     }
 
     /// Only the owner buys Premium, so only the owner's phone reports App Store transactions.
