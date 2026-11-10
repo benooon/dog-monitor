@@ -2076,6 +2076,236 @@
           }
         }
       }
+    },
+    "Activity": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פעילות"
+          }
+        }
+      }
+    },
+    "All cameras": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל המצלמות"
+          }
+        }
+      }
+    },
+    "Barking, visits to the door and other moments show up here.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות, ביקורים ליד הדלת ורגעים אחרים יופיעו כאן."
+          }
+        }
+      }
+    },
+    "Clips aren't set up yet.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הקליפים עדיין לא הוגדרו."
+          }
+        }
+      }
+    },
+    "Couldn't load activity": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו לטעון את הפעילות"
+          }
+        }
+      }
+    },
+    "Couldn't load the clip.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו לטעון את הקליפ."
+          }
+        }
+      }
+    },
+    "Filter": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סינון"
+          }
+        }
+      }
+    },
+    "Lasted": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נמשך"
+          }
+        }
+      }
+    },
+    "Marked right": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סומן כנכון"
+          }
+        }
+      }
+    },
+    "Marked wrong": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סומן כשגוי"
+          }
+        }
+      }
+    },
+    "No": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא"
+          }
+        }
+      }
+    },
+    "No activity yet": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עדיין אין פעילות"
+          }
+        }
+      }
+    },
+    "Nothing here": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין כאן כלום"
+          }
+        }
+      }
+    },
+    "Nothing matches these filters yet.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עדיין אין שום דבר שמתאים לסינון הזה."
+          }
+        }
+      }
+    },
+    "Show": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצגה"
+          }
+        }
+      }
+    },
+    "Show everything": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצגת הכול"
+          }
+        }
+      }
+    },
+    "Snapshot from the camera": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תמונה מהמצלמה"
+          }
+        }
+      }
+    },
+    "Started": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התחיל"
+          }
+        }
+      }
+    },
+    "This moment is gone": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הרגע הזה כבר לא זמין"
+          }
+        }
+      }
+    },
+    "Was this right?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "זה היה נכון?"
+          }
+        }
+      }
+    },
+    "Yes": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כן"
+          }
+        }
+      }
+    },
+    "Your answer wasn't saved. Check your connection and try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התשובה לא נשמרה. כדאי לבדוק את החיבור ולנסות שוב."
+          }
+        }
+      }
+    },
+    "Your answers help the camera learn what's worth telling you.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התשובות שלכם עוזרות למצלמה ללמוד על מה כדאי לעדכן אתכם."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -8,6 +8,7 @@ struct ViewerHomeView: View {
     var isOwner = false
     @State private var showsHousehold = false
     @State private var showsNotifications = false
+    @State private var showsTimeline = false
     /// The daily summary sheet, opened from the toolbar or a "daily summary is ready" push.
     @State private var summary: SummaryRequest?
     @State private var path: [UUID] = []
@@ -67,6 +68,11 @@ struct ViewerHomeView: View {
                     dogName: model.household?.dogs.first?.name
                 )
             }
+            .sheet(isPresented: $showsTimeline) {
+                ActivityTimelineView(
+                    model: TimelineModel(api: model.authorizedAPI, cameras: model.household?.cameras ?? [])
+                )
+            }
             .sheet(item: $summary) { request in
                 DailySummaryView(
                     model: DailySummaryModel(
@@ -103,6 +109,12 @@ struct ViewerHomeView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") { model.signOut() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Activity", systemImage: "clock") {
+                        showsTimeline = true
+                    }
+                    .accessibilityIdentifier("activity-timeline")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Daily summary", systemImage: "chart.bar") {
