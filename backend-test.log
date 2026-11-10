@@ -2,7 +2,7 @@ npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.
 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
 
-added 243 packages, and audited 244 packages in 43s
+added 243 packages, and audited 244 packages in 39s
 
 77 packages are looking for funding
   run `npm fund` for details
@@ -27,23 +27,23 @@ Run `npm audit` for details.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/runner/work/dog-monitor/dog-monitor/backend[39m
 
- [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 818[2mms[22m[39m
- [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 585[2mms[22m[39m
- [32m✓[39m test/live.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 702[2mms[22m[39m
- [32m✓[39m test/realtime.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 946[2mms[22m[39m
- [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
- [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2608[2mms[22m[39m
+ [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 702[2mms[22m[39m
+ [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 665[2mms[22m[39m
+ [32m✓[39m test/live.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 593[2mms[22m[39m
+ [32m✓[39m test/realtime.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 827[2mms[22m[39m
+ [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2546[2mms[22m[39m
    [32m✓[39m JwtService [2m(2)[22m
-     [33m[2m✓[22m[39m rejects expired tokens[33m 2103[2mms[22m[39m
- [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 241[2mms[22m[39m
- [32m✓[39m test/config.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 8[2mms[22m[39m
- [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects expired tokens[33m 2104[2mms[22m[39m
+ [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 325[2mms[22m[39m
+ [32m✓[39m test/config.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 71[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m9 passed[39m[22m[90m (9)[39m
 [2m      Tests [22m [1m[32m65 passed[39m[22m[90m (65)[39m
-[2m   Start at [22m 08:05:00
-[2m   Duration [22m 12.67s[2m (tests 55%, import 41%, transform 4%)[22m
+[2m   Start at [22m 08:06:40
+[2m   Duration [22m 10.92s[2m (tests 61%, import 36%, transform 3%)[22m
 
-[2m    Isolate [22m [33m9 workers spawned[39m[2m · ~115ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~921ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[2m    Isolate [22m [33m9 workers spawned[39m[2m · ~92ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~733ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
 

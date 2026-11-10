@@ -1,12 +1,12 @@
-# CI status: RED
+# CI status: GREEN
 
-- commit: 850ef6ccf48af4f137539c6fd0fcc7d2da267871
-- message: backend: add realtime WebSocket channel for presence, heartbeats and viewer joins
-- time (UTC): 2026-11-10T08:05:24Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42779712152
+- commit: 3fe748a3ea7f3a2773a801b87ae762d88c10351e
+- message: docs: mark WebSocket channel done, claim viewer limit task
+- time (UTC): 2026-11-10T08:10:27Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42779773790
 
 | job | result | log |
 |---|---|---|
 | core (swift test, Linux) | success | core-test.log |
-| ios (xcodebuild test, macOS) | failure (carried over, no iOS changes) | ios-build.log |
+| ios (xcodebuild test, macOS) | success | ios-build.log |
 | backend (lint + test) | success | backend-test.log |
