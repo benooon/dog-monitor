@@ -34,7 +34,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [ ] ios: Rotate streamed (and analyzed) video to match the camera phone's orientation (`AVCaptureDevice.RotationCoordinator` → `videoRotationAngle` on the video output connection).
 - [ ] ios: Pairing UI (moved up: live view needs a paired camera). The owner shows a QR code + 6-digit code; the new device scans it (AVFoundation metadata output) and joins, then picks a role.
 - [ ] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
-- [ ] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client.
+- [~] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client. (in progress 2026-11-10)
 - [ ] ios: Push registration, notification categories and actions (Watch live / Mute 1h), and deep link into live view.
 - [ ] ios: Notification Service Extension target in project.yml that downloads the snapshot and attaches it to the push.
 - [ ] [blocked] ci: TestFlight workflow (`.github/workflows/testflight.yml`). Archive + upload with an App Store Connect API key via `xcodebuild -exportArchive` or fastlane, triggered on every push to main that changes ios/. Needs secrets; see HUMAN_TODO.
