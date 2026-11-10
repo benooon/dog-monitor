@@ -112,6 +112,30 @@ public struct DogMonitorAPI: Sendable {
         )
     }
 
+    // MARK: - Live view & realtime
+
+    /// A viewer token for watching `cameraId` live. Fails with 409 `viewer_limit_reached`,
+    /// or 503 `live_not_configured` until the backend has LiveKit credentials.
+    public func liveToken(cameraId: UUID) async throws -> LiveTokenDTO {
+        try await send("POST", "cameras/\(Self.path(cameraId))/live-token")
+    }
+
+    /// A publisher token for this camera's own room (requires `.device` credentials).
+    public func deviceLiveToken() async throws -> LiveTokenDTO {
+        try await send("POST", "device/live-token")
+    }
+
+    /// The upgrade request for the realtime WebSocket (`GET /ws`), authenticated like any call.
+    public func realtimeRequest() -> URLRequest {
+        var components = URLComponents(url: baseURL.appendingPathComponent("ws"), resolvingAgainstBaseURL: false)
+        components?.scheme = baseURL.scheme == "https" ? "wss" : "ws"
+        var request = URLRequest(url: components?.url ?? baseURL)
+        if let header = credential.authorizationHeader {
+            request.setValue(header, forHTTPHeaderField: "Authorization")
+        }
+        return request
+    }
+
     // MARK: - Plumbing
 
     static func path(_ id: UUID) -> String { id.uuidString.lowercased() }

@@ -103,6 +103,16 @@ public struct CameraPairingResponse: Codable, Sendable, Hashable {
     public let deviceSecret: String
 }
 
+/// What a client needs to join a camera's LiveKit room (`POST /cameras/:id/live-token`, `POST /device/live-token`).
+public struct LiveTokenDTO: Codable, Sendable, Hashable {
+    /// LiveKit server URL (wss://…).
+    public let url: String
+    public let token: String
+    public let room: String
+    public let identity: String
+    public let expiresAt: Date
+}
+
 public struct HealthResponse: Codable, Sendable, Hashable {
     public let status: String
     public let uptimeSeconds: Double
