@@ -1,6 +1,126 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%1$@ has been at the door for %2$@ min": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ליד הדלת כבר %2$@ דק׳"
+          }
+        }
+      }
+    },
+    "%1$@ has been barking for %2$@ min": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: נביחות כבר %2$@ דק׳"
+          }
+        }
+      }
+    },
+    "%1$@ has been whining for %2$@ min": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: יבבות כבר %2$@ דק׳"
+          }
+        }
+      }
+    },
+    "%@ has been barking": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: נביחות ממושכות"
+          }
+        }
+      }
+    },
+    "%@ has calmed down": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: חזר השקט"
+          }
+        }
+      }
+    },
+    "%@ hasn't been seen for a while": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ מחוץ לטווח המצלמה כבר זמן מה"
+          }
+        }
+      }
+    },
+    "%@ is in a forbidden zone": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ באזור אסור"
+          }
+        }
+      }
+    },
+    "%@ is waiting at the door": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ליד הדלת"
+          }
+        }
+      }
+    },
+    "%@ is whining or howling": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: יבבות או יללות"
+          }
+        }
+      }
+    },
+    "%@'s daily summary is ready": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסיכום היומי של %@ מוכן"
+          }
+        }
+      }
+    },
     "%lld watching": {
       "localizations": {
         "he": {
@@ -321,6 +441,16 @@
         }
       }
     },
+    "Mute 1h": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השתקה לשעה"
+          }
+        }
+      }
+    },
     "New invite": {
       "localizations": {
         "he": {
@@ -501,6 +631,42 @@
         }
       }
     },
+    "The camera is offline": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה לא מחוברת"
+          }
+        }
+      }
+    },
+    "The camera is overheating": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה מתחממת"
+          }
+        }
+      }
+    },
+    "The camera's battery is low": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסוללה של המצלמה חלשה"
+          }
+        }
+      }
+    },
     "This camera already has 5 viewers.": {
       "localizations": {
         "he": {
@@ -581,12 +747,142 @@
         }
       }
     },
+    "Watch live": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צפייה חיה"
+          }
+        }
+      }
+    },
     "Watch live and get alerts on your own phone.": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "צפו בשידור חי וקבלו התראות בטלפון שלכם."
+          }
+        }
+      }
+    },
+    "Your dog has been at the door for %@ min": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב ליד הדלת כבר %@ דק׳"
+          }
+        }
+      }
+    },
+    "Your dog has been barking": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות ממושכות"
+          }
+        }
+      }
+    },
+    "Your dog has been barking for %@ min": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות כבר %@ דק׳"
+          }
+        }
+      }
+    },
+    "Your dog has been whining for %@ min": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יבבות כבר %@ דק׳"
+          }
+        }
+      }
+    },
+    "Your dog has calmed down": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חזר השקט"
+          }
+        }
+      }
+    },
+    "Your dog hasn't been seen for a while": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב מחוץ לטווח המצלמה כבר זמן מה"
+          }
+        }
+      }
+    },
+    "Your dog is in a forbidden zone": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב באזור אסור"
+          }
+        }
+      }
+    },
+    "Your dog is waiting at the door": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב ליד הדלת"
+          }
+        }
+      }
+    },
+    "Your dog is whining or howling": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יבבות או יללות"
+          }
+        }
+      }
+    },
+    "Your dog's daily summary is ready": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסיכום היומי מוכן"
           }
         }
       }

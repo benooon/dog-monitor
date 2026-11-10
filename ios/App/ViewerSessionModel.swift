@@ -88,6 +88,7 @@ final class ViewerSessionModel {
     }
 
     func signOut() {
+        PushRegistry.shared.deactivate()
         realtime?.stop()
         realtime = nil
         household = nil

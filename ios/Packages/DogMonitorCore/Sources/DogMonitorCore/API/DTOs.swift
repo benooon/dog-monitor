@@ -166,12 +166,21 @@ public struct UpdateDeviceRequest: Codable, Sendable, Hashable {
     public var appVersion: String?
     /// Hex-encoded APNs device token.
     public var apnsToken: String?
+    /// No pushes to this phone until then ("Mute 1h").
+    public var mutedUntil: Date?
 
-    public init(name: String? = nil, model: String? = nil, appVersion: String? = nil, apnsToken: String? = nil) {
+    public init(
+        name: String? = nil,
+        model: String? = nil,
+        appVersion: String? = nil,
+        apnsToken: String? = nil,
+        mutedUntil: Date? = nil
+    ) {
         self.name = name
         self.model = model
         self.appVersion = appVersion
         self.apnsToken = apnsToken
+        self.mutedUntil = mutedUntil
     }
 }
 

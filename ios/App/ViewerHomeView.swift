@@ -7,9 +7,11 @@ struct ViewerHomeView: View {
     let householdName: String
     var isOwner = false
     @State private var showsInvite = false
+    @State private var path: [UUID] = []
+    private let router = DeepLinkRouter.shared
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 if let message = model.errorMessage {
                     Section {
@@ -23,11 +25,7 @@ struct ViewerHomeView: View {
                             .foregroundStyle(.secondary)
                     }
                     ForEach(cameras) { camera in
-                        NavigationLink {
-                            if let realtime = model.realtime {
-                                LiveView(camera: camera, api: model.authorizedAPI, realtime: realtime)
-                            }
-                        } label: {
+                        NavigationLink(value: camera.id) {
                             CameraRow(camera: camera, livePresence: model.realtime?.presence[camera.id])
                         }
                         .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
@@ -55,9 +53,23 @@ struct ViewerHomeView: View {
             .sheet(isPresented: $showsInvite, onDismiss: { Task { await model.loadHousehold() } }) {
                 InviteSheet(model: model)
             }
+            .navigationDestination(for: UUID.self) { cameraId in
+                if let camera = model.household?.cameras.first(where: { $0.id == cameraId }), let realtime = model.realtime {
+                    LiveView(camera: camera, api: model.authorizedAPI, realtime: realtime)
+                } else {
+                    ProgressView()
+                }
+            }
+            .onChange(of: router.liveCameraId, initial: true) { _, cameraId in
+                // Opened from a notification ("Watch live" or a tap).
+                guard let cameraId else { return }
+                path = [cameraId]
+                router.liveCameraId = nil
+            }
             .task {
                 model.startRealtime()
                 await model.loadHousehold()
+                await PushRegistry.shared.activate(api: model.authorizedAPI)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

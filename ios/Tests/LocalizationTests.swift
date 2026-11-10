@@ -36,6 +36,8 @@ final class LocalizationTests: XCTestCase {
         "Microphone off — barking can't be detected.",
         "Barks in the last minute: %lld",
         "%lld watching",
+        "Watch live",
+        "Mute 1h",
         "Live",
         "Connecting…",
         "Waiting for the camera…",
@@ -78,6 +80,43 @@ final class LocalizationTests: XCTestCase {
             XCTAssertNotEqual(value, "<missing>", "Missing Hebrew for \"\(key)\"")
             XCTAssertTrue(value.unicodeScalars.contains { (0x0590...0x05FF).contains($0.value) },
                           "Hebrew value for \"\(key)\" contains no Hebrew letters: \(value)")
+        }
+    }
+
+    /// The backend sends these as `loc-key`s (backend/src/notifications/payload.ts); keep the lists in sync.
+    private static let pushKeys = [
+        "%@ has been barking",
+        "Your dog has been barking",
+        "%@ is whining or howling",
+        "Your dog is whining or howling",
+        "%@ is in a forbidden zone",
+        "Your dog is in a forbidden zone",
+        "%@ is waiting at the door",
+        "Your dog is waiting at the door",
+        "%@ hasn't been seen for a while",
+        "Your dog hasn't been seen for a while",
+        "%@ has calmed down",
+        "Your dog has calmed down",
+        "The camera is offline",
+        "The camera's battery is low",
+        "The camera is overheating",
+        "%@'s daily summary is ready",
+        "Your dog's daily summary is ready",
+        "%1$@ has been barking for %2$@ min",
+        "Your dog has been barking for %@ min",
+        "%1$@ has been whining for %2$@ min",
+        "Your dog has been whining for %@ min",
+        "%1$@ has been at the door for %2$@ min",
+        "Your dog has been at the door for %@ min",
+    ]
+
+    func testPushCopyIsLocalized() throws {
+        let hebrew = try bundle(for: "he")
+        for key in Self.pushKeys {
+            let value = hebrew.localizedString(forKey: key, value: "<missing>", table: nil)
+            XCTAssertNotEqual(value, "<missing>", "Missing Hebrew push copy for \"\(key)\"")
+            XCTAssertEqual(value.components(separatedBy: "%").count, key.components(separatedBy: "%").count,
+                           "Placeholder count differs for \"\(key)\"")
         }
     }
 
