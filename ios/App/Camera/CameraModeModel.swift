@@ -23,8 +23,12 @@ final class CameraModeModel {
     private(set) var screen = CameraScreenState()
     /// Recent audio detections, for the debug overlay.
     private(set) var detectionLog = DetectionLog()
-    /// The dog's state per the event engine (SPEC §5).
-    private(set) var dogState: DogState = .unknown
+    /// The dog's state per the event engine (SPEC §5); viewers see it via heartbeats.
+    private(set) var dogState: DogState = .unknown {
+        didSet {
+            if dogState != oldValue { live?.dogStateChanged() }
+        }
+    }
 
     let capture: CaptureService
     /// Live view (realtime link + LiveKit), only when this phone is paired as a camera.
@@ -158,7 +162,8 @@ final class CameraModeModel {
         guard isPaired else { return }
         let controller = CameraLiveController(
             api: DogMonitorAPI(baseURL: AppConfig.apiBaseURL, credential: credential),
-            capture: capture
+            capture: capture,
+            dogState: { [weak self] in self?.dogState ?? .unknown }
         )
         live = controller
         controller.start()

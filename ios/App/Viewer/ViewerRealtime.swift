@@ -9,6 +9,8 @@ import Observation
 final class ViewerRealtime {
     /// Presence reported by the server; cameras missing here fall back to their last heartbeat.
     private(set) var presence: [UUID: Bool] = [:]
+    /// The dog's state per camera, as last reported.
+    private(set) var dogStates: [UUID: DogState] = [:]
     private(set) var isConnected = false
 
     private let connection: RealtimeConnection
@@ -63,6 +65,12 @@ final class ViewerRealtime {
             isConnected = false
         case .message(.cameras(let cameras)):
             presence = Dictionary(cameras.map { ($0.id, $0.online) }, uniquingKeysWith: { _, new in new })
+            dogStates = Dictionary(
+                cameras.compactMap { camera in camera.dogState.map { (camera.id, $0) } },
+                uniquingKeysWith: { _, new in new }
+            )
+        case .message(.cameraState(let cameraId, let state)):
+            dogStates[cameraId] = state
         case .message(.presence(let cameraId, let online)):
             presence[cameraId] = online
         case .message:

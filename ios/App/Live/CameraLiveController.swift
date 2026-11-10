@@ -32,9 +32,13 @@ final class CameraLiveController {
     @ObservationIgnored private var isReconciling = false
     @ObservationIgnored private var needsReconcile = false
 
-    init(api: DogMonitorAPI, capture: CaptureService) {
+    /// The dog's current state, sent with every heartbeat.
+    private let dogState: @MainActor () -> DogState
+
+    init(api: DogMonitorAPI, capture: CaptureService, dogState: @escaping @MainActor () -> DogState = { .unknown }) {
         self.api = api
         self.capture = capture
+        self.dogState = dogState
         let request = api.realtimeRequest()
         connection = RealtimeConnection { request }
     }
@@ -91,8 +95,14 @@ final class CameraLiveController {
         Task { await reconcile() }
     }
 
+    /// Call when the dog's state changes so viewers see it without waiting for the next heartbeat.
+    func dogStateChanged() {
+        Task { await sendHeartbeat() }
+    }
+
     private func sendHeartbeat() async {
-        await connection.send(.heartbeat(health.current()))
+        let state = dogState()
+        await connection.send(.heartbeat(health.current(), dogState: state == .unknown ? nil : state))
     }
 
     /// Starts or stops publishing to match the policy, and schedules the linger stop.

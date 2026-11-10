@@ -1,7 +1,7 @@
 import DogMonitorCore
 import SwiftUI
 
-/// Viewer home: the household's cameras (tap for live view) and dogs. Snapshots come later.
+/// Viewer home: a card per camera (last snapshot, online, dog state; tap for live view) and the dogs.
 struct ViewerHomeView: View {
     let model: ViewerSessionModel
     let householdName: String
@@ -26,7 +26,12 @@ struct ViewerHomeView: View {
                     }
                     ForEach(cameras) { camera in
                         NavigationLink(value: camera.id) {
-                            CameraRow(camera: camera, livePresence: model.realtime?.presence[camera.id])
+                            CameraCard(
+                                camera: camera,
+                                snapshot: model.snapshots[camera.id],
+                                livePresence: model.realtime?.presence[camera.id],
+                                dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
+                            )
                         }
                         .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
                     }
@@ -90,26 +95,59 @@ struct ViewerHomeView: View {
     }
 }
 
-private struct CameraRow: View {
+/// One camera: last snapshot, name, online status and the dog's current state.
+private struct CameraCard: View {
     let camera: DeviceDTO
+    let snapshot: URL?
     /// Presence from the realtime channel, which is fresher than the last heartbeat time.
     var livePresence: Bool?
+    var dogState: DogState?
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 30)) { context in
             let online = livePresence ?? camera.isOnline(now: context.date)
-            HStack {
-                Image(systemName: "video.fill")
-                    .foregroundStyle(.tint)
-                Text(verbatim: camera.name)
-                Spacer()
-                Circle()
-                    .fill(online ? Color.green : Color.secondary)
-                    .frame(width: 8, height: 8)
-                Text(online ? LocalizedStringKey("Online") : LocalizedStringKey("Offline"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack {
+                    Rectangle().fill(.quaternary)
+                    if let snapshot {
+                        AsyncImage(url: snapshot) { image in
+                            image.resizable().scaledToFill()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                    } else {
+                        Image(systemName: "video.fill")
+                            .font(.largeTitle)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .aspectRatio(16 / 9, contentMode: .fit)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(alignment: .topLeading) {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(online ? Color.green : Color.secondary)
+                            .frame(width: 8, height: 8)
+                        Text(online ? LocalizedStringKey("Online") : LocalizedStringKey("Offline"))
+                    }
+                    .font(.caption.bold())
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.thinMaterial, in: Capsule())
+                    .padding(8)
+                }
+                HStack {
+                    Text(verbatim: camera.name)
+                        .font(.headline)
+                    Spacer()
+                    if online, let label = dogState?.label {
+                        Text(label)
+                            .font(.subheadline)
+                            .foregroundStyle(dogState?.isAlerting == true ? Color.orange : Color.secondary)
+                    }
+                }
             }
+            .padding(.vertical, 4)
             .accessibilityElement(children: .combine)
         }
     }

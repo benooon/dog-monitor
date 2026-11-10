@@ -11,6 +11,8 @@ final class ViewerSessionModel {
     /// Full household (cameras, dogs) for the viewer home, loaded once ready.
     private(set) var household: HouseholdDTO?
     var errorMessage: String?
+    /// Latest snapshot URL per camera (empty until the backend has storage).
+    private(set) var snapshots: [UUID: URL] = [:]
     /// Realtime presence + watch signals, while the viewer home is shown.
     private(set) var realtime: ViewerRealtime?
 
@@ -57,6 +59,13 @@ final class ViewerSessionModel {
         await perform {
             household = try await api.household()
         }
+        await loadSnapshots()
+    }
+
+    /// Best effort: storage may not be configured yet, which is fine for the home screen.
+    private func loadSnapshots() async {
+        guard let list = try? await api.cameraSnapshots() else { return }
+        snapshots = Dictionary(list.map { ($0.cameraId, $0.url) }, uniquingKeysWith: { _, new in new })
     }
 
     /// Owner only: a one-time invite for a camera or family member (nil on failure; see `errorMessage`).
