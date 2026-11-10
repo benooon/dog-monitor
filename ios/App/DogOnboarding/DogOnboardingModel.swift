@@ -24,6 +24,9 @@ final class DogOnboardingModel: Identifiable {
     private(set) var saveFailed = false
     /// Whether a camera already has a no-go zone, so the summary can say if one is still needed.
     let hasZones: Bool
+    /// Another dog in a household that already has one: no alerts question (it shares the
+    /// household's alert style) and its habits only add alerts.
+    let isAnotherDog: Bool
 
     private let api: DogMonitorAPI
     /// The dog being described: one created by an earlier attempt, or one the household already had.
@@ -36,10 +39,29 @@ final class DogOnboardingModel: Identifiable {
         self.dog = dog
         original = dog
         self.hasZones = hasZones
+        isAnotherDog = false
         name = dog?.name ?? ""
         lifeStage = dog?.lifeStage
         traits = Set(dog?.traits ?? [])
         alertStyle = dog?.alertStyle ?? .balanced
+    }
+
+    /// A new dog for a household that already has `firstDog`.
+    init(api: DogMonitorAPI, anotherDogAfter firstDog: DogDTO, hasZones: Bool = false) {
+        self.api = api
+        dog = nil
+        original = nil
+        self.hasZones = hasZones
+        isAnotherDog = true
+        name = ""
+        lifeStage = nil
+        traits = []
+        alertStyle = firstDog.alertStyle ?? .balanced
+    }
+
+    /// The questions in order.
+    var steps: [Step] {
+        isAnotherDog ? Step.allCases.filter { $0 != .alerts } : Step.allCases
     }
 
     /// The dog as last saved, with its photo version once the photo is stored.
@@ -130,7 +152,11 @@ final class DogOnboardingModel: Identifiable {
             }
             guard appliesAlerts else { return true }
             var settings = NotificationSettings(try await api.notificationPrefs())
-            personalization.apply(to: &settings)
+            if isAnotherDog {
+                personalization.add(to: &settings)
+            } else {
+                personalization.apply(to: &settings)
+            }
             _ = try await api.replaceNotificationPrefs(settings.requestPrefs())
             return true
         } catch {

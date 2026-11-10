@@ -64,6 +64,19 @@ final class DogPersonalizationTests: XCTestCase {
         XCTAssertNotNil(settings.quietHours, "quiet hours stay")
     }
 
+    func testAnotherDogOnlyTurnsAlertsOn() {
+        var settings = NotificationSettings(NotificationPrefsDTO(types: Self.types, prefs: []))
+        DogPersonalization(traits: [.waitsAtDoor], alertStyle: .balanced).apply(to: &settings)
+        XCTAssertTrue(settings.isEnabled(.atDoor))
+        XCTAssertFalse(settings.isEnabled(.forbiddenZone))
+
+        // A sofa dog that doesn't wait by the door: sofa alerts on, door alerts stay on.
+        DogPersonalization(traits: [.getsOnFurniture], alertStyle: .balanced).add(to: &settings)
+        XCTAssertTrue(settings.isEnabled(.forbiddenZone))
+        XCTAssertTrue(settings.isEnabled(.atDoor), "the first dog's door alerts stay")
+        XCTAssertFalse(settings.isEnabled(.notVisible))
+    }
+
     func testPromisesMatchTheAnswers() {
         let plan = DogPersonalization(
             lifeStage: .puppy,

@@ -3247,6 +3247,36 @@
           }
         }
       }
+    },
+    "Add another dog": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוספת כלב נוסף"
+          }
+        }
+      }
+    },
+    "Add your dog": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוספת הכלב שלך"
+          }
+        }
+      }
+    },
+    "Who else are we watching?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "על מי עוד נשמור?"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -57,13 +57,13 @@ struct DogOnboardingView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                StepProgress(step: step)
+                StepProgress(step: step, steps: model.steps)
             }
         }
     }
 
     private func advance(from step: DogOnboardingModel.Step) {
-        let steps = DogOnboardingModel.Step.allCases
+        let steps = model.steps
         guard let index = steps.firstIndex(of: step), index + 1 < steps.count else { return }
         path.append(steps[index + 1])
     }
@@ -72,11 +72,11 @@ struct DogOnboardingView: View {
 /// A thin bar in the navigation bar: how far along the questions are.
 private struct StepProgress: View {
     let step: DogOnboardingModel.Step
+    let steps: [DogOnboardingModel.Step]
 
     @ScaledMetric private var width: CGFloat = 120
 
     var body: some View {
-        let steps = DogOnboardingModel.Step.allCases
         let position = (steps.firstIndex(of: step) ?? 0) + 1
         ProgressView(value: Double(position), total: Double(steps.count))
             .progressViewStyle(.linear)
@@ -98,7 +98,7 @@ private struct NameStep: View {
 
     var body: some View {
         QuestionScreen(
-            title: Text("Who are we watching?"),
+            title: model.isAnotherDog ? Text("Who else are we watching?") : Text("Who are we watching?"),
             message: Text("Let's start with your dog's name.")
         ) {
             TextField(text: $model.name) {
@@ -117,7 +117,7 @@ private struct NameStep: View {
             PrimaryButton(title: "Continue", action: next)
                 .disabled(model.validName == nil)
                 .accessibilityIdentifier("dog-onboarding-continue")
-            SecondaryActionButton(title: "Skip for now", action: onSkip)
+            SecondaryActionButton(title: model.isAnotherDog ? "Cancel" : "Skip for now", action: onSkip)
         }
         .onAppear { if autofocus { isFocused = true } }
     }

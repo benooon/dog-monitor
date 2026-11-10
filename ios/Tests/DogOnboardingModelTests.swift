@@ -150,6 +150,25 @@ final class DogOnboardingModelTests: XCTestCase {
         XCTAssertFalse(model.photoUploaded)
     }
 
+    func testAnotherDogSkipsTheAlertsQuestionAndAddsItsAlerts() async throws {
+        let first = DogDTO(id: UUID(), householdId: UUID(), name: "Rex", alertStyle: .important, createdAt: .now)
+        let transport = ScriptedTransport([(201, Self.dog()), (200, Self.prefs), (200, Self.prefs)])
+        let api = DogMonitorAPI(baseURL: URL(string: "https://api.example.com")!, transport: transport)
+        let model = DogOnboardingModel(api: api, anotherDogAfter: first)
+        XCTAssertTrue(model.isAnotherDog)
+        XCTAssertFalse(model.steps.contains(.alerts))
+        XCTAssertEqual(model.alertStyle, .important, "shares the household's alert style")
+
+        model.name = "Luna"
+        let saved = await model.save()
+
+        XCTAssertTrue(saved)
+        XCTAssertEqual(transport.requests.map(\.httpMethod), ["POST", "GET", "PUT"], "a new dog, not an update of Rex")
+        let dog = try body(transport.requests[0])
+        XCTAssertEqual(dog["name"] as? String, "Luna")
+        XCTAssertEqual(dog["alertStyle"] as? String, "important")
+    }
+
     func testNameIsRequired() async {
         let model = DogOnboardingModel(api: DogMonitorAPI(baseURL: URL(string: "https://api.example.com")!))
         model.name = "   "

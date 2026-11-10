@@ -57,6 +57,14 @@ public struct DogPersonalization: Hashable, Sendable {
         }
     }
 
+    /// For another dog in the same household: turns on the alerts this dog needs and leaves
+    /// everything else as it is, so adding a dog never silences one the first dog relies on.
+    public func add(to settings: inout NotificationSettings) {
+        for (type, isOn) in alerts where isOn {
+            settings.setEnabled(true, for: type)
+        }
+    }
+
     /// One line on the summary screen, in display order. The app turns each into copy with the
     /// dog's name.
     public enum Promise: Hashable, Sendable {

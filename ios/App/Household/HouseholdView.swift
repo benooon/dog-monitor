@@ -13,6 +13,8 @@ struct HouseholdView: View {
     @State private var deviceToRemove: DeviceDTO?
     @State private var sharesTrainingData = false
     @State private var copiedExportKey = false
+    /// "Meet your dog" for a new dog, while it is shown.
+    @State private var addingDog: DogOnboardingModel?
 
     private var household: HouseholdDTO? { model.household }
     private var isOwner: Bool { household?.role == .owner }
@@ -46,6 +48,18 @@ struct HouseholdView: View {
             }
             .sheet(isPresented: $showsInvite, onDismiss: { Task { await model.loadHousehold() } }) {
                 InviteSheet(model: model)
+            }
+            .fullScreenCover(item: $addingDog) { onboarding in
+                DogOnboardingView(model: onboarding) {
+                    addingDog = nil
+                } onFinish: {
+                    if onboarding.photoUploaded, let photo = onboarding.photo, let dog = onboarding.savedDog {
+                        model.dogPhotos.store(photo, for: dog)
+                    }
+                    addingDog = nil
+                    Task { await model.loadHousehold() }
+                }
+                .interactiveDismissDisabled()
             }
             .sheet(isPresented: $showsPremium) {
                 if let subscription = model.subscription {
@@ -94,7 +108,7 @@ struct HouseholdView: View {
                 }
             }
 
-            if !household.dogs.isEmpty {
+            if !household.dogs.isEmpty || isOwner {
                 Section("Dogs") {
                     ForEach(household.dogs) { dog in
                         if isOwner {
@@ -117,6 +131,16 @@ struct HouseholdView: View {
                         } else {
                             DogRow(dog: dog, photo: model.dogPhotos.image(for: dog))
                         }
+                    }
+                    if isOwner {
+                        Button {
+                            addingDog = household.dogs.first.map {
+                                DogOnboardingModel(api: model.authorizedAPI, anotherDogAfter: $0, hasZones: household.hasForbiddenZone)
+                            } ?? DogOnboardingModel(api: model.authorizedAPI, hasZones: household.hasForbiddenZone)
+                        } label: {
+                            Label(household.dogs.isEmpty ? LocalizedStringKey("Add your dog") : "Add another dog", systemImage: "plus.circle")
+                        }
+                        .accessibilityIdentifier("household-add-dog")
                     }
                 }
             }
