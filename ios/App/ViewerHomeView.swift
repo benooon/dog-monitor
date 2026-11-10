@@ -15,45 +15,15 @@ struct ViewerHomeView: View {
     @State private var path: [UUID] = []
     private let router = DeepLinkRouter.shared
     private let liveActivities = CameraLiveActivityController.shared
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
         NavigationStack(path: $path) {
-            List {
-                if let message = model.errorMessage {
-                    Section {
-                        Text(message).foregroundStyle(.red)
-                    }
-                }
-                Section("Cameras") {
-                    let cameras = model.household?.cameras ?? []
-                    if cameras.isEmpty {
-                        Text("No cameras yet. Pair a spare iPhone as a camera.")
-                            .foregroundStyle(.secondary)
-                    }
-                    ForEach(cameras) { camera in
-                        NavigationLink(value: camera.id) {
-                            CameraCard(
-                                camera: camera,
-                                snapshot: model.snapshots[camera.id],
-                                livePresence: model.realtime?.presence[camera.id],
-                                dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
-                            )
-                        }
-                        .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
-                        .contextMenu { lockScreenButton(for: camera) }
-                        .swipeActions(edge: .leading) { lockScreenButton(for: camera) }
-                    }
-                }
-                if let dogs = model.household?.dogs, !dogs.isEmpty {
-                    Section("Dogs") {
-                        ForEach(dogs) { dog in
-                            Label {
-                                Text(verbatim: dog.name)
-                            } icon: {
-                                Image(systemName: "pawprint.fill")
-                            }
-                        }
-                    }
+            Group {
+                if horizontalSizeClass == .regular {
+                    cameraGrid
+                } else {
+                    cameraList
                 }
             }
             .overlay {
@@ -144,6 +114,100 @@ struct ViewerHomeView: View {
                 }
             }
         }
+    }
+
+    /// iPhone and narrow iPad windows: a list of camera cards and the dogs.
+    private var cameraList: some View {
+        List {
+            if let message = model.errorMessage {
+                Section {
+                    Text(message).foregroundStyle(.red)
+                }
+            }
+            Section("Cameras") {
+                let cameras = model.household?.cameras ?? []
+                if cameras.isEmpty {
+                    Text("No cameras yet. Pair a spare iPhone as a camera.")
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(cameras) { camera in
+                    NavigationLink(value: camera.id) {
+                        CameraCard(
+                            camera: camera,
+                            snapshot: model.snapshots[camera.id],
+                            livePresence: model.realtime?.presence[camera.id],
+                            dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
+                        )
+                    }
+                    .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
+                    .contextMenu { lockScreenButton(for: camera) }
+                    .swipeActions(edge: .leading) { lockScreenButton(for: camera) }
+                }
+            }
+            if let dogs = model.household?.dogs, !dogs.isEmpty {
+                Section("Dogs") {
+                    ForEach(dogs) { dog in
+                        Label {
+                            Text(verbatim: dog.name)
+                        } icon: {
+                            Image(systemName: "pawprint.fill")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Wide iPad windows: camera cards side by side, so several rooms fit on one screen.
+    private var cameraGrid: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                if let message = model.errorMessage {
+                    Text(message).foregroundStyle(.red)
+                }
+                let cameras = model.household?.cameras ?? []
+                if cameras.isEmpty && model.household != nil {
+                    ContentUnavailableView {
+                        Label("Cameras", systemImage: "video")
+                    } description: {
+                        Text("No cameras yet. Pair a spare iPhone as a camera.")
+                    }
+                }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 320), spacing: 16)], spacing: 16) {
+                    ForEach(cameras) { camera in
+                        NavigationLink(value: camera.id) {
+                            CameraCard(
+                                camera: camera,
+                                snapshot: model.snapshots[camera.id],
+                                livePresence: model.realtime?.presence[camera.id],
+                                dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
+                            )
+                            .padding(12)
+                            .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
+                            .contentShape(RoundedRectangle(cornerRadius: 16))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
+                        .contextMenu { lockScreenButton(for: camera) }
+                    }
+                }
+                if let dogs = model.household?.dogs, !dogs.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Dogs")
+                            .font(.headline)
+                        ForEach(dogs) { dog in
+                            Label {
+                                Text(verbatim: dog.name)
+                            } icon: {
+                                Image(systemName: "pawprint.fill")
+                            }
+                        }
+                    }
+                }
+            }
+            .padding()
+        }
+        .background(Color(.systemGroupedBackground))
     }
 
     /// Hands the latest dog state per camera to the home screen widget.
