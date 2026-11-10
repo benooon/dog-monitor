@@ -21,16 +21,25 @@ final class CameraModeModel {
     /// Debug readout of the frames the app actually receives.
     private(set) var videoFPS: Double = 0
     private(set) var screen = CameraScreenState()
+    /// Recent audio detections, for the debug overlay.
+    private(set) var detectionLog = DetectionLog()
 
     let capture: CaptureService
 
     private var meterTask: Task<Void, Never>?
+    private var analysisTask: Task<Void, Never>?
+    private var detectionTask: Task<Void, Never>?
     private var hideTask: Task<Void, Never>?
     private var savedBrightness: Double?
     private var isSceneActive = true
 
     init(capture: CaptureService = CaptureService()) {
         self.capture = capture
+    }
+
+    /// Barks in the last minute, for the debug overlay.
+    var recentBarkCount: Int {
+        detectionLog.count(of: .bark, within: 60, before: .now)
     }
 
     var isPreviewVisible: Bool {
@@ -50,19 +59,27 @@ final class CameraModeModel {
         hasAudio = await CaptureService.requestAccess(for: .audio)
         do {
             try await capture.start(includeAudio: hasAudio)
+            // Stopped (or the screen left) while the session was starting.
+            guard status == .starting else {
+                capture.stop()
+                return
+            }
             status = .running
             screen.hidePreview()
             startFrameMeter()
+            if hasAudio { startAudioAnalysis() }
             applyDisplay()
         } catch {
-            status = .failed
+            if status == .starting { status = .failed }
         }
     }
 
     func stop() {
         guard status == .running || status == .starting else { return }
-        meterTask?.cancel()
+        for task in [meterTask, analysisTask, detectionTask] { task?.cancel() }
         meterTask = nil
+        analysisTask = nil
+        detectionTask = nil
         hideTask?.cancel()
         capture.stop()
         status = .idle
@@ -88,7 +105,7 @@ final class CameraModeModel {
 
     private func startFrameMeter() {
         meterTask?.cancel()
-        let samples = capture.samples(bufferingNewest: 1)
+        let samples = capture.samples(.video, bufferingNewest: 1)
         meterTask = Task { [weak self] in
             var meter = FrameRateMeter()
             var lastPublished = -Double.infinity
@@ -99,6 +116,22 @@ final class CameraModeModel {
                     lastPublished = time
                     self?.videoFPS = meter.framesPerSecond
                 }
+            }
+        }
+    }
+
+    private func startAudioAnalysis() {
+        // A fresh detector per run, so a run still winding down never shares state with a new one.
+        let detector = BarkDetector()
+        // Audio buffers are small and the classifier needs a continuous signal, so buffer deeper.
+        let samples = capture.samples(.audio, bufferingNewest: 64)
+        let detections = detector.detections()
+        analysisTask = Task.detached(priority: .userInitiated) {
+            await detector.run(samples: samples)
+        }
+        detectionTask = Task { [weak self] in
+            for await detection in detections {
+                self?.detectionLog.append(detection)
             }
         }
     }

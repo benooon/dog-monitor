@@ -81,6 +81,9 @@ struct CameraModeView: View {
                         .font(.footnote)
                         .foregroundStyle(.white.opacity(0.4))
                 }
+                if model.isPreviewVisible, model.hasAudio {
+                    detectionOverlay
+                }
                 Spacer()
                 if model.isPreviewVisible {
                     Button(role: .destructive) {
@@ -123,6 +126,29 @@ struct CameraModeView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(.white.opacity(0.08), in: Capsule())
+    }
+
+    /// Debug overlay: what the audio analyzer heard recently.
+    private var detectionOverlay: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Barks in the last minute: \(model.recentBarkCount)")
+                .font(.caption.bold())
+            ForEach(Array(model.detectionLog.latest(4).enumerated()), id: \.offset) { _, detection in
+                HStack {
+                    Text(verbatim: detection.kind.rawValue)
+                    Spacer()
+                    Text(verbatim: "\(Int((detection.confidence * 100).rounded()))%")
+                        .monospacedDigit()
+                    Text(detection.timestamp, style: .relative)
+                        .monospacedDigit()
+                }
+                .font(.caption2)
+            }
+        }
+        .foregroundStyle(.white)
+        .padding(10)
+        .frame(maxWidth: 260)
+        .background(.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
     }
 
     private func messageScreen(

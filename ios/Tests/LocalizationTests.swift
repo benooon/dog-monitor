@@ -34,6 +34,7 @@ final class LocalizationTests: XCTestCase {
         "Tap the screen to show the preview.",
         "Camera on",
         "Microphone off — barking can't be detected.",
+        "Barks in the last minute: %lld",
     ]
 
     private func bundle(for language: String) throws -> Bundle {

@@ -1,6 +1,16 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Barks in the last minute: %lld": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות בדקה האחרונה: %lld"
+          }
+        }
+      }
+    },
     "Camera": {
       "localizations": {
         "he": {

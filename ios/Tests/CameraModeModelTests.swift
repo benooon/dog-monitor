@@ -27,8 +27,8 @@ final class CameraModeModelTests: XCTestCase {
 
     func testCaptureServiceHandsOutIndependentStreams() {
         let service = CaptureService()
-        let first = service.samples()
-        let second = service.samples(bufferingNewest: 5)
+        let first = service.samples(.video)
+        let second = service.samples(.audio, bufferingNewest: 5)
         _ = (first, second)
         XCTAssertFalse(service.session.isRunning)
     }

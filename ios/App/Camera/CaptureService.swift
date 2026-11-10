@@ -28,6 +28,8 @@ enum CaptureError: Error, Equatable {
 
 /// Owns the single `AVCaptureSession` (video + audio) of camera mode and fans its sample
 /// buffers out to any number of consumers (analysis, recorder, streamer) via `samples(...)`.
+/// Video and audio have separate streams so an audio consumer's deeper buffer never holds
+/// on to video frames.
 ///
 /// All session work runs on a private serial queue; sample buffers arrive on another one.
 final class CaptureService: NSObject, @unchecked Sendable {
@@ -38,7 +40,8 @@ final class CaptureService: NSObject, @unchecked Sendable {
     private let outputQueue = DispatchQueue(label: "com.benooon.dogmonitor.capture.output", qos: .userInitiated)
     private let videoOutput = AVCaptureVideoDataOutput()
     private let audioOutput = AVCaptureAudioDataOutput()
-    private let broadcaster = Broadcaster<CaptureSample>()
+    private let videoBroadcaster = Broadcaster<CaptureSample>()
+    private let audioBroadcaster = Broadcaster<CaptureSample>()
     // Touched only on `sessionQueue`.
     private var isConfigured = false
     private var runtimeErrorObserver: NSObjectProtocol?
@@ -72,10 +75,14 @@ final class CaptureService: NSObject, @unchecked Sendable {
         }
     }
 
-    /// A stream of every sample from now on. With the default buffer of 1, a slow consumer
-    /// just sees the latest sample when it is ready for the next one.
-    func samples(bufferingNewest limit: Int = 1) -> AsyncStream<CaptureSample> {
-        broadcaster.subscribe(bufferingNewest: limit)
+    /// A stream of every video or audio sample from now on. With a buffer of 1, a slow
+    /// consumer just sees the latest sample when it is ready for the next one. Keep video
+    /// buffers small (1–2); audio consumers that must not miss samples can use more.
+    func samples(_ kind: CaptureSample.Kind, bufferingNewest limit: Int = 1) -> AsyncStream<CaptureSample> {
+        switch kind {
+        case .video: videoBroadcaster.subscribe(bufferingNewest: limit)
+        case .audio: audioBroadcaster.subscribe(bufferingNewest: limit)
+        }
     }
 
     /// Configures the session on first use and starts it.
@@ -159,8 +166,9 @@ final class CaptureService: NSObject, @unchecked Sendable {
 extension CaptureService: AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate {
     // Shared by both delegate protocols; tells video and audio apart by output.
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        let isVideo = output === videoOutput
+        let broadcaster = isVideo ? videoBroadcaster : audioBroadcaster
         guard broadcaster.subscriberCount > 0 else { return }
-        let kind: CaptureSample.Kind = output === videoOutput ? .video : .audio
-        broadcaster.yield(CaptureSample(kind: kind, buffer: sampleBuffer))
+        broadcaster.yield(CaptureSample(kind: isVideo ? .video : .audio, buffer: sampleBuffer))
     }
 }
