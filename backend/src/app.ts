@@ -4,6 +4,9 @@ import type { JwtService } from "./auth/jwt.js";
 import { authPlugin } from "./auth/plugin.js";
 import type { Database } from "./db/client.js";
 import { authRoutes } from "./routes/auth.js";
+import { deviceRoutes } from "./routes/devices.js";
+import { dogRoutes } from "./routes/dogs.js";
+import { householdRoutes } from "./routes/households.js";
 import { healthRoutes } from "./routes/health.js";
 
 export interface AppServices {
@@ -29,6 +32,9 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   if (services) {
     await app.register(authPlugin, { jwt: services.jwt });
     await app.register(authRoutes, services);
+    await app.register(householdRoutes, { db: services.db });
+    await app.register(dogRoutes, { db: services.db });
+    await app.register(deviceRoutes, { db: services.db });
   }
   return app;
 }

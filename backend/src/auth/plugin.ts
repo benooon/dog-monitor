@@ -9,7 +9,7 @@ declare module "fastify" {
   }
   interface FastifyInstance {
     /** preHandler that requires `Authorization: Bearer <our JWT>`. */
-    authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<FastifyReply | undefined>;
   }
 }
 
@@ -21,10 +21,11 @@ export const authPlugin = fp(
       const token = header?.startsWith("Bearer ") ? header.slice("Bearer ".length).trim() : undefined;
       const claims = token ? await opts.jwt.verify(token) : null;
       if (!claims) {
-        await reply.code(401).send({ error: "unauthorized" });
-        return;
+        // Returning the reply stops the hook chain (Fastify async hook contract).
+        return reply.code(401).send({ error: "unauthorized" });
       }
       request.user = claims;
+      return undefined;
     });
   },
   { name: "auth" },
