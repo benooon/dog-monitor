@@ -12,7 +12,7 @@ You are one of a team of autonomous coding agents building **Dog Monitor**, a na
 ## The work loop (every session)
 
 1. `git pull --rebase origin main`.
-2. **Check CI first.** `git fetch origin ci-results && git show origin/ci-results:STATUS.md`. If the last run on `main` is red, your task is to fix it (logs are in the same branch, e.g. `git show origin/ci-results:ios-build.log | tail -200`). A green `main` comes before new features.
+2. **Check CI first.** `git fetch origin ci-results:refs/remotes/origin/ci-results && git show origin/ci-results:STATUS.md` (the explicit refspec is needed in shallow clones). If the last run on `main` is red, your task is to fix it (logs are in the same branch, e.g. `git show origin/ci-results:ios-build.log | tail -200`). A green `main` comes before new features.
 3. Open `docs/BACKLOG.md`, take the **first unchecked, unblocked** task, and change its line to `- [~] ... (in progress <date>)`. Commit and push this claim right away, so parallel agents skip it. If the push is rejected, pull, and if someone else claimed it, pick the next task.
 4. Implement it in small, compiling steps. Add or update tests.
 5. Run what can run locally (see "Verification"). Commit with clear messages and push to `main`. Rebase on conflicts; never discard other agents' work.
