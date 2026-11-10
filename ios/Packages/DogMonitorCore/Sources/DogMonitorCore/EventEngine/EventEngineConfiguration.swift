@@ -66,13 +66,13 @@ public struct EventEngineConfiguration: Sendable, Equatable {
     public static let `default` = EventEngineConfiguration(
         barking: ChannelConfiguration(
             eventType: .prolongedBarking, minDuration: 10, countThreshold: 6, gapTolerance: 8,
-            escalations: [5 * 60, 15 * 60, 30 * 60]
+            escalations: [5 * 60.0, 15 * 60.0, 30 * 60.0]
         ),
         whining: ChannelConfiguration(
             eventType: .whining, minDuration: 15, countThreshold: 5, gapTolerance: 8,
-            escalations: [5 * 60, 15 * 60]
+            escalations: [5 * 60.0, 15 * 60.0]
         ),
-        atDoor: ChannelConfiguration(eventType: .atDoor, minDuration: 30, gapTolerance: 10, escalations: [10 * 60]),
+        atDoor: ChannelConfiguration(eventType: .atDoor, minDuration: 30, gapTolerance: 10, escalations: [10 * 60.0]),
         forbiddenZone: ChannelConfiguration(eventType: .forbiddenZone, minDuration: 5, gapTolerance: 10),
         notVisible: ChannelConfiguration(eventType: .notVisible, minDuration: 10 * 60, gapTolerance: 30)
     )
