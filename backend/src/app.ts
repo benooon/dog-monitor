@@ -23,6 +23,7 @@ import { inviteRoutes } from "./routes/invites.js";
 import { notificationPrefRoutes } from "./routes/notification-prefs.js";
 import { cameraLiveRoutes, viewerLiveRoutes } from "./routes/live.js";
 import { realtimeRoutes } from "./routes/realtime.js";
+import { timelineRoutes } from "./routes/timeline.js";
 import { healthRoutes } from "./routes/health.js";
 
 export interface AppServices {
@@ -76,6 +77,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(cameraEventRoutes, { db: services.db, notifier });
     await app.register(cameraMediaRoutes, { db: services.db, storage: services.storage });
     await app.register(viewerMediaRoutes, { db: services.db, storage: services.storage });
+    await app.register(timelineRoutes, { db: services.db });
     if (services.storage && services.retentionDays !== 0) {
       const stop = scheduleRetention(services.db, services.storage, services.retentionDays ?? DEFAULT_RETENTION_DAYS, app.log);
       app.addHook("onClose", async () => stop());
