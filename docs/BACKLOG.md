@@ -52,8 +52,8 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] backend: Viewer timeline API: `GET /events` (household-scoped, newest first, filter by camera and types, cursor pagination) and `PUT /events/:id/feedback` (right/wrong).
 - [~] ios: Event timeline screen (filter by type, play clip via `GET /events/:id/media`, mark detection as right/wrong) using `GET /events` and `PUT /events/:id/feedback`. (in progress 2026-11-10)
 - [x] backend: Per-user notification settings API (types, cameras, quiet hours). `GET`/`PUT /notification-prefs`.
-- [~] ios: Notification settings screen (per event type on/off, per camera overrides, quiet hours) using `GET/PUT /notification-prefs`. (in progress 2026-11-10)
-- [~] ios: Camera health. Heartbeat (battery, charging, thermal, network); show a warning on the camera screen when unplugged or hot, and lower fps on `thermalState` serious. (in progress 2026-11-10)
+- [x] ios: Notification settings screen (per event type on/off, per camera overrides, quiet hours) using `GET/PUT /notification-prefs`.
+- [x] ios: Camera health. Heartbeat (battery, charging, thermal, network); show a warning on the camera screen when unplugged or hot, and lower fps on `thermalState` serious.
 - [~] ios: Push-to-talk from viewer to camera (LiveKit audio track published by the viewer, played on the camera). (in progress 2026-11-10)
 - [~] ios: Household members screen with invite link (Universal Link), plus remove member and revoke device. (in progress 2026-11-10)
 
