@@ -146,6 +146,26 @@ public struct DogMonitorAPI: Sendable {
         try await send("PATCH", "events/\(Self.path(id))", body: request)
     }
 
+    // MARK: - Timeline (user auth)
+
+    /// A page of the household's events, newest first. 400 `invalid_cursor` for a stale cursor.
+    public func timeline(_ filter: TimelineFilter = .all, cursor: String? = nil, limit: Int? = nil) async throws -> TimelinePage {
+        var components = URLComponents()
+        let items = filter.queryItems(cursor: cursor, limit: limit)
+        components.queryItems = items.isEmpty ? nil : items
+        return try await send("GET", "events" + (components.percentEncodedQuery.map { "?" + $0 } ?? ""))
+    }
+
+    /// Marks a detection right or wrong (`nil` clears it); returns the updated event.
+    public func setFeedback(eventId: UUID, _ feedback: DogEvent.Feedback?) async throws -> EventDTO {
+        try await send("PUT", "events/\(Self.path(eventId))/feedback", body: EventFeedbackRequest(feedback: feedback))
+    }
+
+    /// Download URLs for an event's clip and snapshot. 503 `storage_not_configured` without a bucket.
+    public func eventMedia(eventId: UUID) async throws -> EventMediaDTO {
+        try await send("GET", "events/\(Self.path(eventId))/media")
+    }
+
     // MARK: - Event media (camera device auth)
 
     /// Presigned PUT URLs for an event's media. 503 `storage_not_configured` without a bucket.

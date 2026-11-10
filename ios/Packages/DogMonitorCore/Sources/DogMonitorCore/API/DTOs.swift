@@ -153,6 +153,8 @@ public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
     public let confidence: Double?
     public let clipKey: String?
     public let snapshotKey: String?
+    /// A viewer's verdict on the detection (`PUT /events/:id/feedback`); nil until someone answers.
+    public let feedback: DogEvent.Feedback?
 }
 
 /// Body of `POST /events` (camera device auth). The id is generated on the camera so retries are idempotent.
