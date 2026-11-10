@@ -1,12 +1,12 @@
-# CI status: GREEN
+# CI status: RED
 
-- commit: 02bebbd49cb9530e23539a6e79fb2566bd340d43
-- message: docs: claim DogMonitorCore package task
-- time (UTC): 2026-11-10T06:53:00Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42771357062
+- commit: bfc58c9eb2ce70f83308aa6c81941fce050bdde4
+- message: core: add DogMonitorCore package with models and tests
+- time (UTC): 2026-11-10T06:53:36Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42771468306
 
 | job | result | log |
 |---|---|---|
-| core (swift test, Linux) | success | core-test.log |
-| ios (xcodebuild test, macOS) | success (carried over, no iOS changes) | ios-build.log |
-| backend (lint + test) | success | backend-test.log |
+| core (swift test, Linux) | cancelled | core-test.log |
+| ios (xcodebuild test, macOS) | success | ios-build.log |
+| backend (lint + test) | cancelled | backend-test.log |
