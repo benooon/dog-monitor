@@ -28,7 +28,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] backend: LiveKit. `POST /cameras/:id/live-token` mints a viewer token; the camera fetches a publisher token. Env: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
 - [x] backend: WebSocket channel. Camera presence and heartbeats; tell the camera "viewer joined / all viewers left"; mark a camera offline after 3 min without a heartbeat. Protocol: `backend/src/realtime/protocol.ts`.
 - [x] backend: Enforce the 5-viewers-per-camera limit in `POST /cameras/:id/live-token` using WebSocket presence (or LiveKit room participant count), returning 409 `viewer_limit_reached`.
-- [ ] ios: Camera publishes to LiveKit only while viewers are connected (driven by the WebSocket signal), with simulcast 720p/360p.
+- [~] ios: Camera publishes to LiveKit only while viewers are connected (driven by the WebSocket signal), with simulcast 720p/360p. (in progress 2026-11-10)
 - [ ] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
 - [ ] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client.
 - [ ] ios: Push registration, notification categories and actions (Watch live / Mute 1h), and deep link into live view.
