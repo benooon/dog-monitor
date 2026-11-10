@@ -1,12 +1,26 @@
 import { buildApp } from "./app.js";
-import { loadConfig } from "./config.js";
+import { createAppleTokenVerifier } from "./auth/apple.js";
+import { JwtService } from "./auth/jwt.js";
+import { loadConfig, requireServerConfig } from "./config.js";
+import { createDb } from "./db/client.js";
 
 const config = loadConfig();
-const app = await buildApp({ logLevel: config.logLevel });
+const { databaseUrl, jwtSecret } = requireServerConfig(config);
+const dbHandle = createDb(databaseUrl);
+
+const app = await buildApp({
+  logLevel: config.logLevel,
+  services: {
+    db: dbHandle.db,
+    jwt: new JwtService(jwtSecret, config.jwtTtlSeconds),
+    apple: createAppleTokenVerifier({ audiences: config.appleAudiences }),
+  },
+});
 
 const shutdown = async (signal: string) => {
   app.log.info({ signal }, "shutting down");
   await app.close();
+  await dbHandle.close();
   process.exit(0);
 };
 process.on("SIGTERM", () => void shutdown("SIGTERM"));

@@ -14,3 +14,4 @@ One line per decision: `YYYY-MM-DD — decision — why`.
 - 2026-11-10 — Backend dev tooling: ESLint 9 flat config + typescript-eslint, Vitest, tsx; `npm run lint` also runs `tsc --noEmit`.
 - 2026-11-10 — DB: `pg` (node-postgres) driver with Drizzle; event types/dog states stored as text (mirroring DogMonitorCore raw values) instead of PG enums so new values need no enum migration; migrations run on Railway via `preDeployCommand` (`npm run migrate:prod`).
 - 2026-11-10 — `devices.user_id` (nullable) added beyond SPEC §9 so viewer devices map to users for push fan-out; `notification_prefs.device_id` null means all cameras (unique NULLS NOT DISTINCT, needs PG 15+).
+- 2026-11-10 — New backend deps: `jose` (Apple JWKS verification + our HS256 JWTs; zero-dep, standard) and `fastify-plugin` (official, to expose `app.authenticate`). Apple tokens are checked for issuer, audience (`APPLE_AUDIENCES`), RS256 and expiry; nonce checking deferred until the iOS flow sends one.
