@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: b9a4e35fbc72b2591d9d6a06d14003d5d403aab5
-- message: docs: claim clip and snapshot upload task
-- time (UTC): 2026-11-10T09:03:39Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42786422814
+- commit: 998f7a94042e679ffb412a6f903df692514c60a2
+- message: ios: mute/unmute the camera's audio in live view
+- time (UTC): 2026-11-10T09:11:51Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42787395709
 
 | job | result | log |
 |---|---|---|

@@ -2,367 +2,390 @@ Building for debugging...
 [0/13] Write sources
 [2/13] Write swift-version-24593BA9C3E375BF.txt
 [4/31] Emitting module DogMonitorCore
-[5/47] Compiling DogMonitorCore EventUploadQueue.swift
-[6/47] Compiling DogMonitorCore CameraHealth.swift
-[7/47] Compiling DogMonitorCore Detection.swift
-[8/47] Compiling DogMonitorCore DeviceRole.swift
-[9/47] Compiling DogMonitorCore DogEvent.swift
-[10/47] Compiling DogMonitorCore DogState.swift
-[11/47] Compiling DogMonitorCore EventType.swift
-[12/47] Compiling DogMonitorCore NormalizedRect.swift
-[13/47] Compiling DogMonitorCore PairingCode.swift
-[14/47] Compiling DogMonitorCore PushPayload.swift
-[15/47] Compiling DogMonitorCore PublishPolicy.swift
-[16/47] Compiling DogMonitorCore RealtimeMessage.swift
-[17/47] Compiling DogMonitorCore ReconnectBackoff.swift
-[18/47] Compiling DogMonitorCore CredentialStore.swift
-[19/47] Compiling DogMonitorCore OnboardingState.swift
-[20/47] Compiling DogMonitorCore SecureStore.swift
-[21/47] Compiling DogMonitorCore APICredential.swift
-[22/47] Compiling DogMonitorCore APIError.swift
-[23/47] Compiling DogMonitorCore DTOs.swift
-[24/47] Compiling DogMonitorCore DogMonitorAPI.swift
-[25/47] Compiling DogMonitorCore HTTPTransport.swift
-[26/47] Compiling DogMonitorCore JSONCoding.swift
-[27/47] Compiling DogMonitorCore DetectionLog.swift
-[28/47] Compiling DogMonitorCore LoudnessDetector.swift
-[29/47] Compiling DogMonitorCore SoundClassMapping.swift
-[30/47] Compiling DogMonitorCore Broadcaster.swift
-[31/47] Compiling DogMonitorCore CameraScreenState.swift
-[32/47] Compiling DogMonitorCore ClipAssembler.swift
-[33/47] Compiling DogMonitorCore FrameRateMeter.swift
-[34/47] Compiling DogMonitorCore DogMonitorCore.swift
-[35/47] Compiling DogMonitorCore EventChannel.swift
-[36/47] Compiling DogMonitorCore EventEngine.swift
-[37/47] Compiling DogMonitorCore EventEngineConfiguration.swift
-[38/55] Wrapping AST for DogMonitorCore for debugging
-[40/55] Emitting module DogMonitorCoreTests
-[41/61] Compiling DogMonitorCoreTests EventUploaderTests.swift
-[42/61] Compiling DogMonitorCoreTests ModelsTests.swift
-[43/61] Compiling DogMonitorCoreTests PairingTests.swift
-[44/61] Compiling DogMonitorCoreTests PushTests.swift
-[45/61] Compiling DogMonitorCoreTests RealtimeTests.swift
-[46/61] Compiling DogMonitorCoreTests SessionTests.swift
-[47/61] Compiling DogMonitorCoreTests APITestSupport.swift
-[48/61] Compiling DogMonitorCoreTests AudioTests.swift
-[49/61] Compiling DogMonitorCoreTests CaptureTests.swift
-[50/61] Compiling DogMonitorCoreTests ClipAssemblerTests.swift
-[51/61] Compiling DogMonitorCoreTests DogMonitorAPITests.swift
-[52/61] Compiling DogMonitorCoreTests EventEngineTests.swift
-[53/62] /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/.build/x86_64-unknown-linux-gnu/debug/DogMonitorCorePackageDiscoveredTests.derived/all-discovered-tests.swift
-[54/62] Write sources
-[55/62] Wrapping AST for DogMonitorCoreTests for debugging
-[57/64] Compiling DogMonitorCorePackageDiscoveredTests DogMonitorCoreTests.swift
-[58/64] Emitting module DogMonitorCorePackageDiscoveredTests
-[59/65] Compiling DogMonitorCorePackageDiscoveredTests all-discovered-tests.swift
-[60/66] /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/.build/x86_64-unknown-linux-gnu/debug/DogMonitorCorePackageTests.derived/runner.swift
-[61/66] Write sources
-[62/66] Wrapping AST for DogMonitorCorePackageDiscoveredTests for debugging
-[64/68] Emitting module DogMonitorCorePackageTests
-[65/68] Compiling DogMonitorCorePackageTests runner.swift
-[66/69] Wrapping AST for DogMonitorCorePackageTests for debugging
-[67/69] Write Objects.LinkFileList
-[68/69] Linking DogMonitorCorePackageTests.xctest
-Build complete! (19.06s)
-Test Suite 'All tests' started at 2026-11-10 08:57:04.775
-Test Suite 'debug.xctest' started at 2026-11-10 08:57:04.776
-Test Suite 'BroadcasterTests' started at 2026-11-10 08:57:04.776
-Test Case 'BroadcasterTests.testCancelledConsumerIsRemoved' started at 2026-11-10 08:57:04.776
+[5/48] Compiling DogMonitorCore EventUploadQueue.swift
+[6/48] Compiling DogMonitorCore MediaUploadQueue.swift
+[7/48] Compiling DogMonitorCore CameraHealth.swift
+[8/48] Compiling DogMonitorCore Detection.swift
+[9/48] Compiling DogMonitorCore DeviceRole.swift
+[10/48] Compiling DogMonitorCore DogEvent.swift
+[11/48] Compiling DogMonitorCore DogState.swift
+[12/48] Compiling DogMonitorCore EventType.swift
+[13/48] Compiling DogMonitorCore NormalizedRect.swift
+[14/48] Compiling DogMonitorCore PairingCode.swift
+[15/48] Compiling DogMonitorCore PushPayload.swift
+[16/48] Compiling DogMonitorCore PublishPolicy.swift
+[17/48] Compiling DogMonitorCore RealtimeMessage.swift
+[18/48] Compiling DogMonitorCore ReconnectBackoff.swift
+[19/48] Compiling DogMonitorCore CredentialStore.swift
+[20/48] Compiling DogMonitorCore OnboardingState.swift
+[21/48] Compiling DogMonitorCore SecureStore.swift
+[22/48] Compiling DogMonitorCore APICredential.swift
+[23/48] Compiling DogMonitorCore APIError.swift
+[24/48] Compiling DogMonitorCore DTOs.swift
+[25/48] Compiling DogMonitorCore DogMonitorAPI.swift
+[26/48] Compiling DogMonitorCore HTTPTransport.swift
+[27/48] Compiling DogMonitorCore JSONCoding.swift
+[28/48] Compiling DogMonitorCore DetectionLog.swift
+[29/48] Compiling DogMonitorCore LoudnessDetector.swift
+[30/48] Compiling DogMonitorCore SoundClassMapping.swift
+[31/48] Compiling DogMonitorCore Broadcaster.swift
+[32/48] Compiling DogMonitorCore CameraScreenState.swift
+[33/48] Compiling DogMonitorCore ClipAssembler.swift
+[34/48] Compiling DogMonitorCore FrameRateMeter.swift
+[35/48] Compiling DogMonitorCore DogMonitorCore.swift
+[36/48] Compiling DogMonitorCore EventChannel.swift
+[37/48] Compiling DogMonitorCore EventEngine.swift
+[38/48] Compiling DogMonitorCore EventEngineConfiguration.swift
+[39/49] Wrapping AST for DogMonitorCore for debugging
+[41/57] Emitting module DogMonitorCoreTests
+[42/63] Compiling DogMonitorCoreTests MediaUploaderTests.swift
+[43/63] Compiling DogMonitorCoreTests ModelsTests.swift
+[44/63] Compiling DogMonitorCoreTests PairingTests.swift
+[45/63] Compiling DogMonitorCoreTests PushTests.swift
+[46/63] Compiling DogMonitorCoreTests RealtimeTests.swift
+[47/63] Compiling DogMonitorCoreTests SessionTests.swift
+[48/63] Compiling DogMonitorCoreTests APITestSupport.swift
+[49/63] Compiling DogMonitorCoreTests AudioTests.swift
+[50/63] Compiling DogMonitorCoreTests CaptureTests.swift
+[51/63] Compiling DogMonitorCoreTests ClipAssemblerTests.swift
+[52/63] Compiling DogMonitorCoreTests DogMonitorAPITests.swift
+[53/63] Compiling DogMonitorCoreTests EventEngineTests.swift
+[54/63] Compiling DogMonitorCoreTests EventUploaderTests.swift
+[55/64] /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/.build/x86_64-unknown-linux-gnu/debug/DogMonitorCorePackageDiscoveredTests.derived/all-discovered-tests.swift
+[56/64] Write sources
+[57/64] Wrapping AST for DogMonitorCoreTests for debugging
+[59/66] Emitting module DogMonitorCorePackageDiscoveredTests
+[60/66] Compiling DogMonitorCorePackageDiscoveredTests DogMonitorCoreTests.swift
+[61/67] Compiling DogMonitorCorePackageDiscoveredTests all-discovered-tests.swift
+[62/68] /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/.build/x86_64-unknown-linux-gnu/debug/DogMonitorCorePackageTests.derived/runner.swift
+[63/68] Write sources
+[64/68] Wrapping AST for DogMonitorCorePackageDiscoveredTests for debugging
+[66/70] Compiling DogMonitorCorePackageTests runner.swift
+[67/70] Emitting module DogMonitorCorePackageTests
+[68/71] Wrapping AST for DogMonitorCorePackageTests for debugging
+[69/71] Write Objects.LinkFileList
+[70/71] Linking DogMonitorCorePackageTests.xctest
+Build complete! (13.09s)
+Test Suite 'All tests' started at 2026-11-10 09:04:54.774
+Test Suite 'debug.xctest' started at 2026-11-10 09:04:54.775
+Test Suite 'BroadcasterTests' started at 2026-11-10 09:04:54.775
+Test Case 'BroadcasterTests.testCancelledConsumerIsRemoved' started at 2026-11-10 09:04:54.775
 Test Case 'BroadcasterTests.testCancelledConsumerIsRemoved' passed (0.001 seconds)
-Test Case 'BroadcasterTests.testConcurrentYieldsFromManyThreads' started at 2026-11-10 08:57:04.778
+Test Case 'BroadcasterTests.testConcurrentYieldsFromManyThreads' started at 2026-11-10 09:04:54.776
 Test Case 'BroadcasterTests.testConcurrentYieldsFromManyThreads' passed (0.003 seconds)
-Test Case 'BroadcasterTests.testEverySubscriberReceivesEveryElement' started at 2026-11-10 08:57:04.781
+Test Case 'BroadcasterTests.testEverySubscriberReceivesEveryElement' started at 2026-11-10 09:04:54.779
 Test Case 'BroadcasterTests.testEverySubscriberReceivesEveryElement' passed (0.0 seconds)
-Test Case 'BroadcasterTests.testSlowSubscriberKeepsOnlyNewest' started at 2026-11-10 08:57:04.781
+Test Case 'BroadcasterTests.testSlowSubscriberKeepsOnlyNewest' started at 2026-11-10 09:04:54.780
 Test Case 'BroadcasterTests.testSlowSubscriberKeepsOnlyNewest' passed (0.0 seconds)
-Test Case 'BroadcasterTests.testSubscriberOnlySeesElementsAfterSubscribing' started at 2026-11-10 08:57:04.781
+Test Case 'BroadcasterTests.testSubscriberOnlySeesElementsAfterSubscribing' started at 2026-11-10 09:04:54.780
 Test Case 'BroadcasterTests.testSubscriberOnlySeesElementsAfterSubscribing' passed (0.0 seconds)
-Test Case 'BroadcasterTests.testSubscribingAfterFinishGivesFinishedStream' started at 2026-11-10 08:57:04.782
+Test Case 'BroadcasterTests.testSubscribingAfterFinishGivesFinishedStream' started at 2026-11-10 09:04:54.780
 Test Case 'BroadcasterTests.testSubscribingAfterFinishGivesFinishedStream' passed (0.0 seconds)
-Test Suite 'BroadcasterTests' passed at 2026-11-10 08:57:04.782
+Test Suite 'BroadcasterTests' passed at 2026-11-10 09:04:54.780
 	 Executed 6 tests, with 0 failures (0 unexpected) in 0.005 (0.005) seconds
-Test Suite 'CameraScreenStateTests' started at 2026-11-10 08:57:04.782
-Test Case 'CameraScreenStateTests.testHidePreview' started at 2026-11-10 08:57:04.782
-Test Case 'CameraScreenStateTests.testHidePreview' passed (0.0 seconds)
-Test Case 'CameraScreenStateTests.testKeepAliveExtendsOnlyAVisiblePreview' started at 2026-11-10 08:57:04.782
+Test Suite 'CameraScreenStateTests' started at 2026-11-10 09:04:54.780
+Test Case 'CameraScreenStateTests.testHidePreview' started at 2026-11-10 09:04:54.780
+Test Case 'CameraScreenStateTests.testHidePreview' passed (0.1 seconds)
+Test Case 'CameraScreenStateTests.testKeepAliveExtendsOnlyAVisiblePreview' started at 2026-11-10 09:04:54.881
 Test Case 'CameraScreenStateTests.testKeepAliveExtendsOnlyAVisiblePreview' passed (0.0 seconds)
-Test Case 'CameraScreenStateTests.testSecondTapHidesPreview' started at 2026-11-10 08:57:04.782
+Test Case 'CameraScreenStateTests.testSecondTapHidesPreview' started at 2026-11-10 09:04:54.881
 Test Case 'CameraScreenStateTests.testSecondTapHidesPreview' passed (0.0 seconds)
-Test Case 'CameraScreenStateTests.testStartsBlackAndDimmed' started at 2026-11-10 08:57:04.782
+Test Case 'CameraScreenStateTests.testStartsBlackAndDimmed' started at 2026-11-10 09:04:54.881
 Test Case 'CameraScreenStateTests.testStartsBlackAndDimmed' passed (0.0 seconds)
-Test Case 'CameraScreenStateTests.testTapAfterTimeoutShowsAgain' started at 2026-11-10 08:57:04.782
+Test Case 'CameraScreenStateTests.testTapAfterTimeoutShowsAgain' started at 2026-11-10 09:04:54.881
 Test Case 'CameraScreenStateTests.testTapAfterTimeoutShowsAgain' passed (0.0 seconds)
-Test Case 'CameraScreenStateTests.testTapShowsPreviewThenItTimesOut' started at 2026-11-10 08:57:04.782
+Test Case 'CameraScreenStateTests.testTapShowsPreviewThenItTimesOut' started at 2026-11-10 09:04:54.881
 Test Case 'CameraScreenStateTests.testTapShowsPreviewThenItTimesOut' passed (0.0 seconds)
-Test Case 'CameraScreenStateTests.testTimeoutHasAFloor' started at 2026-11-10 08:57:04.783
+Test Case 'CameraScreenStateTests.testTimeoutHasAFloor' started at 2026-11-10 09:04:54.881
 Test Case 'CameraScreenStateTests.testTimeoutHasAFloor' passed (0.0 seconds)
-Test Suite 'CameraScreenStateTests' passed at 2026-11-10 08:57:04.783
-	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'ClipAssemblerTests' started at 2026-11-10 08:57:04.783
-Test Case 'ClipAssemblerTests.testClipHasPreRollAndPostRoll' started at 2026-11-10 08:57:04.783
+Test Suite 'CameraScreenStateTests' passed at 2026-11-10 09:04:54.881
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.101 (0.101) seconds
+Test Suite 'ClipAssemblerTests' started at 2026-11-10 09:04:54.881
+Test Case 'ClipAssemblerTests.testClipHasPreRollAndPostRoll' started at 2026-11-10 09:04:54.881
 Test Case 'ClipAssemblerTests.testClipHasPreRollAndPostRoll' passed (0.0 seconds)
-Test Case 'ClipAssemblerTests.testClipNeverExceedsMaxDuration' started at 2026-11-10 08:57:04.783
+Test Case 'ClipAssemblerTests.testClipNeverExceedsMaxDuration' started at 2026-11-10 09:04:54.882
 Test Case 'ClipAssemblerTests.testClipNeverExceedsMaxDuration' passed (0.0 seconds)
-Test Case 'ClipAssemblerTests.testClipRightAfterStartHasShortPreRoll' started at 2026-11-10 08:57:04.783
+Test Case 'ClipAssemblerTests.testClipRightAfterStartHasShortPreRoll' started at 2026-11-10 09:04:54.882
 Test Case 'ClipAssemblerTests.testClipRightAfterStartHasShortPreRoll' passed (0.0 seconds)
-Test Case 'ClipAssemblerTests.testFinishAllReturnsPartialClipsAndClearsTheRing' started at 2026-11-10 08:57:04.784
+Test Case 'ClipAssemblerTests.testFinishAllReturnsPartialClipsAndClearsTheRing' started at 2026-11-10 09:04:54.882
 Test Case 'ClipAssemblerTests.testFinishAllReturnsPartialClipsAndClearsTheRing' passed (0.0 seconds)
-Test Case 'ClipAssemblerTests.testFinishAllSkipsClipsWithoutMedia' started at 2026-11-10 08:57:04.784
+Test Case 'ClipAssemblerTests.testFinishAllSkipsClipsWithoutMedia' started at 2026-11-10 09:04:54.882
 Test Case 'ClipAssemblerTests.testFinishAllSkipsClipsWithoutMedia' passed (0.0 seconds)
-Test Case 'ClipAssemblerTests.testOverlappingClipsShareSegments' started at 2026-11-10 08:57:04.784
+Test Case 'ClipAssemblerTests.testOverlappingClipsShareSegments' started at 2026-11-10 09:04:54.882
 Test Case 'ClipAssemblerTests.testOverlappingClipsShareSegments' passed (0.0 seconds)
-Test Case 'ClipAssemblerTests.testRepeatedTriggerIsIgnored' started at 2026-11-10 08:57:04.784
-Test Case 'ClipAssemblerTests.testRepeatedTriggerIsIgnored' passed (0.0 seconds)
-Test Case 'ClipAssemblerTests.testRingKeepsOnlyThePreRoll' started at 2026-11-10 08:57:04.784
-Test Case 'ClipAssemblerTests.testRingKeepsOnlyThePreRoll' passed (0.001 seconds)
-Test Suite 'ClipAssemblerTests' passed at 2026-11-10 08:57:04.785
+Test Case 'ClipAssemblerTests.testRepeatedTriggerIsIgnored' started at 2026-11-10 09:04:54.883
+Test Case 'ClipAssemblerTests.testRepeatedTriggerIsIgnored' passed (0.001 seconds)
+Test Case 'ClipAssemblerTests.testRingKeepsOnlyThePreRoll' started at 2026-11-10 09:04:54.883
+Test Case 'ClipAssemblerTests.testRingKeepsOnlyThePreRoll' passed (0.0 seconds)
+Test Suite 'ClipAssemblerTests' passed at 2026-11-10 09:04:54.883
 	 Executed 8 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'CredentialStoreTests' started at 2026-11-10 08:57:04.785
-Test Case 'CredentialStoreTests.testCorruptDataLoadsAsSignedOut' started at 2026-11-10 08:57:04.785
-Test Case 'CredentialStoreTests.testCorruptDataLoadsAsSignedOut' passed (0.001 seconds)
-Test Case 'CredentialStoreTests.testRoundTripsUserAndDeviceCredentials' started at 2026-11-10 08:57:04.786
+Test Suite 'CredentialStoreTests' started at 2026-11-10 09:04:54.883
+Test Case 'CredentialStoreTests.testCorruptDataLoadsAsSignedOut' started at 2026-11-10 09:04:54.883
+Test Case 'CredentialStoreTests.testCorruptDataLoadsAsSignedOut' passed (0.0 seconds)
+Test Case 'CredentialStoreTests.testRoundTripsUserAndDeviceCredentials' started at 2026-11-10 09:04:54.884
 Test Case 'CredentialStoreTests.testRoundTripsUserAndDeviceCredentials' passed (0.001 seconds)
-Test Suite 'CredentialStoreTests' passed at 2026-11-10 08:57:04.787
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'DetectionLogTests' started at 2026-11-10 08:57:04.787
-Test Case 'DetectionLogTests.testCountsKindWithinWindow' started at 2026-11-10 08:57:04.787
-Test Case 'DetectionLogTests.testCountsKindWithinWindow' passed (0.1 seconds)
-Test Case 'DetectionLogTests.testKeepsNewestUpToCapacity' started at 2026-11-10 08:57:04.887
+Test Suite 'CredentialStoreTests' passed at 2026-11-10 09:04:54.885
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'DetectionLogTests' started at 2026-11-10 09:04:54.885
+Test Case 'DetectionLogTests.testCountsKindWithinWindow' started at 2026-11-10 09:04:54.885
+Test Case 'DetectionLogTests.testCountsKindWithinWindow' passed (0.001 seconds)
+Test Case 'DetectionLogTests.testKeepsNewestUpToCapacity' started at 2026-11-10 09:04:54.885
 Test Case 'DetectionLogTests.testKeepsNewestUpToCapacity' passed (0.0 seconds)
-Test Suite 'DetectionLogTests' passed at 2026-11-10 08:57:04.888
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.101 (0.101) seconds
-Test Suite 'DeviceRoleTests' started at 2026-11-10 08:57:04.888
-Test Case 'DeviceRoleTests.testWireFormat' started at 2026-11-10 08:57:04.888
+Test Suite 'DetectionLogTests' passed at 2026-11-10 09:04:54.885
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'DeviceRoleTests' started at 2026-11-10 09:04:54.885
+Test Case 'DeviceRoleTests.testWireFormat' started at 2026-11-10 09:04:54.885
 Test Case 'DeviceRoleTests.testWireFormat' passed (0.0 seconds)
-Test Suite 'DeviceRoleTests' passed at 2026-11-10 08:57:04.888
+Test Suite 'DeviceRoleTests' passed at 2026-11-10 09:04:54.886
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
-Test Suite 'DeviceStatusTests' started at 2026-11-10 08:57:04.888
-Test Case 'DeviceStatusTests.testOnlineWithinThreeMinutesOfHeartbeat' started at 2026-11-10 08:57:04.888
-Test Case 'DeviceStatusTests.testOnlineWithinThreeMinutesOfHeartbeat' passed (0.006 seconds)
-Test Suite 'DeviceStatusTests' passed at 2026-11-10 08:57:04.894
-	 Executed 1 test, with 0 failures (0 unexpected) in 0.006 (0.006) seconds
-Test Suite 'DogMonitorAPITests' started at 2026-11-10 08:57:04.894
-Test Case 'DogMonitorAPITests.testDecodesDatesWithAndWithoutFractionalSeconds' started at 2026-11-10 08:57:04.894
+Test Suite 'DeviceStatusTests' started at 2026-11-10 09:04:54.886
+Test Case 'DeviceStatusTests.testOnlineWithinThreeMinutesOfHeartbeat' started at 2026-11-10 09:04:54.886
+Test Case 'DeviceStatusTests.testOnlineWithinThreeMinutesOfHeartbeat' passed (0.005 seconds)
+Test Suite 'DeviceStatusTests' passed at 2026-11-10 09:04:54.891
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.005 (0.005) seconds
+Test Suite 'DogMonitorAPITests' started at 2026-11-10 09:04:54.891
+Test Case 'DogMonitorAPITests.testDecodesDatesWithAndWithoutFractionalSeconds' started at 2026-11-10 09:04:54.891
 Test Case 'DogMonitorAPITests.testDecodesDatesWithAndWithoutFractionalSeconds' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testDecodingErrors' started at 2026-11-10 08:57:04.895
+Test Case 'DogMonitorAPITests.testDecodingErrors' started at 2026-11-10 09:04:54.892
 Test Case 'DogMonitorAPITests.testDecodingErrors' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testDeleteAcceptsEmptyNoContent' started at 2026-11-10 08:57:04.897
+Test Case 'DogMonitorAPITests.testDeleteAcceptsEmptyNoContent' started at 2026-11-10 09:04:54.893
 Test Case 'DogMonitorAPITests.testDeleteAcceptsEmptyNoContent' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testHTTPErrorWithoutJSONBody' started at 2026-11-10 08:57:04.897
+Test Case 'DogMonitorAPITests.testHTTPErrorWithoutJSONBody' started at 2026-11-10 09:04:54.893
 Test Case 'DogMonitorAPITests.testHTTPErrorWithoutJSONBody' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testHouseholdDecoding' started at 2026-11-10 08:57:04.897
+Test Case 'DogMonitorAPITests.testHouseholdDecoding' started at 2026-11-10 09:04:54.894
 Test Case 'DogMonitorAPITests.testHouseholdDecoding' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testJoiningAsMember' started at 2026-11-10 08:57:04.898
-Test Case 'DogMonitorAPITests.testJoiningAsMember' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testMapsHTTPErrorsToAPIError' started at 2026-11-10 08:57:04.898
+Test Case 'DogMonitorAPITests.testJoiningAsMember' started at 2026-11-10 09:04:54.894
+Test Case 'DogMonitorAPITests.testJoiningAsMember' passed (0.0 seconds)
+Test Case 'DogMonitorAPITests.testMapsHTTPErrorsToAPIError' started at 2026-11-10 09:04:54.895
 Test Case 'DogMonitorAPITests.testMapsHTTPErrorsToAPIError' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testOmitsNilFieldsInRequests' started at 2026-11-10 08:57:04.899
+Test Case 'DogMonitorAPITests.testOmitsNilFieldsInRequests' started at 2026-11-10 09:04:54.895
 Test Case 'DogMonitorAPITests.testOmitsNilFieldsInRequests' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testPairingAsCamera' started at 2026-11-10 08:57:04.899
+Test Case 'DogMonitorAPITests.testPairingAsCamera' started at 2026-11-10 09:04:54.895
 Test Case 'DogMonitorAPITests.testPairingAsCamera' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testSignInWithApplePostsJSONAndDecodes' started at 2026-11-10 08:57:04.900
-Test Case 'DogMonitorAPITests.testSignInWithApplePostsJSONAndDecodes' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testUpdateDeviceSendsOnlyChangedFields' started at 2026-11-10 08:57:04.900
+Test Case 'DogMonitorAPITests.testSignInWithApplePostsJSONAndDecodes' started at 2026-11-10 09:04:54.896
+Test Case 'DogMonitorAPITests.testSignInWithApplePostsJSONAndDecodes' passed (0.001 seconds)
+Test Case 'DogMonitorAPITests.testUpdateDeviceSendsOnlyChangedFields' started at 2026-11-10 09:04:54.897
 Test Case 'DogMonitorAPITests.testUpdateDeviceSendsOnlyChangedFields' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testUserAndDeviceAuthorizationHeaders' started at 2026-11-10 08:57:04.901
-Test Case 'DogMonitorAPITests.testUserAndDeviceAuthorizationHeaders' passed (0.002 seconds)
-Test Suite 'DogMonitorAPITests' passed at 2026-11-10 08:57:04.903
-	 Executed 12 tests, with 0 failures (0 unexpected) in 0.009 (0.009) seconds
-Test Suite 'EventEngineTests' started at 2026-11-10 08:57:04.903
-Test Case 'EventEngineTests.testAtDoorFiresAfterThirtySecondsAndEndsWhenTheDogLeaves' started at 2026-11-10 08:57:04.903
+Test Case 'DogMonitorAPITests.testUserAndDeviceAuthorizationHeaders' started at 2026-11-10 09:04:54.898
+Test Case 'DogMonitorAPITests.testUserAndDeviceAuthorizationHeaders' passed (0.001 seconds)
+Test Suite 'DogMonitorAPITests' passed at 2026-11-10 09:04:54.899
+	 Executed 12 tests, with 0 failures (0 unexpected) in 0.008 (0.008) seconds
+Test Suite 'EventEngineTests' started at 2026-11-10 09:04:54.899
+Test Case 'EventEngineTests.testAtDoorFiresAfterThirtySecondsAndEndsWhenTheDogLeaves' started at 2026-11-10 09:04:54.899
 Test Case 'EventEngineTests.testAtDoorFiresAfterThirtySecondsAndEndsWhenTheDogLeaves' passed (0.001 seconds)
-Test Case 'EventEngineTests.testBarkingAfterCalmIsANewPushEvenWithinCooldown' started at 2026-11-10 08:57:04.905
-Test Case 'EventEngineTests.testBarkingAfterCalmIsANewPushEvenWithinCooldown' passed (0.001 seconds)
-Test Case 'EventEngineTests.testBarkingAfterCooldownStartsANewEvent' started at 2026-11-10 08:57:04.906
+Test Case 'EventEngineTests.testBarkingAfterCalmIsANewPushEvenWithinCooldown' started at 2026-11-10 09:04:54.900
+Test Case 'EventEngineTests.testBarkingAfterCalmIsANewPushEvenWithinCooldown' passed (0.0 seconds)
+Test Case 'EventEngineTests.testBarkingAfterCooldownStartsANewEvent' started at 2026-11-10 09:04:54.901
 Test Case 'EventEngineTests.testBarkingAfterCooldownStartsANewEvent' passed (0.0 seconds)
-Test Case 'EventEngineTests.testBarkingAgainWithinCooldownContinuesTheSameEvent' started at 2026-11-10 08:57:04.907
+Test Case 'EventEngineTests.testBarkingAgainWithinCooldownContinuesTheSameEvent' started at 2026-11-10 09:04:54.901
 Test Case 'EventEngineTests.testBarkingAgainWithinCooldownContinuesTheSameEvent' passed (0.0 seconds)
-Test Case 'EventEngineTests.testBarkingWinsCurrentState' started at 2026-11-10 08:57:04.907
-Test Case 'EventEngineTests.testBarkingWinsCurrentState' passed (0.001 seconds)
-Test Case 'EventEngineTests.testBriefForbiddenZoneVisitDoesNotFire' started at 2026-11-10 08:57:04.908
-Test Case 'EventEngineTests.testBriefForbiddenZoneVisitDoesNotFire' passed (0.001 seconds)
-Test Case 'EventEngineTests.testBurstOfBarksFiresByCount' started at 2026-11-10 08:57:04.909
+Test Case 'EventEngineTests.testBarkingWinsCurrentState' started at 2026-11-10 09:04:54.901
+Test Case 'EventEngineTests.testBarkingWinsCurrentState' passed (0.0 seconds)
+Test Case 'EventEngineTests.testBriefForbiddenZoneVisitDoesNotFire' started at 2026-11-10 09:04:54.902
+Test Case 'EventEngineTests.testBriefForbiddenZoneVisitDoesNotFire' passed (0.0 seconds)
+Test Case 'EventEngineTests.testBurstOfBarksFiresByCount' started at 2026-11-10 09:04:54.902
 Test Case 'EventEngineTests.testBurstOfBarksFiresByCount' passed (0.0 seconds)
-Test Case 'EventEngineTests.testCalmedDownAfterQuietPeriod' started at 2026-11-10 08:57:04.909
+Test Case 'EventEngineTests.testCalmedDownAfterQuietPeriod' started at 2026-11-10 09:04:54.902
 Test Case 'EventEngineTests.testCalmedDownAfterQuietPeriod' passed (0.0 seconds)
-Test Case 'EventEngineTests.testConfigurationIsAdjustable' started at 2026-11-10 08:57:04.910
+Test Case 'EventEngineTests.testConfigurationIsAdjustable' started at 2026-11-10 09:04:54.902
 Test Case 'EventEngineTests.testConfigurationIsAdjustable' passed (0.001 seconds)
-Test Case 'EventEngineTests.testEpisodeEndsAfterGapTolerance' started at 2026-11-10 08:57:04.911
-Test Case 'EventEngineTests.testEpisodeEndsAfterGapTolerance' passed (0.001 seconds)
-Test Case 'EventEngineTests.testEscalatesAtFiveAndFifteenMinutesOnce' started at 2026-11-10 08:57:04.911
-Test Case 'EventEngineTests.testEscalatesAtFiveAndFifteenMinutesOnce' passed (0.005 seconds)
-Test Case 'EventEngineTests.testEventsCarryCameraAndPeakConfidence' started at 2026-11-10 08:57:04.916
+Test Case 'EventEngineTests.testEpisodeEndsAfterGapTolerance' started at 2026-11-10 09:04:54.903
+Test Case 'EventEngineTests.testEpisodeEndsAfterGapTolerance' passed (0.0 seconds)
+Test Case 'EventEngineTests.testEscalatesAtFiveAndFifteenMinutesOnce' started at 2026-11-10 09:04:54.903
+Test Case 'EventEngineTests.testEscalatesAtFiveAndFifteenMinutesOnce' passed (0.004 seconds)
+Test Case 'EventEngineTests.testEventsCarryCameraAndPeakConfidence' started at 2026-11-10 09:04:54.907
 Test Case 'EventEngineTests.testEventsCarryCameraAndPeakConfidence' passed (0.0 seconds)
-Test Case 'EventEngineTests.testFiresOnlyOncePerEpisode' started at 2026-11-10 08:57:04.916
+Test Case 'EventEngineTests.testFiresOnlyOncePerEpisode' started at 2026-11-10 09:04:54.907
 Test Case 'EventEngineTests.testFiresOnlyOncePerEpisode' passed (0.001 seconds)
-Test Case 'EventEngineTests.testGrowlCountsAsBarking' started at 2026-11-10 08:57:04.917
+Test Case 'EventEngineTests.testGrowlCountsAsBarking' started at 2026-11-10 09:04:54.908
 Test Case 'EventEngineTests.testGrowlCountsAsBarking' passed (0.0 seconds)
-Test Case 'EventEngineTests.testIntermittentBarksWithinAMinuteFireByCount' started at 2026-11-10 08:57:04.917
+Test Case 'EventEngineTests.testIntermittentBarksWithinAMinuteFireByCount' started at 2026-11-10 09:04:54.908
 Test Case 'EventEngineTests.testIntermittentBarksWithinAMinuteFireByCount' passed (0.0 seconds)
-Test Case 'EventEngineTests.testIsolatedBarksDoNotFire' started at 2026-11-10 08:57:04.917
+Test Case 'EventEngineTests.testIsolatedBarksDoNotFire' started at 2026-11-10 09:04:54.908
 Test Case 'EventEngineTests.testIsolatedBarksDoNotFire' passed (0.0 seconds)
-Test Case 'EventEngineTests.testLowConfidenceAndNonDogSoundsAreIgnored' started at 2026-11-10 08:57:04.918
+Test Case 'EventEngineTests.testLowConfidenceAndNonDogSoundsAreIgnored' started at 2026-11-10 09:04:54.908
 Test Case 'EventEngineTests.testLowConfidenceAndNonDogSoundsAreIgnored' passed (0.0 seconds)
-Test Case 'EventEngineTests.testNotVisibleNeedsTenMinutes' started at 2026-11-10 08:57:04.918
-Test Case 'EventEngineTests.testNotVisibleNeedsTenMinutes' passed (0.001 seconds)
-Test Case 'EventEngineTests.testShortBarkDelaysCalm' started at 2026-11-10 08:57:04.919
+Test Case 'EventEngineTests.testNotVisibleNeedsTenMinutes' started at 2026-11-10 09:04:54.909
+Test Case 'EventEngineTests.testNotVisibleNeedsTenMinutes' passed (0.003 seconds)
+Test Case 'EventEngineTests.testShortBarkDelaysCalm' started at 2026-11-10 09:04:54.912
 Test Case 'EventEngineTests.testShortBarkDelaysCalm' passed (0.0 seconds)
-Test Case 'EventEngineTests.testSustainedBarkingFiresAfterMinDuration' started at 2026-11-10 08:57:04.919
+Test Case 'EventEngineTests.testSustainedBarkingFiresAfterMinDuration' started at 2026-11-10 09:04:54.912
 Test Case 'EventEngineTests.testSustainedBarkingFiresAfterMinDuration' passed (0.0 seconds)
-Test Case 'EventEngineTests.testWhiningIsSeparateFromBarking' started at 2026-11-10 08:57:04.920
+Test Case 'EventEngineTests.testWhiningIsSeparateFromBarking' started at 2026-11-10 09:04:54.912
 Test Case 'EventEngineTests.testWhiningIsSeparateFromBarking' passed (0.0 seconds)
-Test Suite 'EventEngineTests' passed at 2026-11-10 08:57:04.920
-	 Executed 21 tests, with 0 failures (0 unexpected) in 0.016 (0.016) seconds
-Test Suite 'EventUploaderTests' started at 2026-11-10 08:57:04.920
-Test Case 'EventUploaderTests.testDropsRejectedItemsButStopsOnServerErrors' started at 2026-11-10 08:57:04.920
-Test Case 'EventUploaderTests.testDropsRejectedItemsButStopsOnServerErrors' passed (0.001 seconds)
-Test Case 'EventUploaderTests.testFileStoreRoundTrip' started at 2026-11-10 08:57:04.922
+Test Suite 'EventEngineTests' passed at 2026-11-10 09:04:54.912
+	 Executed 21 tests, with 0 failures (0 unexpected) in 0.013 (0.013) seconds
+Test Suite 'EventUploaderTests' started at 2026-11-10 09:04:54.912
+Test Case 'EventUploaderTests.testDropsRejectedItemsButStopsOnServerErrors' started at 2026-11-10 09:04:54.912
+Test Case 'EventUploaderTests.testDropsRejectedItemsButStopsOnServerErrors' passed (0.002 seconds)
+Test Case 'EventUploaderTests.testFileStoreRoundTrip' started at 2026-11-10 09:04:54.915
 Test Case 'EventUploaderTests.testFileStoreRoundTrip' passed (0.002 seconds)
-Test Case 'EventUploaderTests.testKeepsItemsWhenOfflineAndPersistsThem' started at 2026-11-10 08:57:04.924
-Test Case 'EventUploaderTests.testKeepsItemsWhenOfflineAndPersistsThem' passed (0.006 seconds)
-Test Case 'EventUploaderTests.testMapsEngineOutputsToUploads' started at 2026-11-10 08:57:04.929
-Test Case 'EventUploaderTests.testMapsEngineOutputsToUploads' passed (0.001 seconds)
-Test Case 'EventUploaderTests.testSendsInOrderAndEmptiesTheQueue' started at 2026-11-10 08:57:04.931
+Test Case 'EventUploaderTests.testKeepsItemsWhenOfflineAndPersistsThem' started at 2026-11-10 09:04:54.917
+Test Case 'EventUploaderTests.testKeepsItemsWhenOfflineAndPersistsThem' passed (0.001 seconds)
+Test Case 'EventUploaderTests.testMapsEngineOutputsToUploads' started at 2026-11-10 09:04:54.918
+Test Case 'EventUploaderTests.testMapsEngineOutputsToUploads' passed (0.0 seconds)
+Test Case 'EventUploaderTests.testSendsInOrderAndEmptiesTheQueue' started at 2026-11-10 09:04:54.918
 Test Case 'EventUploaderTests.testSendsInOrderAndEmptiesTheQueue' passed (0.001 seconds)
-Test Suite 'EventUploaderTests' passed at 2026-11-10 08:57:04.932
-	 Executed 5 tests, with 0 failures (0 unexpected) in 0.011 (0.011) seconds
-Test Suite 'FrameRateMeterTests' started at 2026-11-10 08:57:04.932
-Test Case 'FrameRateMeterTests.testClockResetStartsFresh' started at 2026-11-10 08:57:04.932
-Test Case 'FrameRateMeterTests.testClockResetStartsFresh' passed (0.0 seconds)
-Test Case 'FrameRateMeterTests.testOldFramesLeaveTheWindow' started at 2026-11-10 08:57:04.932
+Test Suite 'EventUploaderTests' passed at 2026-11-10 09:04:54.919
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.007 (0.007) seconds
+Test Suite 'FrameRateMeterTests' started at 2026-11-10 09:04:54.919
+Test Case 'FrameRateMeterTests.testClockResetStartsFresh' started at 2026-11-10 09:04:54.919
+Test Case 'FrameRateMeterTests.testClockResetStartsFresh' passed (0.1 seconds)
+Test Case 'FrameRateMeterTests.testOldFramesLeaveTheWindow' started at 2026-11-10 09:04:55.020
 Test Case 'FrameRateMeterTests.testOldFramesLeaveTheWindow' passed (0.0 seconds)
-Test Case 'FrameRateMeterTests.testSteadyThirtyFPS' started at 2026-11-10 08:57:04.932
+Test Case 'FrameRateMeterTests.testSteadyThirtyFPS' started at 2026-11-10 09:04:55.020
 Test Case 'FrameRateMeterTests.testSteadyThirtyFPS' passed (0.0 seconds)
-Test Case 'FrameRateMeterTests.testZeroWithTooFewFrames' started at 2026-11-10 08:57:04.932
+Test Case 'FrameRateMeterTests.testZeroWithTooFewFrames' started at 2026-11-10 09:04:55.020
 Test Case 'FrameRateMeterTests.testZeroWithTooFewFrames' passed (0.0 seconds)
-Test Suite 'FrameRateMeterTests' passed at 2026-11-10 08:57:04.932
-	 Executed 4 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
-Test Suite 'InviteCountdownTests' started at 2026-11-10 08:57:04.932
-Test Case 'InviteCountdownTests.testCountsDownAndExpires' started at 2026-11-10 08:57:04.932
+Test Suite 'FrameRateMeterTests' passed at 2026-11-10 09:04:55.020
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.101 (0.101) seconds
+Test Suite 'InviteCountdownTests' started at 2026-11-10 09:04:55.020
+Test Case 'InviteCountdownTests.testCountsDownAndExpires' started at 2026-11-10 09:04:55.020
 Test Case 'InviteCountdownTests.testCountsDownAndExpires' passed (0.0 seconds)
-Test Suite 'InviteCountdownTests' passed at 2026-11-10 08:57:04.933
+Test Suite 'InviteCountdownTests' passed at 2026-11-10 09:04:55.020
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
-Test Suite 'LiveAPITests' started at 2026-11-10 08:57:04.933
-Test Case 'LiveAPITests.testLiveTokenRequests' started at 2026-11-10 08:57:04.933
+Test Suite 'LiveAPITests' started at 2026-11-10 09:04:55.020
+Test Case 'LiveAPITests.testLiveTokenRequests' started at 2026-11-10 09:04:55.020
 Test Case 'LiveAPITests.testLiveTokenRequests' passed (0.001 seconds)
-Test Case 'LiveAPITests.testRealtimeRequestUsesWebSocketSchemeAndAuth' started at 2026-11-10 08:57:04.934
+Test Case 'LiveAPITests.testRealtimeRequestUsesWebSocketSchemeAndAuth' started at 2026-11-10 09:04:55.021
 Test Case 'LiveAPITests.testRealtimeRequestUsesWebSocketSchemeAndAuth' passed (0.002 seconds)
-Test Suite 'LiveAPITests' passed at 2026-11-10 08:57:04.935
+Test Suite 'LiveAPITests' passed at 2026-11-10 09:04:55.023
 	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
-Test Suite 'LoudnessDetectorTests' started at 2026-11-10 08:57:04.935
-Test Case 'LoudnessDetectorTests.testDecibels' started at 2026-11-10 08:57:04.935
+Test Suite 'LoudnessDetectorTests' started at 2026-11-10 09:04:55.023
+Test Case 'LoudnessDetectorTests.testDecibels' started at 2026-11-10 09:04:55.023
 Test Case 'LoudnessDetectorTests.testDecibels' passed (0.0 seconds)
-Test Case 'LoudnessDetectorTests.testLoudWindowsAreReported' started at 2026-11-10 08:57:04.936
+Test Case 'LoudnessDetectorTests.testLoudWindowsAreReported' started at 2026-11-10 09:04:55.023
 Test Case 'LoudnessDetectorTests.testLoudWindowsAreReported' passed (0.0 seconds)
-Test Case 'LoudnessDetectorTests.testQuietAudioProducesNothing' started at 2026-11-10 08:57:04.936
+Test Case 'LoudnessDetectorTests.testQuietAudioProducesNothing' started at 2026-11-10 09:04:55.024
 Test Case 'LoudnessDetectorTests.testQuietAudioProducesNothing' passed (0.0 seconds)
-Test Case 'LoudnessDetectorTests.testRMS' started at 2026-11-10 08:57:04.936
+Test Case 'LoudnessDetectorTests.testRMS' started at 2026-11-10 09:04:55.024
 Test Case 'LoudnessDetectorTests.testRMS' passed (0.0 seconds)
-Test Case 'LoudnessDetectorTests.testWindowsSpanMultipleBuffers' started at 2026-11-10 08:57:04.936
+Test Case 'LoudnessDetectorTests.testWindowsSpanMultipleBuffers' started at 2026-11-10 09:04:55.024
 Test Case 'LoudnessDetectorTests.testWindowsSpanMultipleBuffers' passed (0.001 seconds)
-Test Suite 'LoudnessDetectorTests' passed at 2026-11-10 08:57:04.937
+Test Suite 'LoudnessDetectorTests' passed at 2026-11-10 09:04:55.025
 	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'ModelsTests' started at 2026-11-10 08:57:04.937
-Test Case 'ModelsTests.testCameraHealthWarnings' started at 2026-11-10 08:57:04.937
-Test Case 'ModelsTests.testCameraHealthWarnings' passed (0.001 seconds)
-Test Case 'ModelsTests.testDetectionClampsConfidenceAndThreshold' started at 2026-11-10 08:57:04.938
-Test Case 'ModelsTests.testDetectionClampsConfidenceAndThreshold' passed (0.001 seconds)
-Test Case 'ModelsTests.testDogEventDerivesStateAndDuration' started at 2026-11-10 08:57:04.939
+Test Suite 'MediaUploaderTests' started at 2026-11-10 09:04:55.025
+Test Case 'MediaUploaderTests.testDuplicateEnqueueIsIgnored' started at 2026-11-10 09:04:55.025
+Test Case 'MediaUploaderTests.testDuplicateEnqueueIsIgnored' passed (0.001 seconds)
+Test Case 'MediaUploaderTests.testEventNotCreatedYetIsRetriedLater' started at 2026-11-10 09:04:55.026
+Test Case 'MediaUploaderTests.testEventNotCreatedYetIsRetriedLater' passed (0.005 seconds)
+Test Case 'MediaUploaderTests.testExpiredItemsAreDropped' started at 2026-11-10 09:04:55.030
+Test Case 'MediaUploaderTests.testExpiredItemsAreDropped' passed (0.003 seconds)
+Test Case 'MediaUploaderTests.testFileLayoutMatchesRecorder' started at 2026-11-10 09:04:55.033
+Test Case 'MediaUploaderTests.testFileLayoutMatchesRecorder' passed (0.0 seconds)
+Test Case 'MediaUploaderTests.testMissingFileIsDropped' started at 2026-11-10 09:04:55.034
+Test Case 'MediaUploaderTests.testMissingFileIsDropped' passed (0.0 seconds)
+Test Case 'MediaUploaderTests.testOfflineKeepsTheQueueAcrossLaunches' started at 2026-11-10 09:04:55.034
+Test Case 'MediaUploaderTests.testOfflineKeepsTheQueueAcrossLaunches' passed (0.003 seconds)
+Test Case 'MediaUploaderTests.testRejectedUploadIsDropped' started at 2026-11-10 09:04:55.038
+Test Case 'MediaUploaderTests.testRejectedUploadIsDropped' passed (0.002 seconds)
+Test Case 'MediaUploaderTests.testUploadNowReturnsTheKeyWithoutPatching' started at 2026-11-10 09:04:55.040
+Test Case 'MediaUploaderTests.testUploadNowReturnsTheKeyWithoutPatching' passed (0.002 seconds)
+Test Case 'MediaUploaderTests.testUploadsClipAndAttachesItToTheEvent' started at 2026-11-10 09:04:55.042
+Test Case 'MediaUploaderTests.testUploadsClipAndAttachesItToTheEvent' passed (0.002 seconds)
+Test Suite 'MediaUploaderTests' passed at 2026-11-10 09:04:55.044
+	 Executed 9 tests, with 0 failures (0 unexpected) in 0.019 (0.019) seconds
+Test Suite 'ModelsTests' started at 2026-11-10 09:04:55.044
+Test Case 'ModelsTests.testCameraHealthWarnings' started at 2026-11-10 09:04:55.044
+Test Case 'ModelsTests.testCameraHealthWarnings' passed (0.0 seconds)
+Test Case 'ModelsTests.testDetectionClampsConfidenceAndThreshold' started at 2026-11-10 09:04:55.044
+Test Case 'ModelsTests.testDetectionClampsConfidenceAndThreshold' passed (0.0 seconds)
+Test Case 'ModelsTests.testDogEventDerivesStateAndDuration' started at 2026-11-10 09:04:55.045
 Test Case 'ModelsTests.testDogEventDerivesStateAndDuration' passed (0.0 seconds)
-Test Case 'ModelsTests.testDogStateAlerting' started at 2026-11-10 08:57:04.939
+Test Case 'ModelsTests.testDogStateAlerting' started at 2026-11-10 09:04:55.045
 Test Case 'ModelsTests.testDogStateAlerting' passed (0.0 seconds)
-Test Case 'ModelsTests.testEventTypeDefaultsMatchSpec' started at 2026-11-10 08:57:04.939
+Test Case 'ModelsTests.testEventTypeDefaultsMatchSpec' started at 2026-11-10 09:04:55.045
 Test Case 'ModelsTests.testEventTypeDefaultsMatchSpec' passed (0.0 seconds)
-Test Case 'ModelsTests.testEventTypeWireFormat' started at 2026-11-10 08:57:04.939
+Test Case 'ModelsTests.testEventTypeWireFormat' started at 2026-11-10 09:04:55.045
 Test Case 'ModelsTests.testEventTypeWireFormat' passed (0.0 seconds)
-Test Case 'ModelsTests.testVersion' started at 2026-11-10 08:57:04.940
+Test Case 'ModelsTests.testVersion' started at 2026-11-10 09:04:55.045
 Test Case 'ModelsTests.testVersion' passed (0.0 seconds)
-Test Suite 'ModelsTests' passed at 2026-11-10 08:57:04.940
-	 Executed 7 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
-Test Suite 'OnboardingStateTests' started at 2026-11-10 08:57:04.940
-Test Case 'OnboardingStateTests.testHouseholdNameValidation' started at 2026-11-10 08:57:04.940
+Test Suite 'ModelsTests' passed at 2026-11-10 09:04:55.045
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'OnboardingStateTests' started at 2026-11-10 09:04:55.045
+Test Case 'OnboardingStateTests.testHouseholdNameValidation' started at 2026-11-10 09:04:55.045
 Test Case 'OnboardingStateTests.testHouseholdNameValidation' passed (0.0 seconds)
-Test Case 'OnboardingStateTests.testNeedsHouseholdWhenUserHasNone' started at 2026-11-10 08:57:04.940
+Test Case 'OnboardingStateTests.testNeedsHouseholdWhenUserHasNone' started at 2026-11-10 09:04:55.046
 Test Case 'OnboardingStateTests.testNeedsHouseholdWhenUserHasNone' passed (0.0 seconds)
-Test Case 'OnboardingStateTests.testReadyWithFirstHousehold' started at 2026-11-10 08:57:04.940
+Test Case 'OnboardingStateTests.testReadyWithFirstHousehold' started at 2026-11-10 09:04:55.046
 Test Case 'OnboardingStateTests.testReadyWithFirstHousehold' passed (0.0 seconds)
-Test Suite 'OnboardingStateTests' passed at 2026-11-10 08:57:04.941
+Test Suite 'OnboardingStateTests' passed at 2026-11-10 09:04:55.046
 	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'PairingCodeTests' started at 2026-11-10 08:57:04.941
-Test Case 'PairingCodeTests.testParsesCodesTypedLoosely' started at 2026-11-10 08:57:04.941
+Test Suite 'PairingCodeTests' started at 2026-11-10 09:04:55.046
+Test Case 'PairingCodeTests.testParsesCodesTypedLoosely' started at 2026-11-10 09:04:55.046
 Test Case 'PairingCodeTests.testParsesCodesTypedLoosely' passed (0.0 seconds)
-Test Case 'PairingCodeTests.testParsesLinksAndBareTokens' started at 2026-11-10 08:57:04.941
+Test Case 'PairingCodeTests.testParsesLinksAndBareTokens' started at 2026-11-10 09:04:55.046
 Test Case 'PairingCodeTests.testParsesLinksAndBareTokens' passed (0.0 seconds)
-Test Case 'PairingCodeTests.testQRContentRoundTrips' started at 2026-11-10 08:57:04.941
+Test Case 'PairingCodeTests.testQRContentRoundTrips' started at 2026-11-10 09:04:55.046
 Test Case 'PairingCodeTests.testQRContentRoundTrips' passed (0.0 seconds)
-Test Suite 'PairingCodeTests' passed at 2026-11-10 08:57:04.942
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'PublishPolicyTests' started at 2026-11-10 08:57:04.942
-Test Case 'PublishPolicyTests.testConnectionLostWindsDown' started at 2026-11-10 08:57:04.942
+Test Suite 'PairingCodeTests' passed at 2026-11-10 09:04:55.047
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'PublishPolicyTests' started at 2026-11-10 09:04:55.047
+Test Case 'PublishPolicyTests.testConnectionLostWindsDown' started at 2026-11-10 09:04:55.047
 Test Case 'PublishPolicyTests.testConnectionLostWindsDown' passed (0.0 seconds)
-Test Case 'PublishPolicyTests.testIdleUntilAViewerJoins' started at 2026-11-10 08:57:04.942
+Test Case 'PublishPolicyTests.testIdleUntilAViewerJoins' started at 2026-11-10 09:04:55.047
 Test Case 'PublishPolicyTests.testIdleUntilAViewerJoins' passed (0.0 seconds)
-Test Case 'PublishPolicyTests.testKeepsPublishingForTheLingerAfterTheLastViewerLeaves' started at 2026-11-10 08:57:04.942
+Test Case 'PublishPolicyTests.testKeepsPublishingForTheLingerAfterTheLastViewerLeaves' started at 2026-11-10 09:04:55.047
 Test Case 'PublishPolicyTests.testKeepsPublishingForTheLingerAfterTheLastViewerLeaves' passed (0.0 seconds)
-Test Case 'PublishPolicyTests.testRejoinWithinLingerCancelsTheStop' started at 2026-11-10 08:57:04.942
+Test Case 'PublishPolicyTests.testRejoinWithinLingerCancelsTheStop' started at 2026-11-10 09:04:55.047
 Test Case 'PublishPolicyTests.testRejoinWithinLingerCancelsTheStop' passed (0.0 seconds)
-Test Case 'PublishPolicyTests.testRepeatedZeroDoesNotExtendTheLinger' started at 2026-11-10 08:57:04.943
+Test Case 'PublishPolicyTests.testRepeatedZeroDoesNotExtendTheLinger' started at 2026-11-10 09:04:55.047
 Test Case 'PublishPolicyTests.testRepeatedZeroDoesNotExtendTheLinger' passed (0.0 seconds)
-Test Suite 'PublishPolicyTests' passed at 2026-11-10 08:57:04.943
-	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'PushPayloadTests' started at 2026-11-10 08:57:04.943
-Test Case 'PushPayloadTests.testActionIdentifiersAreStable' started at 2026-11-10 08:57:04.943
+Test Suite 'PublishPolicyTests' passed at 2026-11-10 09:04:55.047
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
+Test Suite 'PushPayloadTests' started at 2026-11-10 09:04:55.047
+Test Case 'PushPayloadTests.testActionIdentifiersAreStable' started at 2026-11-10 09:04:55.047
 Test Case 'PushPayloadTests.testActionIdentifiersAreStable' passed (0.0 seconds)
-Test Case 'PushPayloadTests.testMuteLastsAnHour' started at 2026-11-10 08:57:04.943
+Test Case 'PushPayloadTests.testMuteLastsAnHour' started at 2026-11-10 09:04:55.047
 Test Case 'PushPayloadTests.testMuteLastsAnHour' passed (0.0 seconds)
-Test Case 'PushPayloadTests.testParsesEventPushes' started at 2026-11-10 08:57:04.944
+Test Case 'PushPayloadTests.testParsesEventPushes' started at 2026-11-10 09:04:55.047
 Test Case 'PushPayloadTests.testParsesEventPushes' passed (0.0 seconds)
-Test Case 'PushPayloadTests.testSnapshotURLMustBeHTTPS' started at 2026-11-10 08:57:04.944
+Test Case 'PushPayloadTests.testSnapshotURLMustBeHTTPS' started at 2026-11-10 09:04:55.047
 Test Case 'PushPayloadTests.testSnapshotURLMustBeHTTPS' passed (0.0 seconds)
-Test Case 'PushPayloadTests.testTokenHex' started at 2026-11-10 08:57:04.944
+Test Case 'PushPayloadTests.testTokenHex' started at 2026-11-10 09:04:55.047
 Test Case 'PushPayloadTests.testTokenHex' passed (0.0 seconds)
-Test Case 'PushPayloadTests.testToleratesUnknownTypesAndRejectsOtherPushes' started at 2026-11-10 08:57:04.945
+Test Case 'PushPayloadTests.testToleratesUnknownTypesAndRejectsOtherPushes' started at 2026-11-10 09:04:55.048
 Test Case 'PushPayloadTests.testToleratesUnknownTypesAndRejectsOtherPushes' passed (0.0 seconds)
-Test Suite 'PushPayloadTests' passed at 2026-11-10 08:57:04.945
-	 Executed 6 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'RealtimeMessageTests' started at 2026-11-10 08:57:04.945
-Test Case 'RealtimeMessageTests.testDecodesServerMessages' started at 2026-11-10 08:57:04.945
-Test Case 'RealtimeMessageTests.testDecodesServerMessages' passed (0.001 seconds)
-Test Case 'RealtimeMessageTests.testEncodesClientMessages' started at 2026-11-10 08:57:04.946
-Test Case 'RealtimeMessageTests.testEncodesClientMessages' passed (0.001 seconds)
-Test Case 'RealtimeMessageTests.testRejectsMalformedMessages' started at 2026-11-10 08:57:04.946
+Test Suite 'PushPayloadTests' passed at 2026-11-10 09:04:55.048
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'RealtimeMessageTests' started at 2026-11-10 09:04:55.048
+Test Case 'RealtimeMessageTests.testDecodesServerMessages' started at 2026-11-10 09:04:55.048
+Test Case 'RealtimeMessageTests.testDecodesServerMessages' passed (0.0 seconds)
+Test Case 'RealtimeMessageTests.testEncodesClientMessages' started at 2026-11-10 09:04:55.048
+Test Case 'RealtimeMessageTests.testEncodesClientMessages' passed (0.002 seconds)
+Test Case 'RealtimeMessageTests.testRejectsMalformedMessages' started at 2026-11-10 09:04:55.050
 Test Case 'RealtimeMessageTests.testRejectsMalformedMessages' passed (0.0 seconds)
-Test Suite 'RealtimeMessageTests' passed at 2026-11-10 08:57:04.946
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'ReconnectBackoffTests' started at 2026-11-10 08:57:04.946
-Test Case 'ReconnectBackoffTests.testDoublesUpToTheCapAndResets' started at 2026-11-10 08:57:04.946
+Test Suite 'RealtimeMessageTests' passed at 2026-11-10 09:04:55.050
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'ReconnectBackoffTests' started at 2026-11-10 09:04:55.050
+Test Case 'ReconnectBackoffTests.testDoublesUpToTheCapAndResets' started at 2026-11-10 09:04:55.050
 Test Case 'ReconnectBackoffTests.testDoublesUpToTheCapAndResets' passed (0.0 seconds)
-Test Case 'ReconnectBackoffTests.testJitterOnlyShortens' started at 2026-11-10 08:57:04.947
+Test Case 'ReconnectBackoffTests.testJitterOnlyShortens' started at 2026-11-10 09:04:55.050
 Test Case 'ReconnectBackoffTests.testJitterOnlyShortens' passed (0.0 seconds)
-Test Suite 'ReconnectBackoffTests' passed at 2026-11-10 08:57:04.947
+Test Suite 'ReconnectBackoffTests' passed at 2026-11-10 09:04:55.050
 	 Executed 2 tests, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
-Test Suite 'SoundClassMappingTests' started at 2026-11-10 08:57:04.947
-Test Case 'SoundClassMappingTests.testKeepsBestLabelPerKind' started at 2026-11-10 08:57:04.947
+Test Suite 'SoundClassMappingTests' started at 2026-11-10 09:04:55.050
+Test Case 'SoundClassMappingTests.testKeepsBestLabelPerKind' started at 2026-11-10 09:04:55.050
 Test Case 'SoundClassMappingTests.testKeepsBestLabelPerKind' passed (0.0 seconds)
-Test Case 'SoundClassMappingTests.testMapsDogClassesAboveThreshold' started at 2026-11-10 08:57:04.947
+Test Case 'SoundClassMappingTests.testMapsDogClassesAboveThreshold' started at 2026-11-10 09:04:55.051
 Test Case 'SoundClassMappingTests.testMapsDogClassesAboveThreshold' passed (0.0 seconds)
-Test Case 'SoundClassMappingTests.testThresholdIsInclusiveAndConfigurable' started at 2026-11-10 08:57:04.947
+Test Case 'SoundClassMappingTests.testThresholdIsInclusiveAndConfigurable' started at 2026-11-10 09:04:55.051
 Test Case 'SoundClassMappingTests.testThresholdIsInclusiveAndConfigurable' passed (0.0 seconds)
-Test Case 'SoundClassMappingTests.testUnknownIdentifiers' started at 2026-11-10 08:57:04.948
+Test Case 'SoundClassMappingTests.testUnknownIdentifiers' started at 2026-11-10 09:04:55.051
 Test Case 'SoundClassMappingTests.testUnknownIdentifiers' passed (0.0 seconds)
-Test Suite 'SoundClassMappingTests' passed at 2026-11-10 08:57:04.948
+Test Suite 'SoundClassMappingTests' passed at 2026-11-10 09:04:55.051
 	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'URLSessionTransportTests' started at 2026-11-10 08:57:04.948
-Test Case 'URLSessionTransportTests.testErrorStatusThroughURLSession' started at 2026-11-10 08:57:04.948
+Test Suite 'URLSessionTransportTests' started at 2026-11-10 09:04:55.051
+Test Case 'URLSessionTransportTests.testErrorStatusThroughURLSession' started at 2026-11-10 09:04:55.051
 Test Case 'URLSessionTransportTests.testErrorStatusThroughURLSession' passed (0.002 seconds)
-Test Case 'URLSessionTransportTests.testRoundTripThroughURLSession' started at 2026-11-10 08:57:04.950
+Test Case 'URLSessionTransportTests.testRoundTripThroughURLSession' started at 2026-11-10 09:04:55.053
 Test Case 'URLSessionTransportTests.testRoundTripThroughURLSession' passed (0.001 seconds)
-Test Suite 'URLSessionTransportTests' passed at 2026-11-10 08:57:04.951
+Test Suite 'URLSessionTransportTests' passed at 2026-11-10 09:04:55.054
 	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
-Test Suite 'debug.xctest' passed at 2026-11-10 08:57:04.951
-	 Executed 112 tests, with 0 failures (0 unexpected) in 0.171 (0.171) seconds
-Test Suite 'All tests' passed at 2026-11-10 08:57:04.951
-	 Executed 112 tests, with 0 failures (0 unexpected) in 0.171 (0.171) seconds
+Test Suite 'debug.xctest' passed at 2026-11-10 09:04:55.054
+	 Executed 121 tests, with 0 failures (0 unexpected) in 0.276 (0.276) seconds
+Test Suite 'All tests' passed at 2026-11-10 09:04:55.054
+	 Executed 121 tests, with 0 failures (0 unexpected) in 0.276 (0.276) seconds
 ◇ Test run started.
 ↳ Testing Library Version: 6.1.3 (1d1f7e489c9c606)
 ↳ Target Platform: x86_64-unknown-linux-gnu
