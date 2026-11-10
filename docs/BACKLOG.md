@@ -10,7 +10,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Create `ios/project.yml` (XcodeGen) with an app target `DogMonitor` (iOS 17, SwiftUI app, bundle id `com.benooon.dogmonitor`, depends on the local DogMonitorCore package), a unit test target `DogMonitorTests`, and Info.plist permission strings (camera, microphone, local network). Add a minimal root view with a "Camera / Viewer" role picker. Add `ios/.gitignore` for `*.xcodeproj` and DerivedData. Goal: the CI `ios` job is green.
 - [x] ios: Add a Hebrew + English String Catalog (`Localizable.xcstrings`), and verify the role picker renders in RTL via a SwiftUI preview and a snapshot-free unit test of the localized keys.
 - [x] backend: Scaffold `backend/` (Node 22, TypeScript strict, Fastify, ESLint, Vitest, tsx for dev, `npm run build` to `dist/`). Add `GET /health`, `backend/.env.example`, and a `Dockerfile` or Nixpacks config suitable for Railway, plus a test for `/health`. Goal: the CI `backend` job is green.
-- [~] backend: Add Drizzle with PostgreSQL. Write the schema from SPEC §9 with migrations and an `npm run migrate` script, and have Vitest run against the CI Postgres service (`DATABASE_URL`). (in progress 2026-11-10)
+- [x] backend: Add Drizzle with PostgreSQL. Write the schema from SPEC §9 with migrations and an `npm run migrate` script, and have Vitest run against the CI Postgres service (`DATABASE_URL`).
 - [ ] docs: Write `README.md`: what the project is, repo layout, how to run the backend locally, and how CI and the agent loop work.
 
 ## Phase 1 — Prototype (one camera, one viewer)
