@@ -44,7 +44,14 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 
 ## Phase 2 — MVP
 
-- [~] ios: Apple-level design pass requested by the owner: design system (`ios/App/Design/`), app icon + accent, Liquid Glass on iOS 26 with fallbacks, and every existing screen redone per `.claude/skills`. CI moves to the newest Xcode on the runner. (in progress 2026-11-10)
+- ios: Apple-level design pass requested by the owner, split into steps (the original claim from 12:32 had nothing pushed by 16:50, so it was taken over and split):
+  - [~] ios: Design system foundation: `ios/App/Design/` tokens (`DS.Spacing`, `DS.Radius`, `DS.Motion`), `GlassCard`, `.glassSurface()`, `PrimaryButton`, `StatusPill` (Liquid Glass on iOS 26, material fallback), app icon (light + dark) and accent color in an asset catalog. (in progress 2026-11-10)
+  - [ ] ci: Build iOS with the newest stable Xcode on the runner (so `#if compiler(>=6.2)` Liquid Glass code is actually compiled), logging the Xcode version.
+  - [ ] ios: Redo viewer home and camera cards with the design system (StatusPill on snapshots, ContentUnavailableView for no cameras, symbol effects, numericText).
+  - [ ] ios: Redo camera mode (floating glass controls over the preview, health warnings as glass cards, Reduce Motion).
+  - [ ] ios: Redo live view (glass control bar: mute, talk, Lock Screen; connection states as ContentUnavailableView).
+  - [ ] ios: Redo onboarding: role picker, sign in, create household, pairing (PrimaryButton, copy per the voice in CLAUDE.md).
+  - [ ] ios: Redo the sheets: household, notification settings, timeline, daily summary, premium (Form/List conventions, empty/error states, copy pass).
 
 - [x] ios: Multiple cameras in viewer home (cards with last snapshot, online status, current dog state).
 - [x] ios: Ring-buffer recorder (`AVAssetWriter`, keeping the last ~5 s in memory). On an event, write a 10–20 s clip + snapshot.
