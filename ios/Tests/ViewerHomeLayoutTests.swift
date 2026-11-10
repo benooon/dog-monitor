@@ -29,7 +29,7 @@ final class ViewerHomeSingleColumnTests: XCTestCase {
         let height: CGFloat = 1_030
         let width = ViewerHomeView.singleColumnMaxWidth(height: height, cameraCount: 2)
         let snapshot = (width - 24) * 9 / 16
-        let total = 2 * (snapshot + 64) + 16 + 24 + 110 + 32
+        let total = 2 * (snapshot + 64) + 16 + 24 + 130 + 32
         XCTAssertLessThanOrEqual(total, height + 1)
         XCTAssertGreaterThan(width, 500)
     }

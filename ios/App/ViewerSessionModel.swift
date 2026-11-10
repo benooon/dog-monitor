@@ -13,6 +13,8 @@ final class ViewerSessionModel {
     var errorMessage: String?
     /// Latest snapshot URL per camera (empty until the backend has storage).
     private(set) var snapshots: [UUID: URL] = [:]
+    /// The dogs' photos, shared by every screen that shows a dog.
+    private(set) var dogPhotos: DogPhotoStore
     /// Realtime presence + watch signals, while the viewer home is shown.
     private(set) var realtime: ViewerRealtime?
     /// Premium purchases and plan, for the household owner only.
@@ -27,6 +29,7 @@ final class ViewerSessionModel {
     init(baseURL: URL = AppConfig.apiBaseURL, store: any SecureStore = KeychainStore()) {
         let credentials = CredentialStore(store: store)
         self.credentials = credentials
+        dogPhotos = DogPhotoStore()
         api = DogMonitorAPI(baseURL: baseURL, credential: credentials.load())
     }
 
@@ -67,6 +70,9 @@ final class ViewerSessionModel {
         }
         updateSubscription()
         await loadSnapshots()
+        if let dogs = household?.dogs {
+            await dogPhotos.load(dogs, api: api)
+        }
     }
 
     /// Only the owner buys Premium, so only the owner's phone reports App Store transactions.
@@ -205,6 +211,10 @@ extension ViewerSessionModel {
         let model = ViewerSessionModel(baseURL: URL(string: "https://example.invalid")!, store: InMemorySecureStore())
         model.isDemo = true
         model.household = .demo
+        model.dogPhotos = DogPhotoStore(directory: nil)
+        if let rex = model.household?.dogs.first {
+            model.dogPhotos.store(DogPhotoStore.samplePortrait(), for: rex)
+        }
         return model
     }
 }
@@ -224,7 +234,13 @@ extension HouseholdDTO {
                 MemberDTO(userId: owner, name: "Ben", role: .owner),
                 MemberDTO(userId: UUID(), name: "Noa", role: .member),
             ],
-            dogs: [DogDTO(id: UUID(), householdId: id, name: "Rex", createdAt: now)],
+            dogs: [
+                DogDTO(
+                    id: UUID(), householdId: id, name: "Rex",
+                    lifeStage: .adult, traits: [.barksAtNoises, .waitsAtDoor], alertStyle: .balanced,
+                    photoUpdatedAt: now, createdAt: now
+                ),
+            ],
             devices: [
                 DeviceDTO(
                     id: UUID(), householdId: id, name: "Living room", role: .camera,

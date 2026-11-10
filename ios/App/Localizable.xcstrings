@@ -3006,6 +3006,17 @@
           }
         }
       }
+    },
+    "%@ · %@": {
+      "comment": "A dog's profile on one line: age group · alert style.",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

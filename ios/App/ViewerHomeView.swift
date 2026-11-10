@@ -139,7 +139,8 @@ struct ViewerHomeView: View {
                             snapshot: model.snapshots[camera.id],
                             livePresence: model.realtime?.presence[camera.id],
                             dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState,
-                            dogName: model.household?.dogs.first?.name
+                            dogName: model.household?.dogs.first?.name,
+                            dogPhoto: firstDogPhoto
                         )
                         // Full-width separator between cards, not one that starts at the state label.
                         .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
@@ -152,11 +153,7 @@ struct ViewerHomeView: View {
             if let dogs = model.household?.dogs, !dogs.isEmpty {
                 Section("Dogs") {
                     ForEach(dogs) { dog in
-                        Label {
-                            Text(verbatim: dog.name)
-                        } icon: {
-                            Image(systemName: "pawprint.fill")
-                        }
+                        DogRow(dog: dog, photo: model.dogPhotos.image(for: dog))
                     }
                 }
             }
@@ -222,7 +219,8 @@ struct ViewerHomeView: View {
                         snapshot: model.snapshots[camera.id],
                         livePresence: model.realtime?.presence[camera.id],
                         dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState,
-                        dogName: model.household?.dogs.first?.name
+                        dogName: model.household?.dogs.first?.name,
+                        dogPhoto: firstDogPhoto
                     )
                     .padding(DS.Spacing.m)
                     .background(Color(.secondarySystemGroupedBackground), in: Self.gridCardShape)
@@ -235,6 +233,11 @@ struct ViewerHomeView: View {
         }
     }
 
+    /// The first dog's photo, shown on camera cards until cameras can be assigned a dog.
+    private var firstDogPhoto: UIImage? {
+        model.household?.dogs.first.flatMap { model.dogPhotos.image(for: $0) }
+    }
+
     /// The household's dogs as a grouped card, matching the camera cards.
     @ViewBuilder
     private var dogsPanel: some View {
@@ -244,13 +247,7 @@ struct ViewerHomeView: View {
                     .font(.headline)
                     .accessibilityAddTraits(.isHeader)
                 ForEach(dogs) { dog in
-                    Label {
-                        Text(verbatim: dog.name)
-                    } icon: {
-                        Image(systemName: "pawprint.fill")
-                            .foregroundStyle(.tint)
-                    }
-                    .font(.body)
+                    DogRow(dog: dog, photo: model.dogPhotos.image(for: dog))
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -293,7 +290,7 @@ struct ViewerHomeView: View {
     /// Height of a camera card besides its snapshot: padding and the name row.
     private static let cardChromeHeight: CGFloat = 64
     /// Room left for the dogs card below single-column cameras.
-    private static let dogsPanelAllowance: CGFloat = 110
+    private static let dogsPanelAllowance: CGFloat = 130
     /// Width of the dogs column beside the cameras in landscape.
     private static let sidebarWidth: CGFloat = 280
     /// Screens narrower than this (split view, small iPads) keep the dogs below the cameras.
@@ -381,6 +378,7 @@ private struct CameraCard: View {
     var dogState: DogState?
     /// Shown on the placeholder before the camera has sent a picture.
     var dogName: String?
+    var dogPhoto: UIImage?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private static let snapshotShape = RoundedRectangle(cornerRadius: DS.Radius.medium, style: .continuous)
@@ -433,7 +431,7 @@ private struct CameraCard: View {
                 }
                 .accessibilityHidden(true)
             } else {
-                NoSnapshotPlaceholder(dogName: dogName)
+                NoSnapshotPlaceholder(dogName: dogName, dogPhoto: dogPhoto)
             }
         }
         .aspectRatio(16 / 9, contentMode: .fit)
@@ -445,6 +443,10 @@ private struct CameraCard: View {
 /// dog's name, so a new household looks ready rather than broken.
 private struct NoSnapshotPlaceholder: View {
     var dogName: String?
+    var dogPhoto: UIImage?
+    @ScaledMetric(relativeTo: .title2) private var avatarSize = NoSnapshotPlaceholder.avatarBaseSize
+
+    private static let avatarBaseSize: CGFloat = 56
 
     /// Strength of the accent wash at the top and bottom of the gradient.
     private static let washTop = 0.22
@@ -458,11 +460,17 @@ private struct NoSnapshotPlaceholder: View {
                 endPoint: .bottom
             )
             VStack(spacing: DS.Spacing.xs) {
-                Image(systemName: "pawprint.fill")
-                    .font(.title2)
-                    .foregroundStyle(.tint)
-                    .padding(.bottom, DS.Spacing.xs)
-                    .accessibilityHidden(true)
+                Group {
+                    if let dogPhoto, let dogName {
+                        DogAvatar(name: dogName, image: dogPhoto, size: min(avatarSize, Self.avatarBaseSize * 1.5))
+                    } else {
+                        Image(systemName: "pawprint.fill")
+                            .font(.title2)
+                            .foregroundStyle(.tint)
+                    }
+                }
+                .padding(.bottom, DS.Spacing.xs)
+                .accessibilityHidden(true)
                 if let dogName {
                     Text(verbatim: dogName)
                         .font(.headline)

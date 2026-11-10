@@ -15,6 +15,10 @@ private struct DogOnboardingPresenter: ViewModifier {
                 DogOnboardingView(model: model) {
                     finish()
                 } onFinish: {
+                    // Show the photo just picked right away instead of downloading it again.
+                    if model.photoUploaded, let photo = model.photo, let dog = model.savedDog {
+                        session.dogPhotos.store(photo, for: dog)
+                    }
                     finish()
                     Task { await session.loadHousehold() }
                 }

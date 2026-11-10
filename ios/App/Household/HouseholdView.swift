@@ -94,6 +94,14 @@ struct HouseholdView: View {
                 }
             }
 
+            if !household.dogs.isEmpty {
+                Section("Dogs") {
+                    ForEach(household.dogs) { dog in
+                        DogRow(dog: dog, photo: model.dogPhotos.image(for: dog))
+                    }
+                }
+            }
+
             Section {
                 ForEach(household.members, id: \.userId) { member in
                     MemberRow(member: member)

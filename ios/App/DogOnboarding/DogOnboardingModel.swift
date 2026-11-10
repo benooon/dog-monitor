@@ -37,6 +37,11 @@ final class DogOnboardingModel: Identifiable {
         alertStyle = dog?.alertStyle ?? .balanced
     }
 
+    /// The dog as last saved, with its photo version once the photo is stored.
+    var savedDog: DogDTO? { dog }
+    /// Whether `photo` is the dog's stored photo (its upload worked).
+    private(set) var photoUploaded = false
+
     /// The name as it will be saved, or nil while it is empty.
     var validName: String? {
         HouseholdNameRules.validated(name)
@@ -89,6 +94,7 @@ final class DogOnboardingModel: Identifiable {
                 if let withPhoto = try? await api.uploadDogPhoto(id: saved.id, jpeg: jpeg) {
                     saved = withPhoto
                     dog = saved
+                    photoUploaded = true
                 }
             }
             var settings = NotificationSettings(try await api.notificationPrefs())
