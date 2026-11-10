@@ -19,15 +19,11 @@ final class StubTransport: HTTPTransport, @unchecked Sendable {
     }
 
     var requests: [URLRequest] {
-        lock.lock()
-        defer { lock.unlock() }
-        return _requests
+        lock.withLock { _requests }
     }
 
     func send(_ request: URLRequest) async throws -> HTTPResponse {
-        lock.lock()
-        _requests.append(request)
-        lock.unlock()
+        lock.withLock { _requests.append(request) }
         return try respond(request)
     }
 }
