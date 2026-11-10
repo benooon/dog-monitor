@@ -2,7 +2,7 @@ npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.
 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
 
-added 243 packages, and audited 244 packages in 41s
+added 270 packages, and audited 271 packages in 44s
 
 77 packages are looking for funding
   run `npm fund` for details
@@ -27,25 +27,28 @@ Run `npm audit` for details.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/runner/work/dog-monitor/dog-monitor/backend[39m
 
- [32m✓[39m test/events.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 805[2mms[22m[39m
- [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 656[2mms[22m[39m
- [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 565[2mms[22m[39m
- [32m✓[39m test/live.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 621[2mms[22m[39m
- [32m✓[39m test/realtime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1021[2mms[22m[39m
- [32m✓[39m test/apns.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 40[2mms[22m[39m
- [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 8[2mms[22m[39m
- [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2610[2mms[22m[39m
+ [32m✓[39m test/events.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 887[2mms[22m[39m
+ [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 732[2mms[22m[39m
+ [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 562[2mms[22m[39m
+ [32m✓[39m test/live.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 773[2mms[22m[39m
+ [32m✓[39m test/realtime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1058[2mms[22m[39m
+ [32m✓[39m test/media.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 650[2mms[22m[39m
+   [32m✓[39m media routes and retention [2m(3)[22m
+     [33m[2m✓[22m[39m hands cameras upload URLs under the event's own prefix[33m 309[2mms[22m[39m
+ [32m✓[39m test/apns.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2592[2mms[22m[39m
    [32m✓[39m JwtService [2m(2)[22m
      [33m[2m✓[22m[39m rejects expired tokens[33m 2105[2mms[22m[39m
- [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 199[2mms[22m[39m
- [32m✓[39m test/config.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 8[2mms[22m[39m
- [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 207[2mms[22m[39m
+ [32m✓[39m test/config.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 86[2mms[22m[39m
 
-[2m Test Files [22m [1m[32m11 passed[39m[22m[90m (11)[39m
-[2m      Tests [22m [1m[32m83 passed[39m[22m[90m (83)[39m
-[2m   Start at [22m 08:34:22
-[2m   Duration [22m 13.43s[2m (tests 57%, import 40%, transform 3%)[22m
+[2m Test Files [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m      Tests [22m [1m[32m89 passed[39m[22m[90m (89)[39m
+[2m   Start at [22m 08:42:36
+[2m   Duration [22m 16.43s[2m (tests 53%, import 44%, transform 3%)[22m
 
-[2m    Isolate [22m [33m11 workers spawned[39m[2m · ~103ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~1.03s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[2m    Isolate [22m [33m12 workers spawned[39m[2m · ~106ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~1.17s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
 
