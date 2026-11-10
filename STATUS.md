@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: f5ebf0bee30071e8205ca9f13b320fe0c4d3b2b3
-- message: ios: live view on the design system (glass control bar with sound, talk and Lock Screen; Live pill; connection problems as ContentUnavailableView)
-- time (UTC): 2026-11-10T18:12:11Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42869173820
+- commit: c5313cf368a3558c8003a75ef5463c727eaf40aa
+- message: ios: timeline, daily summary and premium on design tokens
+- time (UTC): 2026-11-10T18:33:46Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42872637453
 
 | job | result | log |
 |---|---|---|
