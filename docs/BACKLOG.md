@@ -93,4 +93,4 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: iPad layout for viewer mode. (9c7463c, verified by green CI on 9c7463c; adaptive camera grid in regular width)
 - [~] ios: Invite sheet on the design system (the one screen the design pass missed: magic numbers, fixed 44pt code font, red error text): tokens, Dynamic Type code, ContentUnavailableView for error/expired, countdown with numericText, VoiceOver labels for the QR code and digits, RTL + dark previews. (in progress 2026-11-10)
 - [~] core + ios: Public memberwise init for `DeviceDTO` (with tests) so the screens without previews get RTL + dark `#Preview`s: live view, camera notification overrides, event detail. (in progress 2026-11-10)
-- [ ] ios: Symbol effects and `contentTransition(.numericText())` on the viewer home camera cards (left over from the viewer home redesign).
+- [~] ios: Symbol effects on the viewer home camera cards (left over from the viewer home redesign; the cards show no changing numbers, so numericText does not apply). (in progress 2026-11-10)
