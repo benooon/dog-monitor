@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 0250ae106923f13f31fa2cded91fd2270dbf0e7b
-- message: ci: don't publish RED when a job ends without a verdict (abandoned runner)
-- time (UTC): 2026-11-10T15:59:38Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42847893086
+- commit: fa2f05e43f49ed180c170f90af696b3e794cd712
+- message: docs: claim iOS Live Activity task
+- time (UTC): 2026-11-10T16:08:48Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42849338667
 
 | job | result | log |
 |---|---|---|
