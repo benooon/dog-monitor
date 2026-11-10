@@ -56,7 +56,11 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
             await PushRegistry.shared.muteForAnHour()
         } else if action == PushPayload.Action.watchLive.rawValue || action == UNNotificationDefaultActionIdentifier {
             await MainActor.run {
-                DeepLinkRouter.shared.liveCameraId = payload.cameraId
+                if payload.type == .dailySummary && action == UNNotificationDefaultActionIdentifier {
+                    DeepLinkRouter.shared.summaryCameraId = payload.cameraId
+                } else {
+                    DeepLinkRouter.shared.liveCameraId = payload.cameraId
+                }
             }
         }
     }

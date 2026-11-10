@@ -109,6 +109,26 @@
         }
       }
     },
+    "%@ less than yesterday": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ פחות מאתמול"
+          }
+        }
+      }
+    },
+    "%@ more than yesterday": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ יותר מאתמול"
+          }
+        }
+      }
+    },
     "%@'s daily summary is ready": {
       "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
       "extractionState": "manual",
@@ -117,6 +137,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הסיכום היומי של %@ מוכן"
+          }
+        }
+      }
+    },
+    "%@'s day": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום של %@"
           }
         }
       }
@@ -131,12 +161,52 @@
         }
       }
     },
+    "%lld fewer than yesterday": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld פחות מאתמול"
+          }
+        }
+      }
+    },
+    "%lld more than yesterday": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld יותר מאתמול"
+          }
+        }
+      }
+    },
     "%lld watching": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "%lld צופים"
+          }
+        }
+      }
+    },
+    "Active": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פעילות"
+          }
+        }
+      }
+    },
+    "Activity by hour": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פעילות לפי שעה"
           }
         }
       }
@@ -191,12 +261,32 @@
         }
       }
     },
+    "Barks": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות"
+          }
+        }
+      }
+    },
     "Barks in the last minute: %lld": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "נביחות בדקה האחרונה: %lld"
+          }
+        }
+      }
+    },
+    "Barks this week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות השבוע"
           }
         }
       }
@@ -351,6 +441,16 @@
         }
       }
     },
+    "Choose a day": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בחירת יום"
+          }
+        }
+      }
+    },
     "Choose different alerts for one camera.": {
       "localizations": {
         "he": {
@@ -377,6 +477,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "החיבור אבד. מתחבר מחדש…"
+          }
+        }
+      }
+    },
+    "Couldn't load the summary": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו לטעון את הסיכום"
           }
         }
       }
@@ -457,6 +567,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "סיכום יומי"
+          }
+        }
+      }
+    },
+    "Day": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יום"
           }
         }
       }
@@ -567,6 +687,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "אסור"
+          }
+        }
+      }
+    },
+    "Hour": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שעה"
           }
         }
       }
@@ -741,6 +871,16 @@
         }
       }
     },
+    "Minutes": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "דקות"
+          }
+        }
+      }
+    },
     "Mute": {
       "localizations": {
         "he": {
@@ -787,6 +927,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "אין חיבור לאינטרנט."
+          }
+        }
+      }
+    },
+    "No summary yet": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עדיין אין סיכום"
           }
         }
       }
@@ -961,6 +1111,16 @@
         }
       }
     },
+    "Rested": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מנוחה"
+          }
+        }
+      }
+    },
     "Resting": {
       "localizations": {
         "he": {
@@ -977,6 +1137,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "חסר מנוחה"
+          }
+        }
+      }
+    },
+    "Same as yesterday": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כמו אתמול"
           }
         }
       }
@@ -1121,6 +1291,16 @@
         }
       }
     },
+    "Summaries appear once a camera has been on for a while.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סיכומים יופיעו אחרי שהמצלמה תפעל זמן מה."
+          }
+        }
+      }
+    },
     "Summary": {
       "localizations": {
         "he": {
@@ -1157,6 +1337,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הקישו על המסך כדי להציג את התמונה."
+          }
+        }
+      }
+    },
+    "The camera didn't see much on this day.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה לא ראתה הרבה ביום הזה."
           }
         }
       }
@@ -1297,6 +1487,26 @@
         }
       }
     },
+    "Time by state": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "זמן לפי מצב"
+          }
+        }
+      }
+    },
+    "Today": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום"
+          }
+        }
+      }
+    },
     "Too many attempts. Wait a minute and try again.": {
       "localizations": {
         "he": {
@@ -1413,6 +1623,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "יבבות או יללות"
+          }
+        }
+      }
+    },
+    "Yesterday": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אתמול"
           }
         }
       }

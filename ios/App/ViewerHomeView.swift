@@ -8,6 +8,8 @@ struct ViewerHomeView: View {
     var isOwner = false
     @State private var showsHousehold = false
     @State private var showsNotifications = false
+    /// The daily summary sheet, opened from the toolbar or a "daily summary is ready" push.
+    @State private var summary: SummaryRequest?
     @State private var path: [UUID] = []
     private let router = DeepLinkRouter.shared
 
@@ -65,6 +67,21 @@ struct ViewerHomeView: View {
                     dogName: model.household?.dogs.first?.name
                 )
             }
+            .sheet(item: $summary) { request in
+                DailySummaryView(
+                    model: DailySummaryModel(
+                        api: model.authorizedAPI,
+                        cameras: model.household?.cameras ?? [],
+                        cameraId: request.cameraId
+                    ),
+                    dogName: model.household?.dogs.first?.name
+                )
+            }
+            .onChange(of: router.summaryCameraId, initial: true) { _, cameraId in
+                guard let cameraId else { return }
+                summary = SummaryRequest(cameraId: cameraId)
+                router.summaryCameraId = nil
+            }
             .navigationDestination(for: UUID.self) { cameraId in
                 if let camera = model.household?.cameras.first(where: { $0.id == cameraId }), let realtime = model.realtime {
                     LiveView(camera: camera, api: model.authorizedAPI, realtime: realtime)
@@ -88,6 +105,12 @@ struct ViewerHomeView: View {
                     Button("Sign out") { model.signOut() }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
+                    Button("Daily summary", systemImage: "chart.bar") {
+                        summary = SummaryRequest(cameraId: nil)
+                    }
+                    .accessibilityIdentifier("daily-summary")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Notifications", systemImage: "bell") {
                         showsNotifications = true
                     }
@@ -102,6 +125,12 @@ struct ViewerHomeView: View {
             }
         }
     }
+}
+
+/// Which camera the daily summary sheet opens on (nil: the first one).
+private struct SummaryRequest: Identifiable {
+    let id = UUID()
+    let cameraId: UUID?
 }
 
 /// One camera: last snapshot, name, online status and the dog's current state.
