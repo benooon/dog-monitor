@@ -11,6 +11,8 @@ final class ViewerSessionModel {
     /// Full household (cameras, dogs) for the viewer home, loaded once ready.
     private(set) var household: HouseholdDTO?
     var errorMessage: String?
+    /// Realtime presence + watch signals, while the viewer home is shown.
+    private(set) var realtime: ViewerRealtime?
 
     private var api: DogMonitorAPI
     private let credentials: CredentialStore
@@ -75,7 +77,19 @@ final class ViewerSessionModel {
         }
     }
 
+    /// The signed-in API client, for screens that call it directly (live view).
+    var authorizedAPI: DogMonitorAPI { api }
+
+    func startRealtime() {
+        guard realtime == nil, case .user = api.credential else { return }
+        let realtime = ViewerRealtime(api: api)
+        self.realtime = realtime
+        realtime.start()
+    }
+
     func signOut() {
+        realtime?.stop()
+        realtime = nil
         household = nil
         try? credentials.clear()
         api = api.with(credential: .none)

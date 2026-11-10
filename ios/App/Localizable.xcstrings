@@ -91,6 +91,36 @@
         }
       }
     },
+    "Connecting…": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מתחבר…"
+          }
+        }
+      }
+    },
+    "Connection lost. Reconnecting…": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "החיבור אבד. מתחבר מחדש…"
+          }
+        }
+      }
+    },
+    "Couldn't open live view.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן לפתוח צפייה חיה."
+          }
+        }
+      }
+    },
     "Couldn't start the camera.": {
       "localizations": {
         "he": {
@@ -257,6 +287,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "השאירו את הטלפון הזה בבית כדי לשמור על הכלב שלכם."
+          }
+        }
+      }
+    },
+    "Live": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שידור חי"
+          }
+        }
+      }
+    },
+    "Live view isn't set up on the server yet.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צפייה חיה עדיין לא הוגדרה בשרת."
           }
         }
       }
@@ -451,6 +501,16 @@
         }
       }
     },
+    "This camera already has 5 viewers.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "במצלמה הזו כבר צופים 5 אנשים."
+          }
+        }
+      }
+    },
     "This code is invalid or has expired.": {
       "localizations": {
         "he": {
@@ -507,6 +567,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "צופה"
+          }
+        }
+      }
+    },
+    "Waiting for the camera…": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממתין למצלמה…"
           }
         }
       }

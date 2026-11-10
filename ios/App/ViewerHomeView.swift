@@ -1,7 +1,7 @@
 import DogMonitorCore
 import SwiftUI
 
-/// Viewer home: the household's cameras and dogs. Live view and snapshots come later.
+/// Viewer home: the household's cameras (tap for live view) and dogs. Snapshots come later.
 struct ViewerHomeView: View {
     let model: ViewerSessionModel
     let householdName: String
@@ -23,7 +23,14 @@ struct ViewerHomeView: View {
                             .foregroundStyle(.secondary)
                     }
                     ForEach(cameras) { camera in
-                        CameraRow(camera: camera)
+                        NavigationLink {
+                            if let realtime = model.realtime {
+                                LiveView(camera: camera, api: model.authorizedAPI, realtime: realtime)
+                            }
+                        } label: {
+                            CameraRow(camera: camera, livePresence: model.realtime?.presence[camera.id])
+                        }
+                        .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
                     }
                 }
                 if let dogs = model.household?.dogs, !dogs.isEmpty {
@@ -48,7 +55,10 @@ struct ViewerHomeView: View {
             .sheet(isPresented: $showsInvite, onDismiss: { Task { await model.loadHousehold() } }) {
                 InviteSheet(model: model)
             }
-            .task { await model.loadHousehold() }
+            .task {
+                model.startRealtime()
+                await model.loadHousehold()
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") { model.signOut() }
@@ -70,10 +80,12 @@ struct ViewerHomeView: View {
 
 private struct CameraRow: View {
     let camera: DeviceDTO
+    /// Presence from the realtime channel, which is fresher than the last heartbeat time.
+    var livePresence: Bool?
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 30)) { context in
-            let online = camera.isOnline(now: context.date)
+            let online = livePresence ?? camera.isOnline(now: context.date)
             HStack {
                 Image(systemName: "video.fill")
                     .foregroundStyle(.tint)
