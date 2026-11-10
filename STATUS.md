@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 05348b8f459526b3ae3ed00fffcf4a7febb34918
-- message: ios: add Notification Service Extension that attaches the event snapshot
-- time (UTC): 2026-11-10T08:49:41Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42784566672
+- commit: 542f46e57efc17340a882011e31ce2f03e933f3d
+- message: ios: publish camera audio to LiveKit from the capture session's mic
+- time (UTC): 2026-11-10T08:56:09Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42785633116
 
 | job | result | log |
 |---|---|---|
