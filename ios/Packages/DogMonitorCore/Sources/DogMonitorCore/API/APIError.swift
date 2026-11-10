@@ -14,6 +14,15 @@ public enum APIError: Error, Equatable, Sendable {
         if case .http(401, _) = self { return true }
         return false
     }
+
+    /// The server's `error` code, e.g. `camera_limit_reached`.
+    public var code: String? {
+        if case .http(_, let code) = self { return code }
+        return nil
+    }
+
+    /// Pairing was refused because the household's plan has no camera slot left.
+    public var isCameraLimitReached: Bool { code == "camera_limit_reached" }
 }
 
 struct ErrorBody: Decodable {

@@ -239,6 +239,21 @@ public struct DogMonitorAPI: Sendable {
         return request
     }
 
+    // MARK: - Subscription
+
+    /// The household's plan, camera limit and usage.
+    public func subscription() async throws -> SubscriptionDTO {
+        try await send("GET", "subscription")
+    }
+
+    /// Owner only: reports a StoreKit 2 signed transaction (`jwsRepresentation`).
+    /// 400 when it can't be verified, 409 `subscription_in_use` when it unlocks another household,
+    /// 503 `purchases_not_configured`.
+    public func reportAppleTransaction(_ signedTransaction: String) async throws -> SubscriptionDTO {
+        struct Body: Encodable { let signedTransaction: String }
+        return try await send("POST", "subscription/apple", body: Body(signedTransaction: signedTransaction))
+    }
+
     // MARK: - Plumbing
 
     static func path(_ id: UUID) -> String { id.uuidString.lowercased() }
