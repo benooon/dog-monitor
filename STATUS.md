@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 116ad64faa8f059b26c02e2b1dd267885acfa68b
-- message: docs: add README; claim backend auth task
-- time (UTC): 2026-11-10T07:11:33Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42773392871
+- commit: 5e88c2139ad3abbe228dade6f082e2c0c36ebeb2
+- message: backend: add Sign in with Apple auth, JWT middleware and /me
+- time (UTC): 2026-11-10T07:13:13Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42773594035
 
 | job | result | log |
 |---|---|---|
