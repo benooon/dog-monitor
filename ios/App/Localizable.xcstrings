@@ -2396,6 +2396,56 @@
           }
         }
       }
+    },
+    "Camera access is off": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הגישה למצלמה כבויה"
+          }
+        }
+      }
+    },
+    "Allow it in Settings to use this phone as a camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשרו אותה בהגדרות כדי להשתמש בטלפון הזה כמצלמה."
+          }
+        }
+      }
+    },
+    "Couldn't start the camera": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו להפעיל את המצלמה"
+          }
+        }
+      }
+    },
+    "Close other apps that use the camera, then try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סגרו אפליקציות אחרות שמשתמשות במצלמה ונסו שוב."
+          }
+        }
+      }
+    },
+    "Show preview": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצגת התצוגה המקדימה"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

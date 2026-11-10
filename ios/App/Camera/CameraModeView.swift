@@ -4,7 +4,7 @@ import UIKit
 import UniformTypeIdentifiers
 
 /// Camera mode (SPEC §8): a start screen, then a black, dimmed screen while capturing.
-/// A tap shows the live preview and the stop button.
+/// A tap shows the live preview with floating glass controls.
 struct CameraModeView: View {
     @State private var model = CameraModeModel()
     @Environment(\.scenePhase) private var scenePhase
@@ -13,6 +13,8 @@ struct CameraModeView: View {
     @State private var hasCustomModel = CustomSoundModel.isInstalled
     @State private var showsModelImporter = false
     @State private var modelFailed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let onChangeRole: () -> Void
 
     init(onChangeRole: @escaping () -> Void) {
@@ -30,7 +32,9 @@ struct CameraModeView: View {
                 runningScreen
             case .denied:
                 messageScreen(
-                    "Camera access is off. Allow it in Settings to use this phone as a camera.",
+                    title: "Camera access is off",
+                    message: "Allow it in Settings to use this phone as a camera.",
+                    systemImage: "video.slash",
                     actionTitle: "Open Settings"
                 ) {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -38,7 +42,12 @@ struct CameraModeView: View {
                     }
                 }
             case .failed:
-                messageScreen("Couldn't start the camera.", actionTitle: "Try again") {
+                messageScreen(
+                    title: "Couldn't start the camera",
+                    message: "Close other apps that use the camera, then try again.",
+                    systemImage: "exclamationmark.triangle",
+                    actionTitle: "Try again"
+                ) {
                     Task { await model.start() }
                 }
             }
@@ -57,40 +66,23 @@ struct CameraModeView: View {
         }
     }
 
+    // MARK: Start
+
     private var startScreen: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            Image(systemName: "video.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(.tint)
-            Text("Keep this phone plugged in and the app open.")
-                .font(.headline)
-                .multilineTextAlignment(.center)
-            if !model.isPaired {
-                Text("This phone isn't paired yet, so live view is off. Barking is still detected here.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                Button("Pair this camera") { showsPairing = true }
-                    .accessibilityIdentifier("pair-camera")
-            }
-            Spacer()
-            Button {
-                Task { await model.start() }
-            } label: {
-                Text("Start camera")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .accessibilityIdentifier("start-camera")
-            HStack {
-                soundModelMenu
-                Spacer()
-                Button("Change role", action: onChangeRole)
+        // Centered when it fits; scrolls at the largest text sizes.
+        ViewThatFits(in: .vertical) {
+            startHeader
+                .frame(maxHeight: .infinity)
+            ScrollView {
+                startHeader
+                    .padding(.vertical, DS.Spacing.section)
             }
         }
-        .padding()
+        .safeAreaInset(edge: .bottom) {
+            startActions
+        }
+        .padding(.horizontal, DS.Spacing.xl)
+        .padding(.bottom, DS.Spacing.l)
         .fileImporter(isPresented: $showsModelImporter, allowedContentTypes: Self.modelTypes) { result in
             guard case .success(let url) = result else { return }
             Task {
@@ -107,6 +99,45 @@ struct CameraModeView: View {
         } message: {
             Text("Pick a sound classifier made with Create ML. See the training guide.")
         }
+    }
+
+    private var startHeader: some View {
+        VStack(spacing: DS.Spacing.l) {
+            Image(systemName: "video.fill")
+                .font(.largeTitle)
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+                .accessibilityHidden(true)
+            Text("Keep this phone plugged in and the app open.")
+                .font(.title3.weight(.semibold))
+                .multilineTextAlignment(.center)
+            if !model.isPaired {
+                Text("This phone isn't paired yet, so live view is off. Barking is still detected here.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button("Pair this camera", systemImage: "qrcode") { showsPairing = true }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("pair-camera")
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var startActions: some View {
+        VStack(spacing: DS.Spacing.l) {
+            PrimaryButton(title: "Start camera", systemImage: "video.fill") {
+                Task { await model.start() }
+            }
+            .accessibilityIdentifier("start-camera")
+            HStack(spacing: DS.Spacing.m) {
+                soundModelMenu
+                Spacer(minLength: DS.Spacing.s)
+                Button("Change role", action: onChangeRole)
+            }
+            .font(.footnote)
+        }
+        .padding(.top, DS.Spacing.l)
     }
 
     private static var modelTypes: [UTType] {
@@ -130,65 +161,90 @@ struct CameraModeView: View {
         .accessibilityIdentifier("sound-model")
     }
 
+    // MARK: Running
+
     private var runningScreen: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             if model.isPreviewVisible {
                 CameraPreview(session: model.capture.session)
                     .ignoresSafeArea()
+                    .transition(.opacity)
             }
-            VStack(spacing: 12) {
+            VStack(spacing: DS.Spacing.m) {
                 statusIndicator
                 ForEach(model.healthWarnings, id: \.self) { warning in
-                    HealthWarningBanner(warning: warning)
+                    HealthWarningCard(warning: warning)
                 }
                 if !model.isPreviewVisible {
                     Text("Tap the screen to show the preview.")
                         .font(.footnote)
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(.tertiary)
                 }
                 if model.isPreviewVisible, model.hasAudio {
                     detectionOverlay
+                        .transition(.opacity)
                 }
-                Spacer()
+                Spacer(minLength: DS.Spacing.l)
                 if model.isPreviewVisible {
-                    Button {
-                        showsZones = true
-                    } label: {
-                        Label("Zones", systemImage: "square.dashed")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
-                    .accessibilityIdentifier("edit-zones")
-                    Button(role: .destructive) {
-                        model.stop()
-                    } label: {
-                        Text("Stop camera")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .accessibilityIdentifier("stop-camera")
+                    cameraControls
+                        .transition(controlsTransition)
                 }
             }
-            .padding()
+            .padding(DS.Spacing.l)
         }
+        .animation(DS.Motion.animation(DS.Motion.gentle, reduceMotion: reduceMotion), value: model.isPreviewVisible)
         .contentShape(Rectangle())
         .onTapGesture { model.tap() }
+        .accessibilityAction(named: Text("Show preview")) { model.tap() }
         .statusBarHidden()
         .persistentSystemOverlays(.hidden)
         .preferredColorScheme(.dark)
     }
 
+    private var controlsTransition: AnyTransition {
+        reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity)
+    }
+
+    /// Floating glass controls over the preview. Side by side, stacked at accessibility text sizes.
+    private var cameraControls: some View {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(spacing: DS.Spacing.m))
+            : AnyLayout(HStackLayout(spacing: DS.Spacing.m))
+        return GlassControlGroup {
+            layout {
+                Button {
+                    showsZones = true
+                } label: {
+                    Label("Zones", systemImage: "square.dashed")
+                        .frame(maxWidth: .infinity)
+                }
+                .cameraControlStyle(prominent: false)
+                .accessibilityIdentifier("edit-zones")
+                Button(role: .destructive) {
+                    model.stop()
+                } label: {
+                    Label("Stop camera", systemImage: "stop.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .cameraControlStyle(prominent: true)
+                .tint(.red)
+                .accessibilityIdentifier("stop-camera")
+            }
+            .controlSize(.large)
+        }
+    }
+
     private var statusIndicator: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(.red)
-                .frame(width: 8, height: 8)
+        HStack(spacing: DS.Spacing.s) {
+            Image(systemName: "circle.fill")
+                .imageScale(.small)
+                .foregroundStyle(.red)
+                .accessibilityHidden(true)
             Text("Camera on")
             if let state = model.dogState.label {
                 Text(verbatim: "·")
+                    .accessibilityHidden(true)
                 Text(state)
             }
             if model.isPreviewVisible, model.videoFPS > 0 {
@@ -200,10 +256,11 @@ struct CameraModeView: View {
                     // Privacy (SPEC §10): always show when someone is watching.
                     Label {
                         Text("\(live.viewerCount) watching")
+                            .contentTransition(.numericText(value: Double(live.viewerCount)))
                     } icon: {
                         Image(systemName: "eye.fill")
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 } else if live.link == .offline {
                     Image(systemName: "wifi.slash")
                         .accessibilityLabel(Text("Offline"))
@@ -215,79 +272,93 @@ struct CameraModeView: View {
                     Text("Someone is talking")
                 } icon: {
                     Image(systemName: "waveform")
-                        .symbolEffect(.variableColor.iterative, options: .repeating)
+                        .symbolEffect(.variableColor.iterative, options: .repeating, isActive: !reduceMotion)
                 }
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             }
             if !model.hasAudio {
                 Image(systemName: "mic.slash.fill")
                     .accessibilityLabel(Text("Microphone off — barking can't be detected."))
             }
         }
-        .font(.caption)
-        .foregroundStyle(.white.opacity(0.6))
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(.white.opacity(0.08), in: Capsule())
+        .font(.caption.weight(.medium))
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, DS.Spacing.m)
+        .padding(.vertical, DS.Spacing.s)
+        .glassSurface()
+        .accessibilityElement(children: .combine)
     }
 
     /// Debug overlay: what the audio analyzer heard recently.
     private var detectionOverlay: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Barks in the last minute: \(model.recentBarkCount)")
-                .font(.caption.bold())
-            ForEach(Array(model.detectionLog.latest(4).enumerated()), id: \.offset) { _, detection in
-                HStack {
-                    Text(verbatim: detection.kind.rawValue)
-                    Spacer()
-                    Text(verbatim: "\(Int((detection.confidence * 100).rounded()))%")
-                        .monospacedDigit()
-                    Text(detection.timestamp, style: .relative)
-                        .monospacedDigit()
+        GlassCard {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                Text("Barks in the last minute: \(model.recentBarkCount)")
+                    .font(.caption.bold())
+                    .contentTransition(.numericText(value: Double(model.recentBarkCount)))
+                ForEach(Array(model.detectionLog.latest(4).enumerated()), id: \.offset) { _, detection in
+                    HStack(spacing: DS.Spacing.s) {
+                        Text(verbatim: detection.kind.rawValue)
+                        Spacer(minLength: DS.Spacing.s)
+                        Text(verbatim: "\(Int((detection.confidence * 100).rounded()))%")
+                            .monospacedDigit()
+                        Text(detection.timestamp, style: .relative)
+                            .monospacedDigit()
+                    }
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
                 }
-                .font(.caption2)
             }
         }
-        .foregroundStyle(.white)
-        .padding(10)
-        .frame(maxWidth: 260)
-        .background(.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
+        .frame(maxWidth: Self.detectionOverlayMaxWidth)
     }
 
+    private static let detectionOverlayMaxWidth: CGFloat = 280
+
+    // MARK: Problems
+
     private func messageScreen(
-        _ message: LocalizedStringKey,
+        title: LocalizedStringKey,
+        message: LocalizedStringKey,
+        systemImage: String,
         actionTitle: LocalizedStringKey,
         action: @escaping () -> Void
     ) -> some View {
-        VStack(spacing: 16) {
-            Spacer()
+        ContentUnavailableView {
+            Label(title, systemImage: systemImage)
+        } description: {
             Text(message)
-                .multilineTextAlignment(.center)
+        } actions: {
             Button(actionTitle, action: action)
                 .buttonStyle(.borderedProminent)
-            Spacer()
-            Button("Change role", action: onChangeRole)
         }
-        .padding()
+        .safeAreaInset(edge: .bottom) {
+            Button("Change role", action: onChangeRole)
+                .font(.footnote)
+                .padding(.bottom, DS.Spacing.l)
+        }
     }
 }
 
-/// A heat or power problem, shown even on the black screen so it is seen from across the room.
-private struct HealthWarningBanner: View {
+/// A heat or power problem as a glass card, shown even on the black screen so it is seen
+/// from across the room.
+private struct HealthWarningCard: View {
     let warning: CameraHealth.Warning
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        Label {
-            Text(message)
-        } icon: {
-            Image(systemName: symbol)
-                .symbolEffect(.pulse, options: .repeating)
+        GlassCard {
+            Label {
+                Text(message)
+                    .foregroundStyle(.primary)
+            } icon: {
+                Image(systemName: symbol)
+                    .foregroundStyle(.orange)
+                    .symbolEffect(.pulse, options: .repeating, isActive: !reduceMotion)
+            }
+            .font(.subheadline.weight(.semibold))
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .font(.subheadline.weight(.semibold))
-        .foregroundStyle(.orange)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
-        .background(.orange.opacity(0.15), in: Capsule())
         .accessibilityElement(children: .combine)
     }
 
@@ -306,6 +377,54 @@ private struct HealthWarningBanner: View {
         case .lowBattery: "battery.25"
         case .unplugged: "powerplug"
         case .offline: "wifi.slash"
+        }
+    }
+}
+
+/// Groups floating glass controls so their glass blends together on iOS 26.
+private struct GlassControlGroup<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        #if compiler(>=6.2)
+        if #available(iOS 26, *) {
+            GlassEffectContainer(spacing: DS.Spacing.m) {
+                content
+            }
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
+    }
+}
+
+private extension View {
+    /// Glass buttons on iOS 26, bordered buttons before.
+    @ViewBuilder
+    func cameraControlStyle(prominent: Bool) -> some View {
+        #if compiler(>=6.2)
+        if #available(iOS 26, *) {
+            if prominent {
+                buttonStyle(.glassProminent)
+            } else {
+                buttonStyle(.glass)
+            }
+        } else {
+            borderedControlStyle(prominent: prominent)
+        }
+        #else
+        borderedControlStyle(prominent: prominent)
+        #endif
+    }
+
+    @ViewBuilder
+    func borderedControlStyle(prominent: Bool) -> some View {
+        if prominent {
+            buttonStyle(.borderedProminent)
+        } else {
+            buttonStyle(.bordered)
         }
     }
 }
