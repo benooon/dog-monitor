@@ -23,6 +23,8 @@ final class LocalizationTests: XCTestCase {
         "Online",
         "Offline",
         "No cameras yet. Pair a spare iPhone as a camera.",
+        "No cameras yet",
+        "Pair a spare iPhone to watch your dog from here.",
         "Starting camera…",
         "Camera access is off. Allow it in Settings to use this phone as a camera.",
         "Open Settings",

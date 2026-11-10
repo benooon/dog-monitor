@@ -1041,6 +1041,16 @@
         }
       }
     },
+    "No cameras yet": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין עדיין מצלמות"
+          }
+        }
+      }
+    },
     "No cameras yet. Pair a spare iPhone as a camera.": {
       "localizations": {
         "he": {
@@ -1187,6 +1197,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "צימוד"
+          }
+        }
+      }
+    },
+    "Pair a spare iPhone to watch your dog from here.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חברו אייפון פנוי כדי לצפות בכלב מכאן."
           }
         }
       }

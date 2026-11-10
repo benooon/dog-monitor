@@ -121,14 +121,13 @@ struct ViewerHomeView: View {
         List {
             if let message = model.errorMessage {
                 Section {
-                    Text(message).foregroundStyle(.red)
+                    errorLabel(message)
                 }
             }
             Section("Cameras") {
                 let cameras = model.household?.cameras ?? []
-                if cameras.isEmpty {
-                    Text("No cameras yet. Pair a spare iPhone as a camera.")
-                        .foregroundStyle(.secondary)
+                if cameras.isEmpty && model.household != nil {
+                    noCameras
                 }
                 ForEach(cameras) { camera in
                     NavigationLink(value: camera.id) {
@@ -161,19 +160,18 @@ struct ViewerHomeView: View {
     /// Wide iPad windows: camera cards side by side, so several rooms fit on one screen.
     private var cameraGrid: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
                 if let message = model.errorMessage {
-                    Text(message).foregroundStyle(.red)
+                    errorLabel(message)
                 }
                 let cameras = model.household?.cameras ?? []
                 if cameras.isEmpty && model.household != nil {
-                    ContentUnavailableView {
-                        Label("Cameras", systemImage: "video")
-                    } description: {
-                        Text("No cameras yet. Pair a spare iPhone as a camera.")
-                    }
+                    noCameras
                 }
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 320), spacing: 16)], spacing: 16) {
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: Self.gridCardMinWidth), spacing: DS.Spacing.l)],
+                    spacing: DS.Spacing.l
+                ) {
                     ForEach(cameras) { camera in
                         NavigationLink(value: camera.id) {
                             CameraCard(
@@ -182,9 +180,9 @@ struct ViewerHomeView: View {
                                 livePresence: model.realtime?.presence[camera.id],
                                 dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
                             )
-                            .padding(12)
-                            .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
-                            .contentShape(RoundedRectangle(cornerRadius: 16))
+                            .padding(DS.Spacing.m)
+                            .background(.background.secondary, in: Self.gridCardShape)
+                            .contentShape(Self.gridCardShape)
                         }
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
@@ -192,7 +190,7 @@ struct ViewerHomeView: View {
                     }
                 }
                 if let dogs = model.household?.dogs, !dogs.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.s) {
                         Text("Dogs")
                             .font(.headline)
                         ForEach(dogs) { dog in
@@ -219,6 +217,35 @@ struct ViewerHomeView: View {
         Task {
             await liveActivities.sync(dogStates: dogStates, presence: presence, householdCameras: householdCameras)
         }
+    }
+
+    /// Narrowest a camera card gets in the iPad grid before it wraps to fewer columns.
+    private static let gridCardMinWidth: CGFloat = 320
+    private static let gridCardShape = RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+
+    /// The household has no cameras yet; the owner can go straight to pairing one.
+    private var noCameras: some View {
+        ContentUnavailableView {
+            Label("No cameras yet", systemImage: "video.badge.plus")
+        } description: {
+            Text("Pair a spare iPhone to watch your dog from here.")
+        } actions: {
+            if isOwner {
+                Button("Invite family or pair a camera") {
+                    showsHousehold = true
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+
+    private func errorLabel(_ message: String) -> some View {
+        Label {
+            Text(verbatim: message)
+        } icon: {
+            Image(systemName: "exclamationmark.triangle.fill")
+        }
+        .foregroundStyle(.red)
     }
 
     /// Hands the latest dog state per camera to the home screen widget.
@@ -275,53 +302,78 @@ private struct CameraCard: View {
     /// Presence from the realtime channel, which is fresher than the last heartbeat time.
     var livePresence: Bool?
     var dogState: DogState?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private static let snapshotShape = RoundedRectangle(cornerRadius: DS.Radius.medium, style: .continuous)
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 30)) { context in
             let online = livePresence ?? camera.isOnline(now: context.date)
-            VStack(alignment: .leading, spacing: 8) {
-                ZStack {
-                    Rectangle().fill(.quaternary)
-                    if let snapshot {
-                        AsyncImage(url: snapshot) { image in
-                            image.resizable().scaledToFill()
-                        } placeholder: {
-                            ProgressView()
-                        }
-                    } else {
-                        Image(systemName: "video.fill")
-                            .font(.largeTitle)
-                            .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: DS.Spacing.s) {
+                snapshotView
+                    .overlay(alignment: .topLeading) {
+                        StatusPill(
+                            title: online ? "Online" : "Offline",
+                            tint: online ? .green : .secondary
+                        )
+                        .padding(DS.Spacing.s)
                     }
-                }
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(alignment: .topLeading) {
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(online ? Color.green : Color.secondary)
-                            .frame(width: 8, height: 8)
-                        Text(online ? LocalizedStringKey("Online") : LocalizedStringKey("Offline"))
-                    }
-                    .font(.caption.bold())
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(.thinMaterial, in: Capsule())
-                    .padding(8)
-                }
-                HStack {
+                HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.s) {
                     Text(verbatim: camera.name)
                         .font(.headline)
-                    Spacer()
-                    if online, let label = dogState?.label {
-                        Text(label)
-                            .font(.subheadline)
-                            .foregroundStyle(dogState?.isAlerting == true ? Color.orange : Color.secondary)
+                    Spacer(minLength: DS.Spacing.s)
+                    if online, let dogState, let label = dogState.label {
+                        Label {
+                            Text(label)
+                        } icon: {
+                            Image(systemName: dogState.symbol)
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(dogState.isAlerting ? Color.orange : Color.secondary)
+                        .transition(.opacity)
+                        .id(dogState)
                     }
                 }
+                .animation(DS.Motion.animation(DS.Motion.standard, reduceMotion: reduceMotion), value: dogState)
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, DS.Spacing.xs)
             .accessibilityElement(children: .combine)
         }
     }
+
+    private var snapshotView: some View {
+        ZStack {
+            Rectangle().fill(.quaternary)
+            if let snapshot {
+                AsyncImage(url: snapshot) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    ProgressView()
+                }
+                .accessibilityHidden(true)
+            } else {
+                Image(systemName: "video.fill")
+                    .font(.largeTitle)
+                    .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
+            }
+        }
+        .aspectRatio(16 / 9, contentMode: .fit)
+        .clipShape(Self.snapshotShape)
+    }
+}
+
+#Preview {
+    ViewerHomeView(model: ViewerSessionModel(), householdName: "Home", isOwner: true)
+}
+
+#Preview("Hebrew (RTL)") {
+    ViewerHomeView(model: ViewerSessionModel(), householdName: "Home", isOwner: true)
+        .environment(\.locale, Locale(identifier: "he"))
+        .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    ViewerHomeView(model: ViewerSessionModel(), householdName: "Home", isOwner: true)
+        .preferredColorScheme(.dark)
 }
