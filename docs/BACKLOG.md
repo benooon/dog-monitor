@@ -51,7 +51,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Upload clips and snapshots for events through presigned URLs, with an offline queue that retries when the network returns. (2d45a0f)
 - [x] backend: Viewer timeline API: `GET /events` (household-scoped, newest first, filter by camera and types, cursor pagination) and `PUT /events/:id/feedback` (right/wrong).
 - [~] core: Timeline API client: `GET /events` (camera/type filters, cursor pages), `PUT /events/:id/feedback`, `GET /events/:id/media`, and `feedback` on `EventDTO`, with tests. Split out of the timeline screen (whose claim has had nothing pushed since 09:07). (in progress 2026-11-10; code pushed in 1c12ce9, waiting for CI: Actions isn't running, see HUMAN_TODO)
-- [~] ios: Event timeline screen (filter by type, play clip via `GET /events/:id/media`, mark detection as right/wrong) using `GET /events` and `PUT /events/:id/feedback`. (in progress 2026-11-10)
+- [~] ios: Event timeline screen (filter by type, play clip via `GET /events/:id/media`, mark detection as right/wrong) using `GET /events` and `PUT /events/:id/feedback`. (in progress 2026-11-10; taken over at 15:50 by session 01H4JFSoLK, the 09:07 claim never pushed code)
 - [x] backend: Per-user notification settings API (types, cameras, quiet hours). `GET`/`PUT /notification-prefs`.
 - [x] ios: Notification settings screen (per event type on/off, per camera overrides, quiet hours) using `GET/PUT /notification-prefs`.
 - [x] ios: Camera health. Heartbeat (battery, charging, thermal, network); show a warning on the camera screen when unplugged or hot, and lower fps on `thermalState` serious.
@@ -65,19 +65,19 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] core: Rule-based state classifier (resting / restless / atDoor / forbiddenZone / notVisible) from detections over time. Unit tests with synthetic sequences.
 - [x] ios: Zone editor in camera setup (draw polygons over the preview, saved as normalized coordinates) and synced to the backend.
 - [x] core + backend: Daily summary computation (rest minutes, bark count, activity by hour), plus a daily summary push.
-- [~] ios: Daily summary screen with Swift Charts. (in progress 2026-11-10; code pushed in a7a0310, waiting for CI: Actions isn't running, see HUMAN_TODO)
-- [~] ios: "Calmed down" event and push after barking stops and the dog rests. (in progress 2026-11-10; code pushed, waiting for CI: Actions isn't running, see HUMAN_TODO)
+- [x] ios: Daily summary screen with Swift Charts. (verified by green CI run #132 on 094b952)
+- [x] ios: "Calmed down" event and push after barking stops and the dog rests. (verified by green CI run #132 on 094b952)
 
 ## Phase 4 — Custom model
 
-- [~] ios: Opt-in labeled data capture (save short clips with the user's right/wrong feedback for training). (in progress 2026-11-10; code pushed, waiting for CI: Actions isn't running, see HUMAN_TODO)
-- [~] docs: Create ML training guide plus scripts to export labeled data, and a slot in the app to load an updated `.mlmodel`. (in progress 2026-11-10; code pushed, waiting for CI: Actions isn't running, see HUMAN_TODO)
+- [x] ios: Opt-in labeled data capture (save short clips with the user's right/wrong feedback for training). (verified by green CI run #132 on 094b952)
+- [x] docs: Create ML training guide plus scripts to export labeled data, and a slot in the app to load an updated `.mlmodel`. (verified by green CI run #132 on 094b952)
 
 ## Phase 5 — Product
 
 - [x] backend: Subscription entitlements for StoreKit 2: verify signed App Store transactions (x5c chain to the Apple root), store the household plan, `GET /subscription`, and enforce the free-tier camera limit.
 - [x] backend: App Store Server Notifications V2 endpoint (renewals, expirations, refunds) so premium stays right even when the owner's app is not opened. Uses the same signed-payload verifier.
-- [~] ios: StoreKit 2 subscription (free tier limits vs premium). Backend is ready: set `appAccountToken` to the household id, POST each verified `jwsRepresentation` to `/subscription/apple` (after purchase, on `Transaction.updates` and from `currentEntitlements` on launch), read `GET /subscription` for plan/limits, and handle 409 `camera_limit_reached` in pairing with an upgrade prompt. Add a `.storekit` config for local testing. (in progress 2026-11-10; code pushed in dabb001, waiting for CI: Actions isn't running, see HUMAN_TODO)
+- [x] ios: StoreKit 2 subscription (free tier limits vs premium). Backend is ready: set `appAccountToken` to the household id, POST each verified `jwsRepresentation` to `/subscription/apple` (after purchase, on `Transaction.updates` and from `currentEntitlements` on launch), read `GET /subscription` for plan/limits, and handle 409 `camera_limit_reached` in pairing with an upgrade prompt. Add a `.storekit` config for local testing. (verified by green CI run #132 on 094b952)
 - [x] backend: Live Activity updates. Viewers register an ActivityKit push token per camera (`PUT /live-activities`, `DELETE /live-activities/:id`); dog-state and online changes from the realtime hub are sent as APNs `liveactivity` pushes (throttled, dead tokens dropped).
 - [~] core: Live Activity content state (`{state, online}`, matching backend/src/notifications/live-activity.ts) and API calls for `PUT /live-activities` / `DELETE /live-activities/:id`, with tests, so the iOS widget task only adds the extension and UI. (in progress 2026-11-10; code pushed in 98b0d6f, waiting for CI: Actions isn't running, see HUMAN_TODO)
 - [ ] ios: Live Activity for a camera on the viewer's phone (dog state + online, Dynamic Island), started from viewer home, registering its push token with `api.registerLiveActivity` / `api.endLiveActivity` and using `CameraLiveActivityContent` as the ContentState (core), (`{cameraId, pushToken}` hex → `{id}`; `DELETE /live-activities/:id` when it ends). ContentState must decode `{"state": DogState?, "online": Bool}` (backend/src/notifications/live-activity.ts); plus a home screen widget with the dog's current state. Needs a widget extension target in project.yml and an app group.
