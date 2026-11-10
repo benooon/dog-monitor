@@ -32,6 +32,8 @@ final class CameraModeModel {
 
     /// Something moved in the last few seconds; heavier video analysis runs only while true.
     private(set) var isMotionActive = false
+    /// The latest Vision result: where the dog is and its posture (empty when no dog was seen).
+    private(set) var dogDetections: [Detection] = []
     /// Heat and power problems to show on the camera screen, most important first.
     private(set) var healthWarnings: [CameraHealth.Warning] = []
 
@@ -143,6 +145,7 @@ final class CameraModeModel {
         motionTask = nil
         motionResultsTask = nil
         isMotionActive = false
+        dogDetections = []
         meterTask = nil
         analysisTask = nil
         detectionTask = nil
@@ -197,34 +200,49 @@ final class CameraModeModel {
         }
     }
 
-    /// Frame differencing at ~4 fps off the main actor; publishes when the motion gate opens or closes.
+    /// Frame differencing at ~4 fps off the main actor, gating Vision dog detection (twice a
+    /// second while something moves, every 10 s otherwise).
     private func startMotionDetection() {
         motionTask?.cancel()
         motionResultsTask?.cancel()
         let samples = capture.samples(.video, bufferingNewest: 1)
-        let (results, continuation) = AsyncStream<(MotionResult, Bool)>.makeStream(bufferingPolicy: .bufferingNewest(4))
+        let (results, continuation) = AsyncStream<VideoAnalysis>.makeStream(bufferingPolicy: .bufferingNewest(4))
         motionTask = Task.detached(priority: .utility) {
             var detector = MotionDetector()
+            var lastVision: Date?
             for await sample in samples where sample.kind == .video {
                 let now = Date.now
                 guard detector.wants(now), let frame = MotionAnalyzer.lumaFrame(from: sample, timestamp: now) else { continue }
                 let result = detector.process(frame)
-                continuation.yield((result, detector.isActive(at: now)))
+                let gateOpen = detector.isActive(at: now)
+                var dog: [Detection]?
+                if DogVisionAnalyzer.isDue(lastRun: lastVision, now: now, motion: gateOpen) {
+                    lastVision = now
+                    dog = DogVisionAnalyzer.analyze(sample, at: now)
+                }
+                continuation.yield(VideoAnalysis(motion: result, gateOpen: gateOpen, dog: dog))
             }
             continuation.finish()
         }
         motionResultsTask = Task { [weak self] in
-            for await (result, active) in results {
-                self?.motionObserved(result, gateOpen: active)
+            for await analysis in results {
+                self?.videoAnalyzed(analysis)
             }
         }
     }
 
-    private func motionObserved(_ result: MotionResult, gateOpen: Bool) {
-        if gateOpen, !isMotionActive, let detection = MotionDetector.detection(for: result) {
+    private func videoAnalyzed(_ analysis: VideoAnalysis) {
+        if analysis.gateOpen, !isMotionActive, let detection = MotionDetector.detection(for: analysis.motion) {
             detectionLog.append(detection)
         }
-        if gateOpen != isMotionActive { isMotionActive = gateOpen }
+        if analysis.gateOpen != isMotionActive { isMotionActive = analysis.gateOpen }
+        if let dog = analysis.dog {
+            // Log only changes (dog appears, posture changes), not every look.
+            if dog.map(\.kind) != dogDetections.map(\.kind) {
+                dog.forEach { detectionLog.append($0) }
+            }
+            dogDetections = dog
+        }
     }
 
     /// Called after `CameraPairingView` stored the new device credential.
@@ -455,4 +473,11 @@ final class CameraModeModel {
             savedBrightness = nil
         }
     }
+}
+
+/// One analyzed frame: motion, and Vision's dog detections when it ran on this frame.
+private struct VideoAnalysis: Sendable {
+    var motion: MotionResult
+    var gateOpen: Bool
+    var dog: [Detection]?
 }
