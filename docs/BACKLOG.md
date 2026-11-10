@@ -26,8 +26,8 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [~] ios: Bark detection with SoundAnalysis (`SNClassifySoundRequest` built-in classifier), mapping dog-related classes to `Detection` values in core. Show a debug overlay in camera mode. (in progress 2026-11-10)
 - [~] core: Event engine state machine. Detections in, events out, with duration thresholds, cooldowns, escalation and state transitions per SPEC §5. **Heavy unit tests** with simulated timelines (inject a clock). (in progress 2026-11-10)
 - [x] backend: LiveKit. `POST /cameras/:id/live-token` mints a viewer token; the camera fetches a publisher token. Env: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
-- [~] backend: WebSocket channel. Camera presence and heartbeats; tell the camera "viewer joined / all viewers left"; mark a camera offline after 3 min without a heartbeat. (in progress 2026-11-10)
-- [ ] backend: Enforce the 5-viewers-per-camera limit in `POST /cameras/:id/live-token` using WebSocket presence (or LiveKit room participant count), returning 409 `viewer_limit_reached`.
+- [x] backend: WebSocket channel. Camera presence and heartbeats; tell the camera "viewer joined / all viewers left"; mark a camera offline after 3 min without a heartbeat. Protocol: `backend/src/realtime/protocol.ts`.
+- [~] backend: Enforce the 5-viewers-per-camera limit in `POST /cameras/:id/live-token` using WebSocket presence (or LiveKit room participant count), returning 409 `viewer_limit_reached`. (in progress 2026-11-10)
 - [ ] ios: Camera publishes to LiveKit only while viewers are connected (driven by the WebSocket signal), with simulcast 720p/360p.
 - [ ] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
 - [ ] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client.
