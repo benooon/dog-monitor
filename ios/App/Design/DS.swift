@@ -21,6 +21,18 @@ enum DS {
         static let section: CGFloat = 32
     }
 
+    /// Layout limits.
+    enum Layout {
+        /// Widest a column of text, forms or onboarding content gets on iPad and in landscape.
+        static let readableWidth: CGFloat = 560
+
+        /// Horizontal margin that centers a `readableWidth` column in `containerWidth`,
+        /// and never less than `minimum`.
+        static func readableMargin(in containerWidth: CGFloat, minimum: CGFloat = Spacing.xl) -> CGFloat {
+            max(minimum, (containerWidth - readableWidth) / 2)
+        }
+    }
+
     /// Corner radii. Always draw them with `.continuous` corners.
     enum Radius {
         /// 8: thumbnails, small chips.

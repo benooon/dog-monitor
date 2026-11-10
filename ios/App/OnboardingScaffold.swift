@@ -7,9 +7,6 @@ struct OnboardingScaffold<Content: View, Actions: View>: View {
     @ViewBuilder let content: Content
     @ViewBuilder let actions: Actions
 
-    /// Widest the column gets on iPad and in landscape.
-    private static var readableWidth: CGFloat { 560 }
-
     var body: some View {
         ViewThatFits(in: .vertical) {
             content
@@ -28,7 +25,7 @@ struct OnboardingScaffold<Content: View, Actions: View>: View {
             .padding(.bottom, DS.Spacing.l)
         }
         .padding(.horizontal, DS.Spacing.xl)
-        .frame(maxWidth: Self.readableWidth)
+        .frame(maxWidth: DS.Layout.readableWidth)
         .frame(maxWidth: .infinity)
     }
 }

@@ -160,55 +160,99 @@ struct ViewerHomeView: View {
         }
     }
 
-    /// Wide iPad windows: camera cards side by side, so several rooms fit on one screen.
+    /// Wide iPad windows: big camera cards, with the dogs beside them in landscape and below
+    /// them in portrait, so the screen is used instead of leaving it mostly empty.
     private var cameraGrid: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
-                if let message = model.errorMessage {
-                    errorLabel(message)
-                }
-                let cameras = model.household?.cameras ?? []
-                if cameras.isEmpty && model.household != nil {
-                    noCameras
-                }
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: Self.gridCardMinWidth), spacing: DS.Spacing.l)],
-                    spacing: DS.Spacing.l
-                ) {
-                    ForEach(cameras) { camera in
-                        NavigationLink(value: camera.id) {
-                            CameraCard(
-                                camera: camera,
-                                snapshot: model.snapshots[camera.id],
-                                livePresence: model.realtime?.presence[camera.id],
-                                dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
-                            )
-                            .padding(DS.Spacing.m)
-                            .background(.background.secondary, in: Self.gridCardShape)
-                            .contentShape(Self.gridCardShape)
+        GeometryReader { proxy in
+            let cameras = model.household?.cameras ?? []
+            let showsSidebar = proxy.size.width > proxy.size.height
+                && proxy.size.width >= Self.sidebarMinScreenWidth
+            let gridWidth = proxy.size.width - DS.Spacing.l * 2
+                - (showsSidebar ? Self.sidebarWidth + DS.Spacing.l : 0)
+            let columnCount = Self.gridColumnCount(
+                cameraCount: cameras.count,
+                width: gridWidth,
+                portrait: !showsSidebar
+            )
+            ScrollView {
+                VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
+                    if let message = model.errorMessage {
+                        errorLabel(message)
+                    }
+                    if cameras.isEmpty && model.household != nil {
+                        noCameras
+                    }
+                    if showsSidebar {
+                        HStack(alignment: .top, spacing: DS.Spacing.l) {
+                            cameraCards(cameras, columns: columnCount)
+                            dogsPanel
+                                .frame(width: Self.sidebarWidth)
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
-                        .contextMenu { lockScreenButton(for: camera) }
+                    } else {
+                        cameraCards(cameras, columns: columnCount)
+                        dogsPanel
                     }
                 }
-                if let dogs = model.household?.dogs, !dogs.isEmpty {
-                    VStack(alignment: .leading, spacing: DS.Spacing.s) {
-                        Text("Dogs")
-                            .font(.headline)
-                        ForEach(dogs) { dog in
-                            Label {
-                                Text(verbatim: dog.name)
-                            } icon: {
-                                Image(systemName: "pawprint.fill")
-                            }
-                        }
-                    }
-                }
+                .padding(DS.Spacing.l)
             }
-            .padding()
         }
         .background(Color(.systemGroupedBackground))
+    }
+
+    private func cameraCards(_ cameras: [DeviceDTO], columns: Int) -> some View {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: DS.Spacing.l, alignment: .top), count: columns),
+            spacing: DS.Spacing.l
+        ) {
+            ForEach(cameras) { camera in
+                NavigationLink(value: camera.id) {
+                    CameraCard(
+                        camera: camera,
+                        snapshot: model.snapshots[camera.id],
+                        livePresence: model.realtime?.presence[camera.id],
+                        dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
+                    )
+                    .padding(DS.Spacing.m)
+                    .background(Color(.secondarySystemGroupedBackground), in: Self.gridCardShape)
+                    .contentShape(Self.gridCardShape)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
+                .contextMenu { lockScreenButton(for: camera) }
+            }
+        }
+    }
+
+    /// The household's dogs as a grouped card, matching the camera cards.
+    @ViewBuilder
+    private var dogsPanel: some View {
+        if let dogs = model.household?.dogs, !dogs.isEmpty {
+            VStack(alignment: .leading, spacing: DS.Spacing.m) {
+                Text("Dogs")
+                    .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
+                ForEach(dogs) { dog in
+                    Label {
+                        Text(verbatim: dog.name)
+                    } icon: {
+                        Image(systemName: "pawprint.fill")
+                            .foregroundStyle(.tint)
+                    }
+                    .font(.body)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(DS.Spacing.l)
+            .background(Color(.secondarySystemGroupedBackground), in: Self.gridCardShape)
+        }
+    }
+
+    /// Columns for the iPad grid. One or two cameras in portrait get one large card each;
+    /// otherwise as many columns as fit at the minimum card width, never more than there are cameras.
+    static func gridColumnCount(cameraCount: Int, width: CGFloat, portrait: Bool) -> Int {
+        if portrait && cameraCount <= 2 { return 1 }
+        let fitting = Int((width + DS.Spacing.l) / (gridCardMinWidth + DS.Spacing.l))
+        return max(1, min(fitting, max(cameraCount, 1)))
     }
 
     /// Fresh realtime state or a changed camera list: refresh the widget and any Live Activities.
@@ -224,6 +268,10 @@ struct ViewerHomeView: View {
 
     /// Narrowest a camera card gets in the iPad grid before it wraps to fewer columns.
     private static let gridCardMinWidth: CGFloat = 320
+    /// Width of the dogs column beside the cameras in landscape.
+    private static let sidebarWidth: CGFloat = 280
+    /// Screens narrower than this (split view, small iPads) keep the dogs below the cameras.
+    private static let sidebarMinScreenWidth: CGFloat = 960
     private static let gridCardShape = RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
 
     /// The household has no cameras yet; the owner can go straight to pairing one.
