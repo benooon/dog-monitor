@@ -162,6 +162,20 @@ describe.skipIf(!hasDatabase)("realtime channel (GET /ws)", () => {
     expect(await viewer.next()).toEqual({ type: "presence", cameraId: camera.id, online: false });
   });
 
+  it("refuses a sixth viewer", async () => {
+    const { owner, camera } = await setup();
+    for (let i = 0; i < 5; i++) {
+      const peer = { send() {} };
+      hub.viewerConnected(peer, "h", [], clock, `other-${i}`);
+      hub.watch(peer, camera.id);
+    }
+    const viewer = await connect(owner.auth);
+    await viewer.next();
+    viewer.send({ type: "watch", cameraId: camera.id });
+    expect(await viewer.next()).toEqual({ type: "error", error: "viewer_limit_reached" });
+    expect(hub.viewerCount(camera.id)).toBe(5);
+  });
+
   it("refuses to watch cameras outside the household and bad messages", async () => {
     const { camera } = await setup();
     const stranger = await signIn("stranger");

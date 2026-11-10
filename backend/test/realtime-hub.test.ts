@@ -45,6 +45,18 @@ describe("RealtimeHub", () => {
     ]);
   });
 
+  it("knows which users watch a camera", () => {
+    const hub = new RealtimeHub();
+    const phone = new StubPeer();
+    hub.viewerConnected(phone, H, [], T0, "user-1");
+    expect(hub.isWatching(CAM, "user-1")).toBe(false);
+    hub.watch(phone, CAM);
+    expect(hub.isWatching(CAM, "user-1")).toBe(true);
+    expect(hub.isWatching(CAM, "user-2")).toBe(false);
+    hub.viewerDisconnected(phone);
+    expect(hub.isWatching(CAM, "user-1")).toBe(false);
+  });
+
   it("tells a (re)connecting camera that viewers are already waiting", () => {
     const hub = new RealtimeHub();
     const viewer = new StubPeer();

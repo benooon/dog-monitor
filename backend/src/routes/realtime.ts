@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import type { WebSocket } from "@fastify/websocket";
 import type { Database } from "../db/client.js";
 import { devices } from "../db/schema.js";
+import { LIMITS } from "../households/limits.js";
 import { findMembership } from "../households/scope.js";
 import type { Peer, RealtimeHub } from "../realtime/hub.js";
 import { parseCameraMessage, parseViewerMessage, type ServerMessage } from "../realtime/protocol.js";
@@ -105,6 +106,7 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
         householdId,
         cameras.map((c) => ({ id: c.id, lastHeartbeatAt: c.lastHeartbeatAt?.getTime() ?? null })),
         now(),
+        request.user!.userId,
       );
       onClose = () => hub.viewerDisconnected(peer);
       onMessage = async (raw) => {
@@ -124,6 +126,9 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
             ),
           );
         if (!camera) return peer.send({ type: "error", error: "not_found" });
+        if (hub.viewerCount(camera.id) >= LIMITS.viewersPerCamera && !hub.isWatching(camera.id, request.user!.userId)) {
+          return peer.send({ type: "error", error: "viewer_limit_reached" });
+        }
         hub.watch(peer, camera.id);
       };
     }

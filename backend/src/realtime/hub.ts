@@ -17,6 +17,7 @@ interface CameraState {
 
 interface ViewerState {
   householdId: string;
+  userId: string | null;
   watching: Set<string>;
 }
 
@@ -84,8 +85,14 @@ export class RealtimeHub {
 
   // MARK: viewers
 
-  viewerConnected(peer: Peer, householdId: string, cameras: { id: string; lastHeartbeatAt: number | null }[], now: number): void {
-    this.viewers.set(peer, { householdId, watching: new Set() });
+  viewerConnected(
+    peer: Peer,
+    householdId: string,
+    cameras: { id: string; lastHeartbeatAt: number | null }[],
+    now: number,
+    userId: string | null = null,
+  ): void {
+    this.viewers.set(peer, { householdId, userId, watching: new Set() });
     peer.send({
       type: "cameras",
       cameras: cameras.map((c) => {
@@ -125,6 +132,14 @@ export class RealtimeHub {
 
   viewerCount(cameraId: string): number {
     return this.watchers.get(cameraId)?.size ?? 0;
+  }
+
+  /** Whether `userId` already watches `cameraId` from any connection. */
+  isWatching(cameraId: string, userId: string): boolean {
+    for (const peer of this.watchers.get(cameraId) ?? []) {
+      if (this.viewers.get(peer)?.userId === userId) return true;
+    }
+    return false;
   }
 
   // MARK: private

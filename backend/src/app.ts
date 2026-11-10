@@ -57,11 +57,11 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(deviceRoutes, { db: services.db });
     await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter });
     await app.register(deviceSelfRoutes, { db: services.db });
-    await app.register(viewerLiveRoutes, { db: services.db, live: services.live });
-    await app.register(cameraLiveRoutes, { db: services.db, live: services.live });
-
     const hub = services.hub ?? new RealtimeHub();
     const now = services.now ?? Date.now;
+    await app.register(viewerLiveRoutes, { db: services.db, live: services.live, hub });
+    await app.register(cameraLiveRoutes, { db: services.db, live: services.live });
+
     await app.register(websocket);
     await app.register(realtimeRoutes, { db: services.db, hub, now });
     // Marks cameras offline after 3 minutes without a heartbeat.

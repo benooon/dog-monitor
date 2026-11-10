@@ -2,8 +2,10 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { devices, users } from "../db/schema.js";
+import { LIMITS } from "../households/limits.js";
 import { requireHousehold } from "../households/scope.js";
 import type { LiveTokenIssuer } from "../live/livekit.js";
+import type { RealtimeHub } from "../realtime/hub.js";
 
 interface LiveRouteOptions {
   db: Database;
@@ -11,12 +13,17 @@ interface LiveRouteOptions {
   live?: LiveTokenIssuer;
 }
 
+interface ViewerLiveRouteOptions extends LiveRouteOptions {
+  /** Presence, to enforce the viewers-per-camera limit (SPEC §3). */
+  hub: RealtimeHub;
+}
+
 function notConfigured(reply: FastifyReply) {
   return reply.code(503).send({ error: "live_not_configured" });
 }
 
 /** Viewer side: `POST /cameras/:id/live-token` (user auth, scoped to the household). */
-export async function viewerLiveRoutes(app: FastifyInstance, opts: LiveRouteOptions): Promise<void> {
+export async function viewerLiveRoutes(app: FastifyInstance, opts: ViewerLiveRouteOptions): Promise<void> {
   const { db } = opts;
   app.addHook("preHandler", app.authenticate);
   app.addHook("preHandler", requireHousehold(db));
@@ -41,10 +48,15 @@ export async function viewerLiveRoutes(app: FastifyInstance, opts: LiveRouteOpti
         );
       if (!camera) return reply.code(404).send({ error: "not_found" });
       if (camera.status !== "active") return reply.code(409).send({ error: "device_revoked" });
+      // Someone already watching (e.g. reconnecting, or a second phone) doesn't count twice.
+      const userId = request.user!.userId;
+      if (opts.hub.viewerCount(camera.id) >= LIMITS.viewersPerCamera && !opts.hub.isWatching(camera.id, userId)) {
+        return reply.code(409).send({ error: "viewer_limit_reached", limit: LIMITS.viewersPerCamera });
+      }
       if (!opts.live) return notConfigured(reply);
 
-      const [user] = await db.select({ name: users.name }).from(users).where(eq(users.id, request.user!.userId));
-      return opts.live.viewerToken({ deviceId: camera.id, userId: request.user!.userId, name: user?.name });
+      const [user] = await db.select({ name: users.name }).from(users).where(eq(users.id, userId));
+      return opts.live.viewerToken({ deviceId: camera.id, userId, name: user?.name });
     },
   );
 }

@@ -3,6 +3,7 @@ import type { FastifyInstance } from "fastify";
 import { TokenVerifier } from "livekit-server-sdk";
 import type { DbHandle } from "../src/db/client.js";
 import { LIVE_TOKEN_TTL_SECONDS, createLiveKitIssuer, roomForCamera } from "../src/live/livekit.js";
+import { RealtimeHub } from "../src/realtime/hub.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
@@ -63,10 +64,11 @@ describe.skipIf(!hasDatabase)("live token routes", () => {
   let ctx: Awaited<ReturnType<typeof buildTestApp>>;
   let app: FastifyInstance;
   let unconfigured: FastifyInstance;
+  const hub = new RealtimeHub();
 
   beforeAll(async () => {
     h = openTestDb();
-    ctx = await buildTestApp(h, { live: createLiveKitIssuer(LIVEKIT) });
+    ctx = await buildTestApp(h, { live: createLiveKitIssuer(LIVEKIT), hub });
     app = ctx.app;
     unconfigured = (await buildTestApp(h)).app;
   });
@@ -135,6 +137,30 @@ describe.skipIf(!hasDatabase)("live token routes", () => {
     const loner = await signIn("loner");
     const res = await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: loner.auth });
     expect(res.statusCode).toBe(403);
+  });
+
+  it("enforces 5 viewers per camera, without counting a user twice", async () => {
+    const { owner, camera } = await setup();
+    const peers = Array.from({ length: 5 }, () => ({ send() {} }));
+    peers.forEach((peer, i) => {
+      hub.viewerConnected(peer, "h", [], 0, i === 0 ? owner.userId : `other-${i}`);
+      hub.watch(peer, camera.id);
+    });
+    try {
+      // The owner is one of the five (e.g. a second phone or a reconnect): allowed.
+      const again = await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth });
+      expect(again.statusCode).toBe(200);
+
+      const member = await signIn("member");
+      const { householdMembers, households } = await import("../src/db/schema.js");
+      const [home] = await h.db.select().from(households);
+      await h.db.insert(householdMembers).values({ householdId: home!.id, userId: member.userId, role: "member" });
+      const sixth = await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: member.auth });
+      expect(sixth.statusCode).toBe(409);
+      expect(sixth.json()).toEqual({ error: "viewer_limit_reached", limit: 5 });
+    } finally {
+      peers.forEach((peer) => hub.viewerDisconnected(peer));
+    }
   });
 
   it("refuses revoked cameras", async () => {

@@ -11,7 +11,7 @@
  *   ← { type: "presence", cameraId, online }                        (on every change)
  *
  * Both:
- *   ← { type: "error", error: "<code>" }
+ *   ← { type: "error", error: "<code>" }   (bad_message, not_found, viewer_limit_reached, camera_only, no_household)
  */
 
 export const THERMAL_STATES = ["nominal", "fair", "serious", "critical"] as const;
