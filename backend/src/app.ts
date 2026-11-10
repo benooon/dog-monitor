@@ -25,6 +25,7 @@ import { cameraLiveRoutes, viewerLiveRoutes } from "./routes/live.js";
 import { realtimeRoutes } from "./routes/realtime.js";
 import { timelineRoutes } from "./routes/timeline.js";
 import { healthRoutes } from "./routes/health.js";
+import { appLinkRoutes } from "./routes/app-links.js";
 
 export interface AppServices {
   db: Database;
@@ -48,6 +49,8 @@ export interface AppServices {
 
 export interface BuildAppOptions {
   logLevel?: string;
+  /** "<team id>.<bundle id>" values allowed to open invite links (Universal Links). */
+  appLinkIds?: string[];
   /** Omit to build only the stateless routes (e.g. /health). */
   services?: AppServices;
 }
@@ -60,6 +63,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     logger: options.logLevel === "silent" ? false : { level: options.logLevel ?? "info" },
   });
   await app.register(healthRoutes);
+  await app.register(appLinkRoutes, { appIds: options.appLinkIds ?? [] });
 
   const services = options.services;
   if (services) {

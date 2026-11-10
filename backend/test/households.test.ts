@@ -162,6 +162,36 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     expect(fifth.json()).toMatchObject({ error: "camera_limit_reached", limit: 4 });
   });
 
+  it("lets the owner remove a member, revoking their phones", async () => {
+    const owner = await signIn("owner");
+    const member = await signIn("member");
+    const household = (await createHousehold(owner.auth)).json();
+    await addMember(household.id, member.userId);
+    const phone = (
+      await app.inject({ method: "POST", url: "/devices", headers: member.auth, payload: { name: "Phone", role: "viewer", apnsToken: APNS } })
+    ).json();
+
+    const byMember = await app.inject({ method: "DELETE", url: `/household/members/${owner.userId}`, headers: member.auth });
+    expect(byMember.statusCode).toBe(403);
+    const self = await app.inject({ method: "DELETE", url: `/household/members/${owner.userId}`, headers: owner.auth });
+    expect(self.statusCode).toBe(400);
+    expect(self.json()).toEqual({ error: "cannot_remove_owner" });
+    const unknown = await app.inject({
+      method: "DELETE",
+      url: "/household/members/00000000-0000-4000-8000-000000000000",
+      headers: owner.auth,
+    });
+    expect(unknown.statusCode).toBe(404);
+
+    const removed = await app.inject({ method: "DELETE", url: `/household/members/${member.userId}`, headers: owner.auth });
+    expect(removed.statusCode).toBe(204);
+
+    const after = (await app.inject({ method: "GET", url: "/household", headers: owner.auth })).json();
+    expect(after.members).toEqual([expect.objectContaining({ userId: owner.userId })]);
+    expect(after.devices.find((d: { id: string }) => d.id === phone.id)).toMatchObject({ status: "revoked", hasPushToken: false });
+    expect((await app.inject({ method: "GET", url: "/household", headers: member.auth })).statusCode).toBe(403);
+  });
+
   it("lets only the owner revoke, and only the device's user or owner update", async () => {
     const owner = await signIn("owner");
     const member = await signIn("member");

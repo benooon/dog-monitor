@@ -13,6 +13,7 @@ describe("loadConfig", () => {
       jwtTtlSeconds: 2592000,
       appleAudiences: ["com.benooon.dogmonitor"],
       retentionDays: 7,
+      appLinkIds: [],
     });
   });
 
@@ -68,6 +69,12 @@ describe("requireServerConfig", () => {
     expect(() => requireServerConfig(loadConfig({ DATABASE_URL: "postgres://x", JWT_SECRET: "short" }))).toThrow(
       /at least 32/,
     );
+  });
+
+  it("builds the Universal Link app id from the team id", () => {
+    expect(loadConfig({ APPLE_TEAM_ID: "ABCDE12345" }).appLinkIds).toEqual(["ABCDE12345.com.benooon.dogmonitor"]);
+    expect(loadConfig({ APNS_KEY_ID: "K", APNS_TEAM_ID: "T1", APNS_KEY_P8: "p8" }).appLinkIds).toEqual(["T1.com.benooon.dogmonitor"]);
+    expect(loadConfig({ APPLE_TEAM_ID: "T2", APPLE_BUNDLE_ID: "x.y" }).appLinkIds).toEqual(["T2.x.y"]);
   });
 
   it("parses APPLE_AUDIENCES", () => {

@@ -13,6 +13,7 @@ const dbHandle = createDb(databaseUrl);
 
 const app = await buildApp({
   logLevel: config.logLevel,
+  appLinkIds: config.appLinkIds,
   services: {
     db: dbHandle.db,
     jwt: new JwtService(jwtSecret, config.jwtTtlSeconds),

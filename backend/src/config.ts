@@ -23,6 +23,8 @@ export interface Config {
   s3?: S3Config;
   /** Days to keep clips and snapshots. */
   retentionDays: number;
+  /** "<team id>.<bundle id>" for Universal Links; empty until APPLE_TEAM_ID (or APNS_TEAM_ID) is set. */
+  appLinkIds: string[];
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -98,7 +100,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
           }
         : undefined,
     retentionDays,
+    appLinkIds: appLinkIds(env),
   };
+}
+
+function appLinkIds(env: NodeJS.ProcessEnv): string[] {
+  const team = env.APPLE_TEAM_ID || env.APNS_TEAM_ID;
+  if (!team) return [];
+  return [`${team}.${env.APPLE_BUNDLE_ID || "com.benooon.dogmonitor"}`];
 }
 
 /** Throws if a value needed to serve real traffic is missing. */
