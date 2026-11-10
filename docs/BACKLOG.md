@@ -43,7 +43,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 
 ## Phase 2 — MVP
 
-- [ ] ios: Multiple cameras in viewer home (cards with last snapshot, online status, current dog state).
+- [~] ios: Multiple cameras in viewer home (cards with last snapshot, online status, current dog state). (in progress 2026-11-10)
 - [ ] ios: Ring-buffer recorder (`AVAssetWriter`, keeping the last ~5 s in memory). On an event, write a 10–20 s clip + snapshot.
 - [ ] ios: Upload clips and snapshots for events through presigned URLs, with an offline queue that retries when the network returns.
 - [ ] ios: Event timeline screen (filter by type, play clip, mark detection as right/wrong).
