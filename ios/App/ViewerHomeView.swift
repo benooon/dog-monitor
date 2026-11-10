@@ -7,6 +7,7 @@ struct ViewerHomeView: View {
     let householdName: String
     var isOwner = false
     @State private var showsInvite = false
+    @State private var showsNotifications = false
     @State private var path: [UUID] = []
     private let router = DeepLinkRouter.shared
 
@@ -58,6 +59,12 @@ struct ViewerHomeView: View {
             .sheet(isPresented: $showsInvite, onDismiss: { Task { await model.loadHousehold() } }) {
                 InviteSheet(model: model)
             }
+            .sheet(isPresented: $showsNotifications) {
+                NotificationSettingsView(
+                    model: NotificationSettingsModel(api: model.authorizedAPI, cameras: model.household?.cameras ?? []),
+                    dogName: model.household?.dogs.first?.name
+                )
+            }
             .navigationDestination(for: UUID.self) { cameraId in
                 if let camera = model.household?.cameras.first(where: { $0.id == cameraId }), let realtime = model.realtime {
                     LiveView(camera: camera, api: model.authorizedAPI, realtime: realtime)
@@ -79,6 +86,12 @@ struct ViewerHomeView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") { model.signOut() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Notifications", systemImage: "bell") {
+                        showsNotifications = true
+                    }
+                    .accessibilityIdentifier("notification-settings")
                 }
                 if isOwner {
                     ToolbarItem(placement: .topBarLeading) {

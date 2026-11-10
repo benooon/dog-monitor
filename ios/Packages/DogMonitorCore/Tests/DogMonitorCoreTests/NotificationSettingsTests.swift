@@ -111,6 +111,21 @@ final class NotificationSettingsTests: XCTestCase {
         XCTAssertFalse(s.isEnabled(.atDoor, camera: hall))
     }
 
+    func testBindingAccessorsAndQuietHoursSwitch() {
+        var s = settings()
+        s[enabled: .atDoor] = true
+        XCTAssertTrue(s.isEnabled(.atDoor))
+        s[enabled: .atDoor, camera: kitchen] = false
+        XCTAssertFalse(s[enabled: .atDoor, camera: kitchen])
+        XCTAssertTrue(s[enabled: .atDoor, camera: hall])
+
+        XCTAssertFalse(s.isQuietHoursOn)
+        s.isQuietHoursOn = true
+        XCTAssertEqual(s.quietHours, QuietHours.suggested)
+        s.isQuietHoursOn = false
+        XCTAssertNil(s.quietHours)
+    }
+
     // MARK: - Saving
 
     func testRequestHasAHouseholdRowPerTypeAndOnlyDifferingCameraRows() {

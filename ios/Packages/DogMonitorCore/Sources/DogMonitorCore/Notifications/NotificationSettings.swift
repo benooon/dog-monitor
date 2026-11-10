@@ -113,6 +113,32 @@ public struct NotificationSettings: Hashable, Sendable {
         overrides = overrides.filter { cameras.contains($0.key) }
     }
 
+    // MARK: - Bindings
+
+    /// Household-wide on/off, shaped for `$settings[enabled: type]`.
+    public subscript(enabled type: EventType) -> Bool {
+        get { isEnabled(type) }
+        set { setEnabled(newValue, for: type) }
+    }
+
+    /// One camera's on/off, shaped for `$settings[enabled: type, camera: id]`.
+    public subscript(enabled type: EventType, camera camera: UUID) -> Bool {
+        get { isEnabled(type, camera: camera) }
+        set { setEnabled(newValue, for: type, camera: camera) }
+    }
+
+    /// Turning quiet hours on starts from the suggested 22:00–07:00 window.
+    public var isQuietHoursOn: Bool {
+        get { quietHours != nil }
+        set {
+            if newValue {
+                if quietHours == nil { quietHours = .suggested }
+            } else {
+                quietHours = nil
+            }
+        }
+    }
+
     // MARK: - Saving
 
     /// The full set of rows for `PUT /notification-prefs`: one household-wide row per type, plus a row

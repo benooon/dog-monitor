@@ -171,6 +171,16 @@
         }
       }
     },
+    "Calmed down": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חזר השקט"
+          }
+        }
+      }
+    },
     "Camera": {
       "localizations": {
         "he": {
@@ -191,12 +201,42 @@
         }
       }
     },
+    "Camera health": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מצב המצלמה"
+          }
+        }
+      }
+    },
+    "Camera offline": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה לא מחוברת"
+          }
+        }
+      }
+    },
     "Camera on": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "המצלמה פועלת"
+          }
+        }
+      }
+    },
+    "Camera too hot": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה מתחממת"
           }
         }
       }
@@ -231,6 +271,26 @@
         }
       }
     },
+    "Check your connection and try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בדקו את החיבור ונסו שוב."
+          }
+        }
+      }
+    },
+    "Choose different alerts for one camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשר לבחור התראות אחרות לכל מצלמה."
+          }
+        }
+      }
+    },
     "Connecting…": {
       "localizations": {
         "he": {
@@ -251,12 +311,32 @@
         }
       }
     },
+    "Couldn't load your settings": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן לטעון את ההגדרות"
+          }
+        }
+      }
+    },
     "Couldn't open live view.": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "לא ניתן לפתוח צפייה חיה."
+          }
+        }
+      }
+    },
+    "Couldn't save your settings": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן לשמור את ההגדרות"
           }
         }
       }
@@ -287,6 +367,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "יצירת משק בית"
+          }
+        }
+      }
+    },
+    "Custom": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מותאם אישית"
+          }
+        }
+      }
+    },
+    "Daily summary": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סיכום יומי"
           }
         }
       }
@@ -322,6 +422,26 @@
       }
     },
     "Done": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סיום"
+          }
+        }
+      }
+    },
+    "During quiet hours, only barking, whining and camera alerts come through.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בשעות השקטות יגיעו רק התראות על נביחות, יבבות ומצב המצלמה."
+          }
+        }
+      }
+    },
+    "Ends": {
       "localizations": {
         "he": {
           "stringUnit": {
@@ -461,6 +581,26 @@
         }
       }
     },
+    "Long barking": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות ממושכות"
+          }
+        }
+      }
+    },
+    "Low battery": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סוללה חלשה"
+          }
+        }
+      }
+    },
     "Microphone off — barking can't be detected.": {
       "localizations": {
         "he": {
@@ -521,6 +661,26 @@
         }
       }
     },
+    "Notifications": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התראות"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אישור"
+          }
+        }
+      }
+    },
     "Offline": {
       "localizations": {
         "he": {
@@ -571,6 +731,16 @@
         }
       }
     },
+    "Out of view": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחוץ לטווח המצלמה"
+          }
+        }
+      }
+    },
     "Pair": {
       "localizations": {
         "he": {
@@ -591,6 +761,16 @@
         }
       }
     },
+    "Quiet hours": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שעות שקטות"
+          }
+        }
+      }
+    },
     "Resting": {
       "localizations": {
         "he": {
@@ -607,6 +787,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "חסר מנוחה"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שמירה"
           }
         }
       }
@@ -681,12 +871,32 @@
         }
       }
     },
+    "Starts": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התחלה"
+          }
+        }
+      }
+    },
     "Stop camera": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "עצירת המצלמה"
+          }
+        }
+      }
+    },
+    "Summary": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סיכום"
           }
         }
       }
@@ -733,6 +943,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הסוללה של המצלמה חלשה"
+          }
+        }
+      }
+    },
+    "These choices apply only to this camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הבחירות האלה חלות רק על המצלמה הזו."
           }
         }
       }
@@ -807,12 +1027,32 @@
         }
       }
     },
+    "Use household settings": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שימוש בהגדרות משק הבית"
+          }
+        }
+      }
+    },
     "Viewer": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "צופה"
+          }
+        }
+      }
+    },
+    "Waiting at the door": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממתין ליד הדלת"
           }
         }
       }
@@ -853,6 +1093,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "מייבב"
+          }
+        }
+      }
+    },
+    "Whining or howling": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יבבות או יללות"
+          }
+        }
+      }
+    },
+    "Your dog": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב"
           }
         }
       }
