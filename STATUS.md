@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 0066911acf1e9e5910c7bb708715c91b0172d85e
-- message: ios: spell the core NormalizedRect through a typealias next to Vision (fix CI)
-- time (UTC): 2026-11-10T12:58:15Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42819052211
+- commit: 094b9521c49866bd3874355af237e664e93521bb
+- message: docs: mark viewer audio controls and clip upload done (shipped in 998f7a9/2d45a0f, CI green)
+- time (UTC): 2026-11-10T14:59:29Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42838242203
 
 | job | result | log |
 |---|---|---|

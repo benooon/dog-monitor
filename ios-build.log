@@ -55,7 +55,13 @@ Scheme: DogMonitor
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
             self?.sessionQueue.async { self?.applyRotation(angle) }
                                        ^
-2026-11-10 12:57:51.303 xcodebuild[3364:13541] [MT] IDETestOperationsObserverDebug: 279.142 elapsed -- Testing started completed.
-2026-11-10 12:57:51.303 xcodebuild[3364:13541] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 12:57:51.303 xcodebuild[3364:13541] [MT] IDETestOperationsObserverDebug: 279.142 sec, +279.142 sec -- end
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+2026-11-10 14:58:59.786 xcodebuild[4357:16099] [MT] IDETestOperationsObserverDebug: 268.789 elapsed -- Testing started completed.
+2026-11-10 14:58:59.788 xcodebuild[4357:16099] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 14:58:59.788 xcodebuild[4357:16099] [MT] IDETestOperationsObserverDebug: 268.789 sec, +268.789 sec -- end
 Testing started
