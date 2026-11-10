@@ -11,6 +11,11 @@ struct CameraPairingView: View {
     @State private var cameraAllowed: Bool?
     @State private var isWorking = false
     @State private var errorMessage: LocalizedStringKey?
+    /// Bumped on every failed attempt so each one gets its own haptic.
+    @State private var failures = 0
+
+    /// Height of the scanner viewfinder inside the form.
+    private static var scannerHeight: CGFloat { 260 }
 
     var body: some View {
         NavigationStack {
@@ -21,11 +26,12 @@ struct CameraPairingView: View {
                         QRScannerView { scanned in
                             Task { await pair(scanned) }
                         }
-                        .frame(height: 260)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .frame(height: Self.scannerHeight)
+                        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.medium, style: .continuous))
                         .listRowInsets(EdgeInsets())
+                        .accessibilityLabel(Text("Scan the invite QR code from the owner's phone."))
                     case false?:
-                        Text("Allow camera access to scan, or type the code.")
+                        Label("Allow camera access to scan, or type the code.", systemImage: "qrcode.viewfinder")
                             .foregroundStyle(.secondary)
                     case nil:
                         ProgressView()
@@ -58,10 +64,16 @@ struct CameraPairingView: View {
 
                 if let errorMessage {
                     Section {
-                        Text(errorMessage).foregroundStyle(.red)
+                        Label {
+                            Text(errorMessage)
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                        }
+                        .foregroundStyle(.red)
                     }
                 }
             }
+            .sensoryFeedback(.error, trigger: failures)
             .navigationTitle("Pair this camera")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -93,6 +105,7 @@ struct CameraPairingView: View {
             dismiss()
         } catch {
             errorMessage = Self.message(for: error)
+            failures += 1
         }
     }
 
@@ -106,7 +119,22 @@ struct CameraPairingView: View {
         case .http(status: 429, _)?:
             "Too many attempts. Wait a minute and try again."
         default:
-            "Something went wrong. Please try again."
+            "Couldn't pair. Check your connection and try again."
         }
     }
+}
+
+#Preview {
+    CameraPairingView { _ in }
+}
+
+#Preview("Hebrew (RTL)") {
+    CameraPairingView { _ in }
+        .environment(\.locale, Locale(identifier: "he"))
+        .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    CameraPairingView { _ in }
+        .preferredColorScheme(.dark)
 }

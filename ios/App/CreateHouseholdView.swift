@@ -19,31 +19,20 @@ struct CreateHouseholdView: View {
                         .textContentType(.organizationName)
                         .accessibilityIdentifier("household-name")
                     TextField("Dog's name (optional)", text: $dogName)
+                        .textInputAutocapitalization(.words)
                         .accessibilityIdentifier("dog-name")
                 } footer: {
                     Text("Family members and cameras join your household later with an invite.")
                 }
                 if let message = model.errorMessage {
                     Section {
-                        Text(message).foregroundStyle(.red)
-                    }
-                }
-                Section {
-                    Button {
-                        Task {
-                            await model.createHousehold(name: householdName, dogName: dogName.isEmpty ? nil : dogName)
+                        Label {
+                            Text(verbatim: message)
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle.fill")
                         }
-                    } label: {
-                        HStack {
-                            Text("Create")
-                            if model.isWorking {
-                                Spacer()
-                                ProgressView()
-                            }
-                        }
+                        .foregroundStyle(.red)
                     }
-                    .disabled(!canSubmit)
-                    .accessibilityIdentifier("create-household")
                 }
                 Section("Join a household") {
                     TextField("Invite code", text: $inviteCode)
@@ -53,9 +42,22 @@ struct CreateHouseholdView: View {
                     Button("Join") {
                         Task { await model.joinHousehold(code: inviteCode) }
                     }
+                    .accessibilityIdentifier("join-household")
                     .disabled(PairingCode.parse(inviteCode) == nil || model.isWorking)
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                PrimaryButton(title: "Create household", isLoading: model.isWorking) {
+                    Task {
+                        await model.createHousehold(name: householdName, dogName: dogName.isEmpty ? nil : dogName)
+                    }
+                }
+                .disabled(!canSubmit)
+                .accessibilityIdentifier("create-household")
+                .padding(.horizontal, DS.Spacing.xl)
+                .padding(.bottom, DS.Spacing.l)
+            }
+            .sensoryFeedback(.error, trigger: model.errorMessage) { _, new in new != nil }
             .navigationTitle("Create your household")
             .onChange(of: DeepLinkRouter.shared.pendingInvite, initial: true) { _, token in
                 // Opened from an invite link: fill in the invite so one tap joins.
@@ -70,4 +72,19 @@ struct CreateHouseholdView: View {
             }
         }
     }
+}
+
+#Preview {
+    CreateHouseholdView(model: ViewerSessionModel())
+}
+
+#Preview("Hebrew (RTL)") {
+    CreateHouseholdView(model: ViewerSessionModel())
+        .environment(\.locale, Locale(identifier: "he"))
+        .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    CreateHouseholdView(model: ViewerSessionModel())
+        .preferredColorScheme(.dark)
 }

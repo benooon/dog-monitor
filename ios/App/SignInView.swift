@@ -4,24 +4,24 @@ import SwiftUI
 struct SignInView: View {
     let model: ViewerSessionModel
     @State private var nonce: AppleNonce?
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// Apple's button has no intrinsic height; this matches a large control and grows with Dynamic Type.
+    @ScaledMetric(relativeTo: .body) private var appleButtonHeight: CGFloat = 50
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            Image(systemName: "pawprint.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.tint)
-            Text("Dog Monitor")
-                .font(.largeTitle.bold())
-            Text("Sign in to watch your dog from anywhere.")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Spacer()
+        OnboardingScaffold {
+            OnboardingHeader(title: "Dog Monitor", message: "Sign in to watch your dog from anywhere.")
+        } actions: {
             if let message = model.errorMessage {
-                Text(message)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
+                Label {
+                    Text(verbatim: message)
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                }
+                .font(.subheadline)
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
             }
             SignInWithAppleButton(.signIn) { request in
                 let fresh = AppleNonce.random()
@@ -31,12 +31,20 @@ struct SignInView: View {
             } onCompletion: { result in
                 handle(result)
             }
-            .signInWithAppleButtonStyle(.black)
-            .frame(height: 50)
+            // HIG: white on dark backgrounds, black on light.
+            .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+            .frame(height: appleButtonHeight)
+            .clipShape(Capsule())
             .disabled(model.isWorking)
+            .opacity(model.isWorking ? 0 : 1)
+            .overlay {
+                if model.isWorking {
+                    ProgressView()
+                }
+            }
             .accessibilityIdentifier("sign-in-with-apple")
         }
-        .padding()
+        .sensoryFeedback(.error, trigger: model.errorMessage) { _, new in new != nil }
     }
 
     private func handle(_ result: Result<ASAuthorization, any Error>) {
@@ -59,4 +67,19 @@ struct SignInView: View {
         self.nonce = nil
         Task { await model.signIn(identityToken: token, nonce: rawNonce, name: name) }
     }
+}
+
+#Preview {
+    SignInView(model: ViewerSessionModel())
+}
+
+#Preview("Hebrew (RTL)") {
+    SignInView(model: ViewerSessionModel())
+        .environment(\.locale, Locale(identifier: "he"))
+        .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    SignInView(model: ViewerSessionModel())
+        .preferredColorScheme(.dark)
 }

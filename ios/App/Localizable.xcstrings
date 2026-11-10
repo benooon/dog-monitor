@@ -2456,6 +2456,26 @@
           }
         }
       }
+    },
+    "Create household": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יצירת משק בית"
+          }
+        }
+      }
+    },
+    "Couldn't pair. Check your connection and try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצימוד לא הצליח. בדקו את החיבור ונסו שוב."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

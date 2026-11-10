@@ -42,7 +42,7 @@ final class CameraModeModelTests: XCTestCase {
     func testPairingErrorMessages() {
         XCTAssertEqual(CameraPairingView.message(for: APIError.http(status: 404, code: "not_found")), "This code is invalid or has expired.")
         XCTAssertEqual(CameraPairingView.message(for: APIError.http(status: 429, code: nil)), "Too many attempts. Wait a minute and try again.")
-        XCTAssertEqual(CameraPairingView.message(for: APIError.transport("offline")), "Something went wrong. Please try again.")
+        XCTAssertEqual(CameraPairingView.message(for: APIError.transport("offline")), "Couldn't pair. Check your connection and try again.")
     }
 
     func testCaptureServiceHandsOutIndependentStreams() {

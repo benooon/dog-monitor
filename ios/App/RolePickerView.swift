@@ -6,45 +6,55 @@ struct RolePickerView: View {
     let onSelect: (DeviceRole) -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            Image(systemName: "pawprint.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.tint)
-            Text("Dog Monitor")
-                .font(.largeTitle.bold())
-            Text("How will this device be used?")
-                .font(.headline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Spacer()
+        OnboardingScaffold {
+            OnboardingHeader(title: "Dog Monitor", message: "How will this device be used?")
+        } actions: {
             ForEach(DeviceRole.allCases, id: \.self) { role in
-                Button {
-                    onSelect(role)
-                } label: {
-                    HStack(spacing: 16) {
-                        Image(systemName: role.systemImage)
-                            .font(.title2)
-                            .frame(width: 36)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(role.title)
-                                .font(.headline)
-                            Text(role.subtitle)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer(minLength: 0)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 16))
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("role-\(role.rawValue)")
+                RoleCard(role: role) { onSelect(role) }
             }
-            Spacer()
         }
-        .padding()
+    }
+}
+
+/// One choice: symbol, role name and what it means, as a single tappable card.
+private struct RoleCard: View {
+    let role: DeviceRole
+    let action: () -> Void
+
+    /// Keeps the two titles aligned whatever the symbol's width; grows with Dynamic Type.
+    @ScaledMetric(relativeTo: .title2) private var symbolWidth: CGFloat = 36
+
+    private static let shape = RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: DS.Spacing.l) {
+                Image(systemName: role.systemImage)
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                    .frame(width: symbolWidth)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                    Text(role.title)
+                        .font(.headline)
+                    Text(role.subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: DS.Spacing.s)
+                Image(systemName: "chevron.forward")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .multilineTextAlignment(.leading)
+            .padding(DS.Spacing.l)
+            .frame(maxWidth: .infinity)
+            .background(.quaternary, in: Self.shape)
+            .contentShape(Self.shape)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("role-\(role.rawValue)")
     }
 }
 
@@ -56,4 +66,9 @@ struct RolePickerView: View {
     RolePickerView { _ in }
         .environment(\.locale, Locale(identifier: "he"))
         .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    RolePickerView { _ in }
+        .preferredColorScheme(.dark)
 }

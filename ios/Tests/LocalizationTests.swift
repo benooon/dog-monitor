@@ -193,6 +193,13 @@ final class LocalizationTests: XCTestCase {
         "Lasted",
         "Clips aren't set up yet.",
         "Couldn't load the clip.",
+        "Camera access is off",
+        "Allow it in Settings to use this phone as a camera.",
+        "Couldn't start the camera",
+        "Close other apps that use the camera, then try again.",
+        "Show preview",
+        "Create household",
+        "Couldn't pair. Check your connection and try again.",
     ]
 
     private func bundle(for language: String) throws -> Bundle {
