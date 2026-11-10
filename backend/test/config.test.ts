@@ -12,6 +12,7 @@ describe("loadConfig", () => {
       jwtSecret: undefined,
       jwtTtlSeconds: 2592000,
       appleAudiences: ["com.benooon.dogmonitor"],
+      retentionDays: 7,
     });
   });
 
@@ -34,6 +35,16 @@ describe("loadConfig", () => {
     });
     expect(() => loadConfig({ APNS_KEY_ID: "K" })).toThrow(/APNS_TEAM_ID/);
     expect(() => loadConfig({ APNS_ENV: "staging" })).toThrow(/APNS_ENV/);
+  });
+
+  it("reads S3 storage settings", () => {
+    expect(loadConfig({}).s3).toBeUndefined();
+    expect(
+      loadConfig({ S3_BUCKET: "clips", S3_ACCESS_KEY_ID: "id", S3_SECRET_ACCESS_KEY: "secret", S3_ENDPOINT: "https://x.r2.cloudflarestorage.com" }).s3,
+    ).toEqual({ endpoint: "https://x.r2.cloudflarestorage.com", region: "auto", bucket: "clips", accessKeyId: "id", secretAccessKey: "secret" });
+    expect(() => loadConfig({ S3_BUCKET: "clips" })).toThrow(/S3_ACCESS_KEY_ID/);
+    expect(loadConfig({ CLIP_RETENTION_DAYS: "3" }).retentionDays).toBe(3);
+    expect(() => loadConfig({ CLIP_RETENTION_DAYS: "0" })).toThrow(/CLIP_RETENTION_DAYS/);
   });
 
   it("reads LiveKit credentials only when all three are set", () => {

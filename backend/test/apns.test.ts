@@ -102,7 +102,9 @@ describe("buildEventPayload", () => {
   const base = { eventId: "e1", cameraId: "c1", cameraName: "Living room" };
 
   it("builds a time-sensitive barking alert with the dog's name", () => {
-    expect(buildEventPayload({ ...base, type: "prolongedBarking", dogName: "Rex", snapshotKey: "snap.jpg" })).toEqual({
+    expect(
+      buildEventPayload({ ...base, type: "prolongedBarking", dogName: "Rex", snapshotKey: "snap.jpg", snapshotUrl: "https://s3/snap" }),
+    ).toEqual({
       aps: {
         alert: { title: "Living room", "loc-key": "%@ has been barking", "loc-args": ["Rex"] },
         sound: "default",
@@ -115,6 +117,7 @@ describe("buildEventPayload", () => {
       cameraId: "c1",
       type: "prolongedBarking",
       snapshotKey: "snap.jpg",
+      snapshotUrl: "https://s3/snap",
     });
   });
 

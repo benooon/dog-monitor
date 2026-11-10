@@ -7,6 +7,8 @@ import type { ApnsNotification, ApnsResult, ApnsSender } from "../src/notificati
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
+import { FakeStorage } from "./helpers/storage.js";
+import { eventMediaKey } from "../src/storage/storage.js";
 
 class FakeApns implements ApnsSender {
   sent: ApnsNotification[] = [];
@@ -28,7 +30,7 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
 
   beforeAll(async () => {
     h = openTestDb();
-    ctx = await buildTestApp(h, { apns });
+    ctx = await buildTestApp(h, { apns, storage: new FakeStorage() });
     app = ctx.app;
   });
   afterAll(async () => {
@@ -92,7 +94,8 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
 
   it("stores the event and pushes to every viewer phone", async () => {
     const { camera, householdId } = await setup();
-    const res = await postEvent(camera.auth, { snapshotKey: "snaps/1.jpg" });
+    const snapshotKey = eventMediaKey(householdId, camera.id, eventId, "snapshot");
+    const res = await postEvent(camera.auth, { snapshotKey });
     expect(res.statusCode).toBe(201);
     expect(res.json()).toMatchObject({ id: eventId, householdId, cameraId: camera.id, type: "prolongedBarking", confidence: 0.9 });
 
@@ -103,7 +106,8 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
     expect(push.payload).toMatchObject({
       aps: { alert: { title: "Living room", "loc-key": "%@ has been barking", "loc-args": ["Rex"] }, "mutable-content": 1 },
       cameraId: camera.id,
-      snapshotKey: "snaps/1.jpg",
+      snapshotKey,
+      snapshotUrl: `https://bucket.test/${snapshotKey}?get&ttl=21600`,
     });
   });
 
@@ -156,7 +160,8 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
   });
 
   it("ends events and pushes escalations that replace the alert", async () => {
-    const { camera } = await setup();
+    const { camera, householdId } = await setup();
+    const clipKey = eventMediaKey(householdId, camera.id, eventId, "clip");
     await postEvent(camera.auth);
     apns.sent = [];
 
@@ -171,9 +176,9 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
       method: "PATCH",
       url: `/events/${eventId}`,
       headers: camera.auth,
-      payload: { endedAt: "2026-11-10T08:07:00.000Z", clipKey: "clips/1.mp4" },
+      payload: { endedAt: "2026-11-10T08:07:00.000Z", clipKey },
     });
-    expect(end.json()).toMatchObject({ endedAt: "2026-11-10T08:07:00.000Z", clipKey: "clips/1.mp4" });
+    expect(end.json()).toMatchObject({ endedAt: "2026-11-10T08:07:00.000Z", clipKey });
     expect(apns.sent).toHaveLength(0);
   });
 
@@ -181,6 +186,7 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
     const { camera, owner } = await setup();
     expect((await postEvent(camera.auth, { type: "cameraOffline" })).statusCode).toBe(400);
     expect((await postEvent(camera.auth, { confidence: 2 })).statusCode).toBe(400);
+    expect((await postEvent(camera.auth, { snapshotKey: "households/other/x.jpg" })).statusCode).toBe(400);
     expect((await postEvent(owner.auth)).statusCode).toBe(401);
     expect((await app.inject({ method: "PATCH", url: `/events/${eventId}`, headers: camera.auth, payload: { endedAt: null } })).statusCode).toBe(404);
   });

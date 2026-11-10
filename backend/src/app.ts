@@ -7,6 +7,8 @@ import { authPlugin } from "./auth/plugin.js";
 import type { Database } from "./db/client.js";
 import type { LiveTokenIssuer } from "./live/livekit.js";
 import type { ApnsSender } from "./notifications/apns.js";
+import type { MediaStorage } from "./storage/storage.js";
+import { DEFAULT_RETENTION_DAYS, scheduleRetention } from "./storage/retention.js";
 import { EventNotifier, recordCameraOffline } from "./notifications/notifier.js";
 import type { AttemptLimiter } from "./pairing/attempt-limiter.js";
 import { RealtimeHub } from "./realtime/hub.js";
@@ -15,6 +17,7 @@ import { deviceSelfRoutes } from "./routes/device-self.js";
 import { deviceRoutes } from "./routes/devices.js";
 import { dogRoutes } from "./routes/dogs.js";
 import { cameraEventRoutes } from "./routes/events.js";
+import { cameraMediaRoutes, viewerMediaRoutes } from "./routes/media.js";
 import { householdRoutes } from "./routes/households.js";
 import { inviteRoutes } from "./routes/invites.js";
 import { cameraLiveRoutes, viewerLiveRoutes } from "./routes/live.js";
@@ -29,6 +32,10 @@ export interface AppServices {
   live?: LiveTokenIssuer;
   /** APNs; undefined when APNS_* is not configured (events are stored without pushes). */
   apns?: ApnsSender;
+  /** Clip/snapshot storage; undefined when S3_* is not configured. */
+  storage?: MediaStorage;
+  /** Days to keep clips and snapshots (SPEC §10, default 7). */
+  retentionDays?: number;
   /** Realtime presence (tests pass their own to inspect it). */
   hub?: RealtimeHub;
   /** Clock for heartbeats and offline detection (tests). */
@@ -62,8 +69,14 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(deviceRoutes, { db: services.db });
     await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter });
     await app.register(deviceSelfRoutes, { db: services.db });
-    const notifier = new EventNotifier(services.db, services.apns, app.log);
+    const notifier = new EventNotifier(services.db, services.apns, app.log, services.storage);
     await app.register(cameraEventRoutes, { db: services.db, notifier });
+    await app.register(cameraMediaRoutes, { db: services.db, storage: services.storage });
+    await app.register(viewerMediaRoutes, { db: services.db, storage: services.storage });
+    if (services.storage && services.retentionDays !== 0) {
+      const stop = scheduleRetention(services.db, services.storage, services.retentionDays ?? DEFAULT_RETENTION_DAYS, app.log);
+      app.addHook("onClose", async () => stop());
+    }
 
     const hub = services.hub ?? new RealtimeHub();
     hub.addPresenceListener((cameraId, householdId, online) => {

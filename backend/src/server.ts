@@ -5,6 +5,7 @@ import { loadConfig, requireServerConfig } from "./config.js";
 import { createDb } from "./db/client.js";
 import { createLiveKitIssuer } from "./live/livekit.js";
 import { ApnsClient } from "./notifications/apns.js";
+import { S3MediaStorage } from "./storage/storage.js";
 
 const config = loadConfig();
 const { databaseUrl, jwtSecret } = requireServerConfig(config);
@@ -18,6 +19,8 @@ const app = await buildApp({
     apple: createAppleTokenVerifier({ audiences: config.appleAudiences }),
     live: config.liveKit ? createLiveKitIssuer(config.liveKit) : undefined,
     apns: config.apns ? new ApnsClient(config.apns) : undefined,
+    storage: config.s3 ? new S3MediaStorage(config.s3) : undefined,
+    retentionDays: config.retentionDays,
   },
 });
 
@@ -30,6 +33,7 @@ const shutdown = async (signal: string) => {
 process.on("SIGTERM", () => void shutdown("SIGTERM"));
 process.on("SIGINT", () => void shutdown("SIGINT"));
 
+if (!config.s3) app.log.warn("S3_* not set: clip and snapshot uploads are disabled");
 if (!config.apns) app.log.warn("APNS_* not set: events are stored but no pushes are sent");
 if (!config.liveKit) app.log.warn("LIVEKIT_* not set: live view token routes will answer 503");
 

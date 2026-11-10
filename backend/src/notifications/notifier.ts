@@ -3,7 +3,11 @@ import { and, asc, eq, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { devices, dogs, events, notificationPrefs, type EventType } from "../db/schema.js";
 import { isDeadToken, type ApnsSender } from "./apns.js";
+import type { MediaStorage } from "../storage/storage.js";
 import { buildEventPayload, enabledByDefault } from "./payload.js";
+
+/** Long enough to open a notification a while after it arrived. */
+export const SNAPSHOT_URL_TTL_SECONDS = 6 * 60 * 60;
 
 export interface EventNotification {
   householdId: string;
@@ -31,6 +35,7 @@ export class EventNotifier {
     private readonly db: Database,
     private readonly apns: ApnsSender | undefined,
     private readonly log: FastifyBaseLogger,
+    private readonly storage?: MediaStorage,
   ) {}
 
   async notify(event: EventNotification): Promise<NotifyResult> {
@@ -73,6 +78,10 @@ export class EventNotifier {
       .where(eq(dogs.householdId, event.householdId))
       .orderBy(asc(dogs.createdAt))
       .limit(1);
+    const snapshotUrl =
+      this.storage && event.snapshotKey
+        ? await this.storage.presignDownload(event.snapshotKey, SNAPSHOT_URL_TTL_SECONDS).catch(() => undefined)
+        : undefined;
     const payload = buildEventPayload({
       eventId: event.eventId,
       type: event.type,
@@ -81,6 +90,7 @@ export class EventNotifier {
       dogName: dog?.name,
       snapshotKey: event.snapshotKey,
       escalationSeconds: event.escalationSeconds,
+      snapshotUrl,
     });
 
     const apns = this.apns;

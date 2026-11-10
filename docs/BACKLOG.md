@@ -37,7 +37,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client. Also `PATCH /events/:id` (end, escalation push) and the camera-offline push.
 - [ ] backend + ios: Quiet hours. Store each user's time zone (sent by the app) and skip non-time-sensitive pushes inside `quiet_start`–`quiet_end`; the notifier ignores quiet hours today.
 - [~] ios: Push registration, notification categories and actions (Watch live / Mute 1h), and deep link into live view. Add the push copy keys from `backend/src/notifications/payload.ts` (e.g. "%@ has been barking") to Localizable.xcstrings with Hebrew; category id `DOG_EVENT`. (in progress 2026-11-10)
-- [~] backend: Storage service interface with an S3/R2 implementation. Presigned upload and download URLs, plus a daily job that deletes clips older than the retention period. (moved up: the NSE needs snapshot URLs; in progress 2026-11-10)
+- [x] backend: Storage service interface with an S3/R2 implementation. Presigned upload and download URLs, plus a daily job that deletes clips older than the retention period. `POST /device/uploads`, `GET /events/:id/media`; pushes carry a 6 h `snapshotUrl`.
 - [ ] ios: Notification Service Extension target in project.yml that downloads the snapshot and attaches it to the push.
 - [ ] [blocked] ci: TestFlight workflow (`.github/workflows/testflight.yml`). Archive + upload with an App Store Connect API key via `xcodebuild -exportArchive` or fastlane, triggered on every push to main that changes ios/. Needs secrets; see HUMAN_TODO.
 

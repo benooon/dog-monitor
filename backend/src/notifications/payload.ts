@@ -59,6 +59,8 @@ export interface EventPushInput {
   cameraName: string;
   dogName?: string | null;
   snapshotKey?: string | null;
+  /** Presigned download URL of the snapshot, for the Notification Service Extension. */
+  snapshotUrl?: string;
   /** Set for escalation updates ("barking for 5 minutes"). */
   escalationSeconds?: number;
 }
@@ -83,11 +85,12 @@ export function buildEventPayload(input: EventPushInput): Record<string, unknown
       category: EVENT_CATEGORY,
       "interruption-level": level,
       // Lets the Notification Service Extension attach the snapshot.
-      ...(input.snapshotKey && { "mutable-content": 1 }),
+      ...(input.snapshotUrl && { "mutable-content": 1 }),
     },
     eventId: input.eventId,
     cameraId: input.cameraId,
     type: input.type,
     ...(input.snapshotKey && { snapshotKey: input.snapshotKey }),
+    ...(input.snapshotUrl && { snapshotUrl: input.snapshotUrl }),
   };
 }

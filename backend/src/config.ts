@@ -1,5 +1,6 @@
 import type { LiveKitConfig } from "./live/livekit.js";
 import type { ApnsConfig } from "./notifications/apns.js";
+import type { S3Config } from "./storage/storage.js";
 
 /** Runtime configuration, read from environment variables (documented in .env.example). */
 export interface Config {
@@ -18,6 +19,10 @@ export interface Config {
   liveKit?: LiveKitConfig;
   /** APNs token auth; undefined until APNS_KEY_ID, APNS_TEAM_ID and APNS_KEY_P8 are set. */
   apns?: ApnsConfig;
+  /** Clip storage; undefined until S3_BUCKET, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY are set. */
+  s3?: S3Config;
+  /** Days to keep clips and snapshots. */
+  retentionDays: number;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -46,6 +51,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (apnsEnv !== "sandbox" && apnsEnv !== "production") {
     throw new Error(`Invalid APNS_ENV (sandbox or production): ${apnsEnv}`);
   }
+  const s3Vars = [env.S3_BUCKET, env.S3_ACCESS_KEY_ID, env.S3_SECRET_ACCESS_KEY];
+  const s3Set = s3Vars.filter(Boolean).length;
+  if (s3Set > 0 && s3Set < 3) {
+    throw new Error("Set all of S3_BUCKET, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY, or none of them");
+  }
+  const retentionDays = Number(env.CLIP_RETENTION_DAYS ?? 7);
+  if (!Number.isInteger(retentionDays) || retentionDays < 1) {
+    throw new Error(`Invalid CLIP_RETENTION_DAYS: ${env.CLIP_RETENTION_DAYS}`);
+  }
   return {
     port,
     host: env.HOST ?? "0.0.0.0",
@@ -73,6 +87,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
             environment: apnsEnv,
           }
         : undefined,
+    s3:
+      s3Set === 3
+        ? {
+            endpoint: env.S3_ENDPOINT || undefined,
+            region: env.S3_REGION ?? "auto",
+            bucket: env.S3_BUCKET!,
+            accessKeyId: env.S3_ACCESS_KEY_ID!,
+            secretAccessKey: env.S3_SECRET_ACCESS_KEY!,
+          }
+        : undefined,
+    retentionDays,
   };
 }
 

@@ -1,0 +1,63 @@
+import type { FastifyBaseLogger } from "fastify";
+import { and, inArray, isNotNull, lt, or } from "drizzle-orm";
+import type { Database } from "../db/client.js";
+import { events } from "../db/schema.js";
+import type { MediaStorage } from "./storage.js";
+
+export const DEFAULT_RETENTION_DAYS = 7;
+
+/**
+ * Deletes clips and snapshots of events older than the retention period (SPEC §10), and clears
+ * their keys. Event rows stay for the timeline and daily summaries. Returns how many objects were deleted.
+ */
+export async function purgeExpiredMedia(
+  db: Database,
+  storage: MediaStorage,
+  retentionDays: number,
+  now: Date = new Date(),
+): Promise<number> {
+  const cutoff = new Date(now.getTime() - retentionDays * 24 * 60 * 60 * 1000);
+  const expired = await db
+    .select({ id: events.id, clipKey: events.clipKey, snapshotKey: events.snapshotKey })
+    .from(events)
+    .where(and(lt(events.startedAt, cutoff), or(isNotNull(events.clipKey), isNotNull(events.snapshotKey))))
+    .limit(5000);
+  if (expired.length === 0) return 0;
+
+  const keys = expired.flatMap((e) => [e.clipKey, e.snapshotKey]).filter((k): k is string => k !== null);
+  await storage.deleteObjects(keys);
+  await db
+    .update(events)
+    .set({ clipKey: null, snapshotKey: null })
+    .where(
+      inArray(
+        events.id,
+        expired.map((e) => e.id),
+      ),
+    );
+  return keys.length;
+}
+
+/** Runs the purge now and then daily. Returns a function that stops it. */
+export function scheduleRetention(
+  db: Database,
+  storage: MediaStorage,
+  retentionDays: number,
+  log: FastifyBaseLogger,
+): () => void {
+  const run = () => {
+    purgeExpiredMedia(db, storage, retentionDays)
+      .then((deleted) => {
+        if (deleted > 0) log.info({ deleted }, "deleted expired clips and snapshots");
+      })
+      .catch((error: unknown) => log.error({ err: error }, "media retention failed"));
+  };
+  const first = setTimeout(run, 60_000);
+  const daily = setInterval(run, 24 * 60 * 60 * 1000);
+  first.unref();
+  daily.unref();
+  return () => {
+    clearTimeout(first);
+    clearInterval(daily);
+  };
+}

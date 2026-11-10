@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { DOG_STATES, events, type DogState, type EventType } from "../db/schema.js";
 import type { EventNotifier } from "../notifications/notifier.js";
+import { eventMediaPrefix } from "../storage/storage.js";
 
 /** Event types a camera may report; cameraOffline and dailySummary are created by the server. */
 export const CAMERA_EVENT_TYPES = [
@@ -55,6 +56,11 @@ interface UpdateBody {
 
 const storageKey = { type: ["string", "null"], minLength: 1, maxLength: 300 } as const;
 
+/** Media keys must be the ones `POST /device/uploads` handed out for this event. */
+function keysBelongToEvent(prefix: string, ...keys: (string | null | undefined)[]): boolean {
+  return keys.every((key) => key === undefined || key === null || (key.startsWith(prefix) && !key.includes("..")));
+}
+
 /** Camera-reported events (device auth): `POST /events`, `PATCH /events/:id`. */
 export async function cameraEventRoutes(app: FastifyInstance, opts: { db: Database; notifier: EventNotifier }): Promise<void> {
   const { db, notifier } = opts;
@@ -84,6 +90,9 @@ export async function cameraEventRoutes(app: FastifyInstance, opts: { db: Databa
     async (request, reply) => {
       const { deviceId, householdId } = request.device!;
       const body = request.body;
+      if (!keysBelongToEvent(eventMediaPrefix(householdId, deviceId, body.id), body.clipKey, body.snapshotKey)) {
+        return reply.code(400).send({ error: "invalid_media_key" });
+      }
       // Idempotent on the client-generated id, so the camera's offline queue can retry safely.
       const [created] = await db
         .insert(events)
@@ -137,6 +146,9 @@ export async function cameraEventRoutes(app: FastifyInstance, opts: { db: Databa
     async (request, reply) => {
       const { deviceId, householdId } = request.device!;
       const { escalationSeconds, endedAt, ...keys } = request.body;
+      if (!keysBelongToEvent(eventMediaPrefix(householdId, deviceId, request.params.id), keys.clipKey, keys.snapshotKey)) {
+        return reply.code(400).send({ error: "invalid_media_key" });
+      }
       const changes = {
         ...keys,
         ...(endedAt !== undefined && { endedAt: endedAt === null ? null : new Date(endedAt) }),
