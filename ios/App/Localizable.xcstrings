@@ -2516,6 +2516,496 @@
           }
         }
       }
+    },
+    "Puppy": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "גור"
+          }
+        }
+      }
+    },
+    "Adult": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בוגר"
+          }
+        }
+      }
+    },
+    "Senior": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מבוגר"
+          }
+        }
+      }
+    },
+    "Under a year": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פחות משנה"
+          }
+        }
+      }
+    },
+    "1 to 8 years": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בין שנה ל־8 שנים"
+          }
+        }
+      }
+    },
+    "8 years or older": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8 שנים ומעלה"
+          }
+        }
+      }
+    },
+    "Barks at noises": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נובח על רעשים"
+          }
+        }
+      }
+    },
+    "Whines or howls": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מייבב או מיילל"
+          }
+        }
+      }
+    },
+    "Waits by the door": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחכה ליד הדלת"
+          }
+        }
+      }
+    },
+    "Gets on the sofa": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עולה על הספה"
+          }
+        }
+      }
+    },
+    "Mostly sleeps": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בעיקר ישן"
+          }
+        }
+      }
+    },
+    "Only what matters": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רק מה שחשוב"
+          }
+        }
+      }
+    },
+    "A good balance": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "איזון טוב"
+          }
+        }
+      }
+    },
+    "Everything": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכול"
+          }
+        }
+      }
+    },
+    "Long barking and whining.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נביחות ממושכות ויבבות."
+          }
+        }
+      }
+    },
+    "Also %@'s habits, and when things calm down.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "גם ההרגלים של %@, וגם כשהכול נרגע."
+          }
+        }
+      }
+    },
+    "Every time something changes.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בכל פעם שמשהו משתנה."
+          }
+        }
+      }
+    },
+    "We'll tell you when %@ barks for a while.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נעדכן אותך כש%@ נובח הרבה זמן."
+          }
+        }
+      }
+    },
+    "Whining and howling come through right away.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יבבות ויללות יגיעו מיד."
+          }
+        }
+      }
+    },
+    "And when %@ waits by the door.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "וגם כש%@ מחכה ליד הדלת."
+          }
+        }
+      }
+    },
+    "Sofa alerts start once you mark the sofa on the camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התראות על הספה יתחילו אחרי שמסמנים את הספה במצלמה."
+          }
+        }
+      }
+    },
+    "We'll tell you when %@ gets on the sofa.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נעדכן אותך כש%@ עולה על הספה."
+          }
+        }
+      }
+    },
+    "And when %@ settles down again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "וגם כש%@ נרגע שוב."
+          }
+        }
+      }
+    },
+    "%@ mostly sleeps, so we'll stay quiet unless something changes.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ בעיקר ישן, אז נשמור על שקט אלא אם משהו משתנה."
+          }
+        }
+      }
+    },
+    "The daily summary shows how %@ is settling in.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסיכום היומי יראה איך %@ מסתגל."
+          }
+        }
+      }
+    },
+    "Every evening, a short summary of %@'s day.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בכל ערב, סיכום קצר של היום של %@."
+          }
+        }
+      }
+    },
+    "your dog": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב שלך"
+          }
+        }
+      }
+    },
+    "Step %lld of %lld": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שלב %1$lld מתוך %2$lld"
+          }
+        }
+      }
+    },
+    "Who are we watching?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "על מי נשמור?"
+          }
+        }
+      }
+    },
+    "Let's start with your dog's name.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נתחיל בשם של הכלב."
+          }
+        }
+      }
+    },
+    "Your dog's name": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שם הכלב"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המשך"
+          }
+        }
+      }
+    },
+    "Skip for now": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "דילוג בינתיים"
+          }
+        }
+      }
+    },
+    "Add a photo of %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוספת תמונה של %@"
+          }
+        }
+      }
+    },
+    "It shows up on your home screen and Lock Screen.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היא תופיע במסך הבית ובמסך הנעילה."
+          }
+        }
+      }
+    },
+    "Choose a photo": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בחירת תמונה"
+          }
+        }
+      }
+    },
+    "Change photo": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "החלפת תמונה"
+          }
+        }
+      }
+    },
+    "Not now": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא עכשיו"
+          }
+        }
+      }
+    },
+    "How old is %@?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מה הגיל של %@?"
+          }
+        }
+      }
+    },
+    "What does %@ do when alone?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מה %@ עושה כשאין אף אחד בבית?"
+          }
+        }
+      }
+    },
+    "Choose all that fit. This decides which alerts we send.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשר לבחור כמה. לפי זה נחליט אילו התראות לשלוח."
+          }
+        }
+      }
+    },
+    "How much should we tell you?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כמה לעדכן אותך?"
+          }
+        }
+      }
+    },
+    "You can change this anytime in Notifications.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשר לשנות את זה מתי שרוצים בהגדרות ההתראות."
+          }
+        }
+      }
+    },
+    "Recommended": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מומלץ"
+          }
+        }
+      }
+    },
+    "Here's how we'll watch %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ככה נשמור על %@"
+          }
+        }
+      }
+    },
+    "Couldn't save %@'s profile. Check your connection and try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו לשמור את הפרופיל של %@. כדאי לבדוק את החיבור ולנסות שוב."
+          }
+        }
+      }
+    },
+    "Looks good": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נראה טוב"
+          }
+        }
+      }
+    },
+    "No photo yet": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין עדיין תמונה"
+          }
+        }
+      }
+    },
+    "Photo of %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תמונה של %@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

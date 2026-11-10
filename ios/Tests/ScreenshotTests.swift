@@ -29,6 +29,12 @@ final class ScreenshotTests: XCTestCase {
             Screen(name: "03-create-household") {
                 AnyView(CreateHouseholdView(model: ViewerSessionModel(baseURL: sampleAPI.baseURL, store: InMemorySecureStore())))
             },
+            Screen(name: "03a-meet-dog-name") { meetDog([]) },
+            Screen(name: "03b-meet-dog-photo") { meetDog([.photo]) },
+            Screen(name: "03c-meet-dog-age") { meetDog([.photo, .age]) },
+            Screen(name: "03d-meet-dog-alone") { meetDog([.photo, .age, .alone]) },
+            Screen(name: "03e-meet-dog-alerts") { meetDog([.photo, .age, .alone, .alerts]) },
+            Screen(name: "03f-meet-dog-summary") { meetDog([.photo, .age, .alone, .alerts, .summary]) },
             Screen(name: "04-viewer-home") {
                 AnyView(ViewerHomeView(model: .demo, householdName: "Home", isOwner: true))
             },
@@ -62,6 +68,11 @@ final class ScreenshotTests: XCTestCase {
                 AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID())))
             },
         ]
+    }
+
+    /// "Meet your dog" at a given step, with sample answers for Rex.
+    private static func meetDog(_ path: [DogOnboardingModel.Step]) -> AnyView {
+        AnyView(DogOnboardingView(model: .preview(), initialPath: path, autofocus: false, onSkip: {}, onFinish: {}))
     }
 
     func testCaptureScreens() async throws {

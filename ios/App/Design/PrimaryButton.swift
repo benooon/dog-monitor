@@ -35,7 +35,9 @@ struct PrimaryButton: View {
     }
 }
 
-private extension View {
+extension View {
+    /// The primary action look for controls that can't be a `PrimaryButton` (a `PhotosPicker`,
+    /// a `ShareLink`): prominent glass on iOS 26, bordered prominent before.
     @ViewBuilder
     func primaryButtonStyle() -> some View {
         #if compiler(>=6.2)
