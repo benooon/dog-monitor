@@ -78,13 +78,7 @@ Writing result bundle at path:
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
             self?.sessionQueue.async { self?.applyRotation(angle) }
                                        ^
-2026-11-10 17:33:44.756 xcodebuild[5375:24906]  iOSSimulator: 📱<DVTiPhoneSimulator (0x15a7f57d0), iPhone SE (3rd generation), unknown class, 26.2 (23C54), A1285399-F2F4-46E9-8CF2-4AA227FF7EF3> unable to connect to "com.apple.instruments.deviceservice.lockdown" (Error Domain=DVTiPhoneSimulatorErrorDomain Code=-1 "DTServiceHubClient failed to bless service hub for simulator iPhone SE (3rd generation) (A1285399-F2F4-46E9-8CF2-4AA227FF7EF3)" UserInfo={NSLocalizedDescription=DTServiceHubClient failed to bless service hub for simulator iPhone SE (3rd generation) (A1285399-F2F4-46E9-8CF2-4AA227FF7EF3), NSUnderlyingError=0x6000008369a0 {Error Domain=DTServiceHubClient Code=2 "Connection to Simulator service hub (11010) interrupted. Simulator service hub IS still alive." UserInfo={NSLocalizedDescription=Connection to Simulator service hub (11010) interrupted. Simulator service hub IS still alive.}}})
-2026-11-10 17:35:30.880 xcodebuild[5375:19170] [MT] IDETestOperationsObserverDebug: 346.492 elapsed -- Testing started completed.
-2026-11-10 17:35:30.880 xcodebuild[5375:19170] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 17:35:30.880 xcodebuild[5375:19170] [MT] IDETestOperationsObserverDebug: 346.492 sec, +346.492 sec -- end
-** TEST FAILED **
-
+2026-11-10 17:50:32.819 xcodebuild[3611:13955] [MT] IDETestOperationsObserverDebug: 268.005 elapsed -- Testing started completed.
+2026-11-10 17:50:32.819 xcodebuild[3611:13955] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 17:50:32.819 xcodebuild[3611:13955] [MT] IDETestOperationsObserverDebug: 268.005 sec, +268.005 sec -- end
 Testing started
---- Test failures ---
-passed: 288, failed: 1, skipped: 0
-FAIL DogMonitorTests / ViewerSessionModelTests/testAPIBaseURLComesFromInfoPlist(): XCTAssertEqual failed: ("Optional("https")") is not equal to ("Optional("http")")

@@ -1,12 +1,12 @@
-# CI status: RED
+# CI status: GREEN
 
-- commit: a62451a07fa8e24575acc83b36815cbf6519a712
-- message: ci: list failing iOS tests from the result bundle (-quiet hides them)
-- time (UTC): 2026-11-10T17:36:04Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42864590963
+- commit: 4285d0c778ad9bce461ec476ffb75f61cf908f49
+- message: ios: expect the https Railway API URL in the Info.plist test
+- time (UTC): 2026-11-10T17:50:58Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42866891113
 
 | job | result | log |
 |---|---|---|
 | core (swift test, Linux) | success | core-test.log |
-| ios (xcodebuild test, macOS) | failure | ios-build.log |
+| ios (xcodebuild test, macOS) | success | ios-build.log |
 | backend (lint + test) | success | backend-test.log |
