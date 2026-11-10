@@ -22,6 +22,17 @@ struct HouseholdView: View {
             Group {
                 if let household {
                     list(for: household)
+                } else if let message = model.errorMessage, !model.isWorking {
+                    ContentUnavailableView {
+                        Label("Couldn't load your household", systemImage: "exclamationmark.triangle")
+                    } description: {
+                        Text(verbatim: message)
+                    } actions: {
+                        Button("Try again") {
+                            Task { await model.loadHousehold() }
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
                 } else {
                     ProgressView()
                 }
@@ -150,6 +161,14 @@ struct HouseholdView: View {
                     Text("Clips your household marks right or wrong are kept for 90 days to train detection. Other clips are still deleted after a week.")
                 }
             }
+
+            Section {
+                Button("Sign out", role: .destructive) {
+                    dismiss()
+                    model.signOut()
+                }
+                .accessibilityIdentifier("sign-out")
+            }
         }
         .onChange(of: household.shareTrainingData, initial: true) { _, value in
             sharesTrainingData = value ?? false
@@ -246,10 +265,22 @@ private struct DeviceRow: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
             Label {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                     Text(verbatim: device.name)
-                    if let detail = detail(now: context.date) {
-                        Text(detail)
+                    if device.role == .camera {
+                        let online = device.isOnline(now: context.date)
+                        Label {
+                            Text(online ? LocalizedStringKey("Online") : LocalizedStringKey("Offline"))
+                        } icon: {
+                            Image(systemName: "circle.fill")
+                                .imageScale(.small)
+                                .foregroundStyle(online ? Color.green : Color.secondary)
+                        }
+                        .labelStyle(StatusDotLabelStyle())
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    } else if let ownerName {
+                        Text("\(ownerName)'s phone")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -261,11 +292,16 @@ private struct DeviceRow: View {
         }
     }
 
-    private func detail(now: Date) -> LocalizedStringKey? {
-        if device.role == .camera {
-            return device.isOnline(now: now) ? "Online" : "Offline"
+}
+
+/// A small colored dot before a short status, kept tight to the text.
+private struct StatusDotLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: DS.Spacing.xs) {
+            configuration.icon
+                .accessibilityHidden(true)
+            configuration.title
         }
-        return ownerName.map { "\($0)'s phone" }
     }
 }
 

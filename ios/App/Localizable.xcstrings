@@ -541,6 +541,16 @@
         }
       }
     },
+    "Couldn't load your household": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן לטעון את משק הבית"
+          }
+        }
+      }
+    },
     "Couldn't load your settings": {
       "localizations": {
         "he": {

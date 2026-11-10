@@ -91,9 +91,6 @@ struct ViewerHomeView: View {
             .onChange(of: model.realtime?.presence) { statusChanged() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Sign out") { model.signOut() }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
                     Button("Activity", systemImage: "clock") {
                         showsTimeline = true
                     }

@@ -108,7 +108,7 @@ struct NotificationSettingsView: View {
                 }
             }
         }
-        .animation(reduceMotion ? nil : .default, value: model.settings.isQuietHoursOn)
+        .animation(DS.Motion.animation(DS.Motion.standard, reduceMotion: reduceMotion), value: model.settings.isQuietHoursOn)
     }
 
     @ToolbarContentBuilder
