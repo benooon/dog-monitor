@@ -109,7 +109,8 @@ final class DogProfileAPITests: XCTestCase {
 
     func testDecodesProfileAndDropsUnknownValues() async throws {
         let api = DogMonitorAPI(baseURL: Fixtures.baseURL, transport: StubTransport(json: "[\(Self.dogJSON)]"))
-        let dog = try XCTUnwrap(try await api.dogs().first)
+        let dogs = try await api.dogs()
+        let dog = try XCTUnwrap(dogs.first)
         XCTAssertEqual(dog.lifeStage, .adult)
         XCTAssertEqual(dog.traits, [.waitsAtDoor, .whines])
         XCTAssertEqual(dog.alertStyle, .balanced)
@@ -119,7 +120,8 @@ final class DogProfileAPITests: XCTestCase {
     func testDecodesDogsFromOlderServers() async throws {
         let old = #"[{"id":"\#(Fixtures.userID)","householdId":"\#(Fixtures.householdID)","name":"Rex","photoKey":null,"createdAt":"2026-11-10T07:00:00Z"}]"#
         let api = DogMonitorAPI(baseURL: Fixtures.baseURL, transport: StubTransport(json: old))
-        let dog = try XCTUnwrap(try await api.dogs().first)
+        let dogs = try await api.dogs()
+        let dog = try XCTUnwrap(dogs.first)
         XCTAssertNil(dog.lifeStage)
         XCTAssertEqual(dog.traits, [])
         XCTAssertNil(dog.alertStyle)
