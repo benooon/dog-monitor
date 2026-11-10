@@ -53,7 +53,31 @@ public struct DogMonitorAPI: Sendable {
     }
 
     public func createDog(name: String, photoKey: String? = nil) async throws -> DogDTO {
-        try await send("POST", "dogs", body: DogInput(name: name, photoKey: photoKey))
+        try await createDog(DogInput(name: name, photoKey: photoKey))
+    }
+
+    /// Creates a dog; `input.name` is required by the server.
+    public func createDog(_ input: DogInput) async throws -> DogDTO {
+        try await send("POST", "dogs", body: input)
+    }
+
+    /// Stores the dog's photo (a JPEG of up to 512 KB; resize on the phone first).
+    public func uploadDogPhoto(id: UUID, jpeg: Data) async throws -> DogDTO {
+        var request = makeRequest("PUT", "dogs/\(Self.path(id))/photo", body: nil)
+        request.httpBody = jpeg
+        request.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
+        return try decode(try await perform(request))
+    }
+
+    /// The dog's photo as JPEG data. Fails with 404 when there is none.
+    public func dogPhoto(id: UUID) async throws -> Data {
+        var request = makeRequest("GET", "dogs/\(Self.path(id))/photo", body: nil)
+        request.setValue("image/jpeg", forHTTPHeaderField: "Accept")
+        return try await perform(request)
+    }
+
+    public func deleteDogPhoto(id: UUID) async throws -> DogDTO {
+        try await send("DELETE", "dogs/\(Self.path(id))/photo")
     }
 
     public func updateDog(id: UUID, _ changes: DogInput) async throws -> DogDTO {

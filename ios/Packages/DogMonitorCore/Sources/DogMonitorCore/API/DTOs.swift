@@ -51,14 +51,57 @@ public struct DogDTO: Codable, Sendable, Hashable, Identifiable {
     public let householdId: UUID
     public let name: String
     public let photoKey: String?
+    /// Profile from "Meet your dog"; nil/empty until the owner answers (or from older servers).
+    public let lifeStage: DogLifeStage?
+    public let traits: [DogTrait]
+    public let alertStyle: DogAlertStyle?
+    /// When the photo (`GET /dogs/:id/photo`) last changed; nil when there is none.
+    public let photoUpdatedAt: Date?
     public let createdAt: Date
 
-    public init(id: UUID, householdId: UUID, name: String, photoKey: String? = nil, createdAt: Date) {
+    public var hasPhoto: Bool { photoUpdatedAt != nil }
+
+    public init(
+        id: UUID,
+        householdId: UUID,
+        name: String,
+        photoKey: String? = nil,
+        lifeStage: DogLifeStage? = nil,
+        traits: [DogTrait] = [],
+        alertStyle: DogAlertStyle? = nil,
+        photoUpdatedAt: Date? = nil,
+        createdAt: Date
+    ) {
         self.id = id
         self.householdId = householdId
         self.name = name
         self.photoKey = photoKey
+        self.lifeStage = lifeStage
+        self.traits = traits
+        self.alertStyle = alertStyle
+        self.photoUpdatedAt = photoUpdatedAt
         self.createdAt = createdAt
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, householdId, name, photoKey, lifeStage, traits, alertStyle, photoUpdatedAt, createdAt
+    }
+
+    /// Lenient: profile fields may be missing (older servers) and unknown values are ignored.
+    public init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        householdId = try c.decode(UUID.self, forKey: .householdId)
+        name = try c.decode(String.self, forKey: .name)
+        photoKey = try c.decodeIfPresent(String.self, forKey: .photoKey)
+        let rawLifeStage: String? = try? c.decodeIfPresent(String.self, forKey: .lifeStage)
+        lifeStage = rawLifeStage.flatMap(DogLifeStage.init(rawValue:))
+        let rawTraits: [String]? = try? c.decodeIfPresent([String].self, forKey: .traits)
+        traits = (rawTraits ?? []).compactMap(DogTrait.init(rawValue:))
+        let rawAlertStyle: String? = try? c.decodeIfPresent(String.self, forKey: .alertStyle)
+        alertStyle = rawAlertStyle.flatMap(DogAlertStyle.init(rawValue:))
+        photoUpdatedAt = try c.decodeIfPresent(Date.self, forKey: .photoUpdatedAt)
+        createdAt = try c.decode(Date.self, forKey: .createdAt)
     }
 }
 
@@ -307,13 +350,26 @@ public struct AppleSignInRequest: Codable, Sendable, Hashable {
     }
 }
 
+/// Body of `POST /dogs` and `PATCH /dogs/:id`. Fields left nil are not sent (unchanged on PATCH).
 public struct DogInput: Codable, Sendable, Hashable {
     public var name: String?
     public var photoKey: String?
+    public var lifeStage: DogLifeStage?
+    public var traits: [DogTrait]?
+    public var alertStyle: DogAlertStyle?
 
-    public init(name: String? = nil, photoKey: String? = nil) {
+    public init(
+        name: String? = nil,
+        photoKey: String? = nil,
+        lifeStage: DogLifeStage? = nil,
+        traits: [DogTrait]? = nil,
+        alertStyle: DogAlertStyle? = nil
+    ) {
         self.name = name
         self.photoKey = photoKey
+        self.lifeStage = lifeStage
+        self.traits = traits
+        self.alertStyle = alertStyle
     }
 }
 
