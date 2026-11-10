@@ -6,9 +6,12 @@ struct RootView: View {
     @AppStorage("deviceRole") private var storedRole: String = ""
 
     var body: some View {
-        if let role = DeviceRole(rawValue: storedRole) {
-            RoleHomeView(role: role) { storedRole = "" }
-        } else {
+        switch DeviceRole(rawValue: storedRole) {
+        case .viewer:
+            ViewerRootView { storedRole = "" }
+        case .camera:
+            RoleHomeView(role: .camera) { storedRole = "" }
+        case nil:
             RolePickerView { storedRole = $0.rawValue }
         }
     }

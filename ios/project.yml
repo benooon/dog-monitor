@@ -37,6 +37,9 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
+        DMAPIBaseURL: $(API_BASE_URL)
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
@@ -44,9 +47,16 @@ targets:
         NSCameraUsageDescription: Dog Monitor uses the camera to watch your dog and stream live video to your family.
         NSMicrophoneUsageDescription: Dog Monitor uses the microphone to detect barking and to let you hear and talk to your dog.
         NSLocalNetworkUsageDescription: Dog Monitor uses the local network to find and pair with your other devices.
+    entitlements:
+      path: Config/DogMonitor.entitlements
+      properties:
+        com.apple.developer.applesignin:
+          - Default
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor
+        # Backend URL; set to the Railway domain once it exists (see docs/HUMAN_TODO.md).
+        API_BASE_URL: http://localhost:3000
         TARGETED_DEVICE_FAMILY: "1"
         ENABLE_PREVIEWS: YES
 
@@ -74,3 +84,4 @@ schemes:
       gatherCoverageData: false
       targets:
         - DogMonitorTests
+        - package: DogMonitorCore/DogMonitorCoreTests

@@ -1,14 +1,24 @@
 import XCTest
 
-/// Checks the compiled String Catalog: every UI key used by the role picker has a Hebrew translation.
+/// Checks the compiled String Catalog: every UI key used so far has a Hebrew translation.
 final class LocalizationTests: XCTestCase {
-    private static let roleKeys = [
+    private static let uiKeys = [
         "Camera",
         "Viewer",
         "Leave this phone at home to watch your dog.",
         "Watch live and get alerts on your own phone.",
         "How will this device be used?",
         "Change role",
+        "Sign in to watch your dog from anywhere.",
+        "Sign in failed. Please try again.",
+        "Something went wrong. Please try again.",
+        "Household name",
+        "Dog's name (optional)",
+        "Family members and cameras join your household later with an invite.",
+        "Create",
+        "Create your household",
+        "Sign out",
+        "Your household is ready.",
     ]
 
     private func bundle(for language: String) throws -> Bundle {
@@ -21,7 +31,7 @@ final class LocalizationTests: XCTestCase {
 
     func testHebrewTranslationsExist() throws {
         let hebrew = try bundle(for: "he")
-        for key in Self.roleKeys {
+        for key in Self.uiKeys {
             let value = hebrew.localizedString(forKey: key, value: "<missing>", table: nil)
             XCTAssertNotEqual(value, "<missing>", "Missing Hebrew for \"\(key)\"")
             XCTAssertTrue(value.unicodeScalars.contains { (0x0590...0x05FF).contains($0.value) },

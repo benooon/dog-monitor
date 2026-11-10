@@ -21,12 +21,62 @@
         }
       }
     },
+    "Create": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יצירה"
+          }
+        }
+      }
+    },
+    "Create your household": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יצירת משק בית"
+          }
+        }
+      }
+    },
     "Dog Monitor": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "Dog Monitor"
+          }
+        }
+      }
+    },
+    "Dog's name (optional)": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שם הכלב (לא חובה)"
+          }
+        }
+      }
+    },
+    "Family members and cameras join your household later with an invite.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בני משפחה ומצלמות יצטרפו למשק הבית מאוחר יותר באמצעות הזמנה."
+          }
+        }
+      }
+    },
+    "Household name": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שם משק הבית"
           }
         }
       }
@@ -51,6 +101,46 @@
         }
       }
     },
+    "Sign in failed. Please try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ההתחברות נכשלה. נסו שוב."
+          }
+        }
+      }
+    },
+    "Sign in to watch your dog from anywhere.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התחברו כדי לצפות בכלב שלכם מכל מקום."
+          }
+        }
+      }
+    },
+    "Sign out": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התנתקות"
+          }
+        }
+      }
+    },
+    "Something went wrong. Please try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "משהו השתבש. נסו שוב."
+          }
+        }
+      }
+    },
     "Viewer": {
       "localizations": {
         "he": {
@@ -67,6 +157,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "צפו בשידור חי וקבלו התראות בטלפון שלכם."
+          }
+        }
+      }
+    },
+    "Your household is ready.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "משק הבית שלכם מוכן."
           }
         }
       }
