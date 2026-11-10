@@ -60,7 +60,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 ## Phase 3 — Vision analysis
 
 - [~] ios: Motion detector (frame differencing at 2–5 fps, per-zone) that gates the heavier analysis. (in progress 2026-11-10)
-- [ ] ios: Dog detection (`VNRecognizeAnimalsRequest`) + body pose (`VNDetectAnimalBodyPoseRequest`) → `Detection` values.
+- [~] ios: Dog detection (`VNRecognizeAnimalsRequest`) + body pose (`VNDetectAnimalBodyPoseRequest`) → `Detection` values. (in progress 2026-11-10)
 - [ ] core: Rule-based state classifier (resting / restless / atDoor / forbiddenZone / notVisible) from detections over time. Unit tests with synthetic sequences.
 - [ ] ios: Zone editor in camera setup (draw polygons over the preview, saved as normalized coordinates) and synced to the backend.
 - [ ] core + backend: Daily summary computation (rest minutes, bark count, activity by hour), plus a daily summary push.
