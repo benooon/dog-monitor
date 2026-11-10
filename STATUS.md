@@ -1,12 +1,12 @@
-# CI status: RED
+# CI status: GREEN
 
-- commit: 83c44ed3de780905f7ece616339c8126e9fb8681
-- message: backend: add invites (token + 6-digit code), camera pairing and device auth
-- time (UTC): 2026-11-10T07:17:39Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42774119812
+- commit: d6c16d4eecb232e2acc8ae822d6a7a7ceb1a2107
+- message: docs: claim core API client task
+- time (UTC): 2026-11-10T07:19:01Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42774254387
 
 | job | result | log |
 |---|---|---|
 | core (swift test, Linux) | success | core-test.log |
 | ios (xcodebuild test, macOS) | success (carried over, no iOS changes) | ios-build.log |
-| backend (lint + test) | cancelled | backend-test.log |
+| backend (lint + test) | success | backend-test.log |
