@@ -42,8 +42,8 @@ enum DogVisionAnalyzer {
     }
 
     /// Vision's origin is bottom-left; ours is top-left.
-    private static func normalized(_ rect: CGRect) -> DogMonitorCore.NormalizedRect {
-        DogMonitorCore.NormalizedRect(x: rect.minX, y: 1 - rect.maxY, width: rect.width, height: rect.height)
+    private static func normalized(_ rect: CGRect) -> CoreNormalizedRect {
+        CoreNormalizedRect(x: rect.minX, y: 1 - rect.maxY, width: rect.width, height: rect.height)
     }
 
     private static func joints(of observation: VNAnimalBodyPoseObservation) -> [PoseJoint] {
