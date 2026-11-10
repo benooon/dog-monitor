@@ -8,3 +8,8 @@ node_modules/
 dist/
 .env
 *.log
+*.p8
+*.p12
+*.mobileprovision
+.env.*
+!.env.example
