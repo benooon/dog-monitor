@@ -3208,16 +3208,6 @@
         }
       }
     },
-    "Move and scale": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "הזזה ושינוי גודל"
-          }
-        }
-      }
-    },
     "Use photo": {
       "localizations": {
         "he": {
@@ -3274,6 +3264,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "על מי עוד נשמור?"
+          }
+        }
+      }
+    },
+    "Drag to move, pinch to zoom.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "גוררים כדי להזיז, צובטים כדי לשנות גודל."
           }
         }
       }

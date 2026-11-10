@@ -157,7 +157,15 @@ struct PhotoCropView: View {
                     crop = current
                 }
             }
-            .navigationTitle("Move and scale")
+            // A caption instead of a title: between the toolbar buttons a title gets cut off.
+            .safeAreaInset(edge: .bottom) {
+                Text("Drag to move, pinch to zoom.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(DS.Spacing.l)
+            }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
