@@ -10,3 +10,5 @@ Agents add items here when they are blocked. The owner checks items off.
 - [ ] **Railway**: new project → deploy from GitHub repo `benooon/dog-monitor`, root directory `backend`, add the PostgreSQL plugin, set the env vars from `backend/.env.example`. Railway then redeploys automatically on every push to main.
 - [ ] **Cloudflare R2** (or another S3-compatible bucket) for clips. Set the `S3_*` env vars on Railway.
 - [ ] **GitHub Actions minutes:** macOS runners cost 10x minutes on private repos (the free plan has 2,000 min/month, which is about 200 macOS minutes). Either make the repo public (Actions are free) or add a payment method / spending limit.
+- [ ] **Railway backend env**: besides `DATABASE_URL`, set `JWT_SECRET` (`openssl rand -hex 32`) and `APPLE_AUDIENCES=com.benooon.dogmonitor`. Then send agents the public Railway URL (or put it in `ios/project.yml` → `API_BASE_URL`), which currently defaults to `http://localhost:3000`.
+- [ ] Enable the **Sign in with Apple** capability on the App ID `com.benooon.dogmonitor` (the app already declares the entitlement).

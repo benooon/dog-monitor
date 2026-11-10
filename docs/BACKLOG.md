@@ -19,8 +19,9 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] backend: Households (create/get), dogs (CRUD), and devices (register device, update APNs token, revoke). Everything is scoped to the caller's household. Add tests.
 - [x] backend: Pairing. `POST /invites` creates a one-time token (10 min) and `POST /invites/:token/accept` consumes it. Camera devices get a device secret, and device auth uses it. Add tests.
 - [x] core: API client (`DogMonitorAPI`) using URLSession async/await with Codable DTOs matching the backend, and a pluggable base URL. Unit test it with a URLProtocol stub. (On Linux, guard with `#if canImport(FoundationNetworking)`.)
-- [ ] ci: Run the DogMonitorCore package tests on the macOS iOS job too (add `package: DogMonitorCore/DogMonitorCoreTests` to the scheme's test targets in project.yml) so Apple-only compile errors in tests are caught.
-- [~] ios: Sign in with Apple flow, keychain token storage, and household creation screen. (in progress 2026-11-10)
+- [x] ci: Run the DogMonitorCore package tests on the macOS iOS job too (add `package: DogMonitorCore/DogMonitorCoreTests` to the scheme's test targets in project.yml) so Apple-only compile errors in tests are caught.
+- [x] ios: Sign in with Apple flow, keychain token storage, and household creation screen.
+- [ ] ios: Viewer home placeholder → wire `GET /household` into a real home screen once camera list work starts; also send the Sign in with Apple nonce (SHA-256) and verify it in `POST /auth/apple`.
 - [ ] ios: Camera capture pipeline. One `AVCaptureSession` (video + audio) with an `AsyncStream` of sample buffers, fanned out to consumers (analysis, recorder, streamer). Add a camera-mode screen: black screen, `isIdleTimerDisabled`, minimum brightness, tap to show preview.
 - [ ] ios: Bark detection with SoundAnalysis (`SNClassifySoundRequest` built-in classifier), mapping dog-related classes to `Detection` values in core. Show a debug overlay in camera mode.
 - [ ] core: Event engine state machine. Detections in, events out, with duration thresholds, cooldowns, escalation and state transitions per SPEC §5. **Heavy unit tests** with simulated timelines (inject a clock).
