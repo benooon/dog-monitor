@@ -1,5 +1,6 @@
 import DogMonitorCore
 import SwiftUI
+import WidgetKit
 
 /// Viewer home: a card per camera (last snapshot, online, dog state; tap for live view) and the dogs.
 struct ViewerHomeView: View {
@@ -110,6 +111,9 @@ struct ViewerHomeView: View {
                 await PushRegistry.shared.activate(api: model.authorizedAPI)
                 await liveActivities.activate(api: model.authorizedAPI)
             }
+            .onChange(of: model.household) { publishWidgetStatus() }
+            .onChange(of: model.realtime?.dogStates) { publishWidgetStatus() }
+            .onChange(of: model.realtime?.presence) { publishWidgetStatus() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") { model.signOut() }
@@ -140,6 +144,24 @@ struct ViewerHomeView: View {
                 }
             }
         }
+    }
+
+    /// Hands the latest dog state per camera to the home screen widget.
+    private func publishWidgetStatus() {
+        guard let household = model.household else { return }
+        let now = Date.now
+        let snapshots = household.cameras.map { camera in
+            DogStatusSnapshot(
+                cameraId: camera.id,
+                cameraName: camera.name,
+                dogName: household.dogs.first?.name,
+                state: model.realtime?.dogStates[camera.id] ?? camera.currentDogState,
+                online: model.realtime?.presence[camera.id] ?? camera.isOnline(now: now),
+                updatedAt: now
+            )
+        }
+        DogStatusStore.save(snapshots)
+        WidgetCenter.shared.reloadTimelines(ofKind: DogStatusStore.widgetKind)
     }
 
     /// Shows or hides the camera's Live Activity (Lock Screen and Dynamic Island).

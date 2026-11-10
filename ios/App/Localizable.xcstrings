@@ -2336,6 +2336,46 @@
           }
         }
       }
+    },
+    "Dog status": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מצב הכלב"
+          }
+        }
+      }
+    },
+    "What your dog is up to, from your camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מה הכלב שלכם עושה, מהמצלמה."
+          }
+        }
+      }
+    },
+    "Open Dog Monitor to see your dog here.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתחו את Dog Monitor כדי לראות כאן את הכלב."
+          }
+        }
+      }
+    },
+    "Open the app for an update": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתחו את האפליקציה לעדכון"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

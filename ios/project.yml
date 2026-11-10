@@ -66,6 +66,9 @@ targets:
         # Invite links open the app (the backend serves the apple-app-site-association file).
         com.apple.developer.associated-domains:
           - applinks:$(APP_LINK_HOST)
+        # Shared with DogMonitorWidgets for the dog status widget.
+        com.apple.security.application-groups:
+          - group.com.benooon.dogmonitor
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor
@@ -116,6 +119,11 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Config/DogMonitorWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.benooon.dogmonitor
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor.Widgets
