@@ -41,6 +41,16 @@ public struct DailySummaryDTO: Codable, Sendable, Hashable, Identifiable {
     public let stateMinutes: [String: Int]
     public let isFinal: Bool
 
+    public init(cameraId: UUID, date: String, restMinutes: Int, barkCount: Int, activityByHour: [Int], stateMinutes: [String: Int], isFinal: Bool) {
+        self.cameraId = cameraId
+        self.date = date
+        self.restMinutes = restMinutes
+        self.barkCount = barkCount
+        self.activityByHour = activityByHour
+        self.stateMinutes = stateMinutes
+        self.isFinal = isFinal
+    }
+
     public var id: String { "\(cameraId.uuidString)-\(date)" }
 
     public var summary: DailySummary {
