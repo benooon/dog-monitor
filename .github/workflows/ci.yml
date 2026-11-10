@@ -99,11 +99,29 @@ jobs:
           echo "Simulator: $SIM_ID" | tee -a ../ios-build.log
           SCHEME=$(xcodebuild -list -json 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["project"]["schemes"][0])')
           echo "Scheme: $SCHEME" | tee -a ../ios-build.log
+          STATUS=0
           xcodebuild test \
             -scheme "$SCHEME" \
             -destination "id=$SIM_ID" \
+            -resultBundlePath ../TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
-            -quiet 2>&1 | tee -a ../ios-build.log
+            -quiet 2>&1 | tee -a ../ios-build.log || STATUS=$?
+          # -quiet hides which tests failed; list them from the result bundle.
+          if [ "$STATUS" -ne 0 ] && [ -d ../TestResults.xcresult ]; then
+            echo "--- Test failures ---" | tee -a ../ios-build.log
+            xcrun xcresulttool get test-results summary --path ../TestResults.xcresult --compact 2>&1 | python3 -c '
+          import json,sys
+          raw=sys.stdin.read()
+          try:
+              d=json.loads(raw)
+          except Exception:
+              print(raw[:4000]); sys.exit(0)
+          print("passed: %s, failed: %s, skipped: %s" % (d.get("passedTests"), d.get("failedTests"), d.get("skippedTests")))
+          for f in d.get("testFailures", []):
+              print("FAIL %s / %s: %s" % (f.get("targetName"), f.get("testIdentifierString") or f.get("testName"), f.get("failureText")))
+          ' 2>&1 | tee -a ../ios-build.log || true
+          fi
+          exit $STATUS
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: ios-log, path: ios-build.log, if-no-files-found: ignore }
