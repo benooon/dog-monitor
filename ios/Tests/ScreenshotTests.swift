@@ -35,6 +35,7 @@ final class ScreenshotTests: XCTestCase {
             Screen(name: "03d-meet-dog-alone") { meetDog([.photo, .age, .alone]) },
             Screen(name: "03e-meet-dog-alerts") { meetDog([.photo, .age, .alone, .alerts]) },
             Screen(name: "03f-meet-dog-summary") { meetDog([.photo, .age, .alone, .alerts, .summary]) },
+            Screen(name: "03g-mark-sofa") { AnyView(MarkSofaSheet(dogName: "Rex")) },
             Screen(name: "04-viewer-home") {
                 AnyView(ViewerHomeView(model: .demo, householdName: "Home", isOwner: true))
             },

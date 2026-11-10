@@ -3147,6 +3147,56 @@
           }
         }
       }
+    },
+    "Mark the sofa": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סימון הספה"
+          }
+        }
+      }
+    },
+    "On the camera phone at home, tap Zones.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בטלפון המצלמה שבבית, יש להקיש על ״אזורים״."
+          }
+        }
+      }
+    },
+    "Choose Forbidden, then tap the corners of the sofa.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש לבחור ״אסור״ ולהקיש על הפינות של הספה."
+          }
+        }
+      }
+    },
+    "Tap Add zone, then Save.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש להקיש על ״הוספת אזור״ ואז על ״שמירה״."
+          }
+        }
+      }
+    },
+    "We'll tell you when %@ gets on the sofa once it's marked on the camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אחרי שהספה תסומן במצלמה, נספר לך כאשר %@ עולה עליה."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

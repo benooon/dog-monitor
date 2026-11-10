@@ -128,6 +128,8 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
     public let thermal: String?
     /// Cameras: the dog's state from the last heartbeat (raw value; unknown values are ignored).
     public let dogState: String?
+    /// Cameras: the zone kinds drawn on this camera (raw values; only in `GET /household`).
+    public let zoneKinds: [String]?
     public let createdAt: Date
 
     public init(
@@ -145,6 +147,7 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
         charging: Bool? = nil,
         thermal: String? = nil,
         dogState: String? = nil,
+        zoneKinds: [CameraZone.Kind]? = nil,
         createdAt: Date
     ) {
         self.id = id
@@ -161,11 +164,17 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
         self.charging = charging
         self.thermal = thermal
         self.dogState = dogState
+        self.zoneKinds = zoneKinds?.map(\.rawValue)
         self.createdAt = createdAt
     }
 
     public var currentDogState: DogState? {
         dogState.flatMap(DogState.init(rawValue:))
+    }
+
+    /// The known zone kinds on this camera (unknown values are ignored).
+    public var zones: Set<CameraZone.Kind> {
+        Set((zoneKinds ?? []).compactMap(CameraZone.Kind.init(rawValue:)))
     }
 }
 
@@ -457,6 +466,11 @@ extension DeviceDTO {
 extension HouseholdDTO {
     public var cameras: [DeviceDTO] {
         devices.filter { $0.role == .camera && $0.status == .active }
+    }
+
+    /// Whether any active camera has a no-go (forbidden) zone, e.g. around the sofa.
+    public var hasForbiddenZone: Bool {
+        cameras.contains { $0.zones.contains(.forbidden) }
     }
 }
 

@@ -149,6 +149,28 @@ final class DogMonitorAPITests: XCTestCase {
         XCTAssertEqual(household.devices.first?.name, "Living room")
     }
 
+    func testHouseholdKnowsAboutForbiddenZones() async throws {
+        let withSofa = Fixtures.deviceJSON.replacingOccurrences(
+            of: #""thermal":null,"#, with: #""thermal":null,"zoneKinds":["door","forbidden","garden"],"#
+        )
+        let json = """
+        {"id":"\(Fixtures.householdID)","name":"Home","plan":"free","ownerId":"\(Fixtures.userID)","role":"owner",
+         "members":[],"dogs":[],"devices":[\(withSofa)]}
+        """
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: StubTransport(json: json))
+        let household = try await api.household()
+        XCTAssertEqual(household.devices.first?.zones, [.door, .forbidden], "unknown kinds are ignored")
+        XCTAssertTrue(household.hasForbiddenZone)
+
+        let olderAPI = DogMonitorAPI(
+            baseURL: Fixtures.baseURL, credential: .user(token: "t"),
+            transport: StubTransport(json: json.replacingOccurrences(of: withSofa, with: Fixtures.deviceJSON))
+        )
+        let older = try await olderAPI.household()
+        XCTAssertEqual(older.devices.first?.zones, [])
+        XCTAssertFalse(older.hasForbiddenZone)
+    }
+
     func testUpdateDeviceSendsOnlyChangedFields() async throws {
         let stub = StubTransport(json: Fixtures.deviceJSON)
         let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)

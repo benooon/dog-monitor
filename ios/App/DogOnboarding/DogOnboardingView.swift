@@ -267,6 +267,7 @@ private struct SummaryStep: View {
     @ScaledMetric(relativeTo: .largeTitle) private var avatarSize: CGFloat = 112
     @ScaledMetric(relativeTo: .body) private var promiseSymbolWidth: CGFloat = 28
     @State private var failures = 0
+    @State private var showsMarkSofa = false
 
     var body: some View {
         QuestionScreen(title: Text("Here's how we'll watch \(model.displayName)")) {
@@ -275,18 +276,28 @@ private struct SummaryStep: View {
                     .frame(maxWidth: .infinity)
                 VStack(alignment: .leading, spacing: DS.Spacing.l) {
                     ForEach(model.promises, id: \.self) { promise in
+                        let needsZone = promise == .furniture(needsZone: true)
                         HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.m) {
                             Image(systemName: promise.systemImage)
                                 .foregroundStyle(.tint)
                                 // One column for every symbol, so the sentences line up.
                                 .frame(width: promiseSymbolWidth)
                                 .accessibilityHidden(true)
-                            promise.text(dogName: model.displayName)
-                                .font(.body)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                                promise.text(dogName: model.displayName)
+                                    .font(.body)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                if needsZone {
+                                    Button("Mark the sofa") { showsMarkSofa = true }
+                                        .font(.body.weight(.semibold))
+                                        .frame(minHeight: MarkSofaSheet.minimumTapTarget)
+                                        .accessibilityIdentifier("mark-the-sofa")
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .accessibilityElement(children: .combine)
+                        // The sofa row keeps its button reachable on its own.
+                        .accessibilityElement(children: needsZone ? .contain : .combine)
                     }
                 }
                 .padding(DS.Spacing.l)
@@ -315,6 +326,9 @@ private struct SummaryStep: View {
             .accessibilityIdentifier("dog-onboarding-done")
         }
         .sensoryFeedback(.error, trigger: failures)
+        .sheet(isPresented: $showsMarkSofa) {
+            MarkSofaSheet(dogName: model.displayName)
+        }
     }
 }
 

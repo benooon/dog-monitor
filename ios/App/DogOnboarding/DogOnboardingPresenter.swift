@@ -33,7 +33,7 @@ private struct DogOnboardingPresenter: ViewModifier {
         guard onboarding == nil, isOwner, !session.isDemo, let household = session.household else { return }
         let dog = household.dogs.first
         guard dog?.alertStyle == nil, !DogOnboardingRecord.isDone(householdId: household.id) else { return }
-        onboarding = DogOnboardingModel(api: session.authorizedAPI, dog: dog)
+        onboarding = DogOnboardingModel(api: session.authorizedAPI, dog: dog, hasZones: household.hasForbiddenZone)
     }
 
     private func finish() {
