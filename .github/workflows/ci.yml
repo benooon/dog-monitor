@@ -100,7 +100,10 @@ jobs:
           SCHEME=$(xcodebuild -list -json 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["project"]["schemes"][0])')
           echo "Scheme: $SCHEME" | tee -a ../ios-build.log
           STATUS=0
-          xcodebuild test \
+          # ScreenshotTests write PNGs here (TEST_RUNNER_* reaches the test process without the prefix).
+          SHOTS="$GITHUB_WORKSPACE/screenshots"
+          mkdir -p "$SHOTS"
+          TEST_RUNNER_SCREENSHOT_DIR="$SHOTS" xcodebuild test \
             -scheme "$SCHEME" \
             -destination "id=$SIM_ID" \
             -resultBundlePath ../TestResults.xcresult \
@@ -121,10 +124,37 @@ jobs:
               print("FAIL %s / %s: %s" % (f.get("targetName"), f.get("testIdentifierString") or f.get("testName"), f.get("failureText")))
           ' 2>&1 | tee -a ../ios-build.log || true
           fi
+          # iPad screenshots: reuse the build, run only the screenshot test on an iPad simulator.
+          # Best effort: a problem here never turns CI red.
+          if [ "$STATUS" -eq 0 ]; then
+            IPAD_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json,sys
+          d=json.load(sys.stdin)["devices"]
+          ids=[x["udid"] for k,v in d.items() if "iOS" in k for x in v if x["name"].startswith("iPad")]
+          print(ids[-1] if ids else "")')
+            if [ -n "$IPAD_ID" ]; then
+              echo "iPad screenshots on $IPAD_ID" | tee -a ../ios-build.log
+              TEST_RUNNER_SCREENSHOT_DIR="$SHOTS" xcodebuild test-without-building \
+                -scheme "$SCHEME" \
+                -destination "id=$IPAD_ID" \
+                -only-testing:DogMonitorTests/ScreenshotTests \
+                CODE_SIGNING_ALLOWED=NO \
+                -quiet 2>&1 | tee -a ../ios-build.log || echo "WARNING: iPad screenshots failed" | tee -a ../ios-build.log
+            fi
+          fi
+          # Smaller files for the ci-results branch: JPEG, longest side 1200 px.
+          for f in "$SHOTS"/*.png; do
+            [ -e "$f" ] || continue
+            sips -s format jpeg -s formatOptions 80 -Z 1200 "$f" --out "${f%.png}.jpg" >/dev/null && rm "$f"
+          done
+          echo "Screenshots: $(ls "$SHOTS" | wc -l | tr -d ' ')" | tee -a ../ios-build.log
           exit $STATUS
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: ios-log, path: ios-build.log, if-no-files-found: ignore }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: screenshots, path: screenshots/, if-no-files-found: ignore }
 
   backend:
     runs-on: ubuntu-latest
@@ -166,7 +196,10 @@ jobs:
       BACKEND_RESULT: ${{ needs.backend.result }}
     steps:
       - uses: actions/download-artifact@v4
-        with: { path: logs, merge-multiple: true }
+        with: { path: logs, pattern: "*-log", merge-multiple: true }
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with: { name: screenshots, path: shots }
       - name: Publish results to ci-results branch
         shell: bash
         run: |
@@ -187,6 +220,31 @@ jobs:
             mkdir out && git -C out init -q && git -C out checkout -q -b ci-results && git -C out remote add origin "$REPO"
           fi
           cp logs/*.log out/ 2>/dev/null || true
+
+          # Fresh screenshots replace the old set; when iOS didn't run, the last set stays.
+          if ls shots/*.jpg >/dev/null 2>&1; then
+            rm -rf out/screenshots && mkdir -p out/screenshots
+            cp shots/*.jpg out/screenshots/
+            python3 - "$GITHUB_SHA" <<'PY'
+          import os, re, sys
+          sha = sys.argv[1][:7]
+          files = sorted(os.listdir("out/screenshots"))
+          variants = ["light", "dark", "hebrew"]
+          lines = [f"# Screenshots ({sha})", "",
+                   "Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. "
+                   "Live video and the camera preview are not available in the simulator.", ""]
+          for device in ["iphone", "ipad"]:
+              names = sorted({m.group(1) for f in files if (m := re.fullmatch(device + r"-(.+)-(light|dark|hebrew)\.jpg", f))})
+              if not names:
+                  continue
+              lines += [f"## {'iPhone' if device == 'iphone' else 'iPad'}", ""]
+              for name in names:
+                  lines += [f"### {name}", "", "| Light | Dark | Hebrew |", "|---|---|---|"]
+                  cells = [f'<img src="{device}-{name}-{v}.jpg" width="260">' if f"{device}-{name}-{v}.jpg" in files else "" for v in variants]
+                  lines += ["| " + " | ".join(cells) + " |", ""]
+          open("out/screenshots/README.md", "w").write("\n".join(lines) + "\n")
+          PY
+          fi
 
           # iOS skipped because nothing under ios/ changed -> carry over its last real result.
           if [ "$IOS_RESULT" = "skipped" ]; then

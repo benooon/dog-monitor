@@ -306,16 +306,16 @@ private struct StatusDotLabelStyle: LabelStyle {
 }
 
 #Preview {
-    HouseholdView(model: ViewerSessionModel())
+    HouseholdView(model: .demo)
 }
 
 #Preview("Hebrew (RTL)") {
-    HouseholdView(model: ViewerSessionModel())
+    HouseholdView(model: .demo)
         .environment(\.locale, Locale(identifier: "he"))
         .environment(\.layoutDirection, .rightToLeft)
 }
 
 #Preview("Dark") {
-    HouseholdView(model: ViewerSessionModel())
+    HouseholdView(model: .demo)
         .preferredColorScheme(.dark)
 }

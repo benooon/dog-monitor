@@ -102,4 +102,24 @@ final class DeviceRoleTests: XCTestCase {
         decoder.dateDecodingStrategy = .iso8601
         XCTAssertEqual(try decoder.decode(DeviceDTO.self, from: encoder.encode(camera)), camera)
     }
+
+    func testHouseholdInitKeepsOnlyActiveCameras() {
+        let household = UUID()
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        func device(_ role: DeviceRole, _ status: DeviceStatus = .active) -> DeviceDTO {
+            DeviceDTO(id: UUID(), householdId: household, name: "Phone", role: role, status: status, createdAt: now)
+        }
+        let dto = HouseholdDTO(
+            id: household,
+            name: "Home",
+            ownerId: UUID(),
+            role: .owner,
+            dogs: [DogDTO(id: UUID(), householdId: household, name: "Rex", createdAt: now)],
+            devices: [device(.camera), device(.camera, .revoked), device(.viewer)]
+        )
+        XCTAssertEqual(dto.plan, "free")
+        XCTAssertEqual(dto.cameras.count, 1)
+        XCTAssertEqual(dto.dogs.first?.name, "Rex")
+        XCTAssertNil(dto.dogs.first?.photoKey)
+    }
 }

@@ -18,6 +18,9 @@ final class ViewerSessionModel {
     /// Premium purchases and plan, for the household owner only.
     private(set) var subscription: SubscriptionModel?
 
+    /// Sample data for previews and CI screenshots: never touches the network or the keychain.
+    private(set) var isDemo = false
+
     private var api: DogMonitorAPI
     private let credentials: CredentialStore
 
@@ -58,6 +61,7 @@ final class ViewerSessionModel {
     }
 
     func loadHousehold() async {
+        guard !isDemo else { return }
         await perform {
             household = try await api.household()
         }
@@ -192,5 +196,47 @@ final class ViewerSessionModel {
             errorMessage = String(localized: "Something went wrong. Please try again.")
             if state == .loading { state = .signedOut }
         }
+    }
+}
+
+extension ViewerSessionModel {
+    /// A signed-in owner with two cameras and a dog, for previews and CI screenshots.
+    static var demo: ViewerSessionModel {
+        let model = ViewerSessionModel(baseURL: URL(string: "https://example.invalid")!, store: InMemorySecureStore())
+        model.isDemo = true
+        model.household = .demo
+        return model
+    }
+}
+
+extension HouseholdDTO {
+    /// Two cameras (one resting dog, one offline), two phones and a dog.
+    static var demo: HouseholdDTO {
+        let id = UUID()
+        let owner = UUID()
+        let now = Date.now
+        return HouseholdDTO(
+            id: id,
+            name: "Home",
+            ownerId: owner,
+            role: .owner,
+            members: [
+                MemberDTO(userId: owner, name: "Ben", role: .owner),
+                MemberDTO(userId: UUID(), name: "Noa", role: .member),
+            ],
+            dogs: [DogDTO(id: UUID(), householdId: id, name: "Rex", createdAt: now)],
+            devices: [
+                DeviceDTO(
+                    id: UUID(), householdId: id, name: "Living room", role: .camera,
+                    lastHeartbeatAt: now, battery: 0.8, charging: true,
+                    dogState: DogState.resting.rawValue, createdAt: now
+                ),
+                DeviceDTO(
+                    id: UUID(), householdId: id, name: "Kitchen", role: .camera,
+                    lastHeartbeatAt: now.addingTimeInterval(-3600), createdAt: now
+                ),
+                DeviceDTO(id: UUID(), householdId: id, userId: owner, name: "Ben's iPhone", role: .viewer, createdAt: now),
+            ]
+        )
     }
 }

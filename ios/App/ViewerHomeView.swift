@@ -81,6 +81,7 @@ struct ViewerHomeView: View {
                 router.liveCameraId = nil
             }
             .task {
+                guard !model.isDemo else { return }
                 model.startRealtime()
                 await model.loadHousehold()
                 await PushRegistry.shared.activate(api: model.authorizedAPI)
@@ -368,16 +369,16 @@ private struct CameraCard: View {
 }
 
 #Preview {
-    ViewerHomeView(model: ViewerSessionModel(), householdName: "Home", isOwner: true)
+    ViewerHomeView(model: .demo, householdName: "Home", isOwner: true)
 }
 
 #Preview("Hebrew (RTL)") {
-    ViewerHomeView(model: ViewerSessionModel(), householdName: "Home", isOwner: true)
+    ViewerHomeView(model: .demo, householdName: "Home", isOwner: true)
         .environment(\.locale, Locale(identifier: "he"))
         .environment(\.layoutDirection, .rightToLeft)
 }
 
 #Preview("Dark") {
-    ViewerHomeView(model: ViewerSessionModel(), householdName: "Home", isOwner: true)
+    ViewerHomeView(model: .demo, householdName: "Home", isOwner: true)
         .preferredColorScheme(.dark)
 }

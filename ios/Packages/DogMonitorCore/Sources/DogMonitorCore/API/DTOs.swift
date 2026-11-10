@@ -52,6 +52,14 @@ public struct DogDTO: Codable, Sendable, Hashable, Identifiable {
     public let name: String
     public let photoKey: String?
     public let createdAt: Date
+
+    public init(id: UUID, householdId: UUID, name: String, photoKey: String? = nil, createdAt: Date) {
+        self.id = id
+        self.householdId = householdId
+        self.name = name
+        self.photoKey = photoKey
+        self.createdAt = createdAt
+    }
 }
 
 public enum DeviceStatus: String, Codable, Sendable, Hashable {
@@ -137,6 +145,28 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
     public let members: [MemberDTO]
     public let dogs: [DogDTO]
     public let devices: [DeviceDTO]
+
+    public init(
+        id: UUID,
+        name: String,
+        plan: String = "free",
+        ownerId: UUID,
+        role: MemberRole,
+        shareTrainingData: Bool? = nil,
+        members: [MemberDTO] = [],
+        dogs: [DogDTO] = [],
+        devices: [DeviceDTO] = []
+    ) {
+        self.id = id
+        self.name = name
+        self.plan = plan
+        self.ownerId = ownerId
+        self.role = role
+        self.shareTrainingData = shareTrainingData
+        self.members = members
+        self.dogs = dogs
+        self.devices = devices
+    }
 }
 
 public struct InviteDTO: Codable, Sendable, Hashable {
