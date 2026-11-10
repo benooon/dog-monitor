@@ -31,6 +31,17 @@ final class PushPayloadTests: XCTestCase {
         XCTAssertNil(PushPayload(userInfo: ["eventId": "x", "cameraId": "y"]))
     }
 
+    func testSnapshotURLMustBeHTTPS() {
+        XCTAssertEqual(
+            PushPayload.snapshotURL(in: ["snapshotUrl": "https://bucket.example/a.jpg?X-Amz-Signature=1"])?.host,
+            "bucket.example"
+        )
+        XCTAssertNil(PushPayload.snapshotURL(in: ["snapshotUrl": "http://bucket.example/a.jpg"]))
+        XCTAssertNil(PushPayload.snapshotURL(in: ["snapshotUrl": "file:///etc/passwd"]))
+        XCTAssertNil(PushPayload.snapshotURL(in: ["snapshotUrl": 42]))
+        XCTAssertNil(PushPayload.snapshotURL(in: [:]))
+    }
+
     func testActionIdentifiersAreStable() {
         XCTAssertEqual(PushPayload.category, "DOG_EVENT")
         XCTAssertEqual(PushPayload.Action.allCases.map(\.rawValue), ["WATCH_LIVE", "MUTE_1H"])

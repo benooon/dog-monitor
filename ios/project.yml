@@ -30,6 +30,7 @@ targets:
     dependencies:
       - package: DogMonitorCore
       - package: LiveKit
+      - target: NotificationService
     info:
       path: Config/DogMonitor-Info.plist
       properties:
@@ -65,6 +66,27 @@ targets:
         API_BASE_URL: http://localhost:3000
         TARGETED_DEVICE_FAMILY: "1"
         ENABLE_PREVIEWS: YES
+
+  NotificationService:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: NotificationService
+    dependencies:
+      - package: DogMonitorCore
+    info:
+      path: Config/NotificationService-Info.plist
+      properties:
+        CFBundleDisplayName: Dog Monitor Notifications
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.usernotifications.service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationService
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor.NotificationService
+        TARGETED_DEVICE_FAMILY: "1"
 
   DogMonitorTests:
     type: bundle.unit-test

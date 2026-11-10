@@ -14,12 +14,15 @@ public struct PushPayload: Sendable, Equatable {
     public let cameraId: UUID
     public let type: EventType?
     public let snapshotKey: String?
+    /// Short-lived presigned snapshot download (https only), attached by the Notification Service Extension.
+    public let snapshotURL: URL?
 
-    public init(eventId: UUID, cameraId: UUID, type: EventType?, snapshotKey: String?) {
+    public init(eventId: UUID, cameraId: UUID, type: EventType?, snapshotKey: String?, snapshotURL: URL? = nil) {
         self.eventId = eventId
         self.cameraId = cameraId
         self.type = type
         self.snapshotKey = snapshotKey
+        self.snapshotURL = snapshotURL
     }
 
     /// Parses `UNNotificationContent.userInfo`; nil for pushes that aren't event pushes.
@@ -31,6 +34,17 @@ public struct PushPayload: Sendable, Equatable {
         self.cameraId = cameraId
         type = (userInfo["type"] as? String).flatMap(EventType.init(rawValue:))
         snapshotKey = userInfo["snapshotKey"] as? String
+        snapshotURL = Self.snapshotURL(in: userInfo)
+    }
+
+    /// The snapshot URL if present and https (never fetch arbitrary schemes from a push).
+    public static func snapshotURL(in userInfo: [AnyHashable: Any]) -> URL? {
+        guard let string = userInfo["snapshotUrl"] as? String,
+              let url = URL(string: string),
+              url.scheme?.lowercased() == "https",
+              url.host != nil
+        else { return nil }
+        return url
     }
 }
 
