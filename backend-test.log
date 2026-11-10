@@ -2,7 +2,7 @@ npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.
 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
 
-added 270 packages, and audited 271 packages in 43s
+added 270 packages, and audited 271 packages in 40s
 
 77 packages are looking for funding
   run `npm fund` for details
@@ -27,34 +27,36 @@ Run `npm audit` for details.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/runner/work/dog-monitor/dog-monitor/backend[39m
 
- [32m✓[39m test/events.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1168[2mms[22m[39m
- [32m✓[39m test/households.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 645[2mms[22m[39m
- [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 777[2mms[22m[39m
- [32m✓[39m test/live.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 822[2mms[22m[39m
- [32m✓[39m test/media.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 679[2mms[22m[39m
- [32m✓[39m test/realtime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1153[2mms[22m[39m
+ [32m✓[39m test/events.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1167[2mms[22m[39m
+ [32m✓[39m test/households.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 597[2mms[22m[39m
+ [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 730[2mms[22m[39m
+ [32m✓[39m test/live.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 698[2mms[22m[39m
+ [32m✓[39m test/media.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 685[2mms[22m[39m
+   [32m✓[39m media routes and retention [2m(4)[22m
+     [33m[2m✓[22m[39m hands cameras upload URLs under the event's own prefix[33m 322[2mms[22m[39m
+ [32m✓[39m test/realtime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1130[2mms[22m[39m
    [32m✓[39m realtime channel (GET /ws) [2m(6)[22m
-     [33m[2m✓[22m[39m rejects unauthenticated upgrades[33m 302[2mms[22m[39m
- [32m✓[39m test/timeline.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 530[2mms[22m[39m
- [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 12[2mms[22m[39m
- [32m✓[39m test/apns.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 38[2mms[22m[39m
- [32m✓[39m test/summaries.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 474[2mms[22m[39m
- [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2649[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects unauthenticated upgrades[33m 343[2mms[22m[39m
+ [32m✓[39m test/timeline.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 544[2mms[22m[39m
+ [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m test/apns.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m test/summaries.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 390[2mms[22m[39m
+ [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2598[2mms[22m[39m
    [32m✓[39m JwtService [2m(2)[22m
      [33m[2m✓[22m[39m rejects expired tokens[33m 2104[2mms[22m[39m
- [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 216[2mms[22m[39m
- [32m✓[39m test/notification-prefs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 420[2mms[22m[39m
- [32m✓[39m test/zones.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 418[2mms[22m[39m
- [32m✓[39m test/config.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 11[2mms[22m[39m
- [32m✓[39m test/quiet-hours.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 21[2mms[22m[39m
- [32m✓[39m test/app-links.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 90[2mms[22m[39m
- [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 217[2mms[22m[39m
+ [32m✓[39m test/notification-prefs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 487[2mms[22m[39m
+ [32m✓[39m test/zones.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 447[2mms[22m[39m
+ [32m✓[39m test/config.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m test/quiet-hours.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m test/app-links.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 79[2mms[22m[39m
+ [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 78[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m18 passed[39m[22m[90m (18)[39m
 [2m      Tests [22m [1m[32m116 passed[39m[22m[90m (116)[39m
-[2m   Start at [22m 12:47:54
-[2m   Duration [22m 24.19s[2m (import 49%, tests 48%, transform 3%)[22m
+[2m   Start at [22m 12:51:22
+[2m   Duration [22m 21.50s[2m (tests 52%, import 45%, transform 2%)[22m
 
-[2m    Isolate [22m [33m18 workers spawned[39m[2m · ~111ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~1.89s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[2m    Isolate [22m [33m18 workers spawned[39m[2m · ~96ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~1.63s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
 

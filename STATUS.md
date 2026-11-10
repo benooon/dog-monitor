@@ -1,12 +1,12 @@
-# CI status: RED
+# CI status: GREEN
 
-- commit: 9346dc73b0be5a63fe63cc60f85ba6e012ab6f8b
-- message: core+ios: daily summary on the camera, uploaded every 15 minutes
-- time (UTC): 2026-11-10T12:50:05Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42818545856
+- commit: 0066911acf1e9e5910c7bb708715c91b0172d85e
+- message: ios: spell the core NormalizedRect through a typealias next to Vision (fix CI)
+- time (UTC): 2026-11-10T12:58:15Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42819052211
 
 | job | result | log |
 |---|---|---|
 | core (swift test, Linux) | success | core-test.log |
-| ios (xcodebuild test, macOS) | failure | ios-build.log |
+| ios (xcodebuild test, macOS) | success | ios-build.log |
 | backend (lint + test) | success | backend-test.log |
