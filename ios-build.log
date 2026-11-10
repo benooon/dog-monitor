@@ -12,64 +12,64 @@ Writing result bundle at path:
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
 { platform:iOS Simulator, arch:x86_64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:141:39: warning: main actor-isolated property 'displayName' can not be referenced from a Sendable closure
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:39: warning: main actor-isolated property 'displayName' can not be referenced from a Sendable closure
                 DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingModel.swift:56:9: note: property declared here
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingModel.swift:78:9: note: property declared here
     var displayName: String {
         ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:141:33: warning: main actor-isolated property 'model' can not be referenced from a Sendable closure
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:33: warning: main actor-isolated property 'model' can not be referenced from a Sendable closure
                 DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
                                 ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:127:19: note: property declared here
     @Bindable var model: DogOnboardingModel
                   ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:141:65: warning: main actor-isolated property 'photo' can not be referenced from a Sendable closure
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:65: warning: main actor-isolated property 'photo' can not be referenced from a Sendable closure
                 DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
                                                                 ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingModel.swift:17:9: note: property declared here
     var photo: UIImage?
         ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:141:59: warning: main actor-isolated property 'model' can not be referenced from a Sendable closure
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:59: warning: main actor-isolated property 'model' can not be referenced from a Sendable closure
                 DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
                                                           ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:127:19: note: property declared here
     @Bindable var model: DogOnboardingModel
                   ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:141:82: warning: main actor-isolated property 'avatarSize' can not be referenced from a Sendable closure
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:82: warning: main actor-isolated property 'avatarSize' can not be referenced from a Sendable closure
                 DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
                                                                                  ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:131:56: note: property declared here
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:132:56: note: property declared here
     @ScaledMetric(relativeTo: .largeTitle) private var avatarSize: CGFloat = 168
                                                        ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:143:49: warning: main actor-isolated property 'photo' can not be referenced from a nonisolated context
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:144:49: warning: main actor-isolated property 'photo' can not be referenced from a nonisolated context
                         Image(systemName: model.photo == nil ? "plus" : "pencil")
                                                 ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingModel.swift:17:9: note: property declared here
     var photo: UIImage?
         ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:143:43: warning: main actor-isolated property 'model' can not be referenced from a nonisolated context
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:144:43: warning: main actor-isolated property 'model' can not be referenced from a nonisolated context
                         Image(systemName: model.photo == nil ? "plus" : "pencil")
                                           ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:127:19: note: property declared here
     @Bindable var model: DogOnboardingModel
                   ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:146:43: warning: main actor-isolated property 'badgeSize' can not be referenced from a nonisolated context
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:147:43: warning: main actor-isolated property 'badgeSize' can not be referenced from a nonisolated context
                             .frame(width: badgeSize, height: badgeSize)
                                           ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:133:31: note: property declared here
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:134:31: note: property declared here
     @ScaledMetric private var badgeSize: CGFloat = 44
                               ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:146:62: warning: main actor-isolated property 'badgeSize' can not be referenced from a nonisolated context
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:147:62: warning: main actor-isolated property 'badgeSize' can not be referenced from a nonisolated context
                             .frame(width: badgeSize, height: badgeSize)
                                                              ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:133:31: note: property declared here
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:134:31: note: property declared here
     @ScaledMetric private var badgeSize: CGFloat = 44
                               ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Household/DogProfileEditor.swift:143:26: warning: main actor-isolated property 'shownPhoto' can not be referenced from a Sendable closure
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Household/DogProfileEditor.swift:136:26: warning: main actor-isolated property 'shownPhoto' can not be referenced from a Sendable closure
                     Text(shownPhoto == nil ? "Choose a photo" : "Change photo")
                          ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Household/DogProfileEditor.swift:28:17: note: property declared here
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Household/DogProfileEditor.swift:29:17: note: property declared here
     private var shownPhoto: UIImage? {
                 ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
@@ -132,16 +132,19 @@ Writing result bundle at path:
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
             self?.sessionQueue.async { self?.applyRotation(angle) }
                                        ^
-2026-11-10 23:03:38.765 xcodebuild[4782:17134] [MT] IDETestOperationsObserverDebug: 668.917 elapsed -- Testing started completed.
-2026-11-10 23:03:38.765 xcodebuild[4782:17134] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 23:03:38.765 xcodebuild[4782:17134] [MT] IDETestOperationsObserverDebug: 668.917 sec, +668.917 sec -- end
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+2026-11-10 23:18:26.341 xcodebuild[3002:12141] [MT] IDETestOperationsObserverDebug: 217.689 elapsed -- Testing started completed.
+2026-11-10 23:18:26.341 xcodebuild[3002:12141] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 23:18:26.341 xcodebuild[3002:12141] [MT] IDETestOperationsObserverDebug: 217.689 sec, +217.689 sec -- end
 Testing started
 iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
 { platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-2026-11-10 23:11:39.000 xcodebuild[34587:94539] [MT] IDETestOperationsObserverDebug: 449.201 elapsed -- Testing started completed.
-2026-11-10 23:11:39.002 xcodebuild[34587:94539] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 23:11:39.002 xcodebuild[34587:94539] [MT] IDETestOperationsObserverDebug: 449.201 sec, +449.201 sec -- end
+2026-11-10 23:22:01.121 xcodebuild[11341:38568] [MT] IDETestOperationsObserverDebug: 197.799 elapsed -- Testing started completed.
+2026-11-10 23:22:01.121 xcodebuild[11341:38568] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 23:22:01.121 xcodebuild[11341:38568] [MT] IDETestOperationsObserverDebug: 197.799 sec, +197.799 sec -- end
 Testing started
-Screenshots: 126
+Screenshots: 132
