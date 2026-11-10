@@ -48,7 +48,7 @@ final class BarkDetector: @unchecked Sendable {
             configure(for: format)
         }
         guard let converter, let analysisFormat, let analyzer,
-              let input = Self.pcmBuffer(from: sampleBuffer, format: format),
+              let input = AudioSampleBuffer.pcmBuffer(from: sampleBuffer, format: format),
               let output = AVAudioPCMBuffer(pcmFormat: analysisFormat, frameCapacity: input.frameLength)
         else { return }
 
@@ -113,21 +113,6 @@ final class BarkDetector: @unchecked Sendable {
         analysisFormat = nil
         loudness = nil
         framePosition = 0
-    }
-
-    private static func pcmBuffer(from sampleBuffer: CMSampleBuffer, format: AVAudioFormat) -> AVAudioPCMBuffer? {
-        let frames = CMSampleBufferGetNumSamples(sampleBuffer)
-        guard frames > 0,
-              let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(frames))
-        else { return nil }
-        buffer.frameLength = AVAudioFrameCount(frames)
-        let status = CMSampleBufferCopyPCMDataIntoAudioBufferList(
-            sampleBuffer,
-            at: 0,
-            frameCount: Int32(frames),
-            into: buffer.mutableAudioBufferList
-        )
-        return status == noErr ? buffer : nil
     }
 }
 

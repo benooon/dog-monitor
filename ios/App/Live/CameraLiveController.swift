@@ -125,7 +125,12 @@ final class CameraLiveController {
             if !isStreaming || !connected {
                 do {
                     let token = try await api.deviceLiveToken()
-                    try await publisher.start(token: token, frames: capture.samples(.video, bufferingNewest: 1))
+                    try await publisher.start(
+                        token: token,
+                        frames: capture.samples(.video, bufferingNewest: 1),
+                        // ~20 ms per buffer: keep a few hundred ms so audio is not dropped.
+                        audio: capture.samples(.audio, bufferingNewest: 16)
+                    )
                     isStreaming = true
                 } catch {
                     logger.error("Could not start publishing: \(String(describing: error), privacy: .public)")
