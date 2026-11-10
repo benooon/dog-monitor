@@ -141,6 +141,16 @@
         }
       }
     },
+    "Allow microphone access in Settings to talk to your dog.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשרו גישה למיקרופון בהגדרות כדי לדבר עם הכלב."
+          }
+        }
+      }
+    },
     "At the door": {
       "localizations": {
         "he": {
@@ -871,6 +881,16 @@
         }
       }
     },
+    "Someone is talking": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מישהו מדבר"
+          }
+        }
+      }
+    },
     "Something went wrong. Please try again.": {
       "localizations": {
         "he": {
@@ -921,12 +941,32 @@
         }
       }
     },
+    "Stop talking": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפסקת דיבור"
+          }
+        }
+      }
+    },
     "Summary": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "סיכום"
+          }
+        }
+      }
+    },
+    "Talk": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "דיבור"
           }
         }
       }
@@ -1273,6 +1313,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הסיכום היומי מוכן"
+          }
+        }
+      }
+    },
+    "Your voice plays from the camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הקול שלכם יושמע מהמצלמה."
           }
         }
       }

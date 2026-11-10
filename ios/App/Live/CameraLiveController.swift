@@ -19,6 +19,8 @@ final class CameraLiveController {
     private(set) var link: Link = .connecting
     private(set) var viewerCount = 0
     private(set) var isStreaming = false
+    /// A viewer is talking through the camera's speaker right now (privacy: always shown).
+    private(set) var isViewerTalking = false
 
     private let api: DogMonitorAPI
     private let capture: CaptureService
@@ -54,6 +56,14 @@ final class CameraLiveController {
         })
         tasks.append(Task { [weak self] in
             while !Task.isCancelled {
+                guard let self else { return }
+                let talking = self.isStreaming && self.publisher.isViewerTalking
+                if talking != self.isViewerTalking { self.isViewerTalking = talking }
+                try? await Task.sleep(for: .milliseconds(500))
+            }
+        })
+        tasks.append(Task { [weak self] in
+            while !Task.isCancelled {
                 await self?.sendHeartbeat()
                 try? await Task.sleep(for: Self.heartbeatInterval)
             }
@@ -68,6 +78,7 @@ final class CameraLiveController {
         policy.connectionLost(at: .now)
         viewerCount = 0
         isStreaming = false
+        isViewerTalking = false
         link = .offline
         let publisher = publisher
         Task { await publisher.stop() }

@@ -151,6 +151,16 @@ struct CameraModeView: View {
                         .accessibilityLabel(Text("Offline"))
                 }
             }
+            if model.live?.isViewerTalking == true {
+                // Privacy (SPEC §10): show when someone is talking through this phone.
+                Label {
+                    Text("Someone is talking")
+                } icon: {
+                    Image(systemName: "waveform")
+                        .symbolEffect(.variableColor.iterative, options: .repeating)
+                }
+                .foregroundStyle(.white)
+            }
             if !model.hasAudio {
                 Image(systemName: "mic.slash.fill")
                     .accessibilityLabel(Text("Microphone off — barking can't be detected."))

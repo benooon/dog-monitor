@@ -1,3 +1,4 @@
+import AVFoundation
 import DogMonitorCore
 import Foundation
 @preconcurrency import LiveKit
@@ -31,6 +32,10 @@ final class LiveViewModel {
     /// sending the audio. Sound plays through the speaker even with the silent switch on
     /// (LiveKit's `.playback` session), since opening live view is an explicit request.
     private(set) var isAudioMuted: Bool
+    /// Push-to-talk: the viewer's mic is published to the camera's speaker.
+    private(set) var isTalking = false
+    /// Microphone permission was refused, so talking is not possible.
+    private(set) var isMicrophoneDenied = false
 
     let cameraId: UUID
     private let api: DogMonitorAPI
@@ -56,6 +61,38 @@ final class LiveViewModel {
         }
     }
 
+    /// Starts or stops talking through the camera. While talking, the camera's own audio is
+    /// paused so the viewer doesn't hear themselves echo back.
+    func toggleTalk() {
+        guard let room, phase == .live else { return }
+        let talk = !isTalking
+        Task {
+            if talk {
+                guard await AVAudioApplication.requestRecordPermission() else {
+                    isMicrophoneDenied = true
+                    return
+                }
+                isMicrophoneDenied = false
+                Self.useDeviceMicrophone()
+            }
+            do {
+                try await room.localParticipant.setMicrophone(enabled: talk)
+                isTalking = talk
+            } catch {
+                logger.info("Could not change talking: \(String(describing: error), privacy: .public)")
+                isTalking = false
+            }
+            await applyAudioPreference(in: room)
+        }
+    }
+
+    /// A phone that was a camera earlier in this launch left LiveKit in manual rendering mode,
+    /// which never opens the mic; viewers need the normal mode.
+    private static func useDeviceMicrophone() {
+        guard AudioManager.shared.isManualRenderingMode else { return }
+        try? AudioManager.shared.setManualRenderingMode(false)
+    }
+
     func start() {
         guard session == nil else { return }
         realtime.watch(cameraId)
@@ -70,6 +107,7 @@ final class LiveViewModel {
         realtime.unwatch(cameraId)
         videoTrack = nil
         hasAudio = false
+        isTalking = false
         let room = room
         self.room = nil
         Task { await room?.disconnect() }
@@ -111,6 +149,7 @@ final class LiveViewModel {
             }
             guard !Task.isCancelled else { return }
             videoTrack = nil
+            isTalking = false
             phase = .reconnecting
             try? await Task.sleep(for: .seconds(backoff.nextDelay()))
         }
@@ -158,7 +197,7 @@ final class LiveViewModel {
             .flatMap(\.audioTracks)
             .compactMap { $0 as? RemoteTrackPublication }
         hasAudio = !publications.isEmpty
-        let enabled = !isAudioMuted
+        let enabled = !isAudioMuted && !isTalking
         for publication in publications where publication.isEnabled != enabled {
             do {
                 try await publication.set(enabled: enabled)

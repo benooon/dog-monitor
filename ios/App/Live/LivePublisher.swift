@@ -11,7 +11,8 @@ import os
 /// Audio works the same way: the capture session owns the microphone (bark detection needs it
 /// all the time), so LiveKit's audio engine runs in manual rendering mode, never opens the mic,
 /// and gets our captured buffers through `AudioManager.shared.mixer.capture(appAudio:)`.
-/// Manual rendering also means remote audio is not played automatically (matters for push-to-talk).
+/// Manual rendering also means remote audio is not played automatically, so viewers' push-to-talk
+/// audio goes through `TalkbackPlayer`.
 actor LivePublisher {
     enum PublishError: Error {
         case noBufferCapturer
@@ -20,6 +21,9 @@ actor LivePublisher {
     private var room: Room?
     private var feed: Task<Void, Never>?
     private var audioFeed: Task<Void, Never>?
+    private var talkbackWatch: Task<Void, Never>?
+    private var talkbackTracks: Set<ObjectIdentifier> = []
+    private let talkback = TalkbackPlayer()
     private let logger = Logger(subsystem: "com.benooon.dogmonitor", category: "LivePublisher")
 
     var isConnected: Bool {
@@ -51,6 +55,12 @@ actor LivePublisher {
             }
         }
         await startAudio(in: room, samples: audio)
+        watchTalkback(in: room)
+    }
+
+    /// Whether a viewer's voice played in the last moment (shown on the camera screen).
+    nonisolated var isViewerTalking: Bool {
+        talkback.isViewerTalking
     }
 
     func stop() async {
@@ -62,7 +72,35 @@ actor LivePublisher {
         self.audioFeed = nil
         feed?.cancel()
         audioFeed?.cancel()
+        talkbackWatch?.cancel()
+        talkbackWatch = nil
+        talkbackTracks.removeAll()
+        talkback.stop()
         await room?.disconnect()
+    }
+
+    // MARK: - Push-to-talk
+
+    /// Viewers publish a microphone track while they talk; play each one as it appears.
+    private func watchTalkback(in room: Room) {
+        talkbackWatch?.cancel()
+        talkbackWatch = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.attachViewerAudio(in: room)
+                try? await Task.sleep(for: .milliseconds(500))
+            }
+        }
+    }
+
+    private func attachViewerAudio(in room: Room) {
+        for participant in room.remoteParticipants.values {
+            for publication in participant.audioTracks {
+                guard let track = publication.track as? RemoteAudioTrack else { continue }
+                if talkbackTracks.insert(ObjectIdentifier(track)).inserted {
+                    track.add(audioRenderer: talkback)
+                }
+            }
+        }
     }
 
     // MARK: - Audio

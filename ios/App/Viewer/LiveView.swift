@@ -32,6 +32,9 @@ struct LiveView: View {
                 Spacer()
                 status
                 Spacer()
+                if model.phase == .live {
+                    talkControl
+                }
             }
             .padding()
             .foregroundStyle(.white)
@@ -56,6 +59,35 @@ struct LiveView: View {
         }
         .onAppear { model.start() }
         .onDisappear { model.stop() }
+    }
+
+    /// Push-to-talk: tap to talk through the camera's speaker, tap again to stop.
+    private var talkControl: some View {
+        VStack(spacing: 8) {
+            if model.isMicrophoneDenied {
+                Text("Allow microphone access in Settings to talk to your dog.")
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
+            }
+            Button {
+                model.toggleTalk()
+            } label: {
+                Label(
+                    model.isTalking ? LocalizedStringKey("Stop talking") : LocalizedStringKey("Talk"),
+                    systemImage: model.isTalking ? "mic.fill" : "mic"
+                )
+                .font(.headline)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .frame(minHeight: 44)
+                .background(model.isTalking ? AnyShapeStyle(.red) : AnyShapeStyle(.ultraThinMaterial), in: Capsule())
+                .symbolEffect(.pulse, options: .repeating, isActive: model.isTalking)
+            }
+            .buttonStyle(.plain)
+            .sensoryFeedback(.impact, trigger: model.isTalking)
+            .accessibilityHint(Text("Your voice plays from the camera."))
+            .accessibilityIdentifier("push-to-talk")
+        }
     }
 
     @ViewBuilder

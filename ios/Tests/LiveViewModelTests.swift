@@ -27,6 +27,21 @@ final class LiveViewModelTests: XCTestCase {
         XCTAssertFalse(defaults.bool(forKey: LiveViewModel.audioMutedKey))
     }
 
+    func testTalkingIsOffAndIgnoredUntilLive() {
+        let model = LiveViewModel(cameraId: UUID(), api: api, realtime: ViewerRealtime(api: api))
+        XCTAssertFalse(model.isTalking)
+        model.toggleTalk() // no room yet: nothing happens, no permission prompt
+        XCTAssertFalse(model.isTalking)
+        XCTAssertFalse(model.isMicrophoneDenied)
+    }
+
+    func testTalkbackPlayerIsQuietUntilAudioArrives() {
+        let player = TalkbackPlayer()
+        XCTAssertFalse(player.isViewerTalking)
+        player.stop()
+        XCTAssertFalse(player.isViewerTalking)
+    }
+
     func testRealtimeStartsDisconnectedWithNoPresence() {
         let realtime = ViewerRealtime(api: api)
         XCTAssertFalse(realtime.isConnected)

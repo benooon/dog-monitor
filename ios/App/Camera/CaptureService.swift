@@ -169,6 +169,15 @@ final class CaptureService: NSObject, @unchecked Sendable {
         session.addOutput(videoOutput)
         followDeviceRotation(of: camera)
 
+        // We own the audio session so viewers' push-to-talk plays from the speaker, not the
+        // earpiece, while the mic keeps recording.
+        if includeAudio {
+            session.automaticallyConfiguresApplicationAudioSession = false
+            let audioSession = AVAudioSession.sharedInstance()
+            try? audioSession.setCategory(.playAndRecord, mode: .videoRecording, options: [.defaultToSpeaker, .mixWithOthers])
+            try? audioSession.setActive(true)
+        }
+
         // Audio is best effort: without it the camera still streams video, but bark detection is off.
         if includeAudio,
            let microphone = AVCaptureDevice.default(for: .audio),
