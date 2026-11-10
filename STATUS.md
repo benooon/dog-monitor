@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: c0a2e61540f7d9fac8199ea7cd506111b329050f
-- message: core: notification prefs API and an editable NotificationSettings model
-- time (UTC): 2026-11-10T12:01:07Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42810608820
+- commit: 73f71d88d2b7dbc5aeea808b8973e7d68b967252
+- message: core+ios: camera health warnings, heat-based frame rate, power and heat events
+- time (UTC): 2026-11-10T12:13:30Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42811675719
 
 | job | result | log |
 |---|---|---|
