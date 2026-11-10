@@ -219,6 +219,62 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
     expect(tokenForFirst.statusCode).toBe(409);
   });
 
+  async function notify(notification: Record<string, unknown>, options: SignOptions = {}) {
+    return app.inject({
+      method: "POST",
+      url: "/app-store/notifications",
+      payload: { signedPayload: await signTransaction(notification, options) },
+    });
+  }
+
+  async function subscription(auth: Record<string, string>) {
+    return (await app.inject({ method: "GET", url: "/subscription", headers: auth })).json();
+  }
+
+  it("applies renewals and refunds from App Store server notifications", async () => {
+    const { auth } = await household("owner");
+    await purchase(auth, transaction());
+
+    const renewal = await notify({
+      notificationType: "DID_RENEW",
+      notificationUUID: "n-1",
+      data: { bundleId: BUNDLE, environment: "Sandbox", signedTransactionInfo: await signTransaction(transaction({ transactionId: "9", expiresDate: NOW.getTime() + 59 * DAY })) },
+    });
+    expect(renewal.statusCode).toBe(200);
+    expect(new Date((await subscription(auth)).expiresAt).getTime()).toBe(NOW.getTime() + 59 * DAY);
+
+    const refund = await notify({
+      notificationType: "REFUND",
+      data: { signedTransactionInfo: await signTransaction(transaction({ transactionId: "9", revocationDate: NOW.getTime() })) },
+    });
+    expect(refund.statusCode).toBe(200);
+    expect((await subscription(auth)).plan).toBe("free");
+  });
+
+  it("finds a new subscriber by appAccountToken and ignores what isn't ours", async () => {
+    const { auth, householdId } = await household("owner");
+    const first = await notify({
+      notificationType: "SUBSCRIBED",
+      data: { signedTransactionInfo: await signTransaction(transaction({ originalTransactionId: "77", appAccountToken: householdId.toUpperCase() })) },
+    });
+    expect(first.statusCode).toBe(200);
+    expect((await subscription(auth)).plan).toBe("premium");
+
+    expect((await notify({ notificationType: "TEST" })).statusCode).toBe(200);
+    const otherProduct = await notify({ data: { signedTransactionInfo: await signTransaction(transaction({ productId: "coins" })) } });
+    expect(otherProduct.statusCode).toBe(200);
+    const stranger = await notify({ data: { signedTransactionInfo: await signTransaction(transaction({ originalTransactionId: "88" })) } });
+    expect(stranger.statusCode).toBe(200);
+  });
+
+  it("rejects notifications that aren't signed by the trusted chain", async () => {
+    const forged = await notify({ notificationType: "DID_RENEW" }, { key: "other-leaf.key" });
+    expect(forged.statusCode).toBe(400);
+    const chain = [fixture("other-leaf.pem"), fixture("other-intermediate.pem"), fixture("other-root.pem")];
+    const otherRoot = await notify({ notificationType: "DID_RENEW" }, { chain, key: "other-leaf.key" });
+    expect(otherRoot.statusCode).toBe(400);
+  });
+
   it("is for owners, and rejects bad transactions", async () => {
     const { auth } = await household("owner");
     const bad = await app.inject({

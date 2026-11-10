@@ -28,7 +28,7 @@ import { cameraZoneRoutes } from "./routes/zones.js";
 import { trainingRoutes } from "./routes/training.js";
 import { cameraSummaryRoutes, viewerSummaryRoutes } from "./routes/summaries.js";
 import { healthRoutes } from "./routes/health.js";
-import { subscriptionRoutes } from "./routes/subscription.js";
+import { appStoreNotificationRoutes, subscriptionRoutes } from "./routes/subscription.js";
 import type { TransactionVerifier } from "./billing/app-store.js";
 import { appLinkRoutes } from "./routes/app-links.js";
 
@@ -94,6 +94,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
       enforcePlanLimits,
       now: () => new Date(clock()),
     });
+    await app.register(appStoreNotificationRoutes, { db: services.db, verifier: services.transactions, now: () => new Date(clock()) });
     const notifier = new EventNotifier(services.db, services.apns, app.log, services.storage, () => new Date(clock()));
     await app.register(cameraEventRoutes, { db: services.db, notifier });
     await app.register(cameraMediaRoutes, { db: services.db, storage: services.storage });

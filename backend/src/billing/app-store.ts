@@ -40,46 +40,52 @@ export class TransactionError extends Error {
 
 export interface TransactionVerifier {
   verify(signedTransaction: string, now: Date): Promise<VerifiedTransaction>;
+  /** Verifies any App Store signed payload (e.g. a server notification) and returns its JSON. */
+  verifyPayload(signedPayload: string, now: Date): Promise<Record<string, unknown>>;
 }
 
 /** Verifies StoreKit 2 signed transactions offline: the x5c chain to Apple's root, then the JWS signature. */
 export function createAppStoreVerifier(config: AppStoreConfig): TransactionVerifier {
   const roots = new Set(config.rootFingerprints.map(normalizeFingerprint));
 
-  return {
-    async verify(signedTransaction, now) {
-      let chain: X509Certificate[];
-      try {
-        const header = decodeProtectedHeader(signedTransaction);
-        if (header.alg !== "ES256" || !Array.isArray(header.x5c) || header.x5c.length !== 3) {
-          throw new TransactionError("invalid_transaction");
-        }
-        chain = header.x5c.map((der) => new X509Certificate(Buffer.from(der, "base64")));
-      } catch {
+  async function verifyPayload(signed: string, now: Date): Promise<Record<string, unknown>> {
+    let chain: X509Certificate[];
+    try {
+      const header = decodeProtectedHeader(signed);
+      if (header.alg !== "ES256" || !Array.isArray(header.x5c) || header.x5c.length !== 3) {
         throw new TransactionError("invalid_transaction");
       }
-      const [leaf, intermediate, root] = chain as [X509Certificate, X509Certificate, X509Certificate];
-      if (!roots.has(normalizeFingerprint(root.fingerprint256))) throw new TransactionError("untrusted_certificate");
-      const chainOk =
-        root.verify(root.publicKey) &&
-        intermediate.verify(root.publicKey) &&
-        leaf.verify(intermediate.publicKey) &&
-        intermediate.checkIssued(root) &&
-        leaf.checkIssued(intermediate) &&
-        hasExtension(leaf, LEAF_OID) &&
-        hasExtension(intermediate, INTERMEDIATE_OID) &&
-        chain.every((cert) => isValidAt(cert, now));
-      if (!chainOk) throw new TransactionError("untrusted_certificate");
+      chain = header.x5c.map((der) => new X509Certificate(Buffer.from(der, "base64")));
+    } catch {
+      throw new TransactionError("invalid_transaction");
+    }
+    const [leaf, intermediate, root] = chain as [X509Certificate, X509Certificate, X509Certificate];
+    if (!roots.has(normalizeFingerprint(root.fingerprint256))) throw new TransactionError("untrusted_certificate");
+    const chainOk =
+      root.verify(root.publicKey) &&
+      intermediate.verify(root.publicKey) &&
+      leaf.verify(intermediate.publicKey) &&
+      intermediate.checkIssued(root) &&
+      leaf.checkIssued(intermediate) &&
+      hasExtension(leaf, LEAF_OID) &&
+      hasExtension(intermediate, INTERMEDIATE_OID) &&
+      chain.every((cert) => isValidAt(cert, now));
+    if (!chainOk) throw new TransactionError("untrusted_certificate");
 
-      let payload: Record<string, unknown>;
-      try {
-        const { payload: bytes } = await compactVerify(signedTransaction, leaf.publicKey, { algorithms: ["ES256"] });
-        payload = JSON.parse(new TextDecoder().decode(bytes)) as Record<string, unknown>;
-      } catch {
-        throw new TransactionError("invalid_signature");
-      }
+    try {
+      const { payload } = await compactVerify(signed, leaf.publicKey, { algorithms: ["ES256"] });
+      const json: unknown = JSON.parse(new TextDecoder().decode(payload));
+      if (typeof json !== "object" || json === null || Array.isArray(json)) throw new Error("not an object");
+      return json as Record<string, unknown>;
+    } catch {
+      throw new TransactionError("invalid_signature");
+    }
+  }
 
-      const transaction = parsePayload(payload);
+  return {
+    verifyPayload,
+    async verify(signedTransaction, now) {
+      const transaction = parsePayload(await verifyPayload(signedTransaction, now));
       if (transaction.bundleId !== config.bundleId) throw new TransactionError("wrong_bundle");
       if (!config.productIds.includes(transaction.productId)) throw new TransactionError("unknown_product");
       return transaction;
