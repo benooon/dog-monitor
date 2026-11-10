@@ -30,6 +30,8 @@ final class CameraModeModel {
         }
     }
 
+    /// Something moved in the last few seconds; heavier video analysis runs only while true.
+    private(set) var isMotionActive = false
     /// Heat and power problems to show on the camera screen, most important first.
     private(set) var healthWarnings: [CameraHealth.Warning] = []
 
@@ -42,6 +44,8 @@ final class CameraModeModel {
     private var credential: APICredential
 
     private var meterTask: Task<Void, Never>?
+    private var motionTask: Task<Void, Never>?
+    private var motionResultsTask: Task<Void, Never>?
     private var analysisTask: Task<Void, Never>?
     private var detectionTask: Task<Void, Never>?
     private var hideTask: Task<Void, Never>?
@@ -122,6 +126,7 @@ final class CameraModeModel {
             status = .running
             screen.hidePreview()
             startFrameMeter()
+            startMotionDetection()
             startEventEngine()
             if hasAudio { startAudioAnalysis() }
             startLive()
@@ -134,7 +139,10 @@ final class CameraModeModel {
 
     func stop() {
         guard status == .running || status == .starting else { return }
-        for task in [meterTask, analysisTask, detectionTask, tickTask] { task?.cancel() }
+        for task in [meterTask, analysisTask, detectionTask, tickTask, motionTask, motionResultsTask] { task?.cancel() }
+        motionTask = nil
+        motionResultsTask = nil
+        isMotionActive = false
         meterTask = nil
         analysisTask = nil
         detectionTask = nil
@@ -187,6 +195,36 @@ final class CameraModeModel {
                 }
             }
         }
+    }
+
+    /// Frame differencing at ~4 fps off the main actor; publishes when the motion gate opens or closes.
+    private func startMotionDetection() {
+        motionTask?.cancel()
+        motionResultsTask?.cancel()
+        let samples = capture.samples(.video, bufferingNewest: 1)
+        let (results, continuation) = AsyncStream<(MotionResult, Bool)>.makeStream(bufferingPolicy: .bufferingNewest(4))
+        motionTask = Task.detached(priority: .utility) {
+            var detector = MotionDetector()
+            for await sample in samples where sample.kind == .video {
+                let now = Date.now
+                guard detector.wants(now), let frame = MotionAnalyzer.lumaFrame(from: sample, timestamp: now) else { continue }
+                let result = detector.process(frame)
+                continuation.yield((result, detector.isActive(at: now)))
+            }
+            continuation.finish()
+        }
+        motionResultsTask = Task { [weak self] in
+            for await (result, active) in results {
+                self?.motionObserved(result, gateOpen: active)
+            }
+        }
+    }
+
+    private func motionObserved(_ result: MotionResult, gateOpen: Bool) {
+        if gateOpen, !isMotionActive, let detection = MotionDetector.detection(for: result) {
+            detectionLog.append(detection)
+        }
+        if gateOpen != isMotionActive { isMotionActive = gateOpen }
     }
 
     /// Called after `CameraPairingView` stored the new device credential.
