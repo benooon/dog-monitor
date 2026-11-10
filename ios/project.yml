@@ -112,6 +112,11 @@ schemes:
       targets:
         DogMonitor: all
         DogMonitorTests: [test]
+    run:
+      config: Debug
+      # Local purchases for the simulator. The backend can't verify these (Xcode signs them), so
+      # Premium shows up only with sandbox or TestFlight purchases.
+      storeKitConfiguration: StoreKit/DogMonitor.storekit
     test:
       config: Debug
       gatherCoverageData: false

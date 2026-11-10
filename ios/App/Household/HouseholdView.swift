@@ -8,6 +8,7 @@ struct HouseholdView: View {
     let model: ViewerSessionModel
     @Environment(\.dismiss) private var dismiss
     @State private var showsInvite = false
+    @State private var showsPremium = false
     @State private var memberToRemove: MemberDTO?
     @State private var deviceToRemove: DeviceDTO?
     @State private var sharesTrainingData = false
@@ -34,6 +35,11 @@ struct HouseholdView: View {
             }
             .sheet(isPresented: $showsInvite, onDismiss: { Task { await model.loadHousehold() } }) {
                 InviteSheet(model: model)
+            }
+            .sheet(isPresented: $showsPremium) {
+                if let subscription = model.subscription {
+                    PremiumView(model: subscription)
+                }
             }
             .confirmationDialog(
                 memberToRemove.map { Text("Remove \(Self.displayName(of: $0))?") } ?? Text(verbatim: ""),
@@ -113,6 +119,10 @@ struct HouseholdView: View {
             )
             deviceSection(title: "Phones", devices: active.filter { $0.role == .viewer }, empty: nil)
 
+            if isOwner, let subscription = model.subscription {
+                PlanSection(status: subscription.status) { showsPremium = true }
+            }
+
             if isOwner {
                 Section {
                     Toggle(isOn: $sharesTrainingData) {
@@ -181,6 +191,32 @@ struct HouseholdView: View {
 
     private func isPresented<Item>(_ item: Binding<Item?>) -> Binding<Bool> {
         Binding(get: { item.wrappedValue != nil }, set: { if !$0 { item.wrappedValue = nil } })
+    }
+}
+
+/// Owner only: the household's plan, opening Premium.
+private struct PlanSection: View {
+    let status: SubscriptionDTO?
+    let showPremium: () -> Void
+
+    var body: some View {
+        Section {
+            Button(action: showPremium) {
+                LabeledContent {
+                    if let status {
+                        Text(status.isPremium ? LocalizedStringKey("Premium") : LocalizedStringKey("Free"))
+                    }
+                } label: {
+                    Label("Plan", systemImage: "star.circle")
+                }
+            }
+            .tint(.primary)
+            .accessibilityIdentifier("household-plan")
+        } footer: {
+            if let status, !status.isPremium {
+                Text("Premium lets your household pair up to \(SubscriptionProducts.premiumCameraLimit) cameras.")
+            }
+        }
     }
 }
 

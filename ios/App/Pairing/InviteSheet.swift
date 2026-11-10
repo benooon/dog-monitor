@@ -8,6 +8,7 @@ struct InviteSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var invite: InviteDTO?
+    @State private var showsPremium = false
 
     var body: some View {
         NavigationStack {
@@ -23,6 +24,9 @@ struct InviteSheet: View {
                     Button("Try again") { Task { await load() } }
                 }
                 Spacer()
+                if let status = model.subscription?.status, status.suggestsUpgrade {
+                    CameraLimitNotice { showsPremium = true }
+                }
                 Text("On the new phone, choose Camera and scan this code, or type the 6 digits. Family members can join with the same code.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -36,7 +40,15 @@ struct InviteSheet: View {
                     Button("Done") { dismiss() }
                 }
             }
-            .task { await load() }
+            .sheet(isPresented: $showsPremium) {
+                if let subscription = model.subscription {
+                    PremiumView(model: subscription)
+                }
+            }
+            .task {
+                await load()
+                await model.subscription?.refresh()
+            }
         }
     }
 
@@ -71,5 +83,24 @@ struct InviteSheet: View {
 
     private func load() async {
         invite = await model.createInvite()
+    }
+}
+
+/// Shown when the free plan has no camera spot left. Family members can still join.
+private struct CameraLimitNotice: View {
+    let showPremium: () -> Void
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Text("New cameras need Premium. Family members can still join with this code.")
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+            Button("Get Premium", action: showPremium)
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("invite-get-premium")
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 12))
     }
 }

@@ -97,7 +97,10 @@ struct CameraPairingView: View {
     }
 
     static func message(for error: any Error) -> LocalizedStringKey {
-        switch error as? APIError {
+        if let error = error as? APIError, error.isCameraLimitReached {
+            return "This household has no room for another camera. The owner can get Premium on the Household screen."
+        }
+        return switch error as? APIError {
         case .http(status: 404, _)?, .http(status: 410, _)?:
             "This code is invalid or has expired."
         case .http(status: 429, _)?:

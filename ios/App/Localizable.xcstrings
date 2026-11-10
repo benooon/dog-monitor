@@ -181,6 +181,16 @@
         }
       }
     },
+    "%lld of %lld": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld מתוך %2$lld"
+          }
+        }
+      }
+    },
     "%lld watching": {
       "localizations": {
         "he": {
@@ -421,6 +431,16 @@
         }
       }
     },
+    "Change or cancel your plan in your App Store account.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשר לשנות או לבטל את התוכנית בחשבון ה-App Store."
+          }
+        }
+      }
+    },
     "Change role": {
       "localizations": {
         "he": {
@@ -497,6 +517,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "העתקת מפתח ייצוא"
+          }
+        }
+      }
+    },
+    "Couldn't confirm Premium. We'll try again the next time you open the app.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו לאשר את פרימיום. ננסה שוב בפעם הבאה שתפתחו את האפליקציה."
           }
         }
       }
@@ -731,6 +761,26 @@
         }
       }
     },
+    "Free": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חינם"
+          }
+        }
+      }
+    },
+    "Get Premium": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שדרוג לפרימיום"
+          }
+        }
+      }
+    },
     "Help improve detection": {
       "localizations": {
         "he": {
@@ -911,6 +961,16 @@
         }
       }
     },
+    "Manage subscription": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ניהול המינוי"
+          }
+        }
+      }
+    },
     "Members": {
       "localizations": {
         "he": {
@@ -957,6 +1017,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "השתקה לשעה"
+          }
+        }
+      }
+    },
+    "New cameras need Premium. Family members can still join with this code.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מצלמות חדשות דורשות פרימיום. בני משפחה עדיין יכולים להצטרף עם הקוד הזה."
           }
         }
       }
@@ -1101,6 +1171,16 @@
         }
       }
     },
+    "Paid through": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שולם עד"
+          }
+        }
+      }
+    },
     "Pair": {
       "localizations": {
         "he": {
@@ -1141,12 +1221,42 @@
         }
       }
     },
+    "Plan": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תוכנית"
+          }
+        }
+      }
+    },
     "Plug this phone in so it stays on.": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "חברו את הטלפון לחשמל כדי שיישאר פועל."
+          }
+        }
+      }
+    },
+    "Premium": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פרימיום"
+          }
+        }
+      }
+    },
+    "Premium lets your household pair up to %lld cameras.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עם פרימיום משק הבית יכול לצמד עד %lld מצלמות."
           }
         }
       }
@@ -1207,6 +1317,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "חסר מנוחה"
+          }
+        }
+      }
+    },
+    "Restore purchases": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שחזור רכישות"
           }
         }
       }
@@ -1477,6 +1597,16 @@
         }
       }
     },
+    "The purchase didn't go through. Please try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הרכישה לא הושלמה. נסו שוב."
+          }
+        }
+      }
+    },
     "Their phones stop getting alerts and can't watch live.": {
       "localizations": {
         "he": {
@@ -1537,6 +1667,16 @@
         }
       }
     },
+    "This household has no room for another camera. The owner can get Premium on the Household screen.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין מקום למצלמה נוספת במשק הבית. הבעלים יכולים לשדרג לפרימיום במסך משק הבית."
+          }
+        }
+      }
+    },
     "This invite has expired.": {
       "localizations": {
         "he": {
@@ -1573,6 +1713,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הטלפון יפסיק לקבל התראות ולא יוכל לצפות בשידור חי."
+          }
+        }
+      }
+    },
+    "This subscription already unlocks another household.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המינוי הזה כבר פעיל במשק בית אחר."
           }
         }
       }
@@ -1683,6 +1833,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "ממתין למצלמה…"
+          }
+        }
+      }
+    },
+    "Watch every room": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עין על כל חדר"
           }
         }
       }

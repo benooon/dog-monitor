@@ -164,6 +164,15 @@ final class LocalizationTests: XCTestCase {
         "Same as yesterday",
         "Today",
         "Yesterday",
+        "Premium",
+        "Free",
+        "Plan",
+        "Get Premium",
+        "Restore purchases",
+        "Manage subscription",
+        "Premium lets your household pair up to %lld cameras.",
+        "New cameras need Premium. Family members can still join with this code.",
+        "This household has no room for another camera. The owner can get Premium on the Household screen.",
     ]
 
     private func bundle(for language: String) throws -> Bundle {

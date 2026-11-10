@@ -15,6 +15,8 @@ final class ViewerSessionModel {
     private(set) var snapshots: [UUID: URL] = [:]
     /// Realtime presence + watch signals, while the viewer home is shown.
     private(set) var realtime: ViewerRealtime?
+    /// Premium purchases and plan, for the household owner only.
+    private(set) var subscription: SubscriptionModel?
 
     private var api: DogMonitorAPI
     private let credentials: CredentialStore
@@ -59,7 +61,22 @@ final class ViewerSessionModel {
         await perform {
             household = try await api.household()
         }
+        updateSubscription()
         await loadSnapshots()
+    }
+
+    /// Only the owner buys Premium, so only the owner's phone reports App Store transactions.
+    private func updateSubscription() {
+        guard let household, household.role == .owner else {
+            subscription?.stop()
+            subscription = nil
+            return
+        }
+        guard subscription?.householdId != household.id else { return }
+        subscription?.stop()
+        let premium = SubscriptionModel(api: api, householdId: household.id)
+        subscription = premium
+        premium.start()
     }
 
     /// Best effort: storage may not be configured yet, which is fine for the home screen.
@@ -145,6 +162,8 @@ final class ViewerSessionModel {
         PushRegistry.shared.deactivate()
         realtime?.stop()
         realtime = nil
+        subscription?.stop()
+        subscription = nil
         household = nil
         try? credentials.clear()
         api = api.with(credential: .none)
