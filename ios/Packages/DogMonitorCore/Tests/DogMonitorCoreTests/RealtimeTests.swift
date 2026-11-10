@@ -22,6 +22,17 @@ final class RealtimeMessageTests: XCTestCase {
             try decode(#"{"type":"presence","cameraId":"11111111-1111-4111-8111-111111111111","online":false}"#),
             .presence(cameraId: cameraId, online: false)
         )
+        XCTAssertEqual(
+            try decode(#"{"type":"cameraState","cameraId":"11111111-1111-4111-8111-111111111111","state":"barking"}"#),
+            .cameraState(cameraId: cameraId, state: .barking)
+        )
+        XCTAssertEqual(
+            try decode(#"{"type":"cameraState","cameraId":"11111111-1111-4111-8111-111111111111","state":"zooming"}"#),
+            .unknown(type: "cameraState")
+        )
+        let withState = try decode(#"{"type":"cameras","cameras":[{"id":"11111111-1111-4111-8111-111111111111","online":true,"state":"resting"}]}"#)
+        guard case .cameras(let cameras) = withState else { return XCTFail("expected cameras") }
+        XCTAssertEqual(cameras.first?.dogState, .resting)
         XCTAssertEqual(try decode(#"{"type":"error","error":"not_found"}"#), .error("not_found"))
         XCTAssertEqual(try decode(#"{"type":"future","x":1}"#), .unknown(type: "future"))
     }
@@ -37,6 +48,10 @@ final class RealtimeMessageTests: XCTestCase {
         XCTAssertEqual(
             String(decoding: try RealtimeClientMessage.heartbeat(health).encoded(), as: UTF8.self),
             #"{"battery":0.5,"charging":true,"thermal":"fair","type":"heartbeat"}"#
+        )
+        XCTAssertEqual(
+            String(decoding: try RealtimeClientMessage.heartbeat(health, dogState: .barking).encoded(), as: UTF8.self),
+            #"{"battery":0.5,"charging":true,"state":"barking","thermal":"fair","type":"heartbeat"}"#
         )
         let unknownBattery = CameraHealth(batteryLevel: nil, isCharging: false, thermalState: .nominal, network: .wifi, reportedAt: Date())
         XCTAssertEqual(

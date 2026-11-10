@@ -10,6 +10,18 @@ public enum RealtimeServerMessage: Sendable, Equatable {
     public struct CameraPresence: Codable, Sendable, Equatable {
         public let id: UUID
         public let online: Bool
+        /// Raw dog state, if the camera reported one.
+        public let state: String?
+
+        public init(id: UUID, online: Bool, state: String? = nil) {
+            self.id = id
+            self.online = online
+            self.state = state
+        }
+
+        public var dogState: DogState? {
+            state.flatMap(DogState.init(rawValue:))
+        }
     }
 
     /// To cameras: how many viewers watch now (0 = all viewers left).
@@ -18,6 +30,8 @@ public enum RealtimeServerMessage: Sendable, Equatable {
     case cameras([CameraPresence])
     /// To viewers, on every change.
     case presence(cameraId: UUID, online: Bool)
+    /// To viewers, when a camera's dog state changes.
+    case cameraState(cameraId: UUID, state: DogState)
     case error(String)
     /// A message type this app version does not know; ignore it.
     case unknown(type: String)
@@ -31,6 +45,9 @@ public enum RealtimeServerMessage: Sendable, Equatable {
             return .cameras(try wire.require(\.cameras))
         case "presence":
             return .presence(cameraId: try wire.require(\.cameraId), online: try wire.require(\.online))
+        case "cameraState":
+            guard let state = DogState(rawValue: try wire.require(\.state)) else { return .unknown(type: wire.type) }
+            return .cameraState(cameraId: try wire.require(\.cameraId), state: state)
         case "error":
             return .error(try wire.require(\.error))
         default:
@@ -45,6 +62,7 @@ public enum RealtimeServerMessage: Sendable, Equatable {
         let cameras: [CameraPresence]?
         let cameraId: UUID?
         let online: Bool?
+        let state: String?
         let error: String?
 
         func require<T>(_ keyPath: KeyPath<Wire, T?>) throws -> T {
@@ -57,8 +75,8 @@ public enum RealtimeServerMessage: Sendable, Equatable {
 }
 
 public enum RealtimeClientMessage: Sendable, Equatable {
-    /// From cameras, every 30–60 s.
-    case heartbeat(CameraHealth)
+    /// From cameras, every 30–60 s and when the dog's state changes.
+    case heartbeat(CameraHealth, dogState: DogState? = nil)
     /// From viewers.
     case watch(cameraId: UUID)
     case unwatch(cameraId: UUID)
@@ -67,12 +85,13 @@ public enum RealtimeClientMessage: Sendable, Equatable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         switch self {
-        case .heartbeat(let health):
+        case .heartbeat(let health, let dogState):
             return try encoder.encode(Heartbeat(
                 type: "heartbeat",
                 battery: health.batteryLevel,
                 charging: health.isCharging,
-                thermal: health.thermalState.rawValue
+                thermal: health.thermalState.rawValue,
+                state: dogState?.rawValue
             ))
         case .watch(let cameraId):
             return try encoder.encode(Watch(type: "watch", cameraId: cameraId.uuidString.lowercased()))
@@ -86,6 +105,7 @@ public enum RealtimeClientMessage: Sendable, Equatable {
         let battery: Double?
         let charging: Bool
         let thermal: String
+        let state: String?
     }
 
     private struct Watch: Encodable {

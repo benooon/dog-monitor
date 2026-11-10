@@ -69,7 +69,21 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
     public let battery: Double?
     public let charging: Bool?
     public let thermal: String?
+    /// Cameras: the dog's state from the last heartbeat (raw value; unknown values are ignored).
+    public let dogState: String?
     public let createdAt: Date
+
+    public var currentDogState: DogState? {
+        dogState.flatMap(DogState.init(rawValue:))
+    }
+}
+
+/// The latest snapshot of a camera (`GET /cameras/snapshots`), with a short-lived URL.
+public struct CameraSnapshotDTO: Codable, Sendable, Hashable {
+    public let cameraId: UUID
+    public let eventId: UUID
+    public let takenAt: Date
+    public let url: URL
 }
 
 public struct HouseholdDTO: Codable, Sendable, Hashable {

@@ -112,6 +112,11 @@ public struct DogMonitorAPI: Sendable {
         )
     }
 
+    /// Latest snapshot per camera. 503 `storage_not_configured` until the backend has a bucket.
+    public func cameraSnapshots() async throws -> [CameraSnapshotDTO] {
+        try await send("GET", "cameras/snapshots")
+    }
+
     // MARK: - Events (camera device auth)
 
     public func createEvent(_ request: CreateEventRequest) async throws -> EventDTO {
