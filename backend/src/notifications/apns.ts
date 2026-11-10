@@ -21,7 +21,8 @@ export const APNS_HOSTS = {
 export interface ApnsNotification {
   deviceToken: string;
   payload: Record<string, unknown>;
-  pushType?: "alert" | "background";
+  /** "liveactivity" goes to the `<bundle id>.push-type.liveactivity` topic. */
+  pushType?: "alert" | "background" | "liveactivity";
   /** 10 = immediately, 5 = power-friendly. */
   priority?: 10 | 5;
   /** Later pushes with the same id replace earlier ones on the device (max 64 bytes). */
@@ -79,7 +80,7 @@ export class ApnsClient implements ApnsSender {
       ":method": "POST",
       ":path": `/3/device/${notification.deviceToken}`,
       authorization: `bearer ${await this.providerToken()}`,
-      "apns-topic": this.config.topic,
+      "apns-topic": notification.pushType === "liveactivity" ? `${this.config.topic}.push-type.liveactivity` : this.config.topic,
       "apns-push-type": notification.pushType ?? "alert",
       "apns-priority": String(notification.priority ?? 10),
       "content-type": "application/json",

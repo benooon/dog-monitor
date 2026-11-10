@@ -31,6 +31,8 @@ import { healthRoutes } from "./routes/health.js";
 import { appStoreNotificationRoutes, subscriptionRoutes } from "./routes/subscription.js";
 import type { TransactionVerifier } from "./billing/app-store.js";
 import { appLinkRoutes } from "./routes/app-links.js";
+import { liveActivityRoutes } from "./routes/live-activities.js";
+import { LiveActivityNotifier } from "./notifications/live-activity.js";
 
 export interface AppServices {
   db: Database;
@@ -54,6 +56,8 @@ export interface AppServices {
   transactions?: TransactionVerifier;
   /** Apply free-plan limits (see billing/plans.ts). */
   enforcePlanLimits?: boolean;
+  /** Minimum time between Live Activity updates per camera (tests use 0). */
+  liveActivityIntervalMs?: number;
 }
 
 export interface BuildAppOptions {
@@ -113,6 +117,15 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
       if (!online) void recordCameraOffline(services.db, notifier, cameraId, householdId, app.log);
     });
     const now = services.now ?? Date.now;
+    const liveActivities = new LiveActivityNotifier(services.db, services.apns, app.log, {
+      status: (cameraId) => hub.cameraStatus(cameraId),
+      now,
+      minIntervalMs: services.liveActivityIntervalMs,
+    });
+    hub.addPresenceListener((cameraId) => liveActivities.cameraChanged(cameraId));
+    hub.addStateListener((cameraId) => liveActivities.cameraChanged(cameraId));
+    app.addHook("onClose", async () => liveActivities.close());
+    await app.register(liveActivityRoutes, { db: services.db });
     await app.register(viewerLiveRoutes, { db: services.db, live: services.live, hub });
     await app.register(cameraLiveRoutes, { db: services.db, live: services.live });
 

@@ -74,6 +74,18 @@ describe("ApnsClient", () => {
     expect(payload.iss).toBe("TEAM456");
   });
 
+  it("sends Live Activity updates to the liveactivity topic", async () => {
+    const { config } = await testConfig();
+    const server = await fakeApns(() => ({ status: 200 }));
+    const client = new ApnsClient(config, server.origin);
+    cleanups.push(() => client.close(), server.close);
+
+    await client.send({ deviceToken: "abcd", payload: { aps: { event: "update" } }, pushType: "liveactivity", priority: 10 });
+    const [req] = server.received;
+    expect(req!.headers["apns-topic"]).toBe("com.benooon.dogmonitor.push-type.liveactivity");
+    expect(req!.headers["apns-push-type"]).toBe("liveactivity");
+  });
+
   it("reports Apple's error reason", async () => {
     const { config } = await testConfig();
     const server = await fakeApns(() => ({ status: 410, body: JSON.stringify({ reason: "Unregistered" }) }));

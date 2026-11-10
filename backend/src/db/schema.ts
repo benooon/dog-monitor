@@ -230,3 +230,26 @@ export const invites = pgTable(
   },
   (t) => [index("invites_code_idx").on(t.code)],
 );
+
+/**
+ * A Live Activity on a viewer's phone showing one camera (ActivityKit). Updated by APNs
+ * `liveactivity` pushes to `pushToken`; iOS ends activities after at most 12 hours.
+ */
+export const liveActivities = pgTable(
+  "live_activities",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    householdId: uuid("household_id")
+      .notNull()
+      .references(() => households.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    cameraId: uuid("camera_id")
+      .notNull()
+      .references(() => devices.id, { onDelete: "cascade" }),
+    pushToken: text("push_token").notNull().unique(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("live_activities_camera_idx").on(t.cameraId)],
+);

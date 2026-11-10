@@ -28,6 +28,9 @@ export interface HubEvents {
   onPresenceChange?: (cameraId: string, householdId: string, online: boolean) => void;
 }
 
+/** A camera's dog state changed (from a heartbeat). */
+export type DogStateListener = (cameraId: string, householdId: string, state: DogState) => void;
+
 /**
  * In-memory presence for one API instance: which cameras are online, which viewers watch which
  * camera. Pure bookkeeping (no sockets, no DB, time passed in), so it is unit-testable.
@@ -40,6 +43,7 @@ export class RealtimeHub {
   private readonly watchers = new Map<string, Set<Peer>>();
 
   private readonly presenceListeners: NonNullable<HubEvents["onPresenceChange"]>[] = [];
+  private readonly stateListeners: DogStateListener[] = [];
 
   constructor(events: HubEvents = {}) {
     if (events.onPresenceChange) this.presenceListeners.push(events.onPresenceChange);
@@ -47,6 +51,16 @@ export class RealtimeHub {
 
   addPresenceListener(listener: NonNullable<HubEvents["onPresenceChange"]>): void {
     this.presenceListeners.push(listener);
+  }
+
+  addStateListener(listener: DogStateListener): void {
+    this.stateListeners.push(listener);
+  }
+
+  /** What this instance knows about a camera right now (null if it never connected here). */
+  cameraStatus(cameraId: string): { online: boolean; state: DogState | null } | null {
+    const state = this.cameras.get(cameraId);
+    return state ? { online: state.online, state: state.dogState } : null;
   }
 
   // MARK: cameras
@@ -80,6 +94,7 @@ export class RealtimeHub {
     if (dogState !== undefined && dogState !== state.dogState) {
       state.dogState = dogState;
       this.toHousehold(state.householdId, { type: "cameraState", cameraId, state: dogState });
+      for (const listener of this.stateListeners) listener(cameraId, state.householdId, dogState);
     }
   }
 
