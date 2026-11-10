@@ -20,6 +20,7 @@ import { cameraEventRoutes } from "./routes/events.js";
 import { cameraMediaRoutes, viewerMediaRoutes } from "./routes/media.js";
 import { householdRoutes } from "./routes/households.js";
 import { inviteRoutes } from "./routes/invites.js";
+import { notificationPrefRoutes } from "./routes/notification-prefs.js";
 import { cameraLiveRoutes, viewerLiveRoutes } from "./routes/live.js";
 import { realtimeRoutes } from "./routes/realtime.js";
 import { healthRoutes } from "./routes/health.js";
@@ -69,6 +70,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(deviceRoutes, { db: services.db });
     await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter });
     await app.register(deviceSelfRoutes, { db: services.db });
+    await app.register(notificationPrefRoutes, { db: services.db });
     const clock = services.now ?? Date.now;
     const notifier = new EventNotifier(services.db, services.apns, app.log, services.storage, () => new Date(clock()));
     await app.register(cameraEventRoutes, { db: services.db, notifier });

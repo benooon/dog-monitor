@@ -48,7 +48,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [~] ios: Ring-buffer recorder (`AVAssetWriter`, keeping the last ~5 s in memory). On an event, write a 10–20 s clip + snapshot. (in progress 2026-11-10)
 - [ ] ios: Upload clips and snapshots for events through presigned URLs, with an offline queue that retries when the network returns.
 - [ ] ios: Event timeline screen (filter by type, play clip, mark detection as right/wrong).
-- [~] backend: Per-user notification settings API (types, cameras, quiet hours). (in progress 2026-11-10)
+- [x] backend: Per-user notification settings API (types, cameras, quiet hours). `GET`/`PUT /notification-prefs`.
 - [ ] ios: Notification settings screen (per event type on/off, per camera overrides, quiet hours) using `GET/PUT /notification-prefs`.
 - [ ] ios: Camera health. Heartbeat (battery, charging, thermal, network); show a warning on the camera screen when unplugged or hot, and lower fps on `thermalState` serious.
 - [ ] ios: Push-to-talk from viewer to camera (LiveKit audio track published by the viewer, played on the camera).
