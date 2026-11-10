@@ -132,15 +132,16 @@ Writing result bundle at path:
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
             self?.sessionQueue.async { self?.applyRotation(angle) }
                                        ^
-2026-11-10 22:16:39.911 xcodebuild[5061:17979] [MT] IDETestOperationsObserverDebug: 340.298 elapsed -- Testing started completed.
-2026-11-10 22:16:39.911 xcodebuild[5061:17979] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 22:16:39.911 xcodebuild[5061:17979] [MT] IDETestOperationsObserverDebug: 340.298 sec, +340.298 sec -- end
-** TEST FAILED **
-
+2026-11-10 22:29:22.572 xcodebuild[3352:13209] [MT] IDETestOperationsObserverDebug: 535.054 elapsed -- Testing started completed.
+2026-11-10 22:29:22.572 xcodebuild[3352:13209] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 22:29:22.572 xcodebuild[3352:13209] [MT] IDETestOperationsObserverDebug: 535.054 sec, +535.054 sec -- end
 Testing started
---- Test failures ---
-passed: 331, failed: 1, skipped: 0
-FAIL DogMonitorTests / ClipRecorderTests/testSavesClipAndSnapshotForTrigger(): failed: caught error: "Error Domain=NSCocoaErrorDomain Code=4 "“E14CDBB3-3325-469E-9FA9-B2D26DF39F88” couldn’t be removed." UserInfo={NSUserStringVariant=(
-    Remove
-), NSFilePath=/Users/runner/Library/Developer/CoreSimulator/Devices/A1285399-F2F4-46E9-8CF2-4AA227FF7EF3/data/Containers/Data/Application/764EB0B4-4231-49BE-BEFC-ECEA439E847B/tmp/E14CDBB3-3325-469E-9FA9-B2D26DF39F88, NSURL=file:///Users/runner/Library/Developer/CoreSimulator/Devices/A1285399-F2F4-46E9-8CF2-4AA227FF7EF3/data/Containers/Data/Application/764EB0B4-4231-49BE-BEFC-ECEA439E847B/tmp/E14CDBB3-3325-469E-9FA9-B2D26DF39F88, NSUnderlyingError=0x600000d41170 {Error Domain=NSPOSIXErrorDomain Code=2 "No such file or directory"}}"
-Screenshots: 60
+iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
+{ platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
+2026-11-10 22:35:25.065 xcodebuild[29649:83721] [MT] IDETestOperationsObserverDebug: 340.960 elapsed -- Testing started completed.
+2026-11-10 22:35:25.066 xcodebuild[29649:83721] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 22:35:25.066 xcodebuild[29649:83721] [MT] IDETestOperationsObserverDebug: 340.960 sec, +340.960 sec -- end
+Testing started
+Screenshots: 120
