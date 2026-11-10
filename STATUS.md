@@ -1,12 +1,12 @@
-# CI status: GREEN
+# CI status: RED
 
-- commit: 8c897a15a2563684204f07795f99d7cb44948b9d
-- message: backend: scaffold Fastify + TypeScript server with /health, Dockerfile and tests
-- time (UTC): 2026-11-10T07:08:38Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42773110444
+- commit: 9d84973010dd887cc3597a27636b98ef7c2833bd
+- message: backend: add Drizzle/PostgreSQL schema, migrations and DB tests
+- time (UTC): 2026-11-10T07:10:13Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42773353045
 
 | job | result | log |
 |---|---|---|
-| core (swift test, Linux) | success | core-test.log |
+| core (swift test, Linux) | cancelled | core-test.log |
 | ios (xcodebuild test, macOS) | success (carried over, no iOS changes) | ios-build.log |
-| backend (lint + test) | success | backend-test.log |
+| backend (lint + test) | cancelled | backend-test.log |
