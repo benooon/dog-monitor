@@ -61,6 +61,8 @@ final class CameraModeModel {
     private var engine: EventEngine?
     /// Visual state from motion, dog position and posture (SPEC §4 layer 3), fed to the engine.
     private var classifier = DogStateClassifier()
+    /// Today's (and recent days') rest, barks and activity, persisted and uploaded when paired.
+    private var summaries = CameraModeModel.loadSummaries()
     private let uploader = EventUploader(store: FileEventQueueStore(url: CameraModeModel.queueURL))
     private let mediaUploader = MediaUploader(
         directory: CameraModeModel.mediaDirectory,
@@ -159,6 +161,7 @@ final class CameraModeModel {
         outputContinuation?.finish()
         outputContinuation = nil
         engine = nil
+        saveSummaries()
         healthMonitor = nil
         healthWarnings = []
         dogState = .unknown
@@ -250,6 +253,47 @@ final class CameraModeModel {
             }
             dogDetections = dog
         }
+    }
+
+    // MARK: - Daily summary
+
+    nonisolated private static var summaryURL: URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+        return base.appendingPathComponent("daily-summary.json")
+    }
+
+    nonisolated private static func loadSummaries() -> DailySummaryAccumulator {
+        guard let data = try? Data(contentsOf: summaryURL),
+              let saved = try? JSONDecoder().decode(DailySummaryAccumulator.self, from: data)
+        else { return DailySummaryAccumulator() }
+        return saved
+    }
+
+    private func saveSummaries() {
+        guard let data = try? JSONEncoder().encode(summaries) else { return }
+        try? FileManager.default.createDirectory(at: Self.summaryURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? data.write(to: Self.summaryURL, options: .atomic)
+    }
+
+    private func tickSummary(save: Bool, upload: Bool) {
+        summaries.tick(state: dogState, moving: isMotionActive, at: .now, calendar: .current)
+        if save { saveSummaries() }
+        if upload { Task { await uploadSummaries() } }
+    }
+
+    /// Sends finished days (which triggers the daily summary push) and today so far.
+    private func uploadSummaries() async {
+        guard let api else { return }
+        for pending in summaries.pendingUploads(now: .now, calendar: .current) {
+            do {
+                try await api.uploadSummary(pending.summary, final: pending.final)
+                if pending.final { summaries.markUploadedFinal(pending.summary.date) }
+            } catch {
+                return // offline: try again at the next upload
+            }
+        }
+        saveSummaries()
     }
 
     // MARK: - Zones
@@ -360,6 +404,7 @@ final class CameraModeModel {
         engine = EventEngine(cameraID: cameraID)
         classifier = DogStateClassifier(zones: DogZones(zones))
         Task { await refreshZones() }
+        Task { await uploadSummaries() }
         healthMonitor = HealthMonitor(cameraID: cameraID)
         if healthReporter == nil { healthReporter = HealthReporter() }
         appliedFrameRate = nil
@@ -377,6 +422,7 @@ final class CameraModeModel {
                 guard let self else { return }
                 ticks += 1
                 self.tick(flush: ticks % 30 == 0)
+                self.tickSummary(save: ticks % 60 == 0, upload: ticks % 900 == 0)
                 if ticks % 5 == 1 { self.checkHealth() }
             }
         }
@@ -384,6 +430,9 @@ final class CameraModeModel {
     }
 
     private func ingest(_ detection: Detection) {
+        if detection.kind == .bark, detection.meets(threshold: Detection.defaultAudioConfidenceThreshold) {
+            summaries.noteBark(at: detection.timestamp, calendar: .current)
+        }
         guard var engine else { return }
         let outputs = engine.ingest(detection)
         self.engine = engine

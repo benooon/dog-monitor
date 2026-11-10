@@ -163,6 +163,32 @@ public struct DogMonitorAPI: Sendable {
         return response.zones
     }
 
+    // MARK: - Daily summaries
+
+    /// Camera: uploads its day so far; `final` once the day is over (sends the summary push once).
+    public func uploadSummary(_ summary: DailySummary, final: Bool) async throws {
+        let body = DailySummaryUpload(
+            restMinutes: summary.restMinutes,
+            barkCount: summary.barkCount,
+            activityByHour: summary.activityByHour,
+            stateMinutes: summary.stateMinutes,
+            final: final
+        )
+        let _: DailySummaryDTO = try await send("PUT", "device/summaries/\(summary.date)", body: body)
+    }
+
+    /// Viewer: stored days, newest first (`from` / `to` are "YYYY-MM-DD").
+    public func summaries(cameraId: UUID? = nil, from: String? = nil, to: String? = nil) async throws -> [DailySummaryDTO] {
+        var items: [URLQueryItem] = []
+        if let cameraId { items.append(URLQueryItem(name: "cameraId", value: Self.path(cameraId))) }
+        if let from { items.append(URLQueryItem(name: "from", value: from)) }
+        if let to { items.append(URLQueryItem(name: "to", value: to)) }
+        var components = URLComponents()
+        components.queryItems = items.isEmpty ? nil : items
+        let list: DailySummaryList = try await send("GET", "summaries" + (components.percentEncodedQuery.map { "?" + $0 } ?? ""))
+        return list.summaries
+    }
+
     // MARK: - Notification preferences (user auth)
 
     /// The caller's push preferences and the defaults for types without a preference.
@@ -204,7 +230,14 @@ public struct DogMonitorAPI: Sendable {
     static func path(_ id: UUID) -> String { id.uuidString.lowercased() }
 
     func makeRequest(_ method: String, _ path: String, body: Data?) -> URLRequest {
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        // A "?query" suffix is kept as the query instead of being escaped into the path.
+        let parts = path.split(separator: "?", maxSplits: 1, omittingEmptySubsequences: false)
+        var url = baseURL.appendingPathComponent(String(parts[0]))
+        if parts.count == 2, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            components.percentEncodedQuery = String(parts[1])
+            url = components.url ?? url
+        }
+        var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if let body {
