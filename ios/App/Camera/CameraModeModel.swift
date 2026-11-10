@@ -27,7 +27,7 @@ final class CameraModeModel {
     let capture: CaptureService
     /// Live view (realtime link + LiveKit), only when this phone is paired as a camera.
     private(set) var live: CameraLiveController?
-    private let credential: APICredential
+    private var credential: APICredential
 
     private var meterTask: Task<Void, Never>?
     private var analysisTask: Task<Void, Never>?
@@ -131,6 +131,12 @@ final class CameraModeModel {
                 }
             }
         }
+    }
+
+    /// Called after `CameraPairingView` stored the new device credential.
+    func didPair(with credential: APICredential) {
+        self.credential = credential
+        if status == .running, live == nil { startLive() }
     }
 
     private func startLive() {

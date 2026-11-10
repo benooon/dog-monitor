@@ -5,6 +5,7 @@ struct CreateHouseholdView: View {
     let model: ViewerSessionModel
     @State private var householdName = ""
     @State private var dogName = ""
+    @State private var inviteCode = ""
 
     private var canSubmit: Bool {
         HouseholdNameRules.validated(householdName) != nil && !model.isWorking
@@ -43,6 +44,16 @@ struct CreateHouseholdView: View {
                     }
                     .disabled(!canSubmit)
                     .accessibilityIdentifier("create-household")
+                }
+                Section("Join a household") {
+                    TextField("Invite code", text: $inviteCode)
+                        .keyboardType(.numberPad)
+                        .textContentType(.oneTimeCode)
+                        .accessibilityIdentifier("invite-code-field")
+                    Button("Join") {
+                        Task { await model.joinHousehold(code: inviteCode) }
+                    }
+                    .disabled(PairingCode.parse(inviteCode) == nil || model.isWorking)
                 }
             }
             .navigationTitle("Create your household")

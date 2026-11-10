@@ -11,6 +11,16 @@
         }
       }
     },
+    "Allow camera access to scan, or type the code.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשרו גישה למצלמה כדי לסרוק, או הקלידו את הקוד."
+          }
+        }
+      }
+    },
     "Barks in the last minute: %lld": {
       "localizations": {
         "he": {
@@ -57,6 +67,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "מצלמות"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ביטול"
           }
         }
       }
@@ -131,6 +151,26 @@
         }
       }
     },
+    "Done": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סיום"
+          }
+        }
+      }
+    },
+    "Expires in %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בתוקף עוד %@"
+          }
+        }
+      }
+    },
     "Family members and cameras join your household later with an invite.": {
       "localizations": {
         "he": {
@@ -157,6 +197,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "איך ישמש המכשיר הזה?"
+          }
+        }
+      }
+    },
+    "Invite": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזמנה"
+          }
+        }
+      }
+    },
+    "Invite code": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קוד הזמנה"
+          }
+        }
+      }
+    },
+    "Join": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצטרפות"
+          }
+        }
+      }
+    },
+    "Join a household": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצטרפות למשק בית"
           }
         }
       }
@@ -191,6 +271,16 @@
         }
       }
     },
+    "New invite": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזמנה חדשה"
+          }
+        }
+      }
+    },
     "No cameras yet. Pair a spare iPhone as a camera.": {
       "localizations": {
         "he": {
@@ -211,6 +301,16 @@
         }
       }
     },
+    "On the new phone, choose Camera and scan this code, or type the 6 digits. Family members can join with the same code.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בטלפון החדש בחרו ״מצלמה״ וסרקו את הקוד, או הקלידו את 6 הספרות. בני משפחה יכולים להצטרף עם אותו קוד."
+          }
+        }
+      }
+    },
     "Online": {
       "localizations": {
         "he": {
@@ -227,6 +327,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "פתיחת ההגדרות"
+          }
+        }
+      }
+    },
+    "Or type the 6-digit code": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "או הקלידו את הקוד בן 6 הספרות"
+          }
+        }
+      }
+    },
+    "Pair": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צימוד"
+          }
+        }
+      }
+    },
+    "Pair this camera": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צימוד המצלמה"
+          }
+        }
+      }
+    },
+    "Scan the invite QR code from the owner's phone.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סרקו את קוד ה-QR של ההזמנה מהטלפון של הבעלים."
           }
         }
       }
@@ -311,12 +451,42 @@
         }
       }
     },
+    "This code is invalid or has expired.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הקוד שגוי או שפג תוקפו."
+          }
+        }
+      }
+    },
+    "This invite has expired.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תוקף ההזמנה פג."
+          }
+        }
+      }
+    },
     "This phone isn't paired yet, so live view is off. Barking is still detected here.": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "הטלפון הזה עדיין לא מצומד, לכן צפייה חיה כבויה. נביחות עדיין מזוהות כאן."
+          }
+        }
+      }
+    },
+    "Too many attempts. Wait a minute and try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יותר מדי ניסיונות. המתינו דקה ונסו שוב."
           }
         }
       }

@@ -32,6 +32,19 @@ final class CameraModeModelTests: XCTestCase {
         XCTAssertNil(CameraModeModel(credential: .device(id: UUID(), secret: "s")).live, "live starts only with capture")
     }
 
+    func testDidPairStoresTheCredential() {
+        let model = CameraModeModel(credential: APICredential.none)
+        model.didPair(with: .device(id: UUID(), secret: "s"))
+        XCTAssertTrue(model.isPaired)
+        XCTAssertNil(model.live, "live view waits until the camera is running")
+    }
+
+    func testPairingErrorMessages() {
+        XCTAssertEqual(CameraPairingView.message(for: APIError.http(status: 404, code: "not_found")), "This code is invalid or has expired.")
+        XCTAssertEqual(CameraPairingView.message(for: APIError.http(status: 429, code: nil)), "Too many attempts. Wait a minute and try again.")
+        XCTAssertEqual(CameraPairingView.message(for: APIError.transport("offline")), "Something went wrong. Please try again.")
+    }
+
     func testCaptureServiceHandsOutIndependentStreams() {
         let service = CaptureService()
         let first = service.samples(.video)

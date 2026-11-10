@@ -57,6 +57,24 @@ final class ViewerSessionModel {
         }
     }
 
+    /// Owner only: a one-time invite for a camera or family member (nil on failure; see `errorMessage`).
+    func createInvite() async -> InviteDTO? {
+        var invite: InviteDTO?
+        await perform {
+            invite = try await api.createInvite()
+        }
+        return invite
+    }
+
+    /// Joins an existing household with an invite code (or scanned token) instead of creating one.
+    func joinHousehold(code: String) async {
+        guard let tokenOrCode = PairingCode.parse(code) else { return }
+        await perform {
+            _ = try await api.acceptInviteAsMember(tokenOrCode)
+            state = OnboardingState.from(try await api.me())
+        }
+    }
+
     func signOut() {
         household = nil
         try? credentials.clear()

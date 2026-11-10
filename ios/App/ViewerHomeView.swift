@@ -5,6 +5,8 @@ import SwiftUI
 struct ViewerHomeView: View {
     let model: ViewerSessionModel
     let householdName: String
+    var isOwner = false
+    @State private var showsInvite = false
 
     var body: some View {
         NavigationStack {
@@ -43,10 +45,23 @@ struct ViewerHomeView: View {
             }
             .navigationTitle(Text(verbatim: model.household?.name ?? householdName))
             .refreshable { await model.loadHousehold() }
+            .sheet(isPresented: $showsInvite, onDismiss: { Task { await model.loadHousehold() } }) {
+                InviteSheet(model: model)
+            }
             .task { await model.loadHousehold() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") { model.signOut() }
+                }
+                if isOwner {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            showsInvite = true
+                        } label: {
+                            Label("Invite", systemImage: "person.badge.plus")
+                        }
+                        .accessibilityIdentifier("invite")
+                    }
                 }
             }
         }

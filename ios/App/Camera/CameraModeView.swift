@@ -7,6 +7,7 @@ import UIKit
 struct CameraModeView: View {
     @State private var model = CameraModeModel()
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showsPairing = false
     let onChangeRole: () -> Void
 
     init(onChangeRole: @escaping () -> Void) {
@@ -41,6 +42,11 @@ struct CameraModeView: View {
             model.scenePhaseChanged(isActive: phase == .active)
         }
         .onDisappear { model.stop() }
+        .sheet(isPresented: $showsPairing) {
+            CameraPairingView { credential in
+                model.didPair(with: credential)
+            }
+        }
     }
 
     private var startScreen: some View {
@@ -57,6 +63,8 @@ struct CameraModeView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+                Button("Pair this camera") { showsPairing = true }
+                    .accessibilityIdentifier("pair-camera")
             }
             Spacer()
             Button {

@@ -25,7 +25,7 @@ struct ViewerRootView: View {
         case .needsHousehold:
             CreateHouseholdView(model: model)
         case .ready(_, let membership):
-            ViewerHomeView(model: model, householdName: membership.name)
+            ViewerHomeView(model: model, householdName: membership.name, isOwner: membership.role == .owner)
         }
     }
 }
