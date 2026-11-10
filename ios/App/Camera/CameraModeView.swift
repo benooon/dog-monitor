@@ -90,6 +90,9 @@ struct CameraModeView: View {
             }
             VStack(spacing: 12) {
                 statusIndicator
+                ForEach(model.healthWarnings, id: \.self) { warning in
+                    HealthWarningBanner(warning: warning)
+                }
                 if !model.isPreviewVisible {
                     Text("Tap the screen to show the preview.")
                         .font(.footnote)
@@ -201,8 +204,51 @@ struct CameraModeView: View {
     }
 }
 
+/// A heat or power problem, shown even on the black screen so it is seen from across the room.
+private struct HealthWarningBanner: View {
+    let warning: CameraHealth.Warning
+
+    var body: some View {
+        Label {
+            Text(message)
+        } icon: {
+            Image(systemName: symbol)
+                .symbolEffect(.pulse, options: .repeating)
+        }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(.orange)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(.orange.opacity(0.15), in: Capsule())
+        .accessibilityElement(children: .combine)
+    }
+
+    private var message: LocalizedStringKey {
+        switch warning {
+        case .overheating: "This phone is hot. Video slows down until it cools."
+        case .lowBattery: "Battery low. Plug this phone in."
+        case .unplugged: "Plug this phone in so it stays on."
+        case .offline: "No internet connection."
+        }
+    }
+
+    private var symbol: String {
+        switch warning {
+        case .overheating: "thermometer.high"
+        case .lowBattery: "battery.25"
+        case .unplugged: "powerplug"
+        case .offline: "wifi.slash"
+        }
+    }
+}
+
 #Preview {
     CameraModeView {}
+}
+
+#Preview("Dark") {
+    CameraModeView {}
+        .preferredColorScheme(.dark)
 }
 
 #Preview("Hebrew (RTL)") {

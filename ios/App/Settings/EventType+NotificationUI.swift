@@ -12,7 +12,7 @@ extension EventType {
         case .notVisible: "Out of view"
         case .calmedDown: "Calmed down"
         case .cameraOffline: "Camera offline"
-        case .lowBattery: "Low battery"
+        case .lowBattery: "Camera not charging"
         case .overheating: "Camera too hot"
         case .dailySummary: "Daily summary"
         }

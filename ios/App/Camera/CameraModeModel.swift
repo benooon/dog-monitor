@@ -30,7 +30,13 @@ final class CameraModeModel {
         }
     }
 
+    /// Heat and power problems to show on the camera screen, most important first.
+    private(set) var healthWarnings: [CameraHealth.Warning] = []
+
     let capture: CaptureService
+    private var healthReporter: HealthReporter?
+    private var healthMonitor: HealthMonitor?
+    private var appliedFrameRate: Int?
     /// Live view (realtime link + LiveKit), only when this phone is paired as a camera.
     private(set) var live: CameraLiveController?
     private var credential: APICredential
@@ -137,6 +143,8 @@ final class CameraModeModel {
         outputContinuation?.finish()
         outputContinuation = nil
         engine = nil
+        healthMonitor = nil
+        healthWarnings = []
         dogState = .unknown
         hideTask?.cancel()
         live?.stop()
@@ -235,6 +243,9 @@ final class CameraModeModel {
         let cameraID: UUID
         if case .device(let id, _) = credential { cameraID = id } else { cameraID = UUID() }
         engine = EventEngine(cameraID: cameraID)
+        healthMonitor = HealthMonitor(cameraID: cameraID)
+        if healthReporter == nil { healthReporter = HealthReporter() }
+        appliedFrameRate = nil
         let (outputs, continuation) = AsyncStream<[EngineOutput]>.makeStream()
         outputContinuation = continuation
         Task { [weak self] in
@@ -249,6 +260,7 @@ final class CameraModeModel {
                 guard let self else { return }
                 ticks += 1
                 self.tick(flush: ticks % 30 == 0)
+                if ticks % 5 == 1 { self.checkHealth() }
             }
         }
         flushEvents()
@@ -272,10 +284,26 @@ final class CameraModeModel {
         if flush { flushEvents() }
     }
 
+    /// Reads battery, charging and heat: updates the on-screen warnings, slows capture when the
+    /// phone is hot, and reports long unplugs and overheating to viewers as events.
+    private func checkHealth() {
+        guard var monitor = healthMonitor, let reporter = healthReporter else { return }
+        let outputs = monitor.update(reporter.current())
+        healthMonitor = monitor
+        if healthWarnings != monitor.screenWarnings { healthWarnings = monitor.screenWarnings }
+        let fps = monitor.targetFrameRate
+        if fps != appliedFrameRate {
+            capture.setFrameRate(fps)
+            appliedFrameRate = fps
+        }
+        record(outputs)
+    }
+
     private func record(_ outputs: [EngineOutput]) {
         guard !outputs.isEmpty, isPaired else { return }
         if let recorder {
-            for case .started(let event) in outputs where event.type != .calmedDown {
+            // Clips are for dog events; health events (battery, heat) have nothing to film.
+            for case .started(let event) in outputs where event.type.dogState != nil && event.type != .calmedDown {
                 recorder.trigger(eventID: event.id)
                 inlineSnapshots.insert(event.id)
             }

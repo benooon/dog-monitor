@@ -48,6 +48,8 @@ final class CaptureService: NSObject, @unchecked Sendable {
     // Keeps video upright for analysis and streaming as the phone is turned (session queue).
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     private var rotationObservation: NSKeyValueObservation?
+    // The camera in use, for frame-rate changes (session queue).
+    private var videoDevice: AVCaptureDevice?
 
     override init() {
         super.init()
@@ -117,6 +119,26 @@ final class CaptureService: NSObject, @unchecked Sendable {
         }
     }
 
+    /// Caps capture at `fps` (lowered when the phone is hot). Clamped to what the format supports.
+    func setFrameRate(_ fps: Int) {
+        sessionQueue.async { [self] in
+            guard let device = videoDevice else { return }
+            let ranges = device.activeFormat.videoSupportedFrameRateRanges
+            let maxSupported = ranges.map(\.maxFrameRate).max() ?? Double(fps)
+            let minSupported = ranges.map(\.minFrameRate).min() ?? 1
+            let rate = min(max(Double(fps), minSupported), maxSupported)
+            let duration = CMTime(value: 1, timescale: CMTimeScale(rate.rounded()))
+            do {
+                try device.lockForConfiguration()
+                device.activeVideoMinFrameDuration = duration
+                device.activeVideoMaxFrameDuration = duration
+                device.unlockForConfiguration()
+            } catch {
+                // Keep the current rate; the next health update tries again.
+            }
+        }
+    }
+
     // MARK: - Private (session queue)
 
     private func configure(includeAudio: Bool) throws {
@@ -136,6 +158,7 @@ final class CaptureService: NSObject, @unchecked Sendable {
         let videoInput = try AVCaptureDeviceInput(device: camera)
         guard session.canAddInput(videoInput) else { throw CaptureError.configurationFailed }
         session.addInput(videoInput)
+        videoDevice = camera
 
         videoOutput.videoSettings = [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,

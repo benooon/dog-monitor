@@ -171,6 +171,16 @@
         }
       }
     },
+    "Battery low. Plug this phone in.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסוללה חלשה. חברו את הטלפון לחשמל."
+          }
+        }
+      }
+    },
     "Calmed down": {
       "localizations": {
         "he": {
@@ -207,6 +217,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "מצב המצלמה"
+          }
+        }
+      }
+    },
+    "Camera not charging": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה לא בטעינה"
           }
         }
       }
@@ -591,16 +611,6 @@
         }
       }
     },
-    "Low battery": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "סוללה חלשה"
-          }
-        }
-      }
-    },
     "Microphone off — barking can't be detected.": {
       "localizations": {
         "he": {
@@ -647,6 +657,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "אין עדיין מצלמות. חברו אייפון פנוי כמצלמה."
+          }
+        }
+      }
+    },
+    "No internet connection.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין חיבור לאינטרנט."
           }
         }
       }
@@ -757,6 +777,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "צימוד המצלמה"
+          }
+        }
+      }
+    },
+    "Plug this phone in so it stays on.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חברו את הטלפון לחשמל כדי שיישאר פועל."
           }
         }
       }
@@ -935,14 +965,14 @@
         }
       }
     },
-    "The camera's battery is low": {
+    "The camera isn't charging": {
       "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
       "extractionState": "manual",
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "הסוללה של המצלמה חלשה"
+            "value": "המצלמה לא בטעינה"
           }
         }
       }
@@ -983,6 +1013,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "תוקף ההזמנה פג."
+          }
+        }
+      }
+    },
+    "This phone is hot. Video slows down until it cools.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפון חם. הווידאו יואט עד שיתקרר."
           }
         }
       }

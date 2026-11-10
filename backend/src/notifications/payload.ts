@@ -14,7 +14,7 @@ const COPY: Record<EventType, Copy> = {
   notVisible: { withDog: "%@ hasn't been seen for a while", withoutDog: "Your dog hasn't been seen for a while" },
   calmedDown: { withDog: "%@ has calmed down", withoutDog: "Your dog has calmed down" },
   cameraOffline: { withDog: "The camera is offline", withoutDog: "The camera is offline" },
-  lowBattery: { withDog: "The camera's battery is low", withoutDog: "The camera's battery is low" },
+  lowBattery: { withDog: "The camera isn't charging", withoutDog: "The camera isn't charging" },
   overheating: { withDog: "The camera is overheating", withoutDog: "The camera is overheating" },
   dailySummary: { withDog: "%@'s daily summary is ready", withoutDog: "Your dog's daily summary is ready" },
 };
