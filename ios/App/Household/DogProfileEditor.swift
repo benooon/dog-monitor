@@ -13,6 +13,7 @@ struct DogProfileEditor: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var item: PhotosPickerItem?
+    @State private var takesPhoto = false
     @State private var confirmsAlerts = false
     @ScaledMetric(relativeTo: .largeTitle) private var avatarSize = DogProfileEditor.avatarBaseSize
 
@@ -124,15 +125,7 @@ struct DogProfileEditor: View {
             Text("Your notification settings will follow the new profile. You can still change them in Notifications.")
         }
         .sensoryFeedback(.error, trigger: model.saveFailed) { _, failed in failed }
-        .onChange(of: item) { _, newItem in
-            guard let newItem else { return }
-            Task {
-                if let data = try? await newItem.loadTransferable(type: Data.self) {
-                    model.setPhoto(data: data)
-                }
-                item = nil
-            }
-        }
+        .dogPhotoPicking(item: $item, takesPhoto: $takesPhoto) { model.setPhoto($0) }
     }
 
     private var photoSection: some View {
@@ -143,6 +136,10 @@ struct DogProfileEditor: View {
                     Text(shownPhoto == nil ? "Choose a photo" : "Change photo")
                 }
                 .buttonStyle(.borderless)
+                if CameraPicker.isAvailable {
+                    Button("Take a photo") { takesPhoto = true }
+                        .buttonStyle(.borderless)
+                }
                 if shownPhoto != nil {
                     Button("Remove photo", role: .destructive) {
                         model.removePhoto()

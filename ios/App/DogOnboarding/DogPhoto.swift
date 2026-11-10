@@ -27,3 +27,23 @@ enum DogPhoto {
         image.jpegData(compressionQuality: jpegQuality)
     }
 }
+
+extension DogPhoto {
+    /// The `rect` square of `image` (in the image's points, orientation applied), scaled to `side` pixels.
+    static func crop(_ image: UIImage, rect: (x: Double, y: Double, side: Double), side: CGFloat) -> UIImage {
+        guard rect.side > 0 else { return square(image, side: side) }
+        let scale = side / rect.side
+        let drawRect = CGRect(
+            x: -rect.x * scale,
+            y: -rect.y * scale,
+            width: image.size.width * scale,
+            height: image.size.height * scale
+        )
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        return UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format).image { _ in
+            image.draw(in: drawRect)
+        }
+    }
+}

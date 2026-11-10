@@ -3197,6 +3197,56 @@
           }
         }
       }
+    },
+    "Take a photo": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צילום תמונה"
+          }
+        }
+      }
+    },
+    "Move and scale": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזזה ושינוי גודל"
+          }
+        }
+      }
+    },
+    "Use photo": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שימוש בתמונה"
+          }
+        }
+      }
+    },
+    "Photo": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תמונה"
+          }
+        }
+      }
+    },
+    "Swipe up or down to zoom.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשר להחליק למעלה או למטה כדי להגדיל או להקטין."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

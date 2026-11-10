@@ -89,6 +89,12 @@ final class DogOnboardingModel: Identifiable {
         removesPhoto = false
     }
 
+    /// Keeps a photo the owner already cropped (square, upload-sized).
+    func setPhoto(_ image: UIImage) {
+        photo = image
+        removesPhoto = false
+    }
+
     /// Drops the picked photo and, on save, the stored one.
     func removePhoto() {
         photo = nil

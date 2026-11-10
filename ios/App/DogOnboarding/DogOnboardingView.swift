@@ -128,6 +128,7 @@ private struct PhotoStep: View {
     let next: () -> Void
 
     @State private var item: PhotosPickerItem?
+    @State private var takesPhoto = false
     @ScaledMetric(relativeTo: .largeTitle) private var avatarSize: CGFloat = 168
     /// The edit badge on the avatar: at least a 44 pt target.
     @ScaledMetric private var badgeSize: CGFloat = 44
@@ -161,6 +162,9 @@ private struct PhotoStep: View {
                 }
                 .controlSize(.large)
                 .primaryButtonStyle()
+                if CameraPicker.isAvailable {
+                    SecondaryActionButton(title: "Take a photo") { takesPhoto = true }
+                }
                 SecondaryActionButton(title: "Not now", action: next)
             } else {
                 PrimaryButton(title: "Continue", action: next)
@@ -171,14 +175,7 @@ private struct PhotoStep: View {
                 }
             }
         }
-        .onChange(of: item) { _, newItem in
-            guard let newItem else { return }
-            Task {
-                if let data = try? await newItem.loadTransferable(type: Data.self) {
-                    model.setPhoto(data: data)
-                }
-            }
-        }
+        .dogPhotoPicking(item: $item, takesPhoto: $takesPhoto) { model.setPhoto($0) }
     }
 }
 

@@ -158,6 +158,34 @@ final class DogOnboardingModelTests: XCTestCase {
         XCTAssertFalse(saved)
     }
 
+    func testCropKeepsTheChosenSquare() throws {
+        // Left half red, right half blue; moving the photo fully right shows the red side.
+        let wide = UIGraphicsImageRenderer(size: CGSize(width: 200, height: 100)).image { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 100, height: 100))
+            UIColor.blue.setFill()
+            context.fill(CGRect(x: 100, y: 0, width: 100, height: 100))
+        }
+        var crop = PhotoCrop(imageWidth: wide.size.width, imageHeight: wide.size.height, viewport: 50)
+        crop.set(zoom: 1, offsetX: 1_000, offsetY: 0)
+        let cropped = DogPhoto.crop(wide, rect: crop.cropRect, side: 16)
+        XCTAssertEqual(cropped.size, CGSize(width: 16, height: 16))
+
+        let cgImage = try XCTUnwrap(cropped.cgImage)
+        var pixel = [UInt8](repeating: 0, count: 4)
+        let drawn = pixel.withUnsafeMutableBytes { buffer -> Bool in
+            guard let context = CGContext(
+                data: buffer.baseAddress, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4,
+                space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            ) else { return false }
+            context.draw(cgImage, in: CGRect(x: -8, y: -8, width: 16, height: 16))
+            return true
+        }
+        XCTAssertTrue(drawn)
+        XCTAssertGreaterThan(pixel[0], 200, "red")
+        XCTAssertLessThan(pixel[2], 50, "not blue")
+    }
+
     func testPhotoIsASmallSquare() {
         let wide = UIGraphicsImageRenderer(size: CGSize(width: 1200, height: 800)).image { _ in }
         let square = DogPhoto.square(wide, side: DogPhoto.uploadSide)
