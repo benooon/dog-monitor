@@ -1,10 +1,12 @@
 import type { FastifyBaseLogger } from "fastify";
-import { and, inArray, isNotNull, lt, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt, or } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { events } from "../db/schema.js";
+import { events, households } from "../db/schema.js";
 import type { MediaStorage } from "./storage.js";
 
 export const DEFAULT_RETENTION_DAYS = 7;
+/** Labeled clips of households that share training data are kept this long. */
+export const TRAINING_RETENTION_DAYS = 90;
 
 /**
  * Deletes clips and snapshots of events older than the retention period (SPEC §10), and clears
@@ -16,11 +18,21 @@ export async function purgeExpiredMedia(
   retentionDays: number,
   now: Date = new Date(),
 ): Promise<number> {
-  const cutoff = new Date(now.getTime() - retentionDays * 24 * 60 * 60 * 1000);
+  const day = 24 * 60 * 60 * 1000;
+  const cutoff = new Date(now.getTime() - retentionDays * day);
+  const trainingCutoff = new Date(now.getTime() - Math.max(TRAINING_RETENTION_DAYS, retentionDays) * day);
   const expired = await db
     .select({ id: events.id, clipKey: events.clipKey, snapshotKey: events.snapshotKey })
     .from(events)
-    .where(and(lt(events.startedAt, cutoff), or(isNotNull(events.clipKey), isNotNull(events.snapshotKey))))
+    .innerJoin(households, eq(households.id, events.householdId))
+    .where(
+      and(
+        lt(events.startedAt, cutoff),
+        or(isNotNull(events.clipKey), isNotNull(events.snapshotKey)),
+        // Labeled clips of opted-in households stay until the training cutoff.
+        or(isNull(events.feedback), eq(households.shareTrainingData, false), lt(events.startedAt, trainingCutoff)),
+      ),
+    )
     .limit(5000);
   if (expired.length === 0) return 0;
 

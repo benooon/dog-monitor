@@ -1,0 +1,1 @@
+ALTER TABLE "households" ADD COLUMN "share_training_data" boolean DEFAULT false NOT NULL;

@@ -68,6 +68,8 @@ export const households = pgTable("households", {
     .notNull()
     .references(() => users.id),
   plan: text("plan").notNull().default("free"),
+  /** Owner opted in to keep clips that members marked right/wrong, for training (SPEC §4 Calibration). */
+  shareTrainingData: boolean("share_training_data").notNull().default(false),
   createdAt: createdAt(),
 });
 

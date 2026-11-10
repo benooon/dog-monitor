@@ -192,6 +192,20 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     expect((await app.inject({ method: "GET", url: "/household", headers: member.auth })).statusCode).toBe(403);
   });
 
+  it("lets only the owner rename the household or change the training opt-in", async () => {
+    const owner = await signIn("owner");
+    const member = await signIn("member");
+    const household = (await createHousehold(owner.auth)).json();
+    await addMember(household.id, member.userId);
+    expect((await app.inject({ method: "GET", url: "/household", headers: owner.auth })).json().shareTrainingData).toBe(false);
+
+    const denied = await app.inject({ method: "PATCH", url: "/household", headers: member.auth, payload: { name: "Mine" } });
+    expect(denied.statusCode).toBe(403);
+    expect((await app.inject({ method: "PATCH", url: "/household", headers: owner.auth, payload: {} })).statusCode).toBe(400);
+    const renamed = await app.inject({ method: "PATCH", url: "/household", headers: owner.auth, payload: { name: "Beach house" } });
+    expect(renamed.json()).toMatchObject({ name: "Beach house", shareTrainingData: false });
+  });
+
   it("lets only the owner revoke, and only the device's user or owner update", async () => {
     const owner = await signIn("owner");
     const member = await signIn("member");

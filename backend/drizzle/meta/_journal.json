@@ -43,6 +43,13 @@
       "when": 1794314485657,
       "tag": "0005_daily_summaries_per_camera",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794315267383,
+      "tag": "0006_household_training_opt_in",
+      "breakpoints": true
     }
   ]
 }

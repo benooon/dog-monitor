@@ -50,12 +50,34 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
       name: household!.name,
       plan: household!.plan,
       ownerId: household!.ownerId,
+      shareTrainingData: household!.shareTrainingData,
       role,
       members,
       dogs: dogRows.map(dogDto),
       devices: deviceRows.map(deviceDto),
     };
   });
+
+  /** Owner only: rename the household or change the training-data opt-in. */
+  app.patch<{ Body: { name?: string; shareTrainingData?: boolean } }>(
+    "/household",
+    {
+      preHandler: [app.authenticate, requireHousehold(db), requireOwner],
+      schema: {
+        body: {
+          type: "object",
+          additionalProperties: false,
+          minProperties: 1,
+          properties: { name: { type: "string", minLength: 1, maxLength: 100 }, shareTrainingData: { type: "boolean" } },
+        },
+      },
+    },
+    async (request) => {
+      const { householdId } = request.household!;
+      const [updated] = await db.update(households).set(request.body).where(eq(households.id, householdId)).returning();
+      return { id: updated!.id, name: updated!.name, plan: updated!.plan, shareTrainingData: updated!.shareTrainingData };
+    },
+  );
 
   /** Owner only: removes a member, signs out their phones (revoked) and drops their push settings. */
   app.delete<{ Params: { userId: string } }>(

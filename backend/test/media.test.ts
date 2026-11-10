@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import type { DbHandle } from "../src/db/client.js";
-import { events } from "../src/db/schema.js";
+import { events, households } from "../src/db/schema.js";
 import { purgeExpiredMedia } from "../src/storage/retention.js";
 import { S3MediaStorage, eventMediaKey } from "../src/storage/storage.js";
 import { TEST_NONCE } from "./helpers/apple.js";
@@ -179,5 +179,41 @@ describe.skipIf(!hasDatabase)("media routes and retention", () => {
     expect(recent!.clipKey).not.toBeNull();
 
     expect(await purgeExpiredMedia(h.db, storage, 7, now)).toBe(0);
+  });
+
+  it("keeps labeled clips of households that share training data, up to 90 days", async () => {
+    const { owner, householdId, cameraId } = await setup();
+    const now = new Date("2026-11-10T08:00:00Z");
+    const labeled = "55555555-5555-4555-8555-555555555555";
+    const ancient = "66666666-6666-4666-8666-666666666666";
+    const key = (id: string) => eventMediaKey(householdId, cameraId, id, "clip");
+    await h.db.insert(events).values([
+      { id: eventId, householdId, deviceId: cameraId, type: "whining", startedAt: new Date("2026-11-01T08:00:00Z"), clipKey: key(eventId) },
+      { id: labeled, householdId, deviceId: cameraId, type: "prolongedBarking", startedAt: new Date("2026-10-01T08:00:00Z"), clipKey: key(labeled), feedback: "wrong" },
+      { id: ancient, householdId, deviceId: cameraId, type: "prolongedBarking", startedAt: new Date("2026-07-01T08:00:00Z"), clipKey: key(ancient), feedback: "correct" },
+    ]);
+
+    // Not opted in: labels don't matter.
+    expect(
+      (await app.inject({ method: "GET", url: "/training/labeled", headers: owner })).json(),
+    ).toEqual({ error: "training_not_enabled" });
+
+    const patch = await app.inject({ method: "PATCH", url: "/household", headers: owner, payload: { shareTrainingData: true } });
+    expect(patch.statusCode).toBe(200);
+    expect(patch.json().shareTrainingData).toBe(true);
+    expect((await app.inject({ method: "GET", url: "/household", headers: owner })).json().shareTrainingData).toBe(true);
+
+    expect(await purgeExpiredMedia(h.db, storage, 7, now)).toBe(2);
+    expect(storage.deleted.sort()).toEqual([key(eventId), key(ancient)].sort());
+
+    const exported = await app.inject({ method: "GET", url: "/training/labeled", headers: owner });
+    expect(exported.statusCode).toBe(200);
+    expect(exported.json().items).toEqual([
+      expect.objectContaining({ eventId: labeled, feedback: "wrong", clipUrl: `https://bucket.test/${key(labeled)}?get&ttl=600` }),
+    ]);
+    expect(exported.json().next).toBeNull();
+
+    await h.db.update(households).set({ shareTrainingData: false }).where(eq(households.id, householdId));
+    expect(await purgeExpiredMedia(h.db, storage, 7, now)).toBe(1);
   });
 });
