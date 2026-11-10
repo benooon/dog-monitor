@@ -78,4 +78,28 @@ final class DeviceRoleTests: XCTestCase {
         let data = try JSONEncoder().encode([DeviceRole.camera, .viewer])
         XCTAssertEqual(String(decoding: data, as: UTF8.self), #"["camera","viewer"]"#)
     }
+
+    func testDeviceInitDefaultsAndRoundTrip() throws {
+        let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+        let camera = DeviceDTO(
+            id: UUID(),
+            householdId: UUID(),
+            name: "Living room",
+            role: .camera,
+            lastHeartbeatAt: t0.addingTimeInterval(-60),
+            dogState: DogState.resting.rawValue,
+            createdAt: t0
+        )
+        XCTAssertEqual(camera.status, .active)
+        XCTAssertFalse(camera.hasPushToken)
+        XCTAssertNil(camera.userId)
+        XCTAssertEqual(camera.currentDogState, .resting)
+        XCTAssertTrue(camera.isOnline(now: t0))
+        XCTAssertFalse(camera.isOnline(now: t0.addingTimeInterval(DeviceDTO.offlineAfter)))
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        XCTAssertEqual(try decoder.decode(DeviceDTO.self, from: encoder.encode(camera)), camera)
+    }
 }

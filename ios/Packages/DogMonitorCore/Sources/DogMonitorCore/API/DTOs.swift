@@ -79,6 +79,40 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
     public let dogState: String?
     public let createdAt: Date
 
+    public init(
+        id: UUID,
+        householdId: UUID,
+        userId: UUID? = nil,
+        name: String,
+        role: DeviceRole,
+        model: String? = nil,
+        appVersion: String? = nil,
+        hasPushToken: Bool = false,
+        status: DeviceStatus = .active,
+        lastHeartbeatAt: Date? = nil,
+        battery: Double? = nil,
+        charging: Bool? = nil,
+        thermal: String? = nil,
+        dogState: String? = nil,
+        createdAt: Date
+    ) {
+        self.id = id
+        self.householdId = householdId
+        self.userId = userId
+        self.name = name
+        self.role = role
+        self.model = model
+        self.appVersion = appVersion
+        self.hasPushToken = hasPushToken
+        self.status = status
+        self.lastHeartbeatAt = lastHeartbeatAt
+        self.battery = battery
+        self.charging = charging
+        self.thermal = thermal
+        self.dogState = dogState
+        self.createdAt = createdAt
+    }
+
     public var currentDogState: DogState? {
         dogState.flatMap(DogState.init(rawValue:))
     }

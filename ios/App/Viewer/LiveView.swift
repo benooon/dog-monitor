@@ -200,3 +200,28 @@ private extension View {
         }
     }
 }
+
+// Previews have no server, so they show the "couldn't open" state over black.
+#Preview {
+    let api = DogMonitorAPI(baseURL: URL(string: "https://example.invalid")!)
+    NavigationStack {
+        LiveView(camera: .previewCamera, api: api, realtime: ViewerRealtime(api: api), dogName: "Rex")
+    }
+}
+
+#Preview("Hebrew (RTL)") {
+    let api = DogMonitorAPI(baseURL: URL(string: "https://example.invalid")!)
+    NavigationStack {
+        LiveView(camera: .previewCamera, api: api, realtime: ViewerRealtime(api: api), dogName: "רקס")
+    }
+    .environment(\.locale, Locale(identifier: "he"))
+    .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    let api = DogMonitorAPI(baseURL: URL(string: "https://example.invalid")!)
+    NavigationStack {
+        LiveView(camera: .previewCamera, api: api, realtime: ViewerRealtime(api: api), dogName: "Rex")
+    }
+    .preferredColorScheme(.dark)
+}

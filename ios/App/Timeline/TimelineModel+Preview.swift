@@ -30,6 +30,7 @@ extension TimelineModel {
             event(.cameraOffline, hoursAgo: 30, minutes: 45),
             event(.dailySummary, hoursAgo: 36),
         ]
-        return TimelineModel(api: .timelinePreview, cameras: [], loaded: events)
+        let livingRoom = DeviceDTO(id: camera, householdId: household, name: "Living room", role: .camera, createdAt: now)
+        return TimelineModel(api: .timelinePreview, cameras: [livingRoom], loaded: events)
     }
 }

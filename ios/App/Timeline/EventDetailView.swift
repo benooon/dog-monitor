@@ -172,3 +172,33 @@ private struct EventMediaView: View {
         }
     }
 }
+
+#Preview {
+    let model = TimelineModel.preview
+    NavigationStack {
+        EventDetailView(model: model, eventId: model.feed.events[1].id)
+    }
+}
+
+#Preview("Hebrew (RTL)") {
+    let model = TimelineModel.preview
+    NavigationStack {
+        EventDetailView(model: model, eventId: model.feed.events[1].id)
+    }
+    .environment(\.locale, Locale(identifier: "he"))
+    .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    let model = TimelineModel.preview
+    NavigationStack {
+        EventDetailView(model: model, eventId: model.feed.events[1].id)
+    }
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Gone") {
+    NavigationStack {
+        EventDetailView(model: .preview, eventId: UUID())
+    }
+}

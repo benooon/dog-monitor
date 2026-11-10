@@ -33,3 +33,24 @@ struct CameraNotificationsView: View {
         .navigationTitle(Text(verbatim: camera.name))
     }
 }
+
+#Preview {
+    NavigationStack {
+        CameraNotificationsView(model: .preview, camera: .previewCamera, dogName: "Rex")
+    }
+}
+
+#Preview("Hebrew (RTL)") {
+    NavigationStack {
+        CameraNotificationsView(model: .preview, camera: .previewCamera, dogName: "רקס")
+    }
+    .environment(\.locale, Locale(identifier: "he"))
+    .environment(\.layoutDirection, .rightToLeft)
+}
+
+#Preview("Dark") {
+    NavigationStack {
+        CameraNotificationsView(model: .preview, camera: .previewCamera, dogName: nil)
+    }
+    .preferredColorScheme(.dark)
+}
