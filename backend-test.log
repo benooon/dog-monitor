@@ -2,7 +2,7 @@ npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.
 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
 
-added 270 packages, and audited 271 packages in 29s
+added 270 packages, and audited 271 packages in 25s
 
 77 packages are looking for funding
   run `npm fund` for details
@@ -27,31 +27,31 @@ Run `npm audit` for details.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/runner/work/dog-monitor/dog-monitor/backend[39m
 
- [32m✓[39m test/events.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 940[2mms[22m[39m
- [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 629[2mms[22m[39m
- [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1503[2mms[22m[39m
-   [32m✓[39m households, dogs and devices [2m(7)[22m
-     [33m[2m✓[22m[39m creates a household with the caller as owner, once[33m 871[2mms[22m[39m
- [32m✓[39m test/live.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 526[2mms[22m[39m
- [32m✓[39m test/media.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 427[2mms[22m[39m
- [32m✓[39m test/realtime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 854[2mms[22m[39m
- [32m✓[39m test/timeline.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 455[2mms[22m[39m
- [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 16[2mms[22m[39m
- [32m✓[39m test/apns.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 25[2mms[22m[39m
- [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2584[2mms[22m[39m
+ [32m✓[39m test/events.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1062[2mms[22m[39m
+ [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 565[2mms[22m[39m
+ [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 438[2mms[22m[39m
+ [32m✓[39m test/live.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 466[2mms[22m[39m
+ [32m✓[39m test/media.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 597[2mms[22m[39m
+   [32m✓[39m media routes and retention [2m(4)[22m
+     [33m[2m✓[22m[39m hands cameras upload URLs under the event's own prefix[33m 366[2mms[22m[39m
+ [32m✓[39m test/realtime.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 809[2mms[22m[39m
+ [32m✓[39m test/timeline.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 325[2mms[22m[39m
+ [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m test/apns.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2412[2mms[22m[39m
    [32m✓[39m JwtService [2m(2)[22m
-     [33m[2m✓[22m[39m rejects expired tokens[33m 2104[2mms[22m[39m
- [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 198[2mms[22m[39m
- [32m✓[39m test/notification-prefs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 302[2mms[22m[39m
- [32m✓[39m test/config.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects expired tokens[33m 2105[2mms[22m[39m
+ [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 171[2mms[22m[39m
+ [32m✓[39m test/notification-prefs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 258[2mms[22m[39m
+ [32m✓[39m test/config.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 5[2mms[22m[39m
  [32m✓[39m test/quiet-hours.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
- [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+ [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 71[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m15 passed[39m[22m[90m (15)[39m
 [2m      Tests [22m [1m[32m105 passed[39m[22m[90m (105)[39m
-[2m   Start at [22m 09:12:53
-[2m   Duration [22m 15.37s[2m (tests 62%, import 36%, transform 2%)[22m
+[2m   Start at [22m 11:47:44
+[2m   Duration [22m 13.60s[2m (tests 60%, import 37%, transform 3%)[22m
 
-[2m    Isolate [22m [33m15 workers spawned[39m[2m · ~69ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~966ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[2m    Isolate [22m [33m15 workers spawned[39m[2m · ~66ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~927ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
 
