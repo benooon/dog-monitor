@@ -1,3 +1,5 @@
+import type { LiveKitConfig } from "./live/livekit.js";
+
 /** Runtime configuration, read from environment variables (documented in .env.example). */
 export interface Config {
   port: number;
@@ -11,6 +13,8 @@ export interface Config {
   jwtTtlSeconds: number;
   /** Accepted `aud` values for Sign in with Apple identity tokens (the app bundle id). */
   appleAudiences: string[];
+  /** LiveKit Cloud credentials; undefined until all three LIVEKIT_* variables are set. */
+  liveKit?: LiveKitConfig;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -21,6 +25,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const jwtTtlSeconds = Number(env.JWT_TTL_SECONDS ?? 60 * 60 * 24 * 30);
   if (!Number.isInteger(jwtTtlSeconds) || jwtTtlSeconds <= 0) {
     throw new Error(`Invalid JWT_TTL_SECONDS: ${env.JWT_TTL_SECONDS}`);
+  }
+  const liveKitVars = [env.LIVEKIT_URL, env.LIVEKIT_API_KEY, env.LIVEKIT_API_SECRET];
+  const setCount = liveKitVars.filter(Boolean).length;
+  if (setCount > 0 && setCount < 3) {
+    throw new Error("Set all of LIVEKIT_URL, LIVEKIT_API_KEY and LIVEKIT_API_SECRET, or none of them");
+  }
+  if (env.LIVEKIT_URL && !/^wss?:\/\//.test(env.LIVEKIT_URL)) {
+    throw new Error(`Invalid LIVEKIT_URL (expected wss://…): ${env.LIVEKIT_URL}`);
   }
   return {
     port,
@@ -34,6 +46,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean),
+    liveKit:
+      setCount === 3
+        ? { url: env.LIVEKIT_URL!, apiKey: env.LIVEKIT_API_KEY!, apiSecret: env.LIVEKIT_API_SECRET! }
+        : undefined,
   };
 }
 

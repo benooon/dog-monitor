@@ -3,6 +3,7 @@ import { createAppleTokenVerifier } from "./auth/apple.js";
 import { JwtService } from "./auth/jwt.js";
 import { loadConfig, requireServerConfig } from "./config.js";
 import { createDb } from "./db/client.js";
+import { createLiveKitIssuer } from "./live/livekit.js";
 
 const config = loadConfig();
 const { databaseUrl, jwtSecret } = requireServerConfig(config);
@@ -14,6 +15,7 @@ const app = await buildApp({
     db: dbHandle.db,
     jwt: new JwtService(jwtSecret, config.jwtTtlSeconds),
     apple: createAppleTokenVerifier({ audiences: config.appleAudiences }),
+    live: config.liveKit ? createLiveKitIssuer(config.liveKit) : undefined,
   },
 });
 
@@ -25,5 +27,7 @@ const shutdown = async (signal: string) => {
 };
 process.on("SIGTERM", () => void shutdown("SIGTERM"));
 process.on("SIGINT", () => void shutdown("SIGINT"));
+
+if (!config.liveKit) app.log.warn("LIVEKIT_* not set: live view token routes will answer 503");
 
 await app.listen({ port: config.port, host: config.host });

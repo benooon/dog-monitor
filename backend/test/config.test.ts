@@ -22,6 +22,17 @@ describe("loadConfig", () => {
   it("rejects an invalid PORT", () => {
     expect(() => loadConfig({ PORT: "abc" })).toThrow(/Invalid PORT/);
   });
+
+  it("reads LiveKit credentials only when all three are set", () => {
+    expect(loadConfig({}).liveKit).toBeUndefined();
+    expect(
+      loadConfig({ LIVEKIT_URL: "wss://x.livekit.cloud", LIVEKIT_API_KEY: "key", LIVEKIT_API_SECRET: "secret" }).liveKit,
+    ).toEqual({ url: "wss://x.livekit.cloud", apiKey: "key", apiSecret: "secret" });
+    expect(() => loadConfig({ LIVEKIT_URL: "wss://x.livekit.cloud" })).toThrow(/LIVEKIT_API_KEY/);
+    expect(() =>
+      loadConfig({ LIVEKIT_URL: "https://x.livekit.cloud", LIVEKIT_API_KEY: "k", LIVEKIT_API_SECRET: "s" }),
+    ).toThrow(/Invalid LIVEKIT_URL/);
+  });
 });
 
 describe("requireServerConfig", () => {

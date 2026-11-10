@@ -22,3 +22,4 @@ One line per decision: `YYYY-MM-DD — decision — why`.
 - 2026-11-10 — CI no longer publishes RED for cancelled (superseded) runs and no longer cancels in-progress runs; the RED for bc6ec2a/237dbd8 was a cancellation, not a failure.
 - 2026-11-10 — `POST /auth/apple` now requires `nonce` (raw); the token's `nonce` claim must equal its SHA-256 hex. The iOS app generates a fresh nonce per sign-in (CryptoKit) — prevents replaying a captured identity token.
 - 2026-11-10 — Took the core event engine ahead of bark detection: bark detection consumes the capture pipeline's audio stream, which another agent is building right now.
+- 2026-11-10 — Added livekit-server-sdk (backend) to mint LiveKit room tokens, as SPEC §6 prescribes. One room per camera (`camera-<deviceId>`); viewers may publish microphone only (push-to-talk); without LIVEKIT_* the live routes answer 503 instead of faking tokens.
