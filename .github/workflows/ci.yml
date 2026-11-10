@@ -79,9 +79,18 @@ jobs:
             echo "SKIPPED: ios/project.yml not created yet" | tee ios-build.log
             exit 0
           fi
+          # Newest stable Xcode on the runner (no betas/RCs), so iOS 26 code behind
+          # `#if compiler(>=6.2)` (Liquid Glass) is compiled too. Falls back to the default.
+          XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | python3 -c '
+          import re,sys
+          apps=[l.strip() for l in sys.stdin if re.fullmatch(r"/Applications/Xcode_\d+(\.\d+)*\.app", l.strip())]
+          key=lambda a: [int(x) for x in re.findall(r"\d+", a)]
+          print(max(apps, key=key) if apps else "")')
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE"; fi
           brew install xcodegen >/dev/null
           cd ios
-          xcodegen generate 2>&1 | tee ../ios-build.log
+          xcodebuild -version 2>&1 | tee ../ios-build.log
+          xcodegen generate 2>&1 | tee -a ../ios-build.log
           SIM_ID=$(xcrun simctl list devices available -j | python3 -c '
           import json,sys
           d=json.load(sys.stdin)["devices"]
