@@ -32,7 +32,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [~] ios: Camera publishes to LiveKit only while viewers are connected (driven by the WebSocket signal), with simulcast 720p/360p. (in progress 2026-11-10)
 - [ ] ios: Publish camera audio to LiveKit. AVCaptureSession already owns the mic for bark detection; either feed captured audio into LiveKit's audio pipeline or verify both can share the mic on a device. Viewers currently get video only.
 - [~] ios: Rotate streamed (and analyzed) video to match the camera phone's orientation (`AVCaptureDevice.RotationCoordinator` → `videoRotationAngle` on the video output connection). (in progress 2026-11-10)
-- [ ] ios: Pairing UI (moved up: live view needs a paired camera). The owner shows a QR code + 6-digit code; the new device scans it (AVFoundation metadata output) and joins, then picks a role.
+- [~] ios: Pairing UI (moved up: live view needs a paired camera). The owner shows a QR code + 6-digit code; the new device scans it (AVFoundation metadata output) and joins, then picks a role. (in progress 2026-11-10)
 - [ ] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
 - [x] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client. Also `PATCH /events/:id` (end, escalation push) and the camera-offline push.
 - [ ] backend + ios: Quiet hours. Store each user's time zone (sent by the app) and skip non-time-sensitive pushes inside `quiet_start`–`quiet_end`; the notifier ignores quiet hours today.
