@@ -81,16 +81,16 @@ Writing result bundle at path:
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
             self?.sessionQueue.async { self?.applyRotation(angle) }
                                        ^
-2026-11-10 19:56:49.338 xcodebuild[3929:14408] [MT] IDETestOperationsObserverDebug: 290.346 elapsed -- Testing started completed.
-2026-11-10 19:56:49.338 xcodebuild[3929:14408] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 19:56:49.338 xcodebuild[3929:14408] [MT] IDETestOperationsObserverDebug: 290.346 sec, +290.346 sec -- end
+2026-11-10 20:17:38.484 xcodebuild[4091:15193] [MT] IDETestOperationsObserverDebug: 295.484 elapsed -- Testing started completed.
+2026-11-10 20:17:38.484 xcodebuild[4091:15193] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 20:17:38.484 xcodebuild[4091:15193] [MT] IDETestOperationsObserverDebug: 295.484 sec, +295.484 sec -- end
 Testing started
 iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
 { platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-2026-11-10 20:07:44.249 xcodebuild[12641:41590] [MT] IDETestOperationsObserverDebug: 632.180 elapsed -- Testing started completed.
-2026-11-10 20:07:44.249 xcodebuild[12641:41590] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 20:07:44.249 xcodebuild[12641:41590] [MT] IDETestOperationsObserverDebug: 632.180 sec, +632.180 sec -- end
+2026-11-10 20:22:10.596 xcodebuild[12677:41869] [MT] IDETestOperationsObserverDebug: 247.949 elapsed -- Testing started completed.
+2026-11-10 20:22:10.642 xcodebuild[12677:41869] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 20:22:10.642 xcodebuild[12677:41869] [MT] IDETestOperationsObserverDebug: 247.949 sec, +247.949 sec -- end
 Testing started
 Screenshots: 78

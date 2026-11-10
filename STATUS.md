@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 316d5c5431e05f6ee3ce39aabc9ab9268bc2c59c
-- message: ios: screenshot review fixes: inline household title, readable width on iPad, larger iPad home cards with dogs card
-- time (UTC): 2026-11-10T20:08:10Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42888935051
+- commit: 108fcbc8f50cfe98745b8b857409d51f142bdc52
+- message: ios: format summary and timeline durations in the screen's locale; chart axes follow it too
+- time (UTC): 2026-11-10T20:22:42Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42889418756
 
 | job | result | log |
 |---|---|---|
