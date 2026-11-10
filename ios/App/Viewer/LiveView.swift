@@ -1,13 +1,20 @@
 import DogMonitorCore
 import SwiftUI
 
-/// Full-screen live view of one camera.
+/// Full-screen live view of one camera: video edge to edge, a "Live" pill, and a floating
+/// glass control bar (sound, talk, Lock Screen).
 struct LiveView: View {
-    let cameraName: String
+    let camera: DeviceDTO
+    let dogName: String?
+    let realtime: ViewerRealtime
     @State private var model: LiveViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private let liveActivities = CameraLiveActivityController.shared
 
-    init(camera: DeviceDTO, api: DogMonitorAPI, realtime: ViewerRealtime) {
-        cameraName = camera.name
+    init(camera: DeviceDTO, api: DogMonitorAPI, realtime: ViewerRealtime, dogName: String? = nil) {
+        self.camera = camera
+        self.dogName = dogName
+        self.realtime = realtime
         _model = State(initialValue: LiveViewModel(cameraId: camera.id, api: api, realtime: realtime))
     }
 
@@ -18,14 +25,11 @@ struct LiveView: View {
                 LiveVideoView(track: track)
                     .ignoresSafeArea()
             }
-            VStack {
+            VStack(spacing: DS.Spacing.l) {
                 HStack {
                     if model.phase == .live {
-                        Label("Live", systemImage: "dot.radiowaves.left.and.right")
-                            .font(.caption.bold())
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(.red, in: Capsule())
+                        StatusPill(title: "Live", tint: .red)
+                            .transition(.opacity)
                     }
                     Spacer()
                 }
@@ -33,60 +37,96 @@ struct LiveView: View {
                 status
                 Spacer()
                 if model.phase == .live {
-                    talkControl
+                    controls
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .padding()
-            .foregroundStyle(.white)
+            .padding(DS.Spacing.l)
+            .animation(DS.Motion.animation(DS.Motion.gentle, reduceMotion: reduceMotion), value: model.phase)
+            // Video is always dark, so the overlay uses dark semantic colors in either appearance.
+            .environment(\.colorScheme, .dark)
         }
-        .navigationTitle(Text(verbatim: cameraName))
+        .navigationTitle(Text(verbatim: camera.name))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbar {
-            if model.hasAudio {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        model.toggleAudio()
-                    } label: {
-                        if model.isAudioMuted {
-                            Label("Unmute", systemImage: "speaker.slash.fill")
-                        } else {
-                            Label("Mute", systemImage: "speaker.wave.2.fill")
-                        }
-                    }
-                }
-            }
-        }
         .onAppear { model.start() }
         .onDisappear { model.stop() }
     }
 
-    /// Push-to-talk: tap to talk through the camera's speaker, tap again to stop.
-    private var talkControl: some View {
-        VStack(spacing: 8) {
+    /// Floating controls: camera sound, push-to-talk, and the Lock Screen Live Activity.
+    private var controls: some View {
+        VStack(spacing: DS.Spacing.s) {
             if model.isMicrophoneDenied {
                 Text("Allow microphone access in Settings to talk to your dog.")
                     .font(.footnote)
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
-            Button {
-                model.toggleTalk()
-            } label: {
-                Label(
-                    model.isTalking ? LocalizedStringKey("Stop talking") : LocalizedStringKey("Talk"),
-                    systemImage: model.isTalking ? "mic.fill" : "mic"
-                )
-                .font(.headline)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 14)
-                .frame(minHeight: 44)
-                .background(model.isTalking ? AnyShapeStyle(.red) : AnyShapeStyle(.ultraThinMaterial), in: Capsule())
-                .symbolEffect(.pulse, options: .repeating, isActive: model.isTalking)
+            HStack(spacing: DS.Spacing.m) {
+                if model.hasAudio {
+                    soundButton
+                }
+                talkButton
+                if liveActivities.isAvailable {
+                    lockScreenButton
+                }
             }
-            .buttonStyle(.plain)
-            .sensoryFeedback(.impact, trigger: model.isTalking)
-            .accessibilityHint(Text("Your voice plays from the camera."))
-            .accessibilityIdentifier("push-to-talk")
+            .controlSize(.large)
+        }
+    }
+
+    private var soundButton: some View {
+        Button {
+            model.toggleAudio()
+        } label: {
+            if model.isAudioMuted {
+                Label("Unmute", systemImage: "speaker.slash.fill")
+            } else {
+                Label("Mute", systemImage: "speaker.wave.2.fill")
+            }
+        }
+        .labelStyle(.iconOnly)
+        .contentTransition(.symbolEffect(.replace))
+        .liveControlStyle(isProminent: false)
+    }
+
+    /// Push-to-talk: tap to talk through the camera's speaker, tap again to stop.
+    private var talkButton: some View {
+        Button {
+            model.toggleTalk()
+        } label: {
+            Label(
+                model.isTalking ? LocalizedStringKey("Stop talking") : LocalizedStringKey("Talk"),
+                systemImage: model.isTalking ? "mic.fill" : "mic"
+            )
+            .symbolEffect(.pulse, options: .repeating, isActive: model.isTalking && !reduceMotion)
+            .frame(maxWidth: .infinity)
+        }
+        .liveControlStyle(isProminent: model.isTalking)
+        .tint(model.isTalking ? .red : nil)
+        .sensoryFeedback(.impact, trigger: model.isTalking)
+        .accessibilityHint(Text("Your voice plays from the camera."))
+        .accessibilityIdentifier("push-to-talk")
+    }
+
+    @ViewBuilder
+    private var lockScreenButton: some View {
+        if liveActivities.isShowing(camera.id) {
+            Button("Hide from Lock Screen", systemImage: "lock.slash") {
+                Task { await liveActivities.stop(cameraId: camera.id) }
+            }
+            .labelStyle(.iconOnly)
+            .liveControlStyle(isProminent: false)
+        } else {
+            Button("Show on Lock Screen", systemImage: "lock.iphone") {
+                let content = CameraLiveActivityContent(
+                    state: realtime.dogStates[camera.id] ?? camera.currentDogState,
+                    online: realtime.presence[camera.id] ?? camera.isOnline(now: .now)
+                )
+                try? liveActivities.start(camera: camera, dogName: dogName, content: content)
+            }
+            .labelStyle(.iconOnly)
+            .liveControlStyle(isProminent: false)
         }
     }
 
@@ -94,23 +134,69 @@ struct LiveView: View {
     private var status: some View {
         switch model.phase {
         case .connecting:
-            ProgressView("Connecting…").tint(.white)
+            progress("Connecting…")
         case .waitingForCamera:
-            ProgressView("Waiting for the camera…").tint(.white)
+            progress("Waiting for the camera…")
         case .reconnecting:
-            ProgressView("Connection lost. Reconnecting…").tint(.white)
+            progress("Connection lost. Reconnecting…")
         case .live:
             EmptyView()
         case .viewerLimitReached:
-            Text("This camera already has 5 viewers.")
+            ContentUnavailableView {
+                Label("This camera already has 5 viewers.", systemImage: "person.3.fill")
+            } description: {
+                Text("Try again when someone stops watching.")
+            } actions: {
+                Button("Try again") { model.retry() }
+                    .buttonStyle(.bordered)
+            }
         case .notConfigured:
-            Text("Live view isn't set up on the server yet.")
+            ContentUnavailableView("Live view isn't set up on the server yet.", systemImage: "video.slash")
         case .failed:
-            VStack(spacing: 12) {
-                Text("Couldn't open live view.")
+            ContentUnavailableView {
+                Label("Couldn't open live view.", systemImage: "exclamationmark.triangle")
+            } description: {
+                Text("Check your connection and try again.")
+            } actions: {
                 Button("Try again") { model.retry() }
                     .buttonStyle(.borderedProminent)
             }
+        }
+    }
+
+    private func progress(_ title: LocalizedStringKey) -> some View {
+        ProgressView(title)
+            .padding(.horizontal, DS.Spacing.l)
+            .padding(.vertical, DS.Spacing.m)
+            .glassSurface(in: RoundedRectangle(cornerRadius: DS.Radius.medium, style: .continuous))
+    }
+}
+
+private extension View {
+    /// Glass buttons on iOS 26 and later (prominent while active), bordered before.
+    @ViewBuilder
+    func liveControlStyle(isProminent: Bool) -> some View {
+        #if compiler(>=6.2)
+        if #available(iOS 26, *) {
+            if isProminent {
+                buttonStyle(.glassProminent)
+            } else {
+                buttonStyle(.glass)
+            }
+        } else {
+            legacyLiveControlStyle(isProminent: isProminent)
+        }
+        #else
+        legacyLiveControlStyle(isProminent: isProminent)
+        #endif
+    }
+
+    @ViewBuilder
+    func legacyLiveControlStyle(isProminent: Bool) -> some View {
+        if isProminent {
+            buttonStyle(.borderedProminent)
+        } else {
+            buttonStyle(.bordered)
         }
     }
 }

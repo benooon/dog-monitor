@@ -64,7 +64,12 @@ struct ViewerHomeView: View {
             }
             .navigationDestination(for: UUID.self) { cameraId in
                 if let camera = model.household?.cameras.first(where: { $0.id == cameraId }), let realtime = model.realtime {
-                    LiveView(camera: camera, api: model.authorizedAPI, realtime: realtime)
+                    LiveView(
+                        camera: camera,
+                        api: model.authorizedAPI,
+                        realtime: realtime,
+                        dogName: model.household?.dogs.first?.name
+                    )
                 } else {
                     ProgressView()
                 }

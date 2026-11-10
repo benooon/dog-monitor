@@ -1787,6 +1787,16 @@
         }
       }
     },
+    "Try again when someone stops watching.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נסו שוב כשמישהו יפסיק לצפות."
+          }
+        }
+      }
+    },
     "Undo": {
       "localizations": {
         "he": {
