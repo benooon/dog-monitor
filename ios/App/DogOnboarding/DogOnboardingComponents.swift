@@ -14,6 +14,8 @@ struct QuestionScreen<Content: View, Actions: View>: View {
         GeometryReader { proxy in
             ScrollView {
                 column
+                    // Always its full height: the min-height frame below must not squeeze the text.
+                    .fixedSize(horizontal: false, vertical: true)
                     // iPad: the question sits in the middle of the screen instead of a strip at the top.
                     .frame(minHeight: proxy.size.height, alignment: horizontalSizeClass == .regular ? .center : .top)
             }
