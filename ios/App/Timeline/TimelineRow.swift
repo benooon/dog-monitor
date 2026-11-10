@@ -6,6 +6,7 @@ struct TimelineRow: View {
     let event: EventDTO
     let cameraName: String?
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.locale) private var locale
 
     var body: some View {
         HStack(spacing: DS.Spacing.m) {
@@ -37,14 +38,18 @@ struct TimelineRow: View {
 
     /// "Living room · 3 min"; parts we don't know are left out.
     private var details: String? {
-        let parts = [cameraName, event.duration.flatMap(Self.formatted(duration:))].compactMap { $0 }
+        let duration = event.duration.flatMap { Self.formatted(duration: $0, locale: locale) }
+        let parts = [cameraName, duration].compactMap { $0 }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
-    private static func formatted(duration: TimeInterval) -> String? {
+    /// "3 min" in the screen's locale (the environment's, not the device's, so previews and
+    /// screenshots in Hebrew match what a Hebrew phone shows).
+    static func formatted(duration: TimeInterval, locale: Locale) -> String? {
         guard duration >= 1 else { return nil }
         return Duration.seconds(duration).formatted(
             .units(allowed: [.hours, .minutes, .seconds], width: .abbreviated, maximumUnitCount: 1)
+                .locale(locale)
         )
     }
 }

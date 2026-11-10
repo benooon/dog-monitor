@@ -222,7 +222,7 @@ private func barkChangeText(_ delta: Int) -> Text {
 }
 
 private func restChangeText(_ delta: Int) -> Text {
-    let amount = minutesText(abs(delta))
+    let amount = Text(minutes: abs(delta))
     if delta > 0 {
         return Text("\(amount) more than yesterday")
     } else if delta < 0 {
@@ -237,6 +237,7 @@ private struct HourlyActivityChart: View {
     let points: [DailySummaryInsights.HourPoint]
     let dateKey: String
     @Environment(\.calendar) private var calendar
+    @Environment(\.locale) private var locale
     /// Tall enough to read 24 bars; grows with Dynamic Type so axis labels keep room.
     @ScaledMetric(relativeTo: .caption) private var chartHeight: CGFloat = 160
 
@@ -249,13 +250,13 @@ private struct HourlyActivityChart: View {
                 y: .value("Minutes", point.activeMinutes)
             )
             .foregroundStyle(Color.accentColor)
-            .accessibilityLabel(hour.formatted(.dateTime.hour()))
-            .accessibilityValue(minutesText(point.activeMinutes))
+            .accessibilityLabel(Text(hour, format: .dateTime.hour()))
+            .accessibilityValue(Text(minutes: point.activeMinutes))
         }
         .chartXAxis {
             AxisMarks(values: .stride(by: .hour, count: 6)) { _ in
                 AxisGridLine()
-                AxisValueLabel(format: .dateTime.hour())
+                AxisValueLabel(format: .dateTime.hour().locale(locale))
             }
         }
         .chartYScale(domain: 0...60)
@@ -271,6 +272,7 @@ private struct HourlyActivityChart: View {
 private struct WeeklyBarksChart: View {
     let points: [DailySummaryInsights.DayPoint]
     @Environment(\.calendar) private var calendar
+    @Environment(\.locale) private var locale
     @ScaledMetric(relativeTo: .caption) private var chartHeight: CGFloat = 140
     /// Earlier days recede so today's bar stands out.
     private static var earlierDayOpacity: Double { 0.35 }
@@ -286,12 +288,12 @@ private struct WeeklyBarksChart: View {
                 y: .value("Barks", item.point.barkCount)
             )
             .foregroundStyle(item.point.id == latest ? Color.accentColor : Color.accentColor.opacity(Self.earlierDayOpacity))
-            .accessibilityLabel(item.day.formatted(.dateTime.weekday(.wide).day().month()))
-            .accessibilityValue(item.point.barkCount.formatted())
+            .accessibilityLabel(Text(item.day, format: .dateTime.weekday(.wide).day().month()))
+            .accessibilityValue(Text(item.point.barkCount, format: .number))
         }
         .chartXAxis {
             AxisMarks(values: .stride(by: .day)) { _ in
-                AxisValueLabel(format: .dateTime.weekday(.narrow), centered: true)
+                AxisValueLabel(format: .dateTime.weekday(.narrow).locale(locale), centered: true)
             }
         }
         .frame(minHeight: chartHeight)
@@ -327,14 +329,11 @@ private struct DayTitle: View {
     }
 }
 
-/// Localized "1 hr, 20 min" for a number of minutes.
-private func minutesText(_ minutes: Int) -> String {
-    Duration.seconds(minutes * 60).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
-}
-
 private extension Text {
+    /// "1 hr, 20 min" for a number of minutes, formatted at render time so it follows the
+    /// environment's locale (Hebrew screens get Hebrew units).
     init(minutes: Int) {
-        self.init(verbatim: minutesText(minutes))
+        self.init(Duration.seconds(minutes * 60), format: .units(allowed: [.hours, .minutes], width: .abbreviated))
     }
 }
 
