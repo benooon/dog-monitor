@@ -84,6 +84,9 @@ targets:
         APP_LINK_HOST: dog-monitor-production.up.railway.app
         TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: YES
+        # App/Assets.xcassets: warm paw icon (light + dark) and the app's single accent color.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 
   NotificationService:
     type: app-extension
