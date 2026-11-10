@@ -165,19 +165,28 @@ export const events = pgTable(
   (t) => [index("events_household_started_idx").on(t.householdId, t.startedAt.desc())],
 );
 
+/** One camera's day, computed on the camera (in its local time) and uploaded as it goes. */
 export const dailySummaries = pgTable(
   "daily_summaries",
   {
     householdId: uuid("household_id")
       .notNull()
       .references(() => households.id, { onDelete: "cascade" }),
+    deviceId: uuid("device_id")
+      .notNull()
+      .references(() => devices.id, { onDelete: "cascade" }),
     date: date("date").notNull(),
     restMinutes: integer("rest_minutes").notNull().default(0),
     barkCount: integer("bark_count").notNull().default(0),
-    /** 24 numbers, one per local hour. */
+    /** 24 numbers, one per local hour: minutes with motion. */
     activityByHour: jsonb("activity_by_hour").$type<number[]>().notNull().default(sql`'[]'::jsonb`),
+    /** Minutes spent in each dog state. */
+    stateMinutes: jsonb("state_minutes").$type<Partial<Record<DogState, number>>>().notNull().default(sql`'{}'::jsonb`),
+    /** Set when the "daily summary is ready" push went out (once per camera and day). */
+    notifiedAt: timestamp("notified_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [primaryKey({ columns: [t.householdId, t.date] })],
+  (t) => [primaryKey({ columns: [t.deviceId, t.date] }), index("daily_summaries_household_date_idx").on(t.householdId, t.date)],
 );
 
 export const notificationPrefs = pgTable(

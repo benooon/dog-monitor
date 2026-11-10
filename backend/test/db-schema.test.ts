@@ -68,6 +68,7 @@ describe.skipIf(!hasDatabase)("database schema", () => {
     });
     await h.db.insert(dailySummaries).values({
       householdId: household.id,
+      deviceId: camera.id,
       date: "2026-11-10",
       restMinutes: 300,
       barkCount: 12,
