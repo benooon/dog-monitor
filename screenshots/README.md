@@ -1,4 +1,4 @@
-# Screenshots (7e589bc)
+# Screenshots (5fc19bb)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
@@ -57,6 +57,12 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="iphone-03f-meet-dog-summary-light.jpg" width="260"> | <img src="iphone-03f-meet-dog-summary-dark.jpg" width="260"> | <img src="iphone-03f-meet-dog-summary-hebrew.jpg" width="260"> |
+
+### 03g-mark-sofa
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-03g-mark-sofa-light.jpg" width="260"> | <img src="iphone-03g-mark-sofa-dark.jpg" width="260"> | <img src="iphone-03g-mark-sofa-hebrew.jpg" width="260"> |
 
 ### 04-viewer-home
 
@@ -179,6 +185,12 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="ipad-03f-meet-dog-summary-light.jpg" width="260"> | <img src="ipad-03f-meet-dog-summary-dark.jpg" width="260"> | <img src="ipad-03f-meet-dog-summary-hebrew.jpg" width="260"> |
+
+### 03g-mark-sofa
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-03g-mark-sofa-light.jpg" width="260"> | <img src="ipad-03g-mark-sofa-dark.jpg" width="260"> | <img src="ipad-03g-mark-sofa-hebrew.jpg" width="260"> |
 
 ### 04-viewer-home
 
