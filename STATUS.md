@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 4285d0c778ad9bce461ec476ffb75f61cf908f49
-- message: ios: expect the https Railway API URL in the Info.plist test
-- time (UTC): 2026-11-10T17:50:58Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42866891113
+- commit: 682dff2a94e77cff48f76505f4c63fa7b39cfd85
+- message: docs: claim onboarding redesign
+- time (UTC): 2026-11-10T17:59:19Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42869056841
 
 | job | result | log |
 |---|---|---|
