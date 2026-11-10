@@ -47,7 +47,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Multiple cameras in viewer home (cards with last snapshot, online status, current dog state).
 - [~] ios: Ring-buffer recorder (`AVAssetWriter`, keeping the last ~5 s in memory). On an event, write a 10–20 s clip + snapshot. (in progress 2026-11-10)
 - [~] ios: Upload clips and snapshots for events through presigned URLs, with an offline queue that retries when the network returns. (in progress 2026-11-10)
-- [~] backend: Viewer timeline API: `GET /events` (household-scoped, newest first, filter by camera and types, cursor pagination) and `PUT /events/:id/feedback` (right/wrong). (in progress 2026-11-10)
+- [x] backend: Viewer timeline API: `GET /events` (household-scoped, newest first, filter by camera and types, cursor pagination) and `PUT /events/:id/feedback` (right/wrong).
 - [ ] ios: Event timeline screen (filter by type, play clip via `GET /events/:id/media`, mark detection as right/wrong) using `GET /events` and `PUT /events/:id/feedback`.
 - [x] backend: Per-user notification settings API (types, cameras, quiet hours). `GET`/`PUT /notification-prefs`.
 - [ ] ios: Notification settings screen (per event type on/off, per camera overrides, quiet hours) using `GET/PUT /notification-prefs`.
