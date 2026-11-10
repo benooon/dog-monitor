@@ -1,0 +1,72 @@
+name: DogMonitor
+
+options:
+  bundleIdPrefix: com.benooon
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+
+packages:
+  DogMonitorCore:
+    path: Packages/DogMonitorCore
+
+targets:
+  DogMonitor:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    dependencies:
+      - package: DogMonitorCore
+    info:
+      path: Config/DogMonitor-Info.plist
+      properties:
+        CFBundleDisplayName: Dog Monitor
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSCameraUsageDescription: Dog Monitor uses the camera to watch your dog and stream live video to your family.
+        NSMicrophoneUsageDescription: Dog Monitor uses the microphone to detect barking and to let you hear and talk to your dog.
+        NSLocalNetworkUsageDescription: Dog Monitor uses the local network to find and pair with your other devices.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor
+        TARGETED_DEVICE_FAMILY: "1"
+        ENABLE_PREVIEWS: YES
+
+  DogMonitorTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: DogMonitor
+      - package: DogMonitorCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  DogMonitor:
+    build:
+      targets:
+        DogMonitor: all
+        DogMonitorTests: [test]
+    test:
+      config: Debug
+      gatherCoverageData: false
+      targets:
+        - DogMonitorTests

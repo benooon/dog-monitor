@@ -72,3 +72,10 @@ final class ModelsTests: XCTestCase {
         try roundTrip(bad)
     }
 }
+
+final class DeviceRoleTests: XCTestCase {
+    func testWireFormat() throws {
+        let data = try JSONEncoder().encode([DeviceRole.camera, .viewer])
+        XCTAssertEqual(String(decoding: data, as: UTF8.self), #"["camera","viewer"]"#)
+    }
+}
