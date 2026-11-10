@@ -65,7 +65,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [~] ios: Zone editor in camera setup (draw polygons over the preview, saved as normalized coordinates) and synced to the backend. (in progress 2026-11-10)
 - [~] core + backend: Daily summary computation (rest minutes, bark count, activity by hour), plus a daily summary push. (in progress 2026-11-10)
 - [~] ios: Daily summary screen with Swift Charts. (in progress 2026-11-10)
-- [ ] ios: "Calmed down" event and push after barking stops and the dog rests.
+- [~] ios: "Calmed down" event and push after barking stops and the dog rests. (in progress 2026-11-10)
 
 ## Phase 4 — Custom model
 
