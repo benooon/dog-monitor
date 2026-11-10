@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 734609c6f699aeb4d1e459b9ab16004e450583cf
-- message: core: fix async call inside XCTUnwrap in dog profile tests
-- time (UTC): 2026-11-10T21:28:40Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42900567533
+- commit: 29a335aaaf0fe4676a7b76107cf5dcc435302d56
+- message: ios: Meet your dog polish from the screenshots
+- time (UTC): 2026-11-10T22:05:49Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42905698440
 
 | job | result | log |
 |---|---|---|
