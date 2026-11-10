@@ -78,10 +78,10 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor
-        # Backend URL; set to the Railway domain once it exists (see docs/HUMAN_TODO.md).
-        API_BASE_URL: http://localhost:3000
-        # Host of API_BASE_URL, for invite Universal Links. Set together with API_BASE_URL.
-        APP_LINK_HOST: localhost
+        # Backend on Railway (backend/, deployed from main).
+        API_BASE_URL: https://dog-monitor-production.up.railway.app
+        # Host of API_BASE_URL, for invite Universal Links. Change together with API_BASE_URL.
+        APP_LINK_HOST: dog-monitor-production.up.railway.app
         TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: YES
 

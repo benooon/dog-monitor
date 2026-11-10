@@ -30,6 +30,29 @@ export interface Config {
   appStore: AppStoreConfig;
   /** Apply the free-plan limits (off until the app can sell premium). */
   enforcePlanLimits: boolean;
+  /** Optional features left off because their variables are incomplete or invalid; logged at startup. */
+  warnings: string[];
+}
+
+/**
+ * Reads a group of variables that only work together. Values are trimmed, so blank or
+ * whitespace-only values count as unset. A partial group turns the feature off with a
+ * warning instead of stopping the server.
+ */
+function group<K extends string>(
+  env: NodeJS.ProcessEnv,
+  names: readonly K[],
+  feature: string,
+  warnings: string[],
+): Record<K, string> | undefined {
+  const values = names.map((name) => [name, env[name]?.trim() ?? ""] as const);
+  const missing = values.filter(([, value]) => !value).map(([name]) => name);
+  if (missing.length === names.length) return undefined;
+  if (missing.length > 0) {
+    warnings.push(`${feature} is off: set ${missing.join(", ")} too (or remove the other ${names.length - missing.length})`);
+    return undefined;
+  }
+  return Object.fromEntries(values) as Record<K, string>;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -41,28 +64,23 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (!Number.isInteger(jwtTtlSeconds) || jwtTtlSeconds <= 0) {
     throw new Error(`Invalid JWT_TTL_SECONDS: ${env.JWT_TTL_SECONDS}`);
   }
-  const liveKitVars = [env.LIVEKIT_URL, env.LIVEKIT_API_KEY, env.LIVEKIT_API_SECRET];
-  const setCount = liveKitVars.filter(Boolean).length;
-  if (setCount > 0 && setCount < 3) {
-    throw new Error("Set all of LIVEKIT_URL, LIVEKIT_API_KEY and LIVEKIT_API_SECRET, or none of them");
+  const warnings: string[] = [];
+  let liveKit = group(env, ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"] as const, "Live view", warnings);
+  if (liveKit) {
+    // The LiveKit dashboard shows both forms; the apps connect over WebSocket.
+    liveKit.LIVEKIT_URL = liveKit.LIVEKIT_URL.replace(/^http(s?):\/\//, "ws$1://");
   }
-  if (env.LIVEKIT_URL && !/^wss?:\/\//.test(env.LIVEKIT_URL)) {
-    throw new Error(`Invalid LIVEKIT_URL (expected wss://…): ${env.LIVEKIT_URL}`);
+  if (liveKit && !/^wss?:\/\//.test(liveKit.LIVEKIT_URL)) {
+    warnings.push(`Live view is off: LIVEKIT_URL must start with wss:// (got ${liveKit.LIVEKIT_URL})`);
+    liveKit = undefined;
   }
-  const apnsVars = [env.APNS_KEY_ID, env.APNS_TEAM_ID, env.APNS_KEY_P8];
-  const apnsSet = apnsVars.filter(Boolean).length;
-  if (apnsSet > 0 && apnsSet < 3) {
-    throw new Error("Set all of APNS_KEY_ID, APNS_TEAM_ID and APNS_KEY_P8, or none of them");
+  const apns = group(env, ["APNS_KEY_ID", "APNS_TEAM_ID", "APNS_KEY_P8"] as const, "Push notifications", warnings);
+  const apnsEnvRaw = env.APNS_ENV?.trim() || "sandbox";
+  if (apnsEnvRaw !== "sandbox" && apnsEnvRaw !== "production") {
+    warnings.push(`APNS_ENV must be sandbox or production (got ${apnsEnvRaw}); using sandbox`);
   }
-  const apnsEnv = env.APNS_ENV ?? "sandbox";
-  if (apnsEnv !== "sandbox" && apnsEnv !== "production") {
-    throw new Error(`Invalid APNS_ENV (sandbox or production): ${apnsEnv}`);
-  }
-  const s3Vars = [env.S3_BUCKET, env.S3_ACCESS_KEY_ID, env.S3_SECRET_ACCESS_KEY];
-  const s3Set = s3Vars.filter(Boolean).length;
-  if (s3Set > 0 && s3Set < 3) {
-    throw new Error("Set all of S3_BUCKET, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY, or none of them");
-  }
+  const apnsEnv = apnsEnvRaw === "production" ? "production" : "sandbox";
+  const s3 = group(env, ["S3_BUCKET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] as const, "Clip storage", warnings);
   const retentionDays = Number(env.CLIP_RETENTION_DAYS ?? 7);
   if (!Number.isInteger(retentionDays) || retentionDays < 1) {
     throw new Error(`Invalid CLIP_RETENTION_DAYS: ${env.CLIP_RETENTION_DAYS}`);
@@ -72,38 +90,35 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     host: env.HOST ?? "0.0.0.0",
     logLevel: env.LOG_LEVEL ?? "info",
     nodeEnv: env.NODE_ENV ?? "development",
-    databaseUrl: env.DATABASE_URL || undefined,
-    jwtSecret: env.JWT_SECRET || undefined,
+    databaseUrl: env.DATABASE_URL?.trim() || undefined,
+    jwtSecret: env.JWT_SECRET?.trim() || undefined,
     jwtTtlSeconds,
     appleAudiences: (env.APPLE_AUDIENCES ?? "com.benooon.dogmonitor")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean),
-    liveKit:
-      setCount === 3
-        ? { url: env.LIVEKIT_URL!, apiKey: env.LIVEKIT_API_KEY!, apiSecret: env.LIVEKIT_API_SECRET! }
-        : undefined,
-    apns:
-      apnsSet === 3
-        ? {
-            keyId: env.APNS_KEY_ID!,
-            teamId: env.APNS_TEAM_ID!,
-            // Railway variables can't hold newlines easily; accept "\n" escapes too.
-            privateKey: env.APNS_KEY_P8!.replace(/\\n/g, "\n"),
-            topic: env.APNS_TOPIC ?? "com.benooon.dogmonitor",
-            environment: apnsEnv,
-          }
-        : undefined,
-    s3:
-      s3Set === 3
-        ? {
-            endpoint: env.S3_ENDPOINT || undefined,
-            region: env.S3_REGION ?? "auto",
-            bucket: env.S3_BUCKET!,
-            accessKeyId: env.S3_ACCESS_KEY_ID!,
-            secretAccessKey: env.S3_SECRET_ACCESS_KEY!,
-          }
-        : undefined,
+    liveKit: liveKit
+      ? { url: liveKit.LIVEKIT_URL, apiKey: liveKit.LIVEKIT_API_KEY, apiSecret: liveKit.LIVEKIT_API_SECRET }
+      : undefined,
+    apns: apns
+      ? {
+          keyId: apns.APNS_KEY_ID,
+          teamId: apns.APNS_TEAM_ID,
+          // Railway variables can't hold newlines easily; accept "\n" escapes too.
+          privateKey: apns.APNS_KEY_P8.replace(/\\n/g, "\n"),
+          topic: env.APNS_TOPIC ?? "com.benooon.dogmonitor",
+          environment: apnsEnv,
+        }
+      : undefined,
+    s3: s3
+      ? {
+          endpoint: env.S3_ENDPOINT?.trim() || undefined,
+          region: env.S3_REGION ?? "auto",
+          bucket: s3.S3_BUCKET,
+          accessKeyId: s3.S3_ACCESS_KEY_ID,
+          secretAccessKey: s3.S3_SECRET_ACCESS_KEY,
+        }
+      : undefined,
     retentionDays,
     appLinkIds: appLinkIds(env),
     appStore: {
@@ -112,6 +127,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       rootFingerprints: list(env.APPLE_ROOT_CA_SHA256 || APPLE_ROOT_CA_G3_SHA256),
     },
     enforcePlanLimits: env.ENFORCE_PLAN_LIMITS === "true",
+    warnings,
   };
 }
 

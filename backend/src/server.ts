@@ -37,6 +37,7 @@ const shutdown = async (signal: string) => {
 process.on("SIGTERM", () => void shutdown("SIGTERM"));
 process.on("SIGINT", () => void shutdown("SIGINT"));
 
+for (const warning of config.warnings) app.log.warn(warning);
 if (!config.s3) app.log.warn("S3_* not set: clip and snapshot uploads are disabled");
 if (!config.apns) app.log.warn("APNS_* not set: events are stored but no pushes are sent");
 if (!config.liveKit) app.log.warn("LIVEKIT_* not set: live view token routes will answer 503");
