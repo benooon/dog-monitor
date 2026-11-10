@@ -8,3 +8,5 @@ One line per decision: `YYYY-MM-DD — decision — why`.
 - 2026-11-10 — LiveKit Cloud as SFU — multiple viewers per camera without overloading the camera phone.
 - 2026-11-10 — XcodeGen, no committed .xcodeproj — agents work on Linux and must not hand-edit pbxproj files.
 - 2026-11-10 — Agents push directly to main, with no PRs — the owner granted full autonomy; CI results are published to the `ci-results` branch.
+- 2026-11-10 — CI decides whether to run the iOS job by diffing against the last commit the iOS job ran on (`ios-sha.txt` in ci-results), not the previous push — with cancel-in-progress, a quick docs push cancelled the iOS run and then reported the old result as carried over.
+- 2026-11-10 — Core tests use XCTest (not Swift Testing) — works identically on the Linux container and Xcode; can switch later.
