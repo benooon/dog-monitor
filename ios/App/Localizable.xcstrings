@@ -1081,6 +1081,16 @@
         }
       }
     },
+    "No picture yet": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עדיין אין תמונה"
+          }
+        }
+      }
+    },
     "No summary yet": {
       "localizations": {
         "he": {

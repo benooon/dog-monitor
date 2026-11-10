@@ -24,6 +24,7 @@ final class LocalizationTests: XCTestCase {
         "Offline",
         "No cameras yet. Pair a spare iPhone as a camera.",
         "No cameras yet",
+        "No picture yet",
         "Couldn't load your household",
         "Try again when someone stops watching.",
         "Pair a spare iPhone to watch your dog from here.",

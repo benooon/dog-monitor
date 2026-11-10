@@ -138,7 +138,8 @@ struct ViewerHomeView: View {
                             camera: camera,
                             snapshot: model.snapshots[camera.id],
                             livePresence: model.realtime?.presence[camera.id],
-                            dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
+                            dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState,
+                            dogName: model.household?.dogs.first?.name
                         )
                     }
                     .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
@@ -210,7 +211,8 @@ struct ViewerHomeView: View {
                         camera: camera,
                         snapshot: model.snapshots[camera.id],
                         livePresence: model.realtime?.presence[camera.id],
-                        dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState
+                        dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState,
+                        dogName: model.household?.dogs.first?.name
                     )
                     .padding(DS.Spacing.m)
                     .background(Color(.secondarySystemGroupedBackground), in: Self.gridCardShape)
@@ -353,6 +355,8 @@ private struct CameraCard: View {
     /// Presence from the realtime channel, which is fresher than the last heartbeat time.
     var livePresence: Bool?
     var dogState: DogState?
+    /// Shown on the placeholder before the camera has sent a picture.
+    var dogName: String?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private static let snapshotShape = RoundedRectangle(cornerRadius: DS.Radius.medium, style: .continuous)
@@ -396,8 +400,8 @@ private struct CameraCard: View {
 
     private var snapshotView: some View {
         ZStack {
-            Rectangle().fill(.quaternary)
             if let snapshot {
+                Rectangle().fill(.quaternary)
                 AsyncImage(url: snapshot) { image in
                     image.resizable().scaledToFill()
                 } placeholder: {
@@ -405,14 +409,49 @@ private struct CameraCard: View {
                 }
                 .accessibilityHidden(true)
             } else {
-                Image(systemName: "video.fill")
-                    .font(.largeTitle)
-                    .foregroundStyle(.secondary)
-                    .accessibilityHidden(true)
+                NoSnapshotPlaceholder(dogName: dogName)
             }
         }
         .aspectRatio(16 / 9, contentMode: .fit)
         .clipShape(Self.snapshotShape)
+    }
+}
+
+/// Stands in for the snapshot until the camera has sent one: a soft accent wash with the
+/// dog's name, so a new household looks ready rather than broken.
+private struct NoSnapshotPlaceholder: View {
+    var dogName: String?
+
+    /// Strength of the accent wash at the top and bottom of the gradient.
+    private static let washTop = 0.22
+    private static let washBottom = 0.08
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color.accentColor.opacity(Self.washTop), Color.accentColor.opacity(Self.washBottom)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            VStack(spacing: DS.Spacing.xs) {
+                Image(systemName: "pawprint.fill")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                    .padding(.bottom, DS.Spacing.xs)
+                    .accessibilityHidden(true)
+                if let dogName {
+                    Text(verbatim: dogName)
+                        .font(.headline)
+                }
+                Text("No picture yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .multilineTextAlignment(.center)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(DS.Spacing.l)
+        }
     }
 }
 
