@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 108fcbc8f50cfe98745b8b857409d51f142bdc52
-- message: ios: format summary and timeline durations in the screen's locale; chart axes follow it too
-- time (UTC): 2026-11-10T20:22:42Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42889418756
+- commit: bf22df7b0e08dc0046a42a4f7a281887b79ccac8
+- message: docs: screenshot review fixes done (CI green on 316d5c5)
+- time (UTC): 2026-11-10T20:37:15Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42892383715
 
 | job | result | log |
 |---|---|---|
