@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 3fe748a3ea7f3a2773a801b87ae762d88c10351e
-- message: docs: mark WebSocket channel done, claim viewer limit task
-- time (UTC): 2026-11-10T08:10:27Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42779773790
+- commit: 0f5b0da1952faf87c972eb115c432c517042def8
+- message: core: add realtime messages, publish policy, reconnect backoff and live token API
+- time (UTC): 2026-11-10T08:16:09Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42780167396
 
 | job | result | log |
 |---|---|---|
