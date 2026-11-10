@@ -94,6 +94,90 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     expect((await app.inject({ method: "GET", url: `/dogs/${dog.id}`, headers: auth })).statusCode).toBe(404);
   });
 
+  it("stores the dog's profile from onboarding", async () => {
+    const { auth } = await signIn("owner");
+    await createHousehold(auth);
+
+    const created = await app.inject({
+      method: "POST",
+      url: "/dogs",
+      headers: auth,
+      payload: { name: "Rex", lifeStage: "adult", traits: ["barksAtNoises", "waitsAtDoor"], alertStyle: "balanced" },
+    });
+    expect(created.statusCode).toBe(201);
+    const dog = created.json();
+    expect(dog).toMatchObject({
+      lifeStage: "adult",
+      traits: ["barksAtNoises", "waitsAtDoor"],
+      alertStyle: "balanced",
+      photoUpdatedAt: null,
+    });
+
+    const plain = (await app.inject({ method: "POST", url: "/dogs", headers: auth, payload: { name: "Bella" } })).json();
+    expect(plain).toMatchObject({ lifeStage: null, traits: [], alertStyle: null });
+
+    const patched = await app.inject({
+      method: "PATCH",
+      url: `/dogs/${dog.id}`,
+      headers: auth,
+      payload: { traits: ["mostlySleeps"], alertStyle: "important", lifeStage: null },
+    });
+    expect(patched.json()).toMatchObject({ traits: ["mostlySleeps"], alertStyle: "important", lifeStage: null, name: "Rex" });
+
+    const household = (await app.inject({ method: "GET", url: "/household", headers: auth })).json();
+    expect(household.dogs.find((d: { id: string }) => d.id === dog.id)).toMatchObject({ traits: ["mostlySleeps"] });
+
+    for (const payload of [
+      { traits: ["chasesCats"] },
+      { traits: ["whines", "whines"] },
+      { lifeStage: "teen" },
+      { alertStyle: "loud" },
+    ]) {
+      const res = await app.inject({ method: "PATCH", url: `/dogs/${dog.id}`, headers: auth, payload });
+      expect(res.statusCode, JSON.stringify(payload)).toBe(400);
+    }
+  });
+
+  it("stores, serves and removes the dog's photo", async () => {
+    const a = await signIn("a");
+    const b = await signIn("b");
+    await createHousehold(a.auth, "A");
+    await createHousehold(b.auth, "B");
+    const dog = (await app.inject({ method: "POST", url: "/dogs", headers: a.auth, payload: { name: "Rex" } })).json();
+    const jpeg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(2048, 7)]);
+    const put = (headers: Record<string, string>, body: Buffer, id = dog.id, type = "image/jpeg") =>
+      app.inject({ method: "PUT", url: `/dogs/${id}/photo`, headers: { ...headers, "content-type": type }, payload: body });
+
+    expect((await app.inject({ method: "GET", url: `/dogs/${dog.id}/photo`, headers: a.auth })).statusCode).toBe(404);
+
+    const stored = await put(a.auth, jpeg);
+    expect(stored.statusCode).toBe(200);
+    expect(stored.json().photoUpdatedAt).toEqual(expect.any(String));
+
+    const got = await app.inject({ method: "GET", url: `/dogs/${dog.id}/photo`, headers: a.auth });
+    expect(got.statusCode).toBe(200);
+    expect(got.headers["content-type"]).toBe("image/jpeg");
+    expect(got.rawPayload.equals(jpeg)).toBe(true);
+
+    // Replacing keeps one photo.
+    const second = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xdb]), Buffer.alloc(16, 1)]);
+    expect((await put(a.auth, second)).statusCode).toBe(200);
+    const again = await app.inject({ method: "GET", url: `/dogs/${dog.id}/photo`, headers: a.auth });
+    expect(again.rawPayload.equals(second)).toBe(true);
+
+    // Not a JPEG, too large, wrong household.
+    expect((await put(a.auth, Buffer.from("not an image"))).statusCode).toBe(415);
+    expect((await put(a.auth, Buffer.from("{}"), dog.id, "application/json")).statusCode).toBe(415);
+    const huge = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff]), Buffer.alloc(600 * 1024)]);
+    expect((await put(a.auth, huge)).statusCode).toBe(413);
+    expect((await put(b.auth, jpeg)).statusCode).toBe(404);
+    expect((await app.inject({ method: "GET", url: `/dogs/${dog.id}/photo`, headers: b.auth })).statusCode).toBe(404);
+
+    const removed = await app.inject({ method: "DELETE", url: `/dogs/${dog.id}/photo`, headers: a.auth });
+    expect(removed.json()).toMatchObject({ photoUpdatedAt: null });
+    expect((await app.inject({ method: "GET", url: `/dogs/${dog.id}/photo`, headers: a.auth })).statusCode).toBe(404);
+  });
+
   it("isolates households from each other", async () => {
     const a = await signIn("a");
     const b = await signIn("b");

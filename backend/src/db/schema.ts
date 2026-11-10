@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  customType,
   date,
   index,
   integer,
@@ -94,6 +95,11 @@ export const householdMembers = pgTable(
   (t) => [primaryKey({ columns: [t.householdId, t.userId] }), index("household_members_user_idx").on(t.userId)],
 );
 
+/** Dog profile answers from onboarding. Stored as text so new values need no migration. */
+export const DOG_LIFE_STAGES = ["puppy", "adult", "senior"] as const;
+export const DOG_TRAITS = ["barksAtNoises", "whines", "waitsAtDoor", "getsOnFurniture", "mostlySleeps"] as const;
+export const DOG_ALERT_STYLES = ["important", "balanced", "everything"] as const;
+
 export const dogs = pgTable("dogs", {
   id: uuid("id").primaryKey().defaultRandom(),
   householdId: uuid("household_id")
@@ -101,7 +107,27 @@ export const dogs = pgTable("dogs", {
     .references(() => households.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   photoKey: text("photo_key"),
+  lifeStage: text("life_stage"),
+  traits: text("traits").array().notNull().default(sql`'{}'::text[]`),
+  alertStyle: text("alert_style"),
+  /** Set when a photo is stored in `dog_photos`; clients use it to refresh cached images. */
+  photoUpdatedAt: timestamp("photo_updated_at", { withTimezone: true }),
   createdAt: createdAt(),
+});
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
+
+/** A small JPEG of each dog, kept in Postgres so it works before clip storage is set up. */
+export const dogPhotos = pgTable("dog_photos", {
+  dogId: uuid("dog_id")
+    .primaryKey()
+    .references(() => dogs.id, { onDelete: "cascade" }),
+  jpeg: bytea("jpeg").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export type PolygonPoint = { x: number; y: number };

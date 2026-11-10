@@ -27,5 +27,15 @@ export function deviceDto(d: DeviceRow) {
 }
 
 export function dogDto(d: DogRow) {
-  return { id: d.id, householdId: d.householdId, name: d.name, photoKey: d.photoKey, createdAt: d.createdAt };
+  return {
+    id: d.id,
+    householdId: d.householdId,
+    name: d.name,
+    photoKey: d.photoKey,
+    lifeStage: d.lifeStage,
+    traits: d.traits,
+    alertStyle: d.alertStyle,
+    photoUpdatedAt: d.photoUpdatedAt,
+    createdAt: d.createdAt,
+  };
 }

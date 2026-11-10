@@ -125,7 +125,7 @@ All analysis runs on the camera device. Video is never sent to the cloud for ana
 - `users` (id, apple_sub, name)
 - `households` (id, name, owner_id, plan)
 - `household_members` (household_id, user_id, role)
-- `dogs` (id, household_id, name, photo_key)
+- `dogs` (id, household_id, name, photo_key, life_stage, traits[], alert_style, photo_updated_at) and `dog_photos` (dog_id, jpeg, updated_at): the profile from "Meet your dog" onboarding; the photo is a small JPEG kept in Postgres
 - `devices` (id, household_id, name, role camera|viewer, model, app_version, apns_token, device_secret_hash, status, last_heartbeat_at, battery, charging, thermal)
 - `zones` (id, device_id, kind door|forbidden|bed, polygon jsonb in normalized coordinates)
 - `events` (id, household_id, device_id, type, state, started_at, ended_at, confidence, clip_key, snapshot_key, feedback)

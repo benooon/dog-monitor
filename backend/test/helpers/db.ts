@@ -13,6 +13,6 @@ export function openTestDb(): DbHandle {
 export async function truncateAll(handle: DbHandle): Promise<void> {
   await handle.db.execute(sql`
     TRUNCATE users, households, household_members, dogs, devices, zones, events,
-      daily_summaries, notification_prefs, invites, live_activities RESTART IDENTITY CASCADE
+      daily_summaries, notification_prefs, invites, live_activities, dog_photos RESTART IDENTITY CASCADE
   `);
 }
