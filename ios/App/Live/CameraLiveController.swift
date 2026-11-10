@@ -111,7 +111,8 @@ final class CameraLiveController {
     private func reconcileOnce() async {
         let now = Date.now
         if policy.shouldPublish(at: now) {
-            if !isStreaming || !publisher.isConnected {
+            let connected = await publisher.isConnected
+            if !isStreaming || !connected {
                 do {
                     let token = try await api.deviceLiveToken()
                     try await publisher.start(token: token, frames: capture.samples(.video, bufferingNewest: 1))
