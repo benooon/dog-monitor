@@ -1,9 +1,9 @@
 # CI status: RED
 
-- commit: c3f6a2c8def33b49572e45b85a0c90d55fc29ee3
-- message: ci: build iOS with the newest stable Xcode on the runner and log its version
-- time (UTC): 2026-11-10T17:09:53Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42860689562
+- commit: 9707786f0b32e128acff2aca5d3b6d3864febcb5
+- message: ios: fix Swift 6.2 sending error when updating Live Activities
+- time (UTC): 2026-11-10T17:20:31Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42862365596
 
 | job | result | log |
 |---|---|---|
