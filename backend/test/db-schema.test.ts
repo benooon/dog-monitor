@@ -107,7 +107,7 @@ describe.skipIf(!hasDatabase)("database schema", () => {
   it("stores invites", async () => {
     const { owner, household } = await seedHousehold();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-    await h.db.insert(invites).values({ token: "tok", householdId: household.id, createdBy: owner.id, expiresAt });
+    await h.db.insert(invites).values({ token: "tok", code: "123456", householdId: household.id, createdBy: owner.id, expiresAt });
     const [invite] = await h.db.select().from(invites).where(eq(invites.token, "tok"));
     expect(invite!.usedAt).toBeNull();
     expect(invite!.expiresAt.getTime()).toBe(expiresAt.getTime());

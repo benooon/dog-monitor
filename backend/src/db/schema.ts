@@ -191,13 +191,19 @@ export const notificationPrefs = pgTable(
   (t) => [unique("notification_prefs_unique").on(t.userId, t.deviceId, t.eventType).nullsNotDistinct()],
 );
 
-export const invites = pgTable("invites", {
-  token: text("token").primaryKey(),
-  householdId: uuid("household_id")
-    .notNull()
-    .references(() => households.id, { onDelete: "cascade" }),
-  createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
-  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-  usedAt: timestamp("used_at", { withTimezone: true }),
-  createdAt: createdAt(),
-});
+export const invites = pgTable(
+  "invites",
+  {
+    token: text("token").primaryKey(),
+    /** 6-digit code for typing instead of scanning; only unique among active invites. */
+    code: text("code").notNull(),
+    householdId: uuid("household_id")
+      .notNull()
+      .references(() => households.id, { onDelete: "cascade" }),
+    createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("invites_code_idx").on(t.code)],
+);
