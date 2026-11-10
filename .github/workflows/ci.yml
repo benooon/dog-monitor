@@ -145,8 +145,13 @@ jobs:
         run: |
           # A cancelled job means the run was superseded or stopped by hand, not that the
           # code is broken: keep the previous STATUS.md instead of publishing a false RED.
+          # The same goes for any other non-verdict (e.g. "abandoned" when no macOS runner
+          # picked the job up): only success/failure/skipped say something about the code.
           for r in "$CORE_RESULT" "$IOS_RESULT" "$BACKEND_RESULT"; do
-            if [ "$r" = "cancelled" ]; then echo "Run was cancelled; not publishing."; exit 0; fi
+            case "$r" in
+              success|failure|skipped) ;;
+              *) echo "A job ended as '$r' (no verdict); not publishing."; exit 0 ;;
+            esac
           done
           git config --global user.name "ci-bot"
           git config --global user.email "ci-bot@users.noreply.github.com"
@@ -159,7 +164,7 @@ jobs:
           # iOS skipped because nothing under ios/ changed -> carry over its last real result.
           if [ "$IOS_RESULT" = "skipped" ]; then
             IOS_RESULT="$(cat out/ios-result.txt 2>/dev/null || echo success) (carried over, no iOS changes)"
-          elif [ "$IOS_RESULT" != "cancelled" ]; then
+          else
             echo "$IOS_RESULT" > out/ios-result.txt
             echo "$GITHUB_SHA" > out/ios-sha.txt
           fi
