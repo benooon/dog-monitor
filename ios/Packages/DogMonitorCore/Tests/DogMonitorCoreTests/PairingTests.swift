@@ -43,6 +43,16 @@ final class PairingCodeTests: XCTestCase {
         XCTAssertNil(PairingCode.parse("http://evil.example/invite/\(token)"))
     }
 
+    func testTrainingOptInPatchesTheHousehold() async throws {
+        let stub = StubTransport(json: #"{"id":"\#(Fixtures.householdID)","name":"Home","plan":"free","shareTrainingData":true}"#)
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)
+        try await api.setShareTrainingData(true)
+        let request = try XCTUnwrap(stub.requests.first)
+        XCTAssertEqual(request.httpMethod, "PATCH")
+        XCTAssertEqual(request.url?.path, "/v1/household")
+        XCTAssertEqual(try Fixtures.bodyJSON(request)["shareTrainingData"] as? Bool, true)
+    }
+
     func testRemoveMemberSendsDelete() async throws {
         let stub = StubTransport(status: 204, json: "")
         let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)

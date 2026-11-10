@@ -461,6 +461,16 @@
         }
       }
     },
+    "Clips your household marks right or wrong are kept for 90 days to train detection. Other clips are still deleted after a week.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סרטונים שבני הבית סימנו כנכונים או שגויים יישמרו 90 יום לאימון הזיהוי. שאר הסרטונים עדיין יימחקו אחרי שבוע."
+          }
+        }
+      }
+    },
     "Connecting…": {
       "localizations": {
         "he": {
@@ -687,6 +697,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "אסור"
+          }
+        }
+      }
+    },
+    "Help improve detection": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עזרה בשיפור הזיהוי"
           }
         }
       }

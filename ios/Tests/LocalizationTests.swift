@@ -103,6 +103,8 @@ final class LocalizationTests: XCTestCase {
         "%@'s phone",
         "Share invite link",
         "Join our household in Dog Monitor.",
+        "Help improve detection",
+        "Clips your household marks right or wrong are kept for 90 days to train detection. Other clips are still deleted after a week.",
         "Zones",
         "Zone type",
         "Undo",

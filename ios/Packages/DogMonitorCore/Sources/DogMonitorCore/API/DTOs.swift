@@ -98,6 +98,8 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
     public let plan: String
     public let ownerId: UUID
     public let role: MemberRole
+    /// The owner opted in to keep labeled clips for training (nil from older servers).
+    public let shareTrainingData: Bool?
     public let members: [MemberDTO]
     public let dogs: [DogDTO]
     public let devices: [DeviceDTO]

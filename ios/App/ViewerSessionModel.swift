@@ -97,6 +97,14 @@ final class ViewerSessionModel {
         return removed
     }
 
+    /// Owner only: the training-data opt-in.
+    func setShareTrainingData(_ enabled: Bool) async {
+        await perform {
+            try await api.setShareTrainingData(enabled)
+        }
+        await loadHousehold()
+    }
+
     /// Owner only: revokes a camera or phone (a camera must be paired again).
     func revokeDevice(_ device: DeviceDTO) async -> Bool {
         var revoked = false

@@ -78,6 +78,13 @@ public struct DogMonitorAPI: Sendable {
         try await send("PATCH", "devices/\(Self.path(id))", body: changes)
     }
 
+    /// Owner only: keep clips members mark right or wrong (90 days) so detection can be trained.
+    public func setShareTrainingData(_ enabled: Bool) async throws {
+        struct Body: Encodable { let shareTrainingData: Bool }
+        struct Response: Decodable { let shareTrainingData: Bool }
+        let _: Response = try await send("PATCH", "household", body: Body(shareTrainingData: enabled))
+    }
+
     /// Owner only: removes a member and revokes their phones. 400 `cannot_remove_owner`.
     public func removeMember(userId: UUID) async throws {
         try await sendWithoutResponse("DELETE", "household/members/\(Self.path(userId))")

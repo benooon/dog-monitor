@@ -9,6 +9,7 @@ struct HouseholdView: View {
     @State private var showsInvite = false
     @State private var memberToRemove: MemberDTO?
     @State private var deviceToRemove: DeviceDTO?
+    @State private var sharesTrainingData = false
 
     private var household: HouseholdDTO? { model.household }
     private var isOwner: Bool { household?.role == .owner }
@@ -109,6 +110,23 @@ struct HouseholdView: View {
                 empty: "No cameras yet. Pair a spare iPhone as a camera."
             )
             deviceSection(title: "Phones", devices: active.filter { $0.role == .viewer }, empty: nil)
+
+            if isOwner {
+                Section {
+                    Toggle(isOn: $sharesTrainingData) {
+                        Label("Help improve detection", systemImage: "wand.and.stars")
+                    }
+                    .onChange(of: sharesTrainingData) { _, enabled in
+                        guard enabled != (household.shareTrainingData ?? false) else { return }
+                        Task { await model.setShareTrainingData(enabled) }
+                    }
+                } footer: {
+                    Text("Clips your household marks right or wrong are kept for 90 days to train detection. Other clips are still deleted after a week.")
+                }
+            }
+        }
+        .onChange(of: household.shareTrainingData, initial: true) { _, value in
+            sharesTrainingData = value ?? false
         }
     }
 
