@@ -1,4 +1,4 @@
-# Screenshots (e71b957)
+# Screenshots (734609c)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
@@ -21,6 +21,42 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="iphone-03-create-household-light.jpg" width="260"> | <img src="iphone-03-create-household-dark.jpg" width="260"> | <img src="iphone-03-create-household-hebrew.jpg" width="260"> |
+
+### 03a-meet-dog-name
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-03a-meet-dog-name-light.jpg" width="260"> | <img src="iphone-03a-meet-dog-name-dark.jpg" width="260"> | <img src="iphone-03a-meet-dog-name-hebrew.jpg" width="260"> |
+
+### 03b-meet-dog-photo
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-03b-meet-dog-photo-light.jpg" width="260"> | <img src="iphone-03b-meet-dog-photo-dark.jpg" width="260"> | <img src="iphone-03b-meet-dog-photo-hebrew.jpg" width="260"> |
+
+### 03c-meet-dog-age
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-03c-meet-dog-age-light.jpg" width="260"> | <img src="iphone-03c-meet-dog-age-dark.jpg" width="260"> | <img src="iphone-03c-meet-dog-age-hebrew.jpg" width="260"> |
+
+### 03d-meet-dog-alone
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-03d-meet-dog-alone-light.jpg" width="260"> | <img src="iphone-03d-meet-dog-alone-dark.jpg" width="260"> | <img src="iphone-03d-meet-dog-alone-hebrew.jpg" width="260"> |
+
+### 03e-meet-dog-alerts
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-03e-meet-dog-alerts-light.jpg" width="260"> | <img src="iphone-03e-meet-dog-alerts-dark.jpg" width="260"> | <img src="iphone-03e-meet-dog-alerts-hebrew.jpg" width="260"> |
+
+### 03f-meet-dog-summary
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-03f-meet-dog-summary-light.jpg" width="260"> | <img src="iphone-03f-meet-dog-summary-dark.jpg" width="260"> | <img src="iphone-03f-meet-dog-summary-hebrew.jpg" width="260"> |
 
 ### 04-viewer-home
 
@@ -101,6 +137,42 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="ipad-03-create-household-light.jpg" width="260"> | <img src="ipad-03-create-household-dark.jpg" width="260"> | <img src="ipad-03-create-household-hebrew.jpg" width="260"> |
+
+### 03a-meet-dog-name
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-03a-meet-dog-name-light.jpg" width="260"> | <img src="ipad-03a-meet-dog-name-dark.jpg" width="260"> | <img src="ipad-03a-meet-dog-name-hebrew.jpg" width="260"> |
+
+### 03b-meet-dog-photo
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-03b-meet-dog-photo-light.jpg" width="260"> | <img src="ipad-03b-meet-dog-photo-dark.jpg" width="260"> | <img src="ipad-03b-meet-dog-photo-hebrew.jpg" width="260"> |
+
+### 03c-meet-dog-age
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-03c-meet-dog-age-light.jpg" width="260"> | <img src="ipad-03c-meet-dog-age-dark.jpg" width="260"> | <img src="ipad-03c-meet-dog-age-hebrew.jpg" width="260"> |
+
+### 03d-meet-dog-alone
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-03d-meet-dog-alone-light.jpg" width="260"> | <img src="ipad-03d-meet-dog-alone-dark.jpg" width="260"> | <img src="ipad-03d-meet-dog-alone-hebrew.jpg" width="260"> |
+
+### 03e-meet-dog-alerts
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-03e-meet-dog-alerts-light.jpg" width="260"> | <img src="ipad-03e-meet-dog-alerts-dark.jpg" width="260"> | <img src="ipad-03e-meet-dog-alerts-hebrew.jpg" width="260"> |
+
+### 03f-meet-dog-summary
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-03f-meet-dog-summary-light.jpg" width="260"> | <img src="ipad-03f-meet-dog-summary-dark.jpg" width="260"> | <img src="ipad-03f-meet-dog-summary-hebrew.jpg" width="260"> |
 
 ### 04-viewer-home
 
