@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: e6e9a5839e7d393c28be535264fadb00219af554
-- message: docs: core timeline API and Live Activity content state done (CI green #138)
-- time (UTC): 2026-11-10T16:18:03Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42850900605
+- commit: dfe60abf807beb4bb8a8973238dbf25c58a49243
+- message: ios+core: dog status home and Lock Screen widget fed through the app group
+- time (UTC): 2026-11-10T16:28:02Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42851986945
 
 | job | result | log |
 |---|---|---|
