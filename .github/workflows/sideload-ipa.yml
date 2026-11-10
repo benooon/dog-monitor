@@ -1,0 +1,61 @@
+name: Sideload IPA
+
+# Builds an UNSIGNED .ipa for personal testing with Sideloadly (free Apple ID, no paid
+# developer account). Extensions (push, widgets) are stripped: they need App Groups and
+# push entitlements that a free account cannot provide. Run it by hand from the Actions tab.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/clever-dirac-8vqemr]
+    paths: [".github/workflows/sideload-ipa.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build unsigned app
+        shell: bash
+        run: |
+          set -o pipefail
+          XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | python3 -c '
+          import re,sys
+          apps=[l.strip() for l in sys.stdin if re.fullmatch(r"/Applications/Xcode_\d+(\.\d+)*\.app", l.strip())]
+          key=lambda a: [int(x) for x in re.findall(r"\d+", a)]
+          print(max(apps, key=key) if apps else "")')
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE"; fi
+          brew install xcodegen >/dev/null
+          cd ios
+          xcodegen generate
+          xcodebuild build \
+            -scheme DogMonitor \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath ../build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            -quiet 2>&1 | tee ../ipa-build.log
+      - name: Package .ipa
+        shell: bash
+        run: |
+          APP=build/Build/Products/Release-iphoneos/DogMonitor.app
+          test -d "$APP"
+          # Free accounts cannot sign these extensions; drop them so installation succeeds.
+          rm -rf "$APP/PlugIns"
+          mkdir -p Payload
+          cp -R "$APP" Payload/
+          zip -qr DogMonitor-sideload.ipa Payload
+          ls -lh DogMonitor-sideload.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DogMonitor-sideload-ipa
+          path: DogMonitor-sideload.ipa
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: ipa-build-log, path: ipa-build.log, if-no-files-found: ignore }
