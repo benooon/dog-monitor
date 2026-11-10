@@ -64,7 +64,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [~] core: Rule-based state classifier (resting / restless / atDoor / forbiddenZone / notVisible) from detections over time. Unit tests with synthetic sequences. (in progress 2026-11-10)
 - [~] ios: Zone editor in camera setup (draw polygons over the preview, saved as normalized coordinates) and synced to the backend. (in progress 2026-11-10)
 - [~] core + backend: Daily summary computation (rest minutes, bark count, activity by hour), plus a daily summary push. (in progress 2026-11-10)
-- [ ] ios: Daily summary screen with Swift Charts.
+- [~] ios: Daily summary screen with Swift Charts. (in progress 2026-11-10)
 - [ ] ios: "Calmed down" event and push after barking stops and the dog rests.
 
 ## Phase 4 — Custom model
