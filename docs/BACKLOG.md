@@ -44,6 +44,8 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 
 ## Phase 2 — MVP
 
+- [~] ios: Apple-level design pass requested by the owner: design system (`ios/App/Design/`), app icon + accent, Liquid Glass on iOS 26 with fallbacks, and every existing screen redone per `.claude/skills`. CI moves to the newest Xcode on the runner. (in progress 2026-11-10)
+
 - [x] ios: Multiple cameras in viewer home (cards with last snapshot, online status, current dog state).
 - [x] ios: Ring-buffer recorder (`AVAssetWriter`, keeping the last ~5 s in memory). On an event, write a 10–20 s clip + snapshot.
 - [~] ios: Upload clips and snapshots for events through presigned URLs, with an offline queue that retries when the network returns. (in progress 2026-11-10)
