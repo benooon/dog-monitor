@@ -30,7 +30,8 @@ struct EventChannel: Sendable {
         }
         lastSeen = max(lastSeen ?? time, time)
         recentHits.append(time)
-        recentHits.removeAll { time.timeIntervalSince($0) > config.countWindow }
+        let countWindow = config.countWindow // a local copy: the closure must not read self while recentHits is mutated
+        recentHits.removeAll { time.timeIntervalSince($0) > countWindow }
         peakConfidence = max(peakConfidence, confidence)
     }
 
