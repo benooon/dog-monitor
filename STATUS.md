@@ -1,12 +1,12 @@
 # CI status: GREEN
 
-- commit: 35fd2eadbf691b50f1b99b4d767fa265c2df6572
-- message: docs: claim CI screenshots task (owner asked to see the app)
-- time (UTC): 2026-11-10T19:18:48Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42883778788
+- commit: f8b7b87a953b6b6b2d43d9761d545c376e422801
+- message: ci+ios: screenshots of the main screens on every iOS run, published to ci-results/screenshots
+- time (UTC): 2026-11-10T19:34:58Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42884108442
 
 | job | result | log |
 |---|---|---|
 | core (swift test, Linux) | success | core-test.log |
-| ios (xcodebuild test, macOS) | success (carried over, no iOS changes) | ios-build.log |
+| ios (xcodebuild test, macOS) | success | ios-build.log |
 | backend (lint + test) | success | backend-test.log |

@@ -81,7 +81,16 @@ Writing result bundle at path:
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
             self?.sessionQueue.async { self?.applyRotation(angle) }
                                        ^
-2026-11-10 19:09:37.488 xcodebuild[3661:14247] [MT] IDETestOperationsObserverDebug: 209.886 elapsed -- Testing started completed.
-2026-11-10 19:09:37.489 xcodebuild[3661:14247] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 19:09:37.489 xcodebuild[3661:14247] [MT] IDETestOperationsObserverDebug: 209.886 sec, +209.886 sec -- end
+2026-11-10 19:30:05.476 xcodebuild[5518:19739] [MT] IDETestOperationsObserverDebug: 280.196 elapsed -- Testing started completed.
+2026-11-10 19:30:05.476 xcodebuild[5518:19739] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 19:30:05.476 xcodebuild[5518:19739] [MT] IDETestOperationsObserverDebug: 280.196 sec, +280.196 sec -- end
 Testing started
+iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
+{ platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
+2026-11-10 19:34:28.487 xcodebuild[13332:44860] [MT] IDETestOperationsObserverDebug: 236.206 elapsed -- Testing started completed.
+2026-11-10 19:34:28.487 xcodebuild[13332:44860] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 19:34:28.487 xcodebuild[13332:44860] [MT] IDETestOperationsObserverDebug: 236.206 sec, +236.206 sec -- end
+Testing started
+Screenshots: 78
