@@ -51,7 +51,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
   - [x] ios: Redo camera mode (floating glass controls over the preview, health warnings as glass cards, Reduce Motion). (327699a, green CI on 682dff2)
   - [x] ios: Redo live view (glass control bar: mute, talk, Lock Screen; connection states as ContentUnavailableView). (verified by green CI on f5ebf0b; LiveView has no #Preview because DeviceDTO has no public init)
   - [~] ios: Redo onboarding: role picker, sign in, create household, pairing (PrimaryButton, copy per the voice in CLAUDE.md). (in progress 2026-11-10)
-  - [~] ios: Redo the household and notification settings sheets (Form/List conventions, empty/error states, copy pass). (in progress 2026-11-10)
+  - [x] ios: Redo the household and notification settings sheets (Form/List conventions, empty/error states, copy pass). (verified by green CI on c5313cf; sign out now lives in the household sheet)
   - [~] ios: Redo the timeline, daily summary and premium sheets (Form/List conventions, empty/error states, copy pass). (in progress 2026-11-10)
 
 - [x] ios: Multiple cameras in viewer home (cards with last snapshot, online status, current dog state).
