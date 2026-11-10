@@ -56,6 +56,8 @@ final class CameraModeModel {
     /// Ring-buffer clip recorder; runs only when paired (clips are for upload).
     private(set) var recorder: ClipRecorder?
     private var engine: EventEngine?
+    /// Visual state from motion, dog position and posture (SPEC §4 layer 3), fed to the engine.
+    private var classifier = DogStateClassifier()
     private let uploader = EventUploader(store: FileEventQueueStore(url: CameraModeModel.queueURL))
     private let mediaUploader = MediaUploader(
         directory: CameraModeModel.mediaDirectory,
@@ -236,7 +238,9 @@ final class CameraModeModel {
             detectionLog.append(detection)
         }
         if analysis.gateOpen != isMotionActive { isMotionActive = analysis.gateOpen }
+        classifier.noteMotion(analysis.motion.hasMotion, at: analysis.motion.timestamp)
         if let dog = analysis.dog {
+            observe(classifier.classify(dog, at: analysis.motion.timestamp), at: analysis.motion.timestamp)
             // Log only changes (dog appears, posture changes), not every look.
             if dog.map(\.kind) != dogDetections.map(\.kind) {
                 dog.forEach { detectionLog.append($0) }
@@ -299,6 +303,7 @@ final class CameraModeModel {
         let cameraID: UUID
         if case .device(let id, _) = credential { cameraID = id } else { cameraID = UUID() }
         engine = EventEngine(cameraID: cameraID)
+        classifier = DogStateClassifier(zones: classifier.zones)
         healthMonitor = HealthMonitor(cameraID: cameraID)
         if healthReporter == nil { healthReporter = HealthReporter() }
         appliedFrameRate = nil
@@ -327,6 +332,14 @@ final class CameraModeModel {
         let outputs = engine.ingest(detection)
         self.engine = engine
         dogState = engine.currentState(at: .now)
+        record(outputs)
+    }
+
+    private func observe(_ state: DogState, at time: Date) {
+        guard var engine else { return }
+        let outputs = engine.observe(state, at: time)
+        self.engine = engine
+        dogState = engine.currentState(at: time)
         record(outputs)
     }
 
