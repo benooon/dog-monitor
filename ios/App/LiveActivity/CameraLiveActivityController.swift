@@ -65,6 +65,32 @@ final class CameraLiveActivityController {
         }
     }
 
+    /// Brings showing activities up to date with the realtime channel while the app is open, so
+    /// they change at once instead of after the backend's push, and ends the ones whose camera
+    /// left the household (unpaired or revoked).
+    func sync(dogStates: [UUID: DogState], presence: [UUID: Bool], householdCameras: Set<UUID>?) async {
+        let activities = Activity<CameraActivityAttributes>.activities.filter(\.isRunning)
+        guard !activities.isEmpty else { return }
+        var showing: [UUID: CameraLiveActivityContent] = [:]
+        for activity in activities {
+            showing[activity.attributes.cameraId] = activity.content.state
+        }
+        let plan = LiveActivitySync.plan(
+            showing: showing,
+            dogStates: dogStates,
+            presence: presence,
+            householdCameras: householdCameras
+        )
+        guard !plan.isEmpty else { return }
+        for cameraId in plan.ends {
+            await stop(cameraId: cameraId)
+        }
+        for activity in activities {
+            guard let content = plan.updates[activity.attributes.cameraId] else { continue }
+            await activity.update(ActivityContent(state: content, staleDate: nil))
+        }
+    }
+
     /// Registers each push token the activity gets. The token sequence finishes when the
     /// activity ends (from the app or swiped away), and then the server record goes too.
     private func watch(_ activity: Activity<CameraActivityAttributes>) {

@@ -81,9 +81,9 @@ struct ViewerHomeView: View {
                 await PushRegistry.shared.activate(api: model.authorizedAPI)
                 await liveActivities.activate(api: model.authorizedAPI)
             }
-            .onChange(of: model.household) { publishWidgetStatus() }
-            .onChange(of: model.realtime?.dogStates) { publishWidgetStatus() }
-            .onChange(of: model.realtime?.presence) { publishWidgetStatus() }
+            .onChange(of: model.household) { statusChanged() }
+            .onChange(of: model.realtime?.dogStates) { statusChanged() }
+            .onChange(of: model.realtime?.presence) { statusChanged() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Sign out") { model.signOut() }
@@ -208,6 +208,17 @@ struct ViewerHomeView: View {
             .padding()
         }
         .background(Color(.systemGroupedBackground))
+    }
+
+    /// Fresh realtime state or a changed camera list: refresh the widget and any Live Activities.
+    private func statusChanged() {
+        publishWidgetStatus()
+        let dogStates = model.realtime?.dogStates ?? [:]
+        let presence = model.realtime?.presence ?? [:]
+        let householdCameras = model.household.map { Set($0.cameras.map(\.id)) }
+        Task {
+            await liveActivities.sync(dogStates: dogStates, presence: presence, householdCameras: householdCameras)
+        }
     }
 
     /// Hands the latest dog state per camera to the home screen widget.
