@@ -68,6 +68,12 @@ export const households = pgTable("households", {
     .notNull()
     .references(() => users.id),
   plan: text("plan").notNull().default("free"),
+  /** Premium is paid up until this time (App Store auto-renewable subscription); null: never subscribed. */
+  planExpiresAt: timestamp("plan_expires_at", { withTimezone: true }),
+  planProductId: text("plan_product_id"),
+  /** Identifies the App Store subscription across renewals, so one purchase unlocks one household. */
+  planOriginalTransactionId: text("plan_original_transaction_id"),
+  planEnvironment: text("plan_environment"),
   /** Owner opted in to keep clips that members marked right/wrong, for training (SPEC §4 Calibration). */
   shareTrainingData: boolean("share_training_data").notNull().default(false),
   createdAt: createdAt(),

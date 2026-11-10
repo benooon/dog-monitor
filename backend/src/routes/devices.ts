@@ -3,7 +3,7 @@ import { and, asc, count, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { devices } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
-import { LIMITS } from "../households/limits.js";
+import { householdCameraLimit } from "../billing/camera-limit.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
 import { isValidTimeZone } from "../notifications/quiet-hours.js";
 
@@ -34,7 +34,7 @@ type UpdateBody = Partial<Pick<RegisterBody, "name" | "model" | "appVersion" | "
   mutedUntil?: string | null;
 };
 
-export async function deviceRoutes(app: FastifyInstance, opts: { db: Database }): Promise<void> {
+export async function deviceRoutes(app: FastifyInstance, opts: { db: Database; enforcePlanLimits?: boolean }): Promise<void> {
   const { db } = opts;
   app.addHook("preHandler", app.authenticate);
   app.addHook("preHandler", requireHousehold(db));
@@ -86,8 +86,9 @@ export async function deviceRoutes(app: FastifyInstance, opts: { db: Database })
           .select({ n: count() })
           .from(devices)
           .where(and(eq(devices.householdId, householdId), eq(devices.role, "camera"), eq(devices.status, "active")));
-        if ((row?.n ?? 0) >= LIMITS.camerasPerHousehold) {
-          return reply.code(409).send({ error: "camera_limit_reached", limit: LIMITS.camerasPerHousehold });
+        const limit = await householdCameraLimit(db, householdId, new Date(), opts.enforcePlanLimits ?? false);
+        if ((row?.n ?? 0) >= limit) {
+          return reply.code(409).send({ error: "camera_limit_reached", limit });
         }
       }
       const [device] = await db

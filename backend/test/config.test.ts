@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadConfig, requireServerConfig } from "../src/config.js";
+import { APPLE_ROOT_CA_G3_SHA256 } from "../src/billing/app-store.js";
 
 describe("loadConfig", () => {
   it("uses defaults", () => {
@@ -14,7 +15,20 @@ describe("loadConfig", () => {
       appleAudiences: ["com.benooon.dogmonitor"],
       retentionDays: 7,
       appLinkIds: [],
+      appStore: {
+        bundleId: "com.benooon.dogmonitor",
+        productIds: ["com.benooon.dogmonitor.premium.monthly", "com.benooon.dogmonitor.premium.yearly"],
+        rootFingerprints: [APPLE_ROOT_CA_G3_SHA256],
+      },
+      enforcePlanLimits: false,
     });
+  });
+
+  it("reads App Store and plan settings", () => {
+    const config = loadConfig({ APP_STORE_PRODUCT_IDS: "a, b", APPLE_ROOT_CA_SHA256: "AA:BB", ENFORCE_PLAN_LIMITS: "true" });
+    expect(config.appStore.productIds).toEqual(["a", "b"]);
+    expect(config.appStore.rootFingerprints).toEqual(["AA:BB"]);
+    expect(config.enforcePlanLimits).toBe(true);
   });
 
   it("reads PORT from env (Railway sets it)", () => {

@@ -4,6 +4,7 @@ import type { Database } from "../db/client.js";
 import { devices, dogs, householdMembers, households, notificationPrefs, users } from "../db/schema.js";
 import { deviceDto, dogDto } from "../households/dto.js";
 import { findMembership, requireHousehold, requireOwner } from "../households/scope.js";
+import { effectivePlan } from "../billing/plans.js";
 
 export async function householdRoutes(app: FastifyInstance, opts: { db: Database }): Promise<void> {
   const { db } = opts;
@@ -31,7 +32,7 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
         await tx.insert(householdMembers).values({ householdId: created!.id, userId, role: "owner" });
         return created!;
       });
-      return reply.code(201).send({ id: household.id, name: household.name, plan: household.plan, role: "owner" });
+      return reply.code(201).send({ id: household.id, name: household.name, plan: effectivePlan(household, new Date()), role: "owner" });
     },
   );
 
@@ -48,7 +49,7 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
     return {
       id: household!.id,
       name: household!.name,
-      plan: household!.plan,
+      plan: effectivePlan(household!, new Date()),
       ownerId: household!.ownerId,
       shareTrainingData: household!.shareTrainingData,
       role,
@@ -75,7 +76,7 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
     async (request) => {
       const { householdId } = request.household!;
       const [updated] = await db.update(households).set(request.body).where(eq(households.id, householdId)).returning();
-      return { id: updated!.id, name: updated!.name, plan: updated!.plan, shareTrainingData: updated!.shareTrainingData };
+      return { id: updated!.id, name: updated!.name, plan: effectivePlan(updated!, new Date()), shareTrainingData: updated!.shareTrainingData };
     },
   );
 

@@ -9,12 +9,13 @@ import type { ApnsSender } from "../../src/notifications/apns.js";
 import type { MediaStorage } from "../../src/storage/storage.js";
 import type { AttemptLimiter } from "../../src/pairing/attempt-limiter.js";
 import { createFakeApple } from "./apple.js";
+import type { TransactionVerifier } from "../../src/billing/app-store.js";
 
 export const TEST_JWT_SECRET = "test-secret-test-secret-test-secret-123";
 
 export async function buildTestApp(
   h: DbHandle,
-  options: { inviteLimiter?: AttemptLimiter; live?: LiveTokenIssuer; hub?: RealtimeHub; now?: () => number; apns?: ApnsSender; storage?: MediaStorage } = {},
+  options: { inviteLimiter?: AttemptLimiter; live?: LiveTokenIssuer; hub?: RealtimeHub; now?: () => number; apns?: ApnsSender; storage?: MediaStorage; transactions?: TransactionVerifier; enforcePlanLimits?: boolean } = {},
 ): Promise<{
   app: FastifyInstance;
   apple: Awaited<ReturnType<typeof createFakeApple>>;
@@ -35,6 +36,8 @@ export async function buildTestApp(
       storage: options.storage,
       retentionDays: 0,
       now: options.now,
+      transactions: options.transactions,
+      enforcePlanLimits: options.enforcePlanLimits,
     },
   });
   return { app, apple, jwt };

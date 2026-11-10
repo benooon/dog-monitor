@@ -6,6 +6,7 @@ import { createDb } from "./db/client.js";
 import { createLiveKitIssuer } from "./live/livekit.js";
 import { ApnsClient } from "./notifications/apns.js";
 import { S3MediaStorage } from "./storage/storage.js";
+import { createAppStoreVerifier } from "./billing/app-store.js";
 
 const config = loadConfig();
 const { databaseUrl, jwtSecret } = requireServerConfig(config);
@@ -22,6 +23,8 @@ const app = await buildApp({
     apns: config.apns ? new ApnsClient(config.apns) : undefined,
     storage: config.s3 ? new S3MediaStorage(config.s3) : undefined,
     retentionDays: config.retentionDays,
+    transactions: createAppStoreVerifier(config.appStore),
+    enforcePlanLimits: config.enforcePlanLimits,
   },
 });
 

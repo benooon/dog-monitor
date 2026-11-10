@@ -28,6 +28,8 @@ import { cameraZoneRoutes } from "./routes/zones.js";
 import { trainingRoutes } from "./routes/training.js";
 import { cameraSummaryRoutes, viewerSummaryRoutes } from "./routes/summaries.js";
 import { healthRoutes } from "./routes/health.js";
+import { subscriptionRoutes } from "./routes/subscription.js";
+import type { TransactionVerifier } from "./billing/app-store.js";
 import { appLinkRoutes } from "./routes/app-links.js";
 
 export interface AppServices {
@@ -48,6 +50,10 @@ export interface AppServices {
   now?: () => number;
   /** Override the invite brute-force limiter (tests). */
   inviteLimiter?: AttemptLimiter;
+  /** StoreKit 2 transaction verification; undefined answers 503 on POST /subscription/apple. */
+  transactions?: TransactionVerifier;
+  /** Apply free-plan limits (see billing/plans.ts). */
+  enforcePlanLimits?: boolean;
 }
 
 export interface BuildAppOptions {
@@ -75,12 +81,19 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(authRoutes, services);
     await app.register(householdRoutes, { db: services.db });
     await app.register(dogRoutes, { db: services.db });
-    await app.register(deviceRoutes, { db: services.db });
-    await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter });
+    const enforcePlanLimits = services.enforcePlanLimits ?? false;
+    await app.register(deviceRoutes, { db: services.db, enforcePlanLimits });
+    await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter, enforcePlanLimits });
     await app.register(deviceSelfRoutes, { db: services.db });
     await app.register(cameraZoneRoutes, { db: services.db });
     await app.register(notificationPrefRoutes, { db: services.db });
     const clock = services.now ?? Date.now;
+    await app.register(subscriptionRoutes, {
+      db: services.db,
+      verifier: services.transactions,
+      enforcePlanLimits,
+      now: () => new Date(clock()),
+    });
     const notifier = new EventNotifier(services.db, services.apns, app.log, services.storage, () => new Date(clock()));
     await app.register(cameraEventRoutes, { db: services.db, notifier });
     await app.register(cameraMediaRoutes, { db: services.db, storage: services.storage });

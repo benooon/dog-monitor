@@ -1,5 +1,6 @@
 import type { LiveKitConfig } from "./live/livekit.js";
 import type { ApnsConfig } from "./notifications/apns.js";
+import { APPLE_ROOT_CA_G3_SHA256, type AppStoreConfig } from "./billing/app-store.js";
 import type { S3Config } from "./storage/storage.js";
 
 /** Runtime configuration, read from environment variables (documented in .env.example). */
@@ -25,6 +26,10 @@ export interface Config {
   retentionDays: number;
   /** "<team id>.<bundle id>" for Universal Links; empty until APPLE_TEAM_ID (or APNS_TEAM_ID) is set. */
   appLinkIds: string[];
+  /** Verifying StoreKit 2 transactions for premium. */
+  appStore: AppStoreConfig;
+  /** Apply the free-plan limits (off until the app can sell premium). */
+  enforcePlanLimits: boolean;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -101,7 +106,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
         : undefined,
     retentionDays,
     appLinkIds: appLinkIds(env),
+    appStore: {
+      bundleId: env.APPLE_BUNDLE_ID || "com.benooon.dogmonitor",
+      productIds: list(env.APP_STORE_PRODUCT_IDS ?? "com.benooon.dogmonitor.premium.monthly,com.benooon.dogmonitor.premium.yearly"),
+      rootFingerprints: list(env.APPLE_ROOT_CA_SHA256 || APPLE_ROOT_CA_G3_SHA256),
+    },
+    enforcePlanLimits: env.ENFORCE_PLAN_LIMITS === "true",
   };
+}
+
+function list(value: string): string[] {
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 function appLinkIds(env: NodeJS.ProcessEnv): string[] {

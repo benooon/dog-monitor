@@ -4,6 +4,7 @@ import type { Database } from "../db/client.js";
 import { devices, householdMembers, invites } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
 import { LIMITS } from "../households/limits.js";
+import { householdCameraLimit } from "../billing/camera-limit.js";
 import { findMembership, requireHousehold, requireOwner } from "../households/scope.js";
 import { AttemptLimiter } from "../pairing/attempt-limiter.js";
 import { INVITE_TTL_MS, hashSecret, newDeviceSecret, newInviteCode, newInviteToken } from "../pairing/secrets.js";
@@ -24,7 +25,7 @@ class AcceptError extends Error {
 
 export async function inviteRoutes(
   app: FastifyInstance,
-  opts: { db: Database; limiter?: AttemptLimiter; now?: () => Date },
+  opts: { db: Database; limiter?: AttemptLimiter; now?: () => Date; enforcePlanLimits?: boolean },
 ): Promise<void> {
   const { db } = opts;
   const limiter = opts.limiter ?? new AttemptLimiter(10, 10 * 60 * 1000);
@@ -136,8 +137,9 @@ export async function inviteRoutes(
             .select({ n: count() })
             .from(devices)
             .where(and(eq(devices.householdId, householdId), eq(devices.role, "camera"), eq(devices.status, "active")));
-          if ((row?.n ?? 0) >= LIMITS.camerasPerHousehold) {
-            throw new AcceptError(409, "camera_limit_reached", { limit: LIMITS.camerasPerHousehold });
+          const limit = await householdCameraLimit(tx, householdId, at, opts.enforcePlanLimits ?? false);
+          if ((row?.n ?? 0) >= limit) {
+            throw new AcceptError(409, "camera_limit_reached", { limit });
           }
           const deviceSecret = newDeviceSecret();
           const [device] = await tx

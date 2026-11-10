@@ -50,6 +50,13 @@
       "when": 1794315267383,
       "tag": "0006_household_training_opt_in",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794316309839,
+      "tag": "0007_household_subscription",
+      "breakpoints": true
     }
   ]
 }
