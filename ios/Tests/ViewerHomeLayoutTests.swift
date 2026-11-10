@@ -21,3 +21,20 @@ final class ViewerHomeLayoutTests: XCTestCase {
         XCTAssertEqual(ViewerHomeView.gridColumnCount(cameraCount: 0, width: 1100, portrait: false), 1)
     }
 }
+
+@MainActor
+final class ViewerHomeSingleColumnTests: XCTestCase {
+    /// Two cameras on a portrait iPad: both cards and the dogs card fit in the screen height.
+    func testTwoCardsAndDogsFitInPortraitHeight() {
+        let height: CGFloat = 1_030
+        let width = ViewerHomeView.singleColumnMaxWidth(height: height, cameraCount: 2)
+        let snapshot = (width - 24) * 9 / 16
+        let total = 2 * (snapshot + 64) + 16 + 24 + 110 + 32
+        XCTAssertLessThanOrEqual(total, height + 1)
+        XCTAssertGreaterThan(width, 500)
+    }
+
+    func testNeverNarrowerThanMinimumCard() {
+        XCTAssertEqual(ViewerHomeView.singleColumnMaxWidth(height: 300, cameraCount: 2), 320)
+    }
+}

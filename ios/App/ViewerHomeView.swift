@@ -141,6 +141,8 @@ struct ViewerHomeView: View {
                             dogState: model.realtime?.dogStates[camera.id] ?? camera.currentDogState,
                             dogName: model.household?.dogs.first?.name
                         )
+                        // Full-width separator between cards, not one that starts at the state label.
+                        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                     }
                     .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
                     .contextMenu { lockScreenButton(for: camera) }
@@ -175,6 +177,10 @@ struct ViewerHomeView: View {
                 width: gridWidth,
                 portrait: !showsSidebar
             )
+            // One large column: keep the cards short enough that they and the dogs fit on screen.
+            let columnMaxWidth = columnCount == 1 && !showsSidebar
+                ? Self.singleColumnMaxWidth(height: proxy.size.height, cameraCount: max(cameras.count, 1))
+                : .infinity
             ScrollView {
                 VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
                     if let message = model.errorMessage {
@@ -190,8 +196,12 @@ struct ViewerHomeView: View {
                                 .frame(width: Self.sidebarWidth)
                         }
                     } else {
-                        cameraCards(cameras, columns: columnCount)
-                        dogsPanel
+                        VStack(spacing: DS.Spacing.xxl) {
+                            cameraCards(cameras, columns: columnCount)
+                            dogsPanel
+                        }
+                        .frame(maxWidth: columnMaxWidth)
+                        .frame(maxWidth: .infinity)
                     }
                 }
                 .padding(DS.Spacing.l)
@@ -249,6 +259,16 @@ struct ViewerHomeView: View {
         }
     }
 
+    /// Widest a single-column card may be so `cameraCount` cards (16:9 snapshot plus the name
+    /// row) and the dogs card fit in `height`; never narrower than the grid's minimum card.
+    static func singleColumnMaxWidth(height: CGFloat, cameraCount: Int) -> CGFloat {
+        let count = CGFloat(cameraCount)
+        let chrome = DS.Spacing.l * 2 + DS.Spacing.xxl + dogsPanelAllowance
+            + DS.Spacing.l * (count - 1)
+        let perCard = (height - chrome) / count - cardChromeHeight
+        return max(gridCardMinWidth, perCard * 16 / 9 + DS.Spacing.m * 2)
+    }
+
     /// Columns for the iPad grid. One or two cameras in portrait get one large card each;
     /// otherwise as many columns as fit at the minimum card width, never more than there are cameras.
     static func gridColumnCount(cameraCount: Int, width: CGFloat, portrait: Bool) -> Int {
@@ -270,6 +290,10 @@ struct ViewerHomeView: View {
 
     /// Narrowest a camera card gets in the iPad grid before it wraps to fewer columns.
     private static let gridCardMinWidth: CGFloat = 320
+    /// Height of a camera card besides its snapshot: padding and the name row.
+    private static let cardChromeHeight: CGFloat = 64
+    /// Room left for the dogs card below single-column cameras.
+    private static let dogsPanelAllowance: CGFloat = 110
     /// Width of the dogs column beside the cameras in landscape.
     private static let sidebarWidth: CGFloat = 280
     /// Screens narrower than this (split view, small iPads) keep the dogs below the cameras.
