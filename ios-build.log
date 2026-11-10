@@ -7,7 +7,7 @@ Scheme: DogMonitor
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
 { platform:iOS Simulator, arch:x86_64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
-2026-11-10 07:06:42.371 xcodebuild[4464:17439] [MT] IDETestOperationsObserverDebug: 250.981 elapsed -- Testing started completed.
-2026-11-10 07:06:42.372 xcodebuild[4464:17439] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-10 07:06:42.372 xcodebuild[4464:17439] [MT] IDETestOperationsObserverDebug: 250.982 sec, +250.982 sec -- end
+2026-11-10 07:27:59.189 xcodebuild[1625:8197] [MT] IDETestOperationsObserverDebug: 474.792 elapsed -- Testing started completed.
+2026-11-10 07:27:59.191 xcodebuild[1625:8197] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 07:27:59.191 xcodebuild[1625:8197] [MT] IDETestOperationsObserverDebug: 474.793 sec, +474.793 sec -- end
 Testing started
