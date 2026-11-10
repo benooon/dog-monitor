@@ -1,12 +1,12 @@
 # CI status: GREEN
 
-- commit: a82d0f33a2170a458513fb8c5ac88d93b339b462
-- message: docs: bootstrap agent instructions, spec, backlog and CI
-- time (UTC): 2026-11-10T06:44:40Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42770480111
+- commit: 6b76fd13a1b11c04ffab95857dd3c42bb7877d3c
+- message: docs: fix ci-results fetch command for shallow clones
+- time (UTC): 2026-11-10T06:48:13Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42770834896
 
 | job | result | log |
 |---|---|---|
 | core (swift test, Linux) | success | core-test.log |
-| ios (xcodebuild test, macOS) | success | ios-build.log |
+| ios (xcodebuild test, macOS) | success (carried over, no iOS changes) | ios-build.log |
 | backend (lint + test) | success | backend-test.log |
