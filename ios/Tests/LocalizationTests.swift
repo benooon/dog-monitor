@@ -23,6 +23,17 @@ final class LocalizationTests: XCTestCase {
         "Online",
         "Offline",
         "No cameras yet. Pair a spare iPhone as a camera.",
+        "Starting camera…",
+        "Camera access is off. Allow it in Settings to use this phone as a camera.",
+        "Open Settings",
+        "Couldn't start the camera.",
+        "Try again",
+        "Keep this phone plugged in and the app open.",
+        "Start camera",
+        "Stop camera",
+        "Tap the screen to show the preview.",
+        "Camera on",
+        "Microphone off — barking can't be detected.",
     ]
 
     private func bundle(for language: String) throws -> Bundle {

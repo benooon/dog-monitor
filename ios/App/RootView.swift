@@ -10,28 +10,10 @@ struct RootView: View {
         case .viewer:
             ViewerRootView { storedRole = "" }
         case .camera:
-            RoleHomeView(role: .camera) { storedRole = "" }
+            CameraModeView { storedRole = "" }
         case nil:
             RolePickerView { storedRole = $0.rawValue }
         }
-    }
-}
-
-/// Placeholder until camera mode and viewer mode exist.
-struct RoleHomeView: View {
-    let role: DeviceRole
-    let onChangeRole: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: role.systemImage)
-                .font(.system(size: 56))
-                .foregroundStyle(.tint)
-            Text(role.title)
-                .font(.title.bold())
-            Button("Change role", action: onChangeRole)
-        }
-        .padding()
     }
 }
 

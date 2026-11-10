@@ -11,6 +11,26 @@
         }
       }
     },
+    "Camera access is off. Allow it in Settings to use this phone as a camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הגישה למצלמה כבויה. אפשרו אותה בהגדרות כדי להשתמש בטלפון הזה כמצלמה."
+          }
+        }
+      }
+    },
+    "Camera on": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה פועלת"
+          }
+        }
+      }
+    },
     "Cameras": {
       "localizations": {
         "he": {
@@ -27,6 +47,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "החלפת תפקיד"
+          }
+        }
+      }
+    },
+    "Couldn't start the camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן להפעיל את המצלמה."
           }
         }
       }
@@ -111,12 +141,32 @@
         }
       }
     },
+    "Keep this phone plugged in and the app open.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השאירו את הטלפון מחובר לחשמל ואת האפליקציה פתוחה."
+          }
+        }
+      }
+    },
     "Leave this phone at home to watch your dog.": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "השאירו את הטלפון הזה בבית כדי לשמור על הכלב שלכם."
+          }
+        }
+      }
+    },
+    "Microphone off — barking can't be detected.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המיקרופון כבוי — לא ניתן לזהות נביחות."
           }
         }
       }
@@ -147,6 +197,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "מחוברת"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתיחת ההגדרות"
           }
         }
       }
@@ -187,6 +247,56 @@
           "stringUnit": {
             "state": "translated",
             "value": "משהו השתבש. נסו שוב."
+          }
+        }
+      }
+    },
+    "Start camera": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפעלת המצלמה"
+          }
+        }
+      }
+    },
+    "Starting camera…": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מפעיל את המצלמה…"
+          }
+        }
+      }
+    },
+    "Stop camera": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עצירת המצלמה"
+          }
+        }
+      }
+    },
+    "Tap the screen to show the preview.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הקישו על המסך כדי להציג את התמונה."
+          }
+        }
+      }
+    },
+    "Try again": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נסו שוב"
           }
         }
       }
