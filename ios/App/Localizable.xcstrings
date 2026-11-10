@@ -471,6 +471,16 @@
         }
       }
     },
+    "Mute": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השתקה"
+          }
+        }
+      }
+    },
     "Mute 1h": {
       "localizations": {
         "he": {
@@ -783,6 +793,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "נסו שוב"
+          }
+        }
+      }
+    },
+    "Unmute": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ביטול השתקה"
           }
         }
       }

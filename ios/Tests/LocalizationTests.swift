@@ -46,6 +46,8 @@ final class LocalizationTests: XCTestCase {
         "Watch live",
         "Mute 1h",
         "Live",
+        "Mute",
+        "Unmute",
         "Connecting…",
         "Waiting for the camera…",
         "Connection lost. Reconnecting…",

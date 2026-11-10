@@ -21,9 +21,16 @@ final class LiveViewModel {
     }
 
     static let cameraWaitTimeout: Duration = .seconds(30)
+    static let audioMutedKey = "liveView.audioMuted"
 
     private(set) var phase: Phase = .connecting
     private(set) var videoTrack: VideoTrack?
+    /// Whether the camera publishes audio (shows the mute button).
+    private(set) var hasAudio = false
+    /// The viewer's choice, remembered across sessions. Muting also stops the server from
+    /// sending the audio. Sound plays through the speaker even with the silent switch on
+    /// (LiveKit's `.playback` session), since opening live view is an explicit request.
+    private(set) var isAudioMuted: Bool
 
     let cameraId: UUID
     private let api: DogMonitorAPI
@@ -31,11 +38,22 @@ final class LiveViewModel {
     private let logger = Logger(subsystem: "com.benooon.dogmonitor", category: "LiveView")
     @ObservationIgnored private var room: Room?
     @ObservationIgnored private var session: Task<Void, Never>?
+    @ObservationIgnored private let defaults: UserDefaults
 
-    init(cameraId: UUID, api: DogMonitorAPI, realtime: ViewerRealtime) {
+    init(cameraId: UUID, api: DogMonitorAPI, realtime: ViewerRealtime, defaults: UserDefaults = .standard) {
         self.cameraId = cameraId
         self.api = api
         self.realtime = realtime
+        self.defaults = defaults
+        isAudioMuted = defaults.bool(forKey: Self.audioMutedKey)
+    }
+
+    func toggleAudio() {
+        isAudioMuted.toggle()
+        defaults.set(isAudioMuted, forKey: Self.audioMutedKey)
+        if let room {
+            Task { await applyAudioPreference(in: room) }
+        }
     }
 
     func start() {
@@ -51,6 +69,7 @@ final class LiveViewModel {
         session = nil
         realtime.unwatch(cameraId)
         videoTrack = nil
+        hasAudio = false
         let room = room
         self.room = nil
         Task { await room?.disconnect() }
@@ -125,10 +144,28 @@ final class LiveViewModel {
                     waited = .zero
                 }
             }
+            await applyAudioPreference(in: room)
             try? await Task.sleep(for: .milliseconds(500))
         }
         await room.disconnect()
         if self.room === room { self.room = nil }
+    }
+
+    /// Enables or disables every remote audio track to match `isAudioMuted` (no-op when it
+    /// already matches), and updates `hasAudio`.
+    private func applyAudioPreference(in room: Room) async {
+        let publications = room.remoteParticipants.values
+            .flatMap(\.audioTracks)
+            .compactMap { $0 as? RemoteTrackPublication }
+        hasAudio = !publications.isEmpty
+        let enabled = !isAudioMuted
+        for publication in publications where publication.isEnabled != enabled {
+            do {
+                try await publication.set(enabled: enabled)
+            } catch {
+                logger.info("Could not change audio: \(String(describing: error), privacy: .public)")
+            }
+        }
     }
 
     private static func cameraVideoTrack(in room: Room) -> VideoTrack? {

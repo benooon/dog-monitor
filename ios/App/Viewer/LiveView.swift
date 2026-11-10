@@ -39,6 +39,21 @@ struct LiveView: View {
         .navigationTitle(Text(verbatim: cameraName))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            if model.hasAudio {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        model.toggleAudio()
+                    } label: {
+                        if model.isAudioMuted {
+                            Label("Unmute", systemImage: "speaker.slash.fill")
+                        } else {
+                            Label("Mute", systemImage: "speaker.wave.2.fill")
+                        }
+                    }
+                }
+            }
+        }
         .onAppear { model.start() }
         .onDisappear { model.stop() }
     }
