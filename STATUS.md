@@ -1,9 +1,9 @@
 # CI status: RED
 
-- commit: 7a780073bceaf1cb7fbfeb9cb5f78444de0cec79
-- message: ios: keep captured video upright with AVCaptureDevice.RotationCoordinator
-- time (UTC): 2026-11-10T08:20:43Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42781300745
+- commit: de44721bd73ab757efd70445e77f15278f99a5d9
+- message: docs: log pairing decisions
+- time (UTC): 2026-11-10T08:24:36Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42781679871
 
 | job | result | log |
 |---|---|---|
