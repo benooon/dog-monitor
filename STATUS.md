@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 95cf1601a2328b51371d619451852a813a845eac
-- message: docs: live view redesign done (CI green on f5ebf0b)
-- time (UTC): 2026-11-10T18:35:04Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42872819511
+- commit: 49fe641f7976150f8794542958bd28a0b3e70929
+- message: docs: onboarding and timeline/summary/premium redesigns done (CI green on c5313cf)
+- time (UTC): 2026-11-10T18:36:43Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42876616236
 
 | job | result | log |
 |---|---|---|
