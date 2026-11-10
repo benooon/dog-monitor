@@ -23,6 +23,8 @@ final class CameraModeModel {
     private(set) var screen = CameraScreenState()
     /// Recent audio detections, for the debug overlay.
     private(set) var detectionLog = DetectionLog()
+    /// The dog's state per the event engine (SPEC §5).
+    private(set) var dogState: DogState = .unknown
 
     let capture: CaptureService
     /// Live view (realtime link + LiveKit), only when this phone is paired as a camera.
@@ -33,6 +35,15 @@ final class CameraModeModel {
     private var analysisTask: Task<Void, Never>?
     private var detectionTask: Task<Void, Never>?
     private var hideTask: Task<Void, Never>?
+    private var tickTask: Task<Void, Never>?
+    private var engine: EventEngine?
+    private let uploader = EventUploader(store: FileEventQueueStore(url: CameraModeModel.queueURL))
+
+    nonisolated private static var queueURL: URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+        return base.appendingPathComponent("event-queue.json")
+    }
     private var savedBrightness: Double?
     private var isSceneActive = true
 
@@ -77,6 +88,7 @@ final class CameraModeModel {
             status = .running
             screen.hidePreview()
             startFrameMeter()
+            startEventEngine()
             if hasAudio { startAudioAnalysis() }
             startLive()
             applyDisplay()
@@ -87,10 +99,13 @@ final class CameraModeModel {
 
     func stop() {
         guard status == .running || status == .starting else { return }
-        for task in [meterTask, analysisTask, detectionTask] { task?.cancel() }
+        for task in [meterTask, analysisTask, detectionTask, tickTask] { task?.cancel() }
         meterTask = nil
         analysisTask = nil
         detectionTask = nil
+        tickTask = nil
+        engine = nil
+        dogState = .unknown
         hideTask?.cancel()
         live?.stop()
         live = nil
@@ -149,6 +164,62 @@ final class CameraModeModel {
         controller.start()
     }
 
+    private var api: DogMonitorAPI? {
+        isPaired ? DogMonitorAPI(baseURL: AppConfig.apiBaseURL, credential: credential) : nil
+    }
+
+    /// Runs the event engine: detections in, events out, ticking every second for durations,
+    /// escalations and "calmed down". Events are queued and uploaded when paired.
+    private func startEventEngine() {
+        let cameraID: UUID
+        if case .device(let id, _) = credential { cameraID = id } else { cameraID = UUID() }
+        engine = EventEngine(cameraID: cameraID)
+        tickTask = Task { [weak self] in
+            var ticks = 0
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                guard let self else { return }
+                ticks += 1
+                self.tick(flush: ticks % 30 == 0)
+            }
+        }
+        flushEvents()
+    }
+
+    private func ingest(_ detection: Detection) {
+        guard var engine else { return }
+        let outputs = engine.ingest(detection)
+        self.engine = engine
+        dogState = engine.currentState(at: .now)
+        record(outputs)
+    }
+
+    private func tick(flush: Bool) {
+        guard var engine else { return }
+        let now = Date.now
+        let outputs = engine.tick(now: now)
+        self.engine = engine
+        dogState = engine.currentState(at: now)
+        record(outputs)
+        if flush { flushEvents() }
+    }
+
+    private func record(_ outputs: [EngineOutput]) {
+        guard !outputs.isEmpty, isPaired else { return }
+        let uploader = uploader
+        let api = api
+        Task {
+            await uploader.enqueue(outputs)
+            if let api { await uploader.flush(using: api) }
+        }
+    }
+
+    private func flushEvents() {
+        guard let api else { return }
+        let uploader = uploader
+        Task { await uploader.flush(using: api) }
+    }
+
     private func startAudioAnalysis() {
         // A fresh detector per run, so a run still winding down never shares state with a new one.
         let detector = BarkDetector()
@@ -161,6 +232,7 @@ final class CameraModeModel {
         detectionTask = Task { [weak self] in
             for await detection in detections {
                 self?.detectionLog.append(detection)
+                self?.ingest(detection)
             }
         }
     }

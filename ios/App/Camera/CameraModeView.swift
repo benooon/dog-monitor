@@ -126,6 +126,10 @@ struct CameraModeView: View {
                 .fill(.red)
                 .frame(width: 8, height: 8)
             Text("Camera on")
+            if let state = model.dogState.label {
+                Text(verbatim: "·")
+                Text(state)
+            }
             if model.isPreviewVisible, model.videoFPS > 0 {
                 Text(verbatim: "· \(Int(model.videoFPS.rounded())) fps")
                     .monospacedDigit()

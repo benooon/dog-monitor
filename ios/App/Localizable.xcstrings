@@ -141,6 +141,26 @@
         }
       }
     },
+    "At the door": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ליד הדלת"
+          }
+        }
+      }
+    },
+    "Barking": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נובח"
+          }
+        }
+      }
+    },
     "Barks in the last minute: %lld": {
       "localizations": {
         "he": {
@@ -351,6 +371,16 @@
         }
       }
     },
+    "In a forbidden zone": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "באזור אסור"
+          }
+        }
+      }
+    },
     "Invite": {
       "localizations": {
         "he": {
@@ -471,6 +501,16 @@
         }
       }
     },
+    "Not visible": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא נראה"
+          }
+        }
+      }
+    },
     "Offline": {
       "localizations": {
         "he": {
@@ -537,6 +577,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "צימוד המצלמה"
+          }
+        }
+      }
+    },
+    "Resting": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נח"
+          }
+        }
+      }
+    },
+    "Restless": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חסר מנוחה"
           }
         }
       }
@@ -763,6 +823,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "צפו בשידור חי וקבלו התראות בטלפון שלכם."
+          }
+        }
+      }
+    },
+    "Whining": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מייבב"
           }
         }
       }
