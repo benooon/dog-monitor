@@ -1,9 +1,9 @@
 # CI status: RED
 
-- commit: 9707786f0b32e128acff2aca5d3b6d3864febcb5
-- message: ios: fix Swift 6.2 sending error when updating Live Activities
-- time (UTC): 2026-11-10T17:20:31Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42862365596
+- commit: a62451a07fa8e24575acc83b36815cbf6519a712
+- message: ci: list failing iOS tests from the result bundle (-quiet hides them)
+- time (UTC): 2026-11-10T17:36:04Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42864590963
 
 | job | result | log |
 |---|---|---|
