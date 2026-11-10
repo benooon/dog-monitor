@@ -10,9 +10,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Let a running build finish (agents push docs commits often, which used to cancel
+# real builds and publish a false RED). Only a *pending* run gets replaced by a newer one.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -141,6 +143,11 @@ jobs:
       - name: Publish results to ci-results branch
         shell: bash
         run: |
+          # A cancelled job means the run was superseded or stopped by hand, not that the
+          # code is broken: keep the previous STATUS.md instead of publishing a false RED.
+          for r in "$CORE_RESULT" "$IOS_RESULT" "$BACKEND_RESULT"; do
+            if [ "$r" = "cancelled" ]; then echo "Run was cancelled; not publishing."; exit 0; fi
+          done
           git config --global user.name "ci-bot"
           git config --global user.email "ci-bot@users.noreply.github.com"
           REPO="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
