@@ -65,12 +65,12 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Zone editor in camera setup (draw polygons over the preview, saved as normalized coordinates) and synced to the backend.
 - [x] core + backend: Daily summary computation (rest minutes, bark count, activity by hour), plus a daily summary push.
 - [~] ios: Daily summary screen with Swift Charts. (in progress 2026-11-10)
-- [~] ios: "Calmed down" event and push after barking stops and the dog rests. (in progress 2026-11-10)
+- [~] ios: "Calmed down" event and push after barking stops and the dog rests. (in progress 2026-11-10; code pushed, waiting for CI: Actions isn't running, see HUMAN_TODO)
 
 ## Phase 4 — Custom model
 
-- [~] ios: Opt-in labeled data capture (save short clips with the user's right/wrong feedback for training). (in progress 2026-11-10)
-- [~] docs: Create ML training guide plus scripts to export labeled data, and a slot in the app to load an updated `.mlmodel`. (in progress 2026-11-10)
+- [~] ios: Opt-in labeled data capture (save short clips with the user's right/wrong feedback for training). (in progress 2026-11-10; code pushed, waiting for CI: Actions isn't running, see HUMAN_TODO)
+- [~] docs: Create ML training guide plus scripts to export labeled data, and a slot in the app to load an updated `.mlmodel`. (in progress 2026-11-10; code pushed, waiting for CI: Actions isn't running, see HUMAN_TODO)
 
 ## Phase 5 — Product
 
