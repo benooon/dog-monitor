@@ -2486,6 +2486,26 @@
           }
         }
       }
+    },
+    "Couldn't create an invite.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן ליצור הזמנה."
+          }
+        }
+      }
+    },
+    "Invite QR code": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קוד QR להזמנה"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -70,6 +70,8 @@ final class LocalizationTests: XCTestCase {
         "Expires in %@",
         "This invite has expired.",
         "New invite",
+        "Couldn't create an invite.",
+        "Invite QR code",
         "On the new phone, choose Camera and scan this code, or type the 6 digits. Family members can join with the same code.",
         "Join a household",
         "Invite code",
