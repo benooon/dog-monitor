@@ -34,8 +34,9 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [ ] ios: Rotate streamed (and analyzed) video to match the camera phone's orientation (`AVCaptureDevice.RotationCoordinator` → `videoRotationAngle` on the video output connection).
 - [ ] ios: Pairing UI (moved up: live view needs a paired camera). The owner shows a QR code + 6-digit code; the new device scans it (AVFoundation metadata output) and joins, then picks a role.
 - [ ] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
-- [~] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client. (in progress 2026-11-10)
-- [ ] ios: Push registration, notification categories and actions (Watch live / Mute 1h), and deep link into live view.
+- [x] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client. Also `PATCH /events/:id` (end, escalation push) and the camera-offline push.
+- [ ] backend + ios: Quiet hours. Store each user's time zone (sent by the app) and skip non-time-sensitive pushes inside `quiet_start`–`quiet_end`; the notifier ignores quiet hours today.
+- [ ] ios: Push registration, notification categories and actions (Watch live / Mute 1h), and deep link into live view. Add the push copy keys from `backend/src/notifications/payload.ts` (e.g. "%@ has been barking") to Localizable.xcstrings with Hebrew; category id `DOG_EVENT`.
 - [ ] ios: Notification Service Extension target in project.yml that downloads the snapshot and attaches it to the push.
 - [ ] [blocked] ci: TestFlight workflow (`.github/workflows/testflight.yml`). Archive + upload with an App Store Connect API key via `xcodebuild -exportArchive` or fastlane, triggered on every push to main that changes ios/. Needs secrets; see HUMAN_TODO.
 
