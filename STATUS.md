@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 49fe641f7976150f8794542958bd28a0b3e70929
-- message: docs: onboarding and timeline/summary/premium redesigns done (CI green on c5313cf)
-- time (UTC): 2026-11-10T18:36:43Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42876616236
+- commit: 566043e7e62f6fbc3a6cd96049c1b301d759ac49
+- message: docs: iPad layout done (CI green on 9c7463c); claim invite sheet redesign, add preview and card follow-ups
+- time (UTC): 2026-11-10T18:48:41Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42878742494
 
 | job | result | log |
 |---|---|---|
