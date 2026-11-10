@@ -20,7 +20,9 @@ final class ViewerSessionModelTests: XCTestCase {
     }
 
     func testAPIBaseURLComesFromInfoPlist() {
-        XCTAssertEqual(AppConfig.apiBaseURL.scheme, "http")
+        // API_BASE_URL in project.yml (the Railway backend), not the localhost fallback.
+        XCTAssertEqual(AppConfig.apiBaseURL.scheme, "https")
+        XCTAssertNotEqual(AppConfig.apiBaseURL.host(), "localhost")
     }
 }
 
