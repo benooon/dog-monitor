@@ -85,7 +85,8 @@ final class CameraLiveActivityController {
         for cameraId in plan.ends {
             await stop(cameraId: cameraId)
         }
-        for activity in activities {
+        // Fetched again (like `stop`), so no activity crosses an await while main-actor bound.
+        for activity in Activity<CameraActivityAttributes>.activities where activity.isRunning {
             guard let content = plan.updates[activity.attributes.cameraId] else { continue }
             await activity.update(ActivityContent(state: content, staleDate: nil))
         }
