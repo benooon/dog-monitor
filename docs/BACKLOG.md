@@ -23,7 +23,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Sign in with Apple flow, keychain token storage, and household creation screen.
 - [x] ios: Viewer home placeholder → wire `GET /household` into a real home screen once camera list work starts; also send the Sign in with Apple nonce (SHA-256) and verify it in `POST /auth/apple`.
 - [~] ios: Camera capture pipeline. One `AVCaptureSession` (video + audio) with an `AsyncStream` of sample buffers, fanned out to consumers (analysis, recorder, streamer). Add a camera-mode screen: black screen, `isIdleTimerDisabled`, minimum brightness, tap to show preview. (in progress 2026-11-10)
-- [ ] ios: Bark detection with SoundAnalysis (`SNClassifySoundRequest` built-in classifier), mapping dog-related classes to `Detection` values in core. Show a debug overlay in camera mode.
+- [~] ios: Bark detection with SoundAnalysis (`SNClassifySoundRequest` built-in classifier), mapping dog-related classes to `Detection` values in core. Show a debug overlay in camera mode. (in progress 2026-11-10)
 - [~] core: Event engine state machine. Detections in, events out, with duration thresholds, cooldowns, escalation and state transitions per SPEC §5. **Heavy unit tests** with simulated timelines (inject a clock). (in progress 2026-11-10)
 - [ ] backend: LiveKit. `POST /cameras/:id/live-token` mints a viewer token; the camera fetches a publisher token. Env: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
 - [ ] backend: WebSocket channel. Camera presence and heartbeats; tell the camera "viewer joined / all viewers left"; mark a camera offline after 3 min without a heartbeat.
