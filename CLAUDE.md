@@ -72,6 +72,7 @@ Dog Monitor is **calm, warm and brief** — a friend watching your dog, not an a
 - This Linux sandbox usually has **no Swift toolchain and no Xcode**. Swift code is verified by CI on a macOS runner, so write it carefully, keep each commit small, and check CI results on your next loop.
 - Backend: `cd backend && npm ci && npm run lint && npm test` must pass locally before you push.
 - CI publishes every run's status and logs to the `ci-results` branch (`STATUS.md`, `ios-build.log`, `core-test.log`, `backend-test.log`). That is how you learn whether your Swift compiled.
+- CI also renders the main screens (iPhone + iPad; light, dark, Hebrew) to `ci-results/screenshots/` (`git archive origin/ci-results screenshots | tar -x`, then look at the JPEGs). After a UI change, look at your screens there and fix what looks off. New screens: add them to `ios/Tests/ScreenshotTests.swift`.
 - A task touching Swift is only done once CI on `main` is green for it. If your push turned CI red, fixing it is your next task.
 
 ## Style
