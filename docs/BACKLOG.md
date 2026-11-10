@@ -25,7 +25,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Camera capture pipeline. One `AVCaptureSession` (video + audio) with an `AsyncStream` of sample buffers, fanned out to consumers (analysis, recorder, streamer). Add a camera-mode screen: black screen, `isIdleTimerDisabled`, minimum brightness, tap to show preview.
 - [x] ios: Bark detection with SoundAnalysis (`SNClassifySoundRequest` built-in classifier), mapping dog-related classes to `Detection` values in core. Show a debug overlay in camera mode.
 - [x] core: Event engine state machine. Detections in, events out, with duration thresholds, cooldowns, escalation and state transitions per SPEC §5. **Heavy unit tests** with simulated timelines (inject a clock).
-- [~] ios: Run `EventEngine` in camera mode: feed bark/whine `Detection`s from the sound analyzer, call `tick(now:)` every second, show `currentState(at:)` in the camera indicator, and queue `.started`/`.escalated`/`.ended` outputs for `POST /events` (persist the queue for offline retry). (in progress 2026-11-10)
+- [x] ios: Run `EventEngine` in camera mode: feed bark/whine `Detection`s from the sound analyzer, call `tick(now:)` every second, show `currentState(at:)` in the camera indicator, and queue `.started`/`.escalated`/`.ended` outputs for `POST /events` (persist the queue for offline retry).
 - [x] backend: LiveKit. `POST /cameras/:id/live-token` mints a viewer token; the camera fetches a publisher token. Env: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
 - [x] backend: WebSocket channel. Camera presence and heartbeats; tell the camera "viewer joined / all viewers left"; mark a camera offline after 3 min without a heartbeat. Protocol: `backend/src/realtime/protocol.ts`.
 - [x] backend: Enforce the 5-viewers-per-camera limit in `POST /cameras/:id/live-token` using WebSocket presence (or LiveKit room participant count), returning 409 `viewer_limit_reached`.
@@ -36,9 +36,9 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
 - [x] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client. Also `PATCH /events/:id` (end, escalation push) and the camera-offline push.
 - [x] backend + ios: Quiet hours. Store each user's time zone (sent by the app) and skip non-time-sensitive pushes inside `quiet_start`–`quiet_end`; the notifier ignores quiet hours today. Done per phone (`devices.time_zone`); time-sensitive alerts still come through. Setting the window from the app is part of the notification settings task.
-- [~] ios: Push registration, notification categories and actions (Watch live / Mute 1h), and deep link into live view. Add the push copy keys from `backend/src/notifications/payload.ts` (e.g. "%@ has been barking") to Localizable.xcstrings with Hebrew; category id `DOG_EVENT`. (in progress 2026-11-10)
+- [x] ios: Push registration, notification categories and actions (Watch live / Mute 1h), and deep link into live view. Add the push copy keys from `backend/src/notifications/payload.ts` (e.g. "%@ has been barking") to Localizable.xcstrings with Hebrew; category id `DOG_EVENT`.
 - [x] backend: Storage service interface with an S3/R2 implementation. Presigned upload and download URLs, plus a daily job that deletes clips older than the retention period. `POST /device/uploads`, `GET /events/:id/media`; pushes carry a 6 h `snapshotUrl`.
-- [~] ios: Notification Service Extension target in project.yml that downloads the snapshot and attaches it to the push. (in progress 2026-11-10)
+- [x] ios: Notification Service Extension target in project.yml that downloads the snapshot and attaches it to the push.
 - [ ] [blocked] ci: TestFlight workflow (`.github/workflows/testflight.yml`). Archive + upload with an App Store Connect API key via `xcodebuild -exportArchive` or fastlane, triggered on every push to main that changes ios/. Needs secrets; see HUMAN_TODO.
 
 ## Phase 2 — MVP
