@@ -1,4 +1,5 @@
 import AVFoundation
+import DogMonitorCore
 import XCTest
 @testable import DogMonitor
 
@@ -52,10 +53,10 @@ final class ClipRecorderTests: XCTestCase {
         of eventID: UUID,
         from media: AsyncStream<RecordedMedia>,
         timeout: Duration
-    ) async -> Set<RecordedMedia.Kind> {
-        await withTaskGroup(of: Set<RecordedMedia.Kind>?.self) { group in
+    ) async -> Set<MediaKind> {
+        await withTaskGroup(of: Set<MediaKind>?.self) { group in
             group.addTask {
-                var kinds = Set<RecordedMedia.Kind>()
+                var kinds = Set<MediaKind>()
                 for await item in media where item.eventID == eventID {
                     kinds.insert(item.kind)
                     if kinds.count == 2 { break }

@@ -7,13 +7,8 @@ import UniformTypeIdentifiers
 
 /// A clip or snapshot saved for an event, ready to upload.
 struct RecordedMedia: Sendable, Equatable {
-    enum Kind: Sendable, Hashable {
-        case clip
-        case snapshot
-    }
-
     let eventID: UUID
-    let kind: Kind
+    let kind: MediaKind
     let url: URL
 }
 
@@ -232,7 +227,7 @@ final class ClipRecorder: NSObject, @unchecked Sendable {
             for segment in clip.segments {
                 data.append(segment.payload)
             }
-            let url = mediaURL(for: clip.id, file: "clip.mp4")
+            let url = mediaURL(for: clip.id, file: MediaKind.clip.fileName)
             let duration = clip.duration
             write(data, to: url, announcing: RecordedMedia(eventID: clip.id, kind: .clip, url: url)) { [logger] in
                 logger.info("Saved \(duration, format: .fixed(precision: 1)) s clip")
@@ -253,7 +248,7 @@ final class ClipRecorder: NSObject, @unchecked Sendable {
             return
         }
         for eventID in eventIDs {
-            let url = mediaURL(for: eventID, file: "snapshot.jpg")
+            let url = mediaURL(for: eventID, file: MediaKind.snapshot.fileName)
             write(jpeg, to: url, announcing: RecordedMedia(eventID: eventID, kind: .snapshot, url: url)) {}
         }
     }

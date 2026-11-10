@@ -297,3 +297,58 @@ extension HouseholdDTO {
         devices.filter { $0.role == .camera && $0.status == .active }
     }
 }
+
+// MARK: - Event media
+
+/// Kinds of event media the camera uploads (`POST /device/uploads`).
+public enum MediaKind: String, Codable, Sendable, Hashable, CaseIterable {
+    case clip
+    case snapshot
+
+    /// File name on the camera and in the bucket.
+    public var fileName: String {
+        switch self {
+        case .clip: "clip.mp4"
+        case .snapshot: "snapshot.jpg"
+        }
+    }
+}
+
+/// Body of `POST /device/uploads`. The event id is sent lowercased, the same way it appears in
+/// `/events/:id` paths, because the backend derives the media key prefix from it.
+public struct MediaUploadsRequest: Codable, Sendable, Hashable {
+    public var eventId: String
+    public var kinds: [MediaKind]
+}
+
+/// A presigned PUT: send the file to `url` with `headers` (no auth header).
+public struct PresignedUploadDTO: Codable, Sendable, Hashable {
+    public let key: String
+    public let url: URL
+    public let headers: [String: String]
+    public let expiresAt: Date
+
+    public init(key: String, url: URL, headers: [String: String], expiresAt: Date) {
+        self.key = key
+        self.url = url
+        self.headers = headers
+        self.expiresAt = expiresAt
+    }
+}
+
+/// Response of `POST /device/uploads`.
+public struct MediaUploadsDTO: Codable, Sendable, Hashable {
+    public struct Uploads: Codable, Sendable, Hashable {
+        public let clip: PresignedUploadDTO?
+        public let snapshot: PresignedUploadDTO?
+    }
+
+    public let uploads: Uploads
+
+    public subscript(kind: MediaKind) -> PresignedUploadDTO? {
+        switch kind {
+        case .clip: uploads.clip
+        case .snapshot: uploads.snapshot
+        }
+    }
+}

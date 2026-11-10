@@ -127,6 +127,24 @@ public struct DogMonitorAPI: Sendable {
         try await send("PATCH", "events/\(Self.path(id))", body: request)
     }
 
+    // MARK: - Event media (camera device auth)
+
+    /// Presigned PUT URLs for an event's media. 503 `storage_not_configured` without a bucket.
+    public func requestUploads(eventId: UUID, kinds: [MediaKind]) async throws -> MediaUploadsDTO {
+        try await send("POST", "device/uploads", body: MediaUploadsRequest(eventId: Self.path(eventId), kinds: kinds))
+    }
+
+    /// PUTs `data` to a presigned URL. The URL carries its own authorization, so no credential is sent.
+    public func upload(_ data: Data, to target: PresignedUploadDTO) async throws {
+        var request = URLRequest(url: target.url)
+        request.httpMethod = "PUT"
+        request.httpBody = data
+        for (field, value) in target.headers {
+            request.setValue(value, forHTTPHeaderField: field)
+        }
+        _ = try await perform(request)
+    }
+
     // MARK: - Live view & realtime
 
     /// A viewer token for watching `cameraId` live. Fails with 409 `viewer_limit_reached`,

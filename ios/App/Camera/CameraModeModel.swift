@@ -45,11 +45,26 @@ final class CameraModeModel {
     private(set) var recorder: ClipRecorder?
     private var engine: EventEngine?
     private let uploader = EventUploader(store: FileEventQueueStore(url: CameraModeModel.queueURL))
+    private let mediaUploader = MediaUploader(
+        directory: CameraModeModel.mediaDirectory,
+        store: FileEventQueueStore(url: CameraModeModel.mediaQueueURL)
+    )
+    private var mediaTask: Task<Void, Never>?
+    /// Engine outputs are published one batch at a time, in order (see `publish`).
+    private var outputContinuation: AsyncStream<[EngineOutput]>.Continuation?
+    /// Started events whose snapshot is uploaded before `POST /events`, so the push has it.
+    private var inlineSnapshots: Set<UUID> = []
 
     nonisolated private static var queueURL: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
         return base.appendingPathComponent("event-queue.json")
+    }
+
+    nonisolated private static var mediaQueueURL: URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+        return base.appendingPathComponent("media-queue.json")
     }
 
     nonisolated static var mediaDirectory: URL {
@@ -118,6 +133,9 @@ final class CameraModeModel {
         analysisTask = nil
         detectionTask = nil
         tickTask = nil
+        // Lets the publisher drain what is already queued, then end.
+        outputContinuation?.finish()
+        outputContinuation = nil
         engine = nil
         dogState = .unknown
         hideTask?.cancel()
@@ -175,15 +193,23 @@ final class CameraModeModel {
         let recorder = ClipRecorder(directory: Self.mediaDirectory, includeAudio: hasAudio)
         let video = capture.samples(.video, bufferingNewest: 2)
         let audio = hasAudio ? capture.samples(.audio, bufferingNewest: 32) : nil
+        let media = recorder.media()
         self.recorder = recorder
         recorderTask = Task.detached(priority: .userInitiated) {
             await recorder.run(video: video, audio: audio)
+        }
+        mediaTask = Task { [weak self] in
+            for await item in media {
+                await self?.recorded(item)
+            }
         }
     }
 
     private func stopRecorder() {
         recorderTask?.cancel()
         recorderTask = nil
+        mediaTask?.cancel()
+        mediaTask = nil
         recorder?.stop()
         recorder = nil
     }
@@ -209,6 +235,13 @@ final class CameraModeModel {
         let cameraID: UUID
         if case .device(let id, _) = credential { cameraID = id } else { cameraID = UUID() }
         engine = EventEngine(cameraID: cameraID)
+        let (outputs, continuation) = AsyncStream<[EngineOutput]>.makeStream()
+        outputContinuation = continuation
+        Task { [weak self] in
+            for await batch in outputs {
+                await self?.publish(batch)
+            }
+        }
         tickTask = Task { [weak self] in
             var ticks = 0
             while !Task.isCancelled {
@@ -241,21 +274,76 @@ final class CameraModeModel {
 
     private func record(_ outputs: [EngineOutput]) {
         guard !outputs.isEmpty, isPaired else { return }
-        for case .started(let event) in outputs where event.type != .calmedDown {
-            recorder?.trigger(eventID: event.id)
+        if let recorder {
+            for case .started(let event) in outputs where event.type != .calmedDown {
+                recorder.trigger(eventID: event.id)
+                inlineSnapshots.insert(event.id)
+            }
         }
-        let uploader = uploader
-        let api = api
-        Task {
-            await uploader.enqueue(outputs)
-            if let api { await uploader.flush(using: api) }
+        outputContinuation?.yield(outputs)
+    }
+
+    /// Queues and sends one batch of outputs. Batches run strictly one after another, so a
+    /// create is always queued before its updates even while it waits for its snapshot.
+    private func publish(_ outputs: [EngineOutput]) async {
+        var outputs = outputs
+        if let api {
+            for index in outputs.indices {
+                guard case .started(var event) = outputs[index], inlineSnapshots.contains(event.id) else { continue }
+                if let key = await uploadSnapshotInline(eventID: event.id, api: api) {
+                    event.snapshotKey = key
+                    outputs[index] = .started(event)
+                }
+            }
+        }
+        await uploader.enqueue(outputs)
+        if let api {
+            await uploader.flush(using: api)
+            await mediaUploader.flush(using: api)
+        }
+    }
+
+    /// Waits briefly for the event's snapshot (the next video frame after the trigger) and
+    /// uploads it, returning its key. On failure the snapshot goes to the media queue and is
+    /// attached later with `PATCH /events/:id`.
+    private func uploadSnapshotInline(eventID: UUID, api: DogMonitorAPI) async -> String? {
+        defer { inlineSnapshots.remove(eventID) }
+        let media = mediaUploader
+        let path = media.fileURL(eventID: eventID, kind: .snapshot).path
+        var waited = 0
+        while !FileManager.default.fileExists(atPath: path), waited < 20 {
+            try? await Task.sleep(for: .milliseconds(100))
+            waited += 1
+        }
+        guard FileManager.default.fileExists(atPath: path) else { return nil }
+        do {
+            return try await media.uploadNow(eventID: eventID, kind: .snapshot, using: api)
+        } catch {
+            await media.enqueue(eventID: eventID, kind: .snapshot)
+            return nil
+        }
+    }
+
+    /// A clip or snapshot was saved: queue it and try to send it.
+    private func recorded(_ item: RecordedMedia) async {
+        let kind = item.kind
+        // Inline snapshots are handled by `uploadSnapshotInline`.
+        if kind == .snapshot, inlineSnapshots.contains(item.eventID) { return }
+        await mediaUploader.enqueue(eventID: item.eventID, kind: kind)
+        if let api {
+            await uploader.flush(using: api)
+            await mediaUploader.flush(using: api)
         }
     }
 
     private func flushEvents() {
         guard let api else { return }
         let uploader = uploader
-        Task { await uploader.flush(using: api) }
+        let mediaUploader = mediaUploader
+        Task {
+            await uploader.flush(using: api)
+            await mediaUploader.flush(using: api)
+        }
     }
 
     private func startAudioAnalysis() {
