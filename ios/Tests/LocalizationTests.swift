@@ -35,6 +35,8 @@ final class LocalizationTests: XCTestCase {
         "Camera on",
         "Microphone off — barking can't be detected.",
         "Barks in the last minute: %lld",
+        "%lld watching",
+        "This phone isn't paired yet, so live view is off. Barking is still detected here.",
     ]
 
     private func bundle(for language: String) throws -> Bundle {

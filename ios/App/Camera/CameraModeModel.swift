@@ -25,6 +25,9 @@ final class CameraModeModel {
     private(set) var detectionLog = DetectionLog()
 
     let capture: CaptureService
+    /// Live view (realtime link + LiveKit), only when this phone is paired as a camera.
+    private(set) var live: CameraLiveController?
+    private let credential: APICredential
 
     private var meterTask: Task<Void, Never>?
     private var analysisTask: Task<Void, Never>?
@@ -33,8 +36,15 @@ final class CameraModeModel {
     private var savedBrightness: Double?
     private var isSceneActive = true
 
-    init(capture: CaptureService = CaptureService()) {
+    init(capture: CaptureService = CaptureService(), credential: APICredential? = nil) {
         self.capture = capture
+        self.credential = credential ?? CredentialStore(store: KeychainStore()).load()
+    }
+
+    /// Paired phones have device credentials; without them the camera only analyzes locally.
+    var isPaired: Bool {
+        if case .device = credential { return true }
+        return false
     }
 
     /// Barks in the last minute, for the debug overlay.
@@ -68,6 +78,7 @@ final class CameraModeModel {
             screen.hidePreview()
             startFrameMeter()
             if hasAudio { startAudioAnalysis() }
+            startLive()
             applyDisplay()
         } catch {
             if status == .starting { status = .failed }
@@ -81,6 +92,8 @@ final class CameraModeModel {
         analysisTask = nil
         detectionTask = nil
         hideTask?.cancel()
+        live?.stop()
+        live = nil
         capture.stop()
         status = .idle
         videoFPS = 0
@@ -118,6 +131,16 @@ final class CameraModeModel {
                 }
             }
         }
+    }
+
+    private func startLive() {
+        guard isPaired else { return }
+        let controller = CameraLiveController(
+            api: DogMonitorAPI(baseURL: AppConfig.apiBaseURL, credential: credential),
+            capture: capture
+        )
+        live = controller
+        controller.start()
     }
 
     private func startAudioAnalysis() {

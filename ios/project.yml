@@ -17,6 +17,9 @@ settings:
 packages:
   DogMonitorCore:
     path: Packages/DogMonitorCore
+  LiveKit:
+    url: https://github.com/livekit/client-sdk-swift
+    majorVersion: 2.0.0
 
 targets:
   DogMonitor:
@@ -26,6 +29,7 @@ targets:
       - path: App
     dependencies:
       - package: DogMonitorCore
+      - package: LiveKit
     info:
       path: Config/DogMonitor-Info.plist
       properties:

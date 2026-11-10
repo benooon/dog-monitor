@@ -1,6 +1,16 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%lld watching": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld צופים"
+          }
+        }
+      }
+    },
     "Barks in the last minute: %lld": {
       "localizations": {
         "he": {
@@ -297,6 +307,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הקישו על המסך כדי להציג את התמונה."
+          }
+        }
+      }
+    },
+    "This phone isn't paired yet, so live view is off. Barking is still detected here.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפון הזה עדיין לא מצומד, לכן צפייה חיה כבויה. נביחות עדיין מזוהות כאן."
           }
         }
       }

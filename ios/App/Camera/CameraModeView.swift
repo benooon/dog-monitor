@@ -52,6 +52,12 @@ struct CameraModeView: View {
             Text("Keep this phone plugged in and the app open.")
                 .font(.headline)
                 .multilineTextAlignment(.center)
+            if !model.isPaired {
+                Text("This phone isn't paired yet, so live view is off. Barking is still detected here.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
             Spacer()
             Button {
                 Task { await model.start() }
@@ -115,6 +121,20 @@ struct CameraModeView: View {
             if model.isPreviewVisible, model.videoFPS > 0 {
                 Text(verbatim: "· \(Int(model.videoFPS.rounded())) fps")
                     .monospacedDigit()
+            }
+            if let live = model.live {
+                if live.viewerCount > 0 {
+                    // Privacy (SPEC §10): always show when someone is watching.
+                    Label {
+                        Text("\(live.viewerCount) watching")
+                    } icon: {
+                        Image(systemName: "eye.fill")
+                    }
+                    .foregroundStyle(.white)
+                } else if live.link == .offline {
+                    Image(systemName: "wifi.slash")
+                        .accessibilityLabel(Text("Offline"))
+                }
             }
             if !model.hasAudio {
                 Image(systemName: "mic.slash.fill")
