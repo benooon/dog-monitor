@@ -40,6 +40,9 @@ final class CameraModeModel {
     private var detectionTask: Task<Void, Never>?
     private var hideTask: Task<Void, Never>?
     private var tickTask: Task<Void, Never>?
+    private var recorderTask: Task<Void, Never>?
+    /// Ring-buffer clip recorder; runs only when paired (clips are for upload).
+    private(set) var recorder: ClipRecorder?
     private var engine: EventEngine?
     private let uploader = EventUploader(store: FileEventQueueStore(url: CameraModeModel.queueURL))
 
@@ -47,6 +50,12 @@ final class CameraModeModel {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
         return base.appendingPathComponent("event-queue.json")
+    }
+
+    nonisolated static var mediaDirectory: URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+        return base.appendingPathComponent("event-media", isDirectory: true)
     }
     private var savedBrightness: Double?
     private var isSceneActive = true
@@ -95,6 +104,7 @@ final class CameraModeModel {
             startEventEngine()
             if hasAudio { startAudioAnalysis() }
             startLive()
+            startRecorder()
             applyDisplay()
         } catch {
             if status == .starting { status = .failed }
@@ -113,6 +123,7 @@ final class CameraModeModel {
         hideTask?.cancel()
         live?.stop()
         live = nil
+        stopRecorder()
         capture.stop()
         status = .idle
         videoFPS = 0
@@ -156,6 +167,25 @@ final class CameraModeModel {
     func didPair(with credential: APICredential) {
         self.credential = credential
         if status == .running, live == nil { startLive() }
+        if status == .running { startRecorder() }
+    }
+
+    private func startRecorder() {
+        guard isPaired, recorder == nil else { return }
+        let recorder = ClipRecorder(directory: Self.mediaDirectory, includeAudio: hasAudio)
+        let video = capture.samples(.video, bufferingNewest: 2)
+        let audio = hasAudio ? capture.samples(.audio, bufferingNewest: 32) : nil
+        self.recorder = recorder
+        recorderTask = Task.detached(priority: .userInitiated) {
+            await recorder.run(video: video, audio: audio)
+        }
+    }
+
+    private func stopRecorder() {
+        recorderTask?.cancel()
+        recorderTask = nil
+        recorder?.stop()
+        recorder = nil
     }
 
     private func startLive() {
@@ -211,6 +241,9 @@ final class CameraModeModel {
 
     private func record(_ outputs: [EngineOutput]) {
         guard !outputs.isEmpty, isPaired else { return }
+        for case .started(let event) in outputs where event.type != .calmedDown {
+            recorder?.trigger(eventID: event.id)
+        }
         let uploader = uploader
         let api = api
         Task {
