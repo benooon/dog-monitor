@@ -145,6 +145,18 @@ public struct DogMonitorAPI: Sendable {
         _ = try await perform(request)
     }
 
+    // MARK: - Notification preferences (user auth)
+
+    /// The caller's push preferences and the defaults for types without a preference.
+    public func notificationPrefs() async throws -> NotificationPrefsDTO {
+        try await send("GET", "notification-prefs")
+    }
+
+    /// Replaces all of the caller's preference rows; returns what is now stored.
+    public func replaceNotificationPrefs(_ prefs: [NotificationPrefDTO]) async throws -> NotificationPrefsDTO {
+        try await send("PUT", "notification-prefs", body: NotificationPrefsRequest(prefs: prefs))
+    }
+
     // MARK: - Live view & realtime
 
     /// A viewer token for watching `cameraId` live. Fails with 409 `viewer_limit_reached`,

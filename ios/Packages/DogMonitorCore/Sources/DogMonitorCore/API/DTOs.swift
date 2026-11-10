@@ -352,3 +352,79 @@ public struct MediaUploadsDTO: Codable, Sendable, Hashable {
         }
     }
 }
+
+// MARK: - Notification preferences
+
+/// One stored preference row: an event type for all cameras (`cameraId == nil`) or one camera.
+/// Quiet hours are "HH:MM" in the phone's time zone and only hold back non-time-sensitive pushes.
+public struct NotificationPrefDTO: Codable, Sendable, Hashable {
+    public var cameraId: UUID?
+    public var eventType: EventType
+    public var enabled: Bool
+    public var quietStart: String?
+    public var quietEnd: String?
+
+    public init(cameraId: UUID?, eventType: EventType, enabled: Bool, quietStart: String? = nil, quietEnd: String? = nil) {
+        self.cameraId = cameraId
+        self.eventType = eventType
+        self.enabled = enabled
+        self.quietStart = quietStart
+        self.quietEnd = quietEnd
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case cameraId, eventType, enabled, quietStart, quietEnd
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cameraId = try container.decodeIfPresent(UUID.self, forKey: .cameraId)
+        eventType = try container.decode(EventType.self, forKey: .eventType)
+        enabled = try container.decode(Bool.self, forKey: .enabled)
+        quietStart = try container.decodeIfPresent(String.self, forKey: .quietStart)
+        quietEnd = try container.decodeIfPresent(String.self, forKey: .quietEnd)
+    }
+
+    /// `cameraId` is required by the backend, so `nil` is sent as an explicit `null`.
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if let cameraId {
+            try container.encode(cameraId.uuidString.lowercased(), forKey: .cameraId)
+        } else {
+            try container.encodeNil(forKey: .cameraId)
+        }
+        try container.encode(eventType, forKey: .eventType)
+        try container.encode(enabled, forKey: .enabled)
+        try container.encodeIfPresent(quietStart, forKey: .quietStart)
+        try container.encodeIfPresent(quietEnd, forKey: .quietEnd)
+    }
+}
+
+/// How the backend treats an event type when the user has no preference row for it.
+public struct NotificationTypeInfoDTO: Codable, Sendable, Hashable {
+    public let eventType: EventType
+    public let enabledByDefault: Bool
+    public let bypassesQuietHours: Bool
+
+    public init(eventType: EventType, enabledByDefault: Bool, bypassesQuietHours: Bool) {
+        self.eventType = eventType
+        self.enabledByDefault = enabledByDefault
+        self.bypassesQuietHours = bypassesQuietHours
+    }
+}
+
+/// Response of `GET` / `PUT /notification-prefs`.
+public struct NotificationPrefsDTO: Codable, Sendable, Hashable {
+    public let types: [NotificationTypeInfoDTO]
+    public let prefs: [NotificationPrefDTO]
+
+    public init(types: [NotificationTypeInfoDTO], prefs: [NotificationPrefDTO]) {
+        self.types = types
+        self.prefs = prefs
+    }
+}
+
+/// Body of `PUT /notification-prefs`: replaces all of the caller's rows.
+public struct NotificationPrefsRequest: Encodable, Sendable, Hashable {
+    public var prefs: [NotificationPrefDTO]
+}
