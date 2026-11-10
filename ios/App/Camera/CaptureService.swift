@@ -45,6 +45,9 @@ final class CaptureService: NSObject, @unchecked Sendable {
     // Touched only on `sessionQueue`.
     private var isConfigured = false
     private var runtimeErrorObserver: NSObjectProtocol?
+    // Keeps video upright for analysis and streaming as the phone is turned (session queue).
+    private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
+    private var rotationObservation: NSKeyValueObservation?
 
     override init() {
         super.init()
@@ -141,6 +144,7 @@ final class CaptureService: NSObject, @unchecked Sendable {
         videoOutput.setSampleBufferDelegate(self, queue: outputQueue)
         guard session.canAddOutput(videoOutput) else { throw CaptureError.configurationFailed }
         session.addOutput(videoOutput)
+        followDeviceRotation(of: camera)
 
         // Audio is best effort: without it the camera still streams video, but bark detection is off.
         if includeAudio,
@@ -153,6 +157,23 @@ final class CaptureService: NSObject, @unchecked Sendable {
                 session.addOutput(audioOutput)
             }
         }
+    }
+
+    private func followDeviceRotation(of camera: AVCaptureDevice) {
+        let coordinator = AVCaptureDevice.RotationCoordinator(device: camera, previewLayer: nil)
+        rotationCoordinator = coordinator
+        applyRotation(coordinator.videoRotationAngleForHorizonLevelCapture)
+        rotationObservation = coordinator.observe(\.videoRotationAngleForHorizonLevelCapture, options: [.new]) { [weak self] coordinator, _ in
+            let angle = coordinator.videoRotationAngleForHorizonLevelCapture
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+        }
+    }
+
+    private func applyRotation(_ angle: CGFloat) {
+        guard let connection = videoOutput.connection(with: .video),
+              connection.isVideoRotationAngleSupported(angle)
+        else { return }
+        connection.videoRotationAngle = angle
     }
 
     private func restartAfterRuntimeError() {

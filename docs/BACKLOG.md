@@ -31,7 +31,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] backend: Enforce the 5-viewers-per-camera limit in `POST /cameras/:id/live-token` using WebSocket presence (or LiveKit room participant count), returning 409 `viewer_limit_reached`.
 - [~] ios: Camera publishes to LiveKit only while viewers are connected (driven by the WebSocket signal), with simulcast 720p/360p. (in progress 2026-11-10)
 - [ ] ios: Publish camera audio to LiveKit. AVCaptureSession already owns the mic for bark detection; either feed captured audio into LiveKit's audio pipeline or verify both can share the mic on a device. Viewers currently get video only.
-- [ ] ios: Rotate streamed (and analyzed) video to match the camera phone's orientation (`AVCaptureDevice.RotationCoordinator` → `videoRotationAngle` on the video output connection).
+- [~] ios: Rotate streamed (and analyzed) video to match the camera phone's orientation (`AVCaptureDevice.RotationCoordinator` → `videoRotationAngle` on the video output connection). (in progress 2026-11-10)
 - [ ] ios: Pairing UI (moved up: live view needs a paired camera). The owner shows a QR code + 6-digit code; the new device scans it (AVFoundation metadata output) and joins, then picks a role.
 - [ ] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
 - [x] backend: APNs sender (token auth, .p8 from env) and `POST /events` that stores the event and fans out pushes according to `notification_prefs`. Unit test with a mocked APNs client. Also `PATCH /events/:id` (end, escalation push) and the camera-offline push.
