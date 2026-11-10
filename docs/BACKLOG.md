@@ -49,7 +49,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
   - [x] ci: Build iOS with the newest stable Xcode on the runner (so `#if compiler(>=6.2)` Liquid Glass code is actually compiled), logging the Xcode version. (verified by green CI on 682dff2, Xcode 26.3)
   - [x] ios: Redo viewer home and camera cards with the design system (StatusPill on snapshots, ContentUnavailableView for no cameras, symbol effects, numericText). (verified by green CI on 682dff2, Xcode 26.3) Still to use where they fit: symbol effects and numericText on the cards.
   - [x] ios: Redo camera mode (floating glass controls over the preview, health warnings as glass cards, Reduce Motion). (327699a, green CI on 682dff2)
-  - [~] ios: Redo live view (glass control bar: mute, talk, Lock Screen; connection states as ContentUnavailableView). (in progress 2026-11-10)
+  - [x] ios: Redo live view (glass control bar: mute, talk, Lock Screen; connection states as ContentUnavailableView). (verified by green CI on f5ebf0b; LiveView has no #Preview because DeviceDTO has no public init)
   - [~] ios: Redo onboarding: role picker, sign in, create household, pairing (PrimaryButton, copy per the voice in CLAUDE.md). (in progress 2026-11-10)
   - [~] ios: Redo the household and notification settings sheets (Form/List conventions, empty/error states, copy pass). (in progress 2026-11-10)
   - [~] ios: Redo the timeline, daily summary and premium sheets (Form/List conventions, empty/error states, copy pass). (in progress 2026-11-10)
