@@ -112,6 +112,16 @@ public struct DogMonitorAPI: Sendable {
         )
     }
 
+    // MARK: - Events (camera device auth)
+
+    public func createEvent(_ request: CreateEventRequest) async throws -> EventDTO {
+        try await send("POST", "events", body: request)
+    }
+
+    public func updateEvent(id: UUID, _ request: UpdateEventRequest) async throws -> EventDTO {
+        try await send("PATCH", "events/\(Self.path(id))", body: request)
+    }
+
     // MARK: - Live view & realtime
 
     /// A viewer token for watching `cameraId` live. Fails with 409 `viewer_limit_reached`,

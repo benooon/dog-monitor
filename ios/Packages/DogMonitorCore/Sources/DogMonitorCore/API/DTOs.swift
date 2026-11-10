@@ -113,6 +113,59 @@ public struct LiveTokenDTO: Codable, Sendable, Hashable {
     public let expiresAt: Date
 }
 
+/// An event as stored by the backend (`POST /events`, `PATCH /events/:id`).
+public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
+    public let id: UUID
+    public let householdId: UUID
+    public let cameraId: UUID?
+    public let type: EventType
+    public let state: DogState?
+    public let startedAt: Date
+    public let endedAt: Date?
+    public let confidence: Double?
+    public let clipKey: String?
+    public let snapshotKey: String?
+}
+
+/// Body of `POST /events` (camera device auth). The id is generated on the camera so retries are idempotent.
+public struct CreateEventRequest: Codable, Sendable, Hashable {
+    public var id: UUID
+    public var type: EventType
+    public var state: DogState?
+    public var startedAt: Date
+    public var endedAt: Date?
+    public var confidence: Double?
+    public var clipKey: String?
+    public var snapshotKey: String?
+
+    public init(_ event: DogEvent) {
+        id = event.id
+        type = event.type
+        state = event.state
+        startedAt = event.startedAt
+        endedAt = event.endedAt
+        confidence = event.confidence
+        clipKey = event.clipKey
+        snapshotKey = event.snapshotKey
+    }
+}
+
+/// Body of `PATCH /events/:id`.
+public struct UpdateEventRequest: Codable, Sendable, Hashable {
+    public var endedAt: Date?
+    public var clipKey: String?
+    public var snapshotKey: String?
+    /// Sends an escalation push ("barking for 5 minutes").
+    public var escalationSeconds: Double?
+
+    public init(endedAt: Date? = nil, clipKey: String? = nil, snapshotKey: String? = nil, escalationSeconds: Double? = nil) {
+        self.endedAt = endedAt
+        self.clipKey = clipKey
+        self.snapshotKey = snapshotKey
+        self.escalationSeconds = escalationSeconds
+    }
+}
+
 public struct HealthResponse: Codable, Sendable, Hashable {
     public let status: String
     public let uptimeSeconds: Double
