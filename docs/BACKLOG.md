@@ -11,11 +11,11 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Add a Hebrew + English String Catalog (`Localizable.xcstrings`), and verify the role picker renders in RTL via a SwiftUI preview and a snapshot-free unit test of the localized keys.
 - [x] backend: Scaffold `backend/` (Node 22, TypeScript strict, Fastify, ESLint, Vitest, tsx for dev, `npm run build` to `dist/`). Add `GET /health`, `backend/.env.example`, and a `Dockerfile` or Nixpacks config suitable for Railway, plus a test for `/health`. Goal: the CI `backend` job is green.
 - [x] backend: Add Drizzle with PostgreSQL. Write the schema from SPEC §9 with migrations and an `npm run migrate` script, and have Vitest run against the CI Postgres service (`DATABASE_URL`).
-- [ ] docs: Write `README.md`: what the project is, repo layout, how to run the backend locally, and how CI and the agent loop work.
+- [x] docs: Write `README.md`: what the project is, repo layout, how to run the backend locally, and how CI and the agent loop work.
 
 ## Phase 1 — Prototype (one camera, one viewer)
 
-- [ ] backend: Auth. `POST /auth/apple` verifies a Sign in with Apple identity token (JWKS) and returns our JWT. Add JWT middleware. Tests mock the JWKS.
+- [~] backend: Auth. `POST /auth/apple` verifies a Sign in with Apple identity token (JWKS) and returns our JWT. Add JWT middleware. Tests mock the JWKS. (in progress 2026-11-10)
 - [ ] backend: Households (create/get), dogs (CRUD), and devices (register device, update APNs token, revoke). Everything is scoped to the caller's household. Add tests.
 - [ ] backend: Pairing. `POST /invites` creates a one-time token (10 min) and `POST /invites/:token/accept` consumes it. Camera devices get a device secret, and device auth uses it. Add tests.
 - [ ] core: API client (`DogMonitorAPI`) using URLSession async/await with Codable DTOs matching the backend, and a pluggable base URL. Unit test it with a URLProtocol stub. (On Linux, guard with `#if canImport(FoundationNetworking)`.)
