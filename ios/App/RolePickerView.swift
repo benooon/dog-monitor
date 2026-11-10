@@ -51,3 +51,9 @@ struct RolePickerView: View {
 #Preview {
     RolePickerView { _ in }
 }
+
+#Preview("Hebrew (RTL)") {
+    RolePickerView { _ in }
+        .environment(\.locale, Locale(identifier: "he"))
+        .environment(\.layoutDirection, .rightToLeft)
+}

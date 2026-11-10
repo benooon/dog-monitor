@@ -30,6 +30,10 @@ targets:
       path: Config/DogMonitor-Info.plist
       properties:
         CFBundleDisplayName: Dog Monitor
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations:
+          - en
+          - he
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}

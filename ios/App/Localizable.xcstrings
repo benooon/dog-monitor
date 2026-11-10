@@ -1,0 +1,76 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Camera": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מצלמה"
+          }
+        }
+      }
+    },
+    "Change role": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "החלפת תפקיד"
+          }
+        }
+      }
+    },
+    "Dog Monitor": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dog Monitor"
+          }
+        }
+      }
+    },
+    "How will this device be used?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "איך ישמש המכשיר הזה?"
+          }
+        }
+      }
+    },
+    "Leave this phone at home to watch your dog.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השאירו את הטלפון הזה בבית כדי לשמור על הכלב שלכם."
+          }
+        }
+      }
+    },
+    "Viewer": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צופה"
+          }
+        }
+      }
+    },
+    "Watch live and get alerts on your own phone.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צפו בשידור חי וקבלו התראות בטלפון שלכם."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

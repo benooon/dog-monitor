@@ -1,0 +1,46 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dog Monitor"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dog Monitor משתמשת במצלמה כדי לצפות בכלב שלכם ולשדר וידאו חי לבני המשפחה."
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dog Monitor משתמשת ברשת המקומית כדי למצוא את המכשירים האחרים שלכם ולהתחבר אליהם."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dog Monitor משתמשת במיקרופון כדי לזהות נביחות ולאפשר לכם לשמוע את הכלב ולדבר איתו."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
