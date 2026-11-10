@@ -63,6 +63,19 @@ describe.skipIf(!hasDatabase)("camera zones", () => {
     expect((await app.inject({ method: "GET", url: "/device/zones", headers: b.camera })).json()).toEqual({ zones: [] });
   });
 
+  it("tells viewers which zone kinds each camera has", async () => {
+    const { owner, camera } = await pairCamera("owner", "Hall");
+    const cameraOf = async () =>
+      (await app.inject({ method: "GET", url: "/household", headers: owner }))
+        .json()
+        .devices.find((d: { role: string }) => d.role === "camera");
+    expect((await cameraOf()).zoneKinds).toEqual([]);
+
+    const sofa2 = { ...sofa, polygon: [{ x: 0.5, y: 0.5 }, { x: 0.6, y: 0.5 }, { x: 0.6, y: 0.6 }] };
+    await app.inject({ method: "PUT", url: "/device/zones", headers: camera, payload: { zones: [sofa, door, sofa2] } });
+    expect((await cameraOf()).zoneKinds).toEqual(["door", "forbidden"]);
+  });
+
   it("validates shapes and requires device auth", async () => {
     const { owner, camera } = await pairCamera("owner", "Hall");
     const bad = [

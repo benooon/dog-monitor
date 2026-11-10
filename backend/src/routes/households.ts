@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices, dogs, householdMembers, households, notificationPrefs, users } from "../db/schema.js";
+import { devices, dogs, householdMembers, households, notificationPrefs, users, zones } from "../db/schema.js";
 import { deviceDto, dogDto } from "../households/dto.js";
 import { findMembership, requireHousehold, requireOwner } from "../households/scope.js";
 import { effectivePlan } from "../billing/plans.js";
@@ -46,6 +46,16 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
       .where(eq(householdMembers.householdId, householdId));
     const dogRows = await db.select().from(dogs).where(eq(dogs.householdId, householdId));
     const deviceRows = await db.select().from(devices).where(eq(devices.householdId, householdId));
+    // Which zone kinds each camera has drawn, so viewers know e.g. whether a sofa zone exists.
+    const zoneRows = await db
+      .selectDistinct({ deviceId: zones.deviceId, kind: zones.kind })
+      .from(zones)
+      .innerJoin(devices, eq(devices.id, zones.deviceId))
+      .where(eq(devices.householdId, householdId));
+    const zoneKinds = new Map<string, string[]>();
+    for (const row of zoneRows) {
+      zoneKinds.set(row.deviceId, [...(zoneKinds.get(row.deviceId) ?? []), row.kind].sort());
+    }
     return {
       id: household!.id,
       name: household!.name,
@@ -55,7 +65,7 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
       role,
       members,
       dogs: dogRows.map(dogDto),
-      devices: deviceRows.map(deviceDto),
+      devices: deviceRows.map((d) => ({ ...deviceDto(d), zoneKinds: zoneKinds.get(d.id) ?? [] })),
     };
   });
 
