@@ -8,28 +8,17 @@ struct QuestionScreen<Content: View, Actions: View>: View {
     @ViewBuilder let content: Content
     @ViewBuilder let actions: Actions
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
-                VStack(alignment: .leading, spacing: DS.Spacing.s) {
-                    title
-                        .font(.largeTitle.bold())
-                        .accessibilityAddTraits(.isHeader)
-                    if let message {
-                        message
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                content
+        GeometryReader { proxy in
+            ScrollView {
+                column
+                    // iPad: the question sits in the middle of the screen instead of a strip at the top.
+                    .frame(minHeight: proxy.size.height, alignment: horizontalSizeClass == .regular ? .center : .top)
             }
-            .padding(.top, DS.Spacing.l)
-            .padding(.horizontal, DS.Spacing.xl)
-            .frame(maxWidth: DS.Layout.readableWidth)
-            .frame(maxWidth: .infinity)
+            .scrollBounceBehavior(.basedOnSize)
         }
-        .scrollBounceBehavior(.basedOnSize)
         .safeAreaInset(edge: .bottom, spacing: DS.Spacing.l) {
             VStack(spacing: DS.Spacing.m) {
                 actions
@@ -39,6 +28,27 @@ struct QuestionScreen<Content: View, Actions: View>: View {
             .frame(maxWidth: DS.Layout.readableWidth)
             .frame(maxWidth: .infinity)
         }
+    }
+
+    private var column: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
+            VStack(alignment: .leading, spacing: DS.Spacing.s) {
+                title
+                    .font(.largeTitle.bold())
+                    .accessibilityAddTraits(.isHeader)
+                if let message {
+                    message
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            content
+        }
+        .padding(.vertical, DS.Spacing.l)
+        .padding(.horizontal, DS.Spacing.xl)
+        .frame(maxWidth: DS.Layout.readableWidth)
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -73,6 +83,11 @@ struct ChoiceCard: View {
         self.action = action
     }
 
+    private var titleText: some View {
+        Text(title)
+            .font(.headline)
+    }
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: DS.Spacing.l) {
@@ -83,17 +98,20 @@ struct ChoiceCard: View {
                     .symbolEffect(.bounce, value: isSelected && !reduceMotion)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                    HStack(spacing: DS.Spacing.s) {
-                        Text(title)
-                            .font(.headline)
-                        if let badge {
-                            Text(badge)
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.tint)
-                                .padding(.horizontal, DS.Spacing.s)
-                                .padding(.vertical, DS.Spacing.xs / 2)
-                                .background(.tint.opacity(0.12), in: Capsule())
+                    if let badge {
+                        // Badge beside the title when it fits, under it otherwise (never hyphenated).
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: DS.Spacing.s) {
+                                titleText
+                                BadgeLabel(text: badge)
+                            }
+                            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                                titleText
+                                BadgeLabel(text: badge)
+                            }
                         }
+                    } else {
+                        titleText
                     }
                     if let subtitle {
                         subtitle
@@ -121,6 +139,22 @@ struct ChoiceCard: View {
         .sensoryFeedback(.selection, trigger: isSelected)
         .animation(DS.Motion.animation(DS.Motion.standard, reduceMotion: reduceMotion), value: isSelected)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+/// A small tinted capsule, e.g. "Recommended".
+private struct BadgeLabel: View {
+    let text: LocalizedStringKey
+
+    var body: some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.tint)
+            .lineLimit(1)
+            .fixedSize()
+            .padding(.horizontal, DS.Spacing.s)
+            .padding(.vertical, DS.Spacing.xs / 2)
+            .background(.tint.opacity(0.12), in: Capsule())
     }
 }
 

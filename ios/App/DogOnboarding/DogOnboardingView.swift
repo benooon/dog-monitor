@@ -265,6 +265,7 @@ private struct SummaryStep: View {
     let onFinish: () -> Void
 
     @ScaledMetric(relativeTo: .largeTitle) private var avatarSize: CGFloat = 112
+    @ScaledMetric(relativeTo: .body) private var promiseSymbolWidth: CGFloat = 28
     @State private var failures = 0
 
     var body: some View {
@@ -274,14 +275,18 @@ private struct SummaryStep: View {
                     .frame(maxWidth: .infinity)
                 VStack(alignment: .leading, spacing: DS.Spacing.l) {
                     ForEach(model.promises, id: \.self) { promise in
-                        Label {
+                        HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.m) {
+                            Image(systemName: promise.systemImage)
+                                .foregroundStyle(.tint)
+                                // One column for every symbol, so the sentences line up.
+                                .frame(width: promiseSymbolWidth)
+                                .accessibilityHidden(true)
                             promise.text(dogName: model.displayName)
                                 .font(.body)
                                 .fixedSize(horizontal: false, vertical: true)
-                        } icon: {
-                            Image(systemName: promise.systemImage)
-                                .foregroundStyle(.tint)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        .accessibilityElement(children: .combine)
                     }
                 }
                 .padding(DS.Spacing.l)
