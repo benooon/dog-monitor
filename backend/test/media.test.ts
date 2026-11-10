@@ -213,7 +213,17 @@ describe.skipIf(!hasDatabase)("media routes and retention", () => {
     ]);
     expect(exported.json().next).toBeNull();
 
+    const exportToken = await app.inject({ method: "POST", url: "/training/export-token", headers: owner });
+    expect(exportToken.statusCode).toBe(200);
+    const scripted = await app.inject({
+      method: "GET",
+      url: "/training/labeled",
+      headers: { authorization: `Bearer ${exportToken.json().token}` },
+    });
+    expect(scripted.json().items).toHaveLength(1);
+
     await h.db.update(households).set({ shareTrainingData: false }).where(eq(households.id, householdId));
+    expect((await app.inject({ method: "POST", url: "/training/export-token", headers: owner })).statusCode).toBe(403);
     expect(await purgeExpiredMedia(h.db, storage, 7, now)).toBe(1);
   });
 });

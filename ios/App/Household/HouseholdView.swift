@@ -1,5 +1,6 @@
 import DogMonitorCore
 import SwiftUI
+import UIKit
 
 /// Who and what is in the household: family members, cameras and phones. The owner can invite,
 /// remove members and remove devices.
@@ -10,6 +11,7 @@ struct HouseholdView: View {
     @State private var memberToRemove: MemberDTO?
     @State private var deviceToRemove: DeviceDTO?
     @State private var sharesTrainingData = false
+    @State private var copiedExportKey = false
 
     private var household: HouseholdDTO? { model.household }
     private var isOwner: Bool { household?.role == .owner }
@@ -119,6 +121,20 @@ struct HouseholdView: View {
                     .onChange(of: sharesTrainingData) { _, enabled in
                         guard enabled != (household.shareTrainingData ?? false) else { return }
                         Task { await model.setShareTrainingData(enabled) }
+                    }
+                    if household.shareTrainingData == true {
+                        Button("Copy export key", systemImage: "key") {
+                            Task {
+                                guard let token = await model.trainingExportToken() else { return }
+                                UIPasteboard.general.string = token
+                                copiedExportKey = true
+                            }
+                        }
+                        if copiedExportKey {
+                            Text("Export key copied. It works for one hour.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 } footer: {
                     Text("Clips your household marks right or wrong are kept for 90 days to train detection. Other clips are still deleted after a week.")

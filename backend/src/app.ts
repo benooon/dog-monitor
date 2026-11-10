@@ -88,7 +88,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(timelineRoutes, { db: services.db });
     await app.register(cameraSummaryRoutes, { db: services.db, notifier });
     await app.register(viewerSummaryRoutes, { db: services.db });
-    await app.register(trainingRoutes, { db: services.db, storage: services.storage });
+    await app.register(trainingRoutes, { db: services.db, storage: services.storage, jwt: services.jwt });
     if (services.storage && services.retentionDays !== 0) {
       const stop = scheduleRetention(services.db, services.storage, services.retentionDays ?? DEFAULT_RETENTION_DAYS, app.log);
       app.addHook("onClose", async () => stop());

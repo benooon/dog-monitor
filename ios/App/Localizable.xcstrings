@@ -491,6 +491,16 @@
         }
       }
     },
+    "Copy export key": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "העתקת מפתח ייצוא"
+          }
+        }
+      }
+    },
     "Couldn't load the summary": {
       "localizations": {
         "he": {
@@ -537,6 +547,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "לא ניתן להפעיל את המצלמה."
+          }
+        }
+      }
+    },
+    "Couldn't use this model": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן להשתמש במודל הזה"
           }
         }
       }
@@ -667,6 +687,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "בתוקף עוד %@"
+          }
+        }
+      }
+    },
+    "Export key copied. It works for one hour.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מפתח הייצוא הועתק. הוא תקף לשעה."
           }
         }
       }
@@ -857,6 +887,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "צפייה חיה עדיין לא הוגדרה בשרת."
+          }
+        }
+      }
+    },
+    "Load a trained model…": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "טעינת מודל מאומן…"
           }
         }
       }
@@ -1091,6 +1131,16 @@
         }
       }
     },
+    "Pick a sound classifier made with Create ML. See the training guide.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בחרו מסווג קול שנוצר ב-Create ML. פרטים במדריך האימון."
+          }
+        }
+      }
+    },
     "Plug this phone in so it stays on.": {
       "localizations": {
         "he": {
@@ -1247,6 +1297,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "משהו השתבש. נסו שוב."
+          }
+        }
+      }
+    },
+    "Sound model: built-in": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מודל קול: מובנה"
+          }
+        }
+      }
+    },
+    "Sound model: trained": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מודל קול: מאומן"
           }
         }
       }
@@ -1573,6 +1643,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "שימוש בהגדרות משק הבית"
+          }
+        }
+      }
+    },
+    "Use the built-in model": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שימוש במודל המובנה"
           }
         }
       }

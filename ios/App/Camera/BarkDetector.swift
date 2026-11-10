@@ -87,12 +87,18 @@ final class BarkDetector: @unchecked Sendable {
         let analyzer = SNAudioStreamAnalyzer(format: target)
         let observer = ResultsObserver(threshold: confidenceThreshold, broadcaster: broadcaster, logger: logger)
         do {
-            let request = try SNClassifySoundRequest(classifierIdentifier: .version1)
-            request.overlapFactor = 0.5
-            let missing = SoundClassMapping.unknownIdentifiers(knownByClassifier: request.knownClassifications)
-            if !missing.isEmpty {
-                logger.warning("Classifier lacks labels: \(missing.joined(separator: ", "), privacy: .public)")
+            let request: SNClassifySoundRequest
+            if let custom = CustomSoundModel.load(), let customRequest = try? SNClassifySoundRequest(mlModel: custom) {
+                // A model trained on this household's labeled clips (docs/TRAINING.md).
+                request = customRequest
+            } else {
+                request = try SNClassifySoundRequest(classifierIdentifier: .version1)
+                let missing = SoundClassMapping.unknownIdentifiers(knownByClassifier: request.knownClassifications)
+                if !missing.isEmpty {
+                    logger.warning("Classifier lacks labels: \(missing.joined(separator: ", "), privacy: .public)")
+                }
             }
+            request.overlapFactor = 0.5
             try analyzer.add(request, withObserver: observer)
         } catch {
             logger.error("Could not start sound classification: \(error.localizedDescription, privacy: .public)")

@@ -18,14 +18,15 @@ export class JwtService {
     this.key = new TextEncoder().encode(secret);
   }
 
-  async issue(claims: UserClaims): Promise<string> {
+  /** `ttlSeconds` overrides the default lifetime (e.g. short-lived export tokens). */
+  async issue(claims: UserClaims, ttlSeconds: number = this.ttlSeconds): Promise<string> {
     return new SignJWT({})
       .setProtectedHeader({ alg: "HS256" })
       .setSubject(claims.userId)
       .setIssuer(ISSUER)
       .setAudience(AUDIENCE)
       .setIssuedAt()
-      .setExpirationTime(`${this.ttlSeconds}s`)
+      .setExpirationTime(`${ttlSeconds}s`)
       .sign(this.key);
   }
 

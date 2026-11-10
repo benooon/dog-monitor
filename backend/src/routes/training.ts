@@ -3,6 +3,7 @@ import { and, asc, eq, gt, isNotNull, type SQL } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { events, households } from "../db/schema.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
+import type { JwtService } from "../auth/jwt.js";
 import type { MediaStorage } from "../storage/storage.js";
 import { DOWNLOAD_URL_TTL_SECONDS } from "./media.js";
 
@@ -11,11 +12,28 @@ import { DOWNLOAD_URL_TTL_SECONDS } from "./media.js";
  * wrong, with short-lived download URLs (for `scripts/export-training-data`). Only for households
  * that opted in; oldest first, 200 per page.
  */
-export async function trainingRoutes(app: FastifyInstance, opts: { db: Database; storage?: MediaStorage }): Promise<void> {
+export const EXPORT_TOKEN_TTL_SECONDS = 60 * 60;
+
+export async function trainingRoutes(
+  app: FastifyInstance,
+  opts: { db: Database; storage?: MediaStorage; jwt: JwtService },
+): Promise<void> {
   const { db } = opts;
   app.addHook("preHandler", app.authenticate);
   app.addHook("preHandler", requireHousehold(db));
   app.addHook("preHandler", requireOwner);
+
+  async function optedIn(householdId: string): Promise<boolean> {
+    const [household] = await db.select({ optedIn: households.shareTrainingData }).from(households).where(eq(households.id, householdId));
+    return household?.optedIn ?? false;
+  }
+
+  /** A one-hour token for the export script, so the app's long-lived session never leaves the phone. */
+  app.post("/training/export-token", async (request, reply) => {
+    if (!(await optedIn(request.household!.householdId))) return reply.code(403).send({ error: "training_not_enabled" });
+    const token = await opts.jwt.issue({ userId: request.user!.userId }, EXPORT_TOKEN_TTL_SECONDS);
+    return { token, expiresAt: new Date(Date.now() + EXPORT_TOKEN_TTL_SECONDS * 1000).toISOString() };
+  });
 
   app.get<{ Querystring: { after?: string } }>(
     "/training/labeled",
@@ -30,8 +48,7 @@ export async function trainingRoutes(app: FastifyInstance, opts: { db: Database;
     },
     async (request, reply) => {
       const { householdId } = request.household!;
-      const [household] = await db.select({ optedIn: households.shareTrainingData }).from(households).where(eq(households.id, householdId));
-      if (!household?.optedIn) return reply.code(403).send({ error: "training_not_enabled" });
+      if (!(await optedIn(householdId))) return reply.code(403).send({ error: "training_not_enabled" });
       if (!opts.storage) return reply.code(503).send({ error: "storage_not_configured" });
 
       const filters: SQL[] = [eq(events.householdId, householdId), isNotNull(events.feedback), isNotNull(events.clipKey)];

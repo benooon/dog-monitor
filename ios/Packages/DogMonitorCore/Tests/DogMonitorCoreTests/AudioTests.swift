@@ -43,6 +43,15 @@ final class SoundClassMappingTests: XCTestCase {
         let missing = SoundClassMapping.unknownIdentifiers(knownByClassifier: ["dog_bark", "dog_howl", "speech"])
         XCTAssertEqual(missing, ["dog_bow_wow", "dog_growl", "dog_whimper"])
     }
+
+    func testCustomModelLabels() {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let input = [
+            SoundClassification(identifier: "bark", confidence: 0.9),
+            SoundClassification(identifier: "other", confidence: 0.95),
+        ]
+        XCTAssertEqual(SoundClassMapping.detections(from: input, at: now).map(\.kind), [.bark])
+    }
 }
 
 final class LoudnessDetectorTests: XCTestCase {

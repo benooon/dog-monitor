@@ -4,6 +4,8 @@ Turn a spare iPhone into a smart dog camera. One or more phones act as **cameras
 
 The full product and technical spec is in [`docs/SPEC.md`](docs/SPEC.md).
 
+To train a bark model on your own labeled clips, see [`docs/TRAINING.md`](docs/TRAINING.md).
+
 ## Repository layout
 
 | Path | What |

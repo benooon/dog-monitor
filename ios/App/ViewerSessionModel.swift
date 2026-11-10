@@ -105,6 +105,15 @@ final class ViewerSessionModel {
         await loadHousehold()
     }
 
+    /// Owner only: a one-hour key for the training export script (nil on failure).
+    func trainingExportToken() async -> String? {
+        var token: String?
+        await perform {
+            token = try await api.trainingExportToken()
+        }
+        return token
+    }
+
     /// Owner only: revokes a camera or phone (a camera must be paired again).
     func revokeDevice(_ device: DeviceDTO) async -> Bool {
         var revoked = false

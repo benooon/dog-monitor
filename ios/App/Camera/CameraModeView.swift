@@ -1,6 +1,7 @@
 import DogMonitorCore
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 /// Camera mode (SPEC §8): a start screen, then a black, dimmed screen while capturing.
 /// A tap shows the live preview and the stop button.
@@ -9,6 +10,9 @@ struct CameraModeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var showsPairing = false
     @State private var showsZones = false
+    @State private var hasCustomModel = CustomSoundModel.isInstalled
+    @State private var showsModelImporter = false
+    @State private var modelFailed = false
     let onChangeRole: () -> Void
 
     init(onChangeRole: @escaping () -> Void) {
@@ -80,9 +84,50 @@ struct CameraModeView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .accessibilityIdentifier("start-camera")
-            Button("Change role", action: onChangeRole)
+            HStack {
+                soundModelMenu
+                Spacer()
+                Button("Change role", action: onChangeRole)
+            }
         }
         .padding()
+        .fileImporter(isPresented: $showsModelImporter, allowedContentTypes: Self.modelTypes) { result in
+            guard case .success(let url) = result else { return }
+            Task {
+                do {
+                    try await CustomSoundModel.install(from: url)
+                    hasCustomModel = true
+                } catch {
+                    modelFailed = true
+                }
+            }
+        }
+        .alert("Couldn't use this model", isPresented: $modelFailed) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Pick a sound classifier made with Create ML. See the training guide.")
+        }
+    }
+
+    private static var modelTypes: [UTType] {
+        [UTType(filenameExtension: "mlmodel"), UTType(filenameExtension: "mlpackage")].compactMap { $0 }
+    }
+
+    /// Which sound model detects barking: the built-in one, or one trained on this household's clips.
+    private var soundModelMenu: some View {
+        Menu {
+            Button("Load a trained model…", systemImage: "square.and.arrow.down") { showsModelImporter = true }
+            if hasCustomModel {
+                Button("Use the built-in model", systemImage: "arrow.counterclockwise") {
+                    CustomSoundModel.remove()
+                    hasCustomModel = false
+                }
+            }
+        } label: {
+            Label(hasCustomModel ? "Sound model: trained" : "Sound model: built-in", systemImage: "waveform.badge.magnifyingglass")
+                .font(.footnote)
+        }
+        .accessibilityIdentifier("sound-model")
     }
 
     private var runningScreen: some View {

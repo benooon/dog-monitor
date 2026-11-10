@@ -85,6 +85,13 @@ public struct DogMonitorAPI: Sendable {
         let _: Response = try await send("PATCH", "household", body: Body(shareTrainingData: enabled))
     }
 
+    /// Owner only: a one-hour token for `scripts/export-training-data.mjs`.
+    public func trainingExportToken() async throws -> String {
+        struct Response: Decodable { let token: String }
+        let response: Response = try await send("POST", "training/export-token")
+        return response.token
+    }
+
     /// Owner only: removes a member and revokes their phones. 400 `cannot_remove_owner`.
     public func removeMember(userId: UUID) async throws {
         try await sendWithoutResponse("DELETE", "household/members/\(Self.path(userId))")
