@@ -254,6 +254,21 @@ public struct DogMonitorAPI: Sendable {
         return try await send("POST", "subscription/apple", body: Body(signedTransaction: signedTransaction))
     }
 
+    // MARK: - Live Activities (user auth)
+
+    /// Registers the ActivityKit push token of a Live Activity showing `cameraId`, so the backend
+    /// can update it. Call again whenever `pushTokenUpdates` yields a new token.
+    /// 404 `camera_not_found` when the camera isn't an active camera in this household.
+    public func registerLiveActivity(cameraId: UUID, pushToken: Data) async throws -> LiveActivityRegistrationDTO {
+        let body = LiveActivityRegistrationRequest(cameraId: Self.path(cameraId), pushToken: PushToken.hex(pushToken))
+        return try await send("PUT", "live-activities", body: body)
+    }
+
+    /// Forgets a Live Activity once it has ended. 404 when it is already gone.
+    public func endLiveActivity(id: UUID) async throws {
+        try await sendWithoutResponse("DELETE", "live-activities/\(Self.path(id))")
+    }
+
     // MARK: - Plumbing
 
     static func path(_ id: UUID) -> String { id.uuidString.lowercased() }
