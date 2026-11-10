@@ -54,7 +54,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] backend: Per-user notification settings API (types, cameras, quiet hours). `GET`/`PUT /notification-prefs`.
 - [x] ios: Notification settings screen (per event type on/off, per camera overrides, quiet hours) using `GET/PUT /notification-prefs`.
 - [x] ios: Camera health. Heartbeat (battery, charging, thermal, network); show a warning on the camera screen when unplugged or hot, and lower fps on `thermalState` serious.
-- [~] ios: Push-to-talk from viewer to camera (LiveKit audio track published by the viewer, played on the camera). (in progress 2026-11-10)
+- [x] ios: Push-to-talk from viewer to camera (LiveKit audio track published by the viewer, played on the camera). (Needs a check on real devices: speaker route on the camera while capturing.)
 - [~] ios: Household members screen with invite link (Universal Link), plus remove member and revoke device. (in progress 2026-11-10)
 
 ## Phase 3 — Vision analysis
