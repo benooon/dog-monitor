@@ -46,9 +46,9 @@ struct PremiumView: View {
             await model.handlePurchase(result)
         }
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 8) {
+            VStack(spacing: DS.Spacing.s) {
                 if let message = model.errorMessage {
-                    Label(message, systemImage: "exclamationmark.triangle")
+                    Label(message, systemImage: "exclamationmark.triangle.fill")
                         .font(.footnote)
                         .foregroundStyle(.red)
                 }
@@ -65,7 +65,7 @@ struct PremiumView: View {
                 .disabled(model.isRestoring)
                 .accessibilityIdentifier("premium-restore")
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, DS.Spacing.s)
         }
     }
 
@@ -93,7 +93,7 @@ struct PremiumView: View {
             }
             if let message = model.errorMessage {
                 Section {
-                    Label(message, systemImage: "exclamationmark.triangle")
+                    Label(message, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.red)
                 }
             }
@@ -104,9 +104,10 @@ struct PremiumView: View {
 /// The pitch, shared by the store and the "you're on Premium" screen.
 private struct PremiumHeader: View {
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: DS.Spacing.m) {
             Image(systemName: "video.badge.plus")
                 .font(.largeTitle)
+                .imageScale(.large)
                 .foregroundStyle(.tint)
                 .accessibilityHidden(true)
             Text("Watch every room")
@@ -118,7 +119,7 @@ private struct PremiumHeader: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
+        .padding(.vertical, DS.Spacing.l)
         .accessibilityElement(children: .combine)
     }
 }

@@ -8,11 +8,11 @@ struct TimelineRow: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DS.Spacing.m) {
             if !dynamicTypeSize.isAccessibilitySize {
                 EventSymbol(type: event.type)
             }
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 Text(event.type.notificationTitle)
                     .font(.body)
                 if let details {
@@ -21,7 +21,7 @@ struct TimelineRow: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            Spacer(minLength: 8)
+            Spacer(minLength: DS.Spacing.s)
             if let feedback = event.feedback {
                 Image(systemName: feedback.symbol)
                     .foregroundStyle(.secondary)
@@ -32,7 +32,6 @@ struct TimelineRow: View {
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
     }
 

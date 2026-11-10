@@ -69,8 +69,11 @@ private struct FeedbackButtons: View {
     let selection: DogEvent.Feedback?
     let choose: (DogEvent.Feedback) -> Void
 
+    /// HIG minimum tap target.
+    private static var minimumTapHeight: CGFloat { 44 }
+
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DS.Spacing.m) {
             choice(.correct, title: "Yes", symbol: "hand.thumbsup")
             choice(.wrong, title: "No", symbol: "hand.thumbsdown")
         }
@@ -87,7 +90,7 @@ private struct FeedbackButtons: View {
             choose(verdict)
         } label: {
             Label(title, systemImage: isSelected ? symbol + ".fill" : symbol)
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: Self.minimumTapHeight)
         }
         .tint(isSelected ? Color.accentColor : Color.secondary)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -127,7 +130,7 @@ private struct EventMediaView: View {
             case .unavailable:
                 message("Clips aren't set up yet.", systemImage: "film")
             case .failed:
-                VStack(spacing: 8) {
+                VStack(spacing: DS.Spacing.s) {
                     message("Couldn't load the clip.", systemImage: "exclamationmark.triangle")
                     Button("Try again") {
                         Task { await load() }
@@ -137,6 +140,7 @@ private struct EventMediaView: View {
             }
         }
         .aspectRatio(16 / 9, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.medium, style: .continuous))
         .task(id: event.id) { await load() }
         .onDisappear {
             if case .clip(let player) = phase { player.pause() }
@@ -147,7 +151,7 @@ private struct EventMediaView: View {
         Label(text, systemImage: systemImage)
             .font(.subheadline)
             .foregroundStyle(.secondary)
-            .padding()
+            .padding(DS.Spacing.l)
     }
 
     private func load() async {

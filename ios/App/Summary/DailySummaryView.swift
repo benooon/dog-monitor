@@ -142,14 +142,14 @@ private struct SummaryHeadline: View {
 
     var body: some View {
         if dynamicTypeSize.isAccessibilitySize {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: DS.Spacing.m) {
                 rested
                 barks
                 active
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, DS.Spacing.xs)
         } else {
-            Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 12) {
+            Grid(alignment: .leading, horizontalSpacing: DS.Spacing.l, verticalSpacing: DS.Spacing.m) {
                 GridRow {
                     rested
                     barks
@@ -158,7 +158,7 @@ private struct SummaryHeadline: View {
                     active
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, DS.Spacing.xs)
         }
     }
 
@@ -192,7 +192,7 @@ private struct SummaryStat: View {
     let change: Text?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
             Label(title, systemImage: systemImage)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -237,6 +237,8 @@ private struct HourlyActivityChart: View {
     let points: [DailySummaryInsights.HourPoint]
     let dateKey: String
     @Environment(\.calendar) private var calendar
+    /// Tall enough to read 24 bars; grows with Dynamic Type so axis labels keep room.
+    @ScaledMetric(relativeTo: .caption) private var chartHeight: CGFloat = 160
 
     var body: some View {
         let start = DailySummaryInsights.date(from: dateKey, calendar: calendar) ?? calendar.startOfDay(for: .now)
@@ -260,8 +262,8 @@ private struct HourlyActivityChart: View {
         .chartYAxis {
             AxisMarks(values: [0, 30, 60])
         }
-        .frame(minHeight: 160)
-        .padding(.vertical, 8)
+        .frame(minHeight: chartHeight)
+        .padding(.vertical, DS.Spacing.s)
     }
 }
 
@@ -269,6 +271,9 @@ private struct HourlyActivityChart: View {
 private struct WeeklyBarksChart: View {
     let points: [DailySummaryInsights.DayPoint]
     @Environment(\.calendar) private var calendar
+    @ScaledMetric(relativeTo: .caption) private var chartHeight: CGFloat = 140
+    /// Earlier days recede so today's bar stands out.
+    private static var earlierDayOpacity: Double { 0.35 }
 
     var body: some View {
         let latest = points.last?.id
@@ -280,7 +285,7 @@ private struct WeeklyBarksChart: View {
                 x: .value("Day", item.day, unit: .day),
                 y: .value("Barks", item.point.barkCount)
             )
-            .foregroundStyle(item.point.id == latest ? Color.accentColor : Color.accentColor.opacity(0.35))
+            .foregroundStyle(item.point.id == latest ? Color.accentColor : Color.accentColor.opacity(Self.earlierDayOpacity))
             .accessibilityLabel(item.day.formatted(.dateTime.weekday(.wide).day().month()))
             .accessibilityValue(item.point.barkCount.formatted())
         }
@@ -289,8 +294,8 @@ private struct WeeklyBarksChart: View {
                 AxisValueLabel(format: .dateTime.weekday(.narrow), centered: true)
             }
         }
-        .frame(minHeight: 140)
-        .padding(.vertical, 8)
+        .frame(minHeight: chartHeight)
+        .padding(.vertical, DS.Spacing.s)
     }
 }
 
@@ -304,6 +309,8 @@ private struct DatedDay: Identifiable {
 private struct DayTitle: View {
     let dateKey: String
     @Environment(\.calendar) private var calendar
+    /// Tall enough to read 24 bars; grows with Dynamic Type so axis labels keep room.
+    @ScaledMetric(relativeTo: .caption) private var chartHeight: CGFloat = 160
 
     var body: some View {
         if let date = DailySummaryInsights.date(from: dateKey, calendar: calendar) {
