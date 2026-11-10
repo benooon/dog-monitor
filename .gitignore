@@ -1,0 +1,10 @@
+.DS_Store
+*.xcodeproj
+xcuserdata/
+DerivedData/
+.build/
+.swiftpm/
+node_modules/
+dist/
+.env
+*.log

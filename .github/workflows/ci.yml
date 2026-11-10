@@ -1,0 +1,173 @@
+name: CI
+
+# Builds and tests every push to main, then publishes status + logs to the
+# `ci-results` branch so agents without GitHub API access can read them with git.
+# macOS minutes are expensive (10x on private repos), so the iOS job only runs
+# when something under ios/ changed; otherwise its previous result is carried over.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ios: ${{ steps.diff.outputs.ios }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - id: diff
+        shell: bash
+        run: |
+          BEFORE="${{ github.event.before }}"
+          if [ "${{ github.event_name }}" != "push" ] || [ -z "$BEFORE" ] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
+            echo "ios=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git diff --name-only "$BEFORE" "${{ github.sha }}" | grep -qE '^(ios/|\.github/workflows/)'; then
+            echo "ios=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ios=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  core:
+    runs-on: ubuntu-latest
+    container: swift:6.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift package tests (Linux)
+        shell: bash
+        run: |
+          set -o pipefail
+          if [ ! -f ios/Packages/DogMonitorCore/Package.swift ]; then
+            echo "SKIPPED: ios/Packages/DogMonitorCore not created yet" | tee core-test.log
+            exit 0
+          fi
+          cd ios/Packages/DogMonitorCore
+          swift test 2>&1 | tee "$GITHUB_WORKSPACE/core-test.log"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: core-log, path: core-test.log, if-no-files-found: ignore }
+
+  ios:
+    needs: changes
+    if: needs.changes.outputs.ios == 'true'
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test app
+        shell: bash
+        run: |
+          set -o pipefail
+          if [ ! -f ios/project.yml ]; then
+            echo "SKIPPED: ios/project.yml not created yet" | tee ios-build.log
+            exit 0
+          fi
+          brew install xcodegen >/dev/null
+          cd ios
+          xcodegen generate 2>&1 | tee ../ios-build.log
+          SIM_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json,sys
+          d=json.load(sys.stdin)["devices"]
+          ids=[x["udid"] for k,v in d.items() if "iOS" in k for x in v if x["name"].startswith("iPhone")]
+          print(ids[-1] if ids else "")')
+          echo "Simulator: $SIM_ID" | tee -a ../ios-build.log
+          SCHEME=$(xcodebuild -list -json 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["project"]["schemes"][0])')
+          echo "Scheme: $SCHEME" | tee -a ../ios-build.log
+          xcodebuild test \
+            -scheme "$SCHEME" \
+            -destination "id=$SIM_ID" \
+            CODE_SIGNING_ALLOWED=NO \
+            -quiet 2>&1 | tee -a ../ios-build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: ios-log, path: ios-build.log, if-no-files-found: ignore }
+
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: dogmonitor_test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/dogmonitor_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Lint and test backend
+        shell: bash
+        run: |
+          set -o pipefail
+          if [ ! -f backend/package.json ]; then
+            echo "SKIPPED: backend not created yet" | tee backend-test.log
+            exit 0
+          fi
+          cd backend
+          { npm ci && npm run lint && npm test; } 2>&1 | tee ../backend-test.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: backend-log, path: backend-test.log, if-no-files-found: ignore }
+
+  report:
+    needs: [changes, core, ios, backend]
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      HEAD_MSG: ${{ github.event.head_commit.message }}
+      CORE_RESULT: ${{ needs.core.result }}
+      IOS_RESULT: ${{ needs.ios.result }}
+      BACKEND_RESULT: ${{ needs.backend.result }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: logs, merge-multiple: true }
+      - name: Publish results to ci-results branch
+        shell: bash
+        run: |
+          git config --global user.name "ci-bot"
+          git config --global user.email "ci-bot@users.noreply.github.com"
+          REPO="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          if ! git clone -q --depth 1 --branch ci-results "$REPO" out 2>/dev/null; then
+            mkdir out && git -C out init -q && git -C out checkout -q -b ci-results && git -C out remote add origin "$REPO"
+          fi
+          cp logs/*.log out/ 2>/dev/null || true
+
+          # iOS skipped because nothing under ios/ changed -> carry over its last real result.
+          if [ "$IOS_RESULT" = "skipped" ]; then
+            IOS_RESULT="$(cat out/ios-result.txt 2>/dev/null || echo success) (carried over, no iOS changes)"
+          else
+            echo "$IOS_RESULT" > out/ios-result.txt
+          fi
+
+          OVERALL=GREEN
+          for r in "$CORE_RESULT" "$IOS_RESULT" "$BACKEND_RESULT"; do
+            case "$r" in success*) ;; *) OVERALL=RED ;; esac
+          done
+          MSG="$(printf '%s' "$HEAD_MSG" | head -1)"
+          {
+            echo "# CI status: $OVERALL"
+            echo
+            echo "- commit: $GITHUB_SHA"
+            echo "- message: $MSG"
+            echo "- time (UTC): $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "- run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo
+            echo "| job | result | log |"
+            echo "|---|---|---|"
+            echo "| core (swift test, Linux) | $CORE_RESULT | core-test.log |"
+            echo "| ios (xcodebuild test, macOS) | $IOS_RESULT | ios-build.log |"
+            echo "| backend (lint + test) | $BACKEND_RESULT | backend-test.log |"
+          } > out/STATUS.md
+          cd out && git add -A && git commit -qm "CI $OVERALL for ${GITHUB_SHA::7}" && git push -q origin ci-results
