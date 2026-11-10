@@ -44,6 +44,9 @@ public struct EventEngineConfiguration: Sendable, Equatable {
     public var audioConfidenceThreshold: Double
     /// Quiet time after a barking/whining event before "calmed down" fires.
     public var calmAfter: TimeInterval
+    /// While the camera can see (a visual state arrived this recently), "calmed down" also waits
+    /// for the dog to be resting. Without vision it fires on quiet alone.
+    public var visualFreshness: TimeInterval
 
     public init(
         barking: ChannelConfiguration,
@@ -52,7 +55,8 @@ public struct EventEngineConfiguration: Sendable, Equatable {
         forbiddenZone: ChannelConfiguration,
         notVisible: ChannelConfiguration,
         audioConfidenceThreshold: Double = Detection.defaultAudioConfidenceThreshold,
-        calmAfter: TimeInterval = 2 * 60
+        calmAfter: TimeInterval = 2 * 60,
+        visualFreshness: TimeInterval = 60
     ) {
         self.barking = barking
         self.whining = whining
@@ -61,6 +65,7 @@ public struct EventEngineConfiguration: Sendable, Equatable {
         self.notVisible = notVisible
         self.audioConfidenceThreshold = audioConfidenceThreshold
         self.calmAfter = calmAfter
+        self.visualFreshness = visualFreshness
     }
 
     public static let `default` = EventEngineConfiguration(

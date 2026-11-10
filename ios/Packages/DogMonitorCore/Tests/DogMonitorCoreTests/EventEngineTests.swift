@@ -188,6 +188,22 @@ final class EventEngineTests: XCTestCase {
         XCTAssertEqual(started(.calmedDown).count, 1, "calm is sent once per alert")
     }
 
+    func testWhenTheCameraSeesTheDogCalmWaitsForRest() {
+        sounds(.bark, from: 0, through: 12, every: 3)
+        seeing(.restless, from: 13, through: 200, every: 5)
+        XCTAssertTrue(started(.calmedDown).isEmpty, "quiet but still restless is not calm")
+        seeing(.resting, from: 205, through: 215, every: 5)
+        XCTAssertEqual(started(.calmedDown).count, 1)
+        XCTAssertEqual(started(.calmedDown).first?.time, 210, "on the first tick after resting was seen")
+    }
+
+    func testStaleVisionFallsBackToQuietAlone() {
+        sounds(.bark, from: 0, through: 12, every: 3)
+        see(.restless, at: 20) // then the vision pipeline goes quiet (no motion, nothing new)
+        XCTAssertTrue(tick(100).filter { $0.event.type == .calmedDown }.isEmpty)
+        XCTAssertEqual(tick(140).filter { $0.event.type == .calmedDown }.count, 1, "last look is over 60 s old")
+    }
+
     func testBarkingAfterCalmIsANewPushEvenWithinCooldown() {
         sounds(.bark, from: 0, through: 12, every: 3)
         tick(30)

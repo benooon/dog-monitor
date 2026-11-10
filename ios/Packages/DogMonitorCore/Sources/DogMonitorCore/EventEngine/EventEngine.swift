@@ -30,6 +30,7 @@ public struct EventEngine: Sendable {
     private var whining: EventChannel
     private var visual: [DogState: EventChannel]
     private var lastObservedState: DogState = .unknown
+    private var lastObservationAt: Date?
 
     /// An alert (barking/whining) happened and "calmed down" has not been sent yet.
     private var calmArmed = false
@@ -85,6 +86,7 @@ public struct EventEngine: Sendable {
     public mutating func observe(_ state: DogState, at time: Date) -> [EngineOutput] {
         var outputs = tick(now: time)
         lastObservedState = state
+        lastObservationAt = time
         if visual[state] != nil {
             visual[state]!.hit(at: time, confidence: 1)
             outputs += tick(now: time)
@@ -117,6 +119,11 @@ public struct EventEngine: Sendable {
         if barking.isActive(at: now) || whining.isActive(at: now) { return [] }
         let quietSince = [barking.lastSeen, whining.lastSeen].compactMap { $0 }.max()
         guard let quietSince, now.timeIntervalSince(quietSince) >= configuration.calmAfter else { return [] }
+        // "Calmed down" means quiet *and* resting when the camera can see the dog (SPEC §5).
+        if let lastObservationAt, now.timeIntervalSince(lastObservationAt) <= configuration.visualFreshness,
+           lastObservedState != .resting {
+            return []
+        }
         calmArmed = false
         let event = DogEvent(
             id: makeID(),
