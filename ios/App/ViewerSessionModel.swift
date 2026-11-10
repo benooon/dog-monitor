@@ -86,6 +86,34 @@ final class ViewerSessionModel {
         }
     }
 
+    /// Owner only: removes a family member and signs their phones out. Returns whether it worked.
+    func removeMember(_ member: MemberDTO) async -> Bool {
+        var removed = false
+        await perform {
+            try await api.removeMember(userId: member.userId)
+            removed = true
+        }
+        if removed { await loadHousehold() }
+        return removed
+    }
+
+    /// Owner only: revokes a camera or phone (a camera must be paired again).
+    func revokeDevice(_ device: DeviceDTO) async -> Bool {
+        var revoked = false
+        await perform {
+            _ = try await api.revokeDevice(id: device.id)
+            revoked = true
+        }
+        if revoked { await loadHousehold() }
+        return revoked
+    }
+
+    /// A shareable link for `invite`, or nil when the server address can't make one.
+    func inviteLink(for invite: InviteDTO) -> URL? {
+        guard api.baseURL.scheme == "https" else { return nil }
+        return PairingCode.inviteLink(token: invite.token, baseURL: api.baseURL)
+    }
+
     /// The signed-in API client, for screens that call it directly (live view).
     var authorizedAPI: DogMonitorAPI { api }
 

@@ -6,7 +6,7 @@ struct ViewerHomeView: View {
     let model: ViewerSessionModel
     let householdName: String
     var isOwner = false
-    @State private var showsInvite = false
+    @State private var showsHousehold = false
     @State private var showsNotifications = false
     @State private var path: [UUID] = []
     private let router = DeepLinkRouter.shared
@@ -56,8 +56,8 @@ struct ViewerHomeView: View {
             }
             .navigationTitle(Text(verbatim: model.household?.name ?? householdName))
             .refreshable { await model.loadHousehold() }
-            .sheet(isPresented: $showsInvite, onDismiss: { Task { await model.loadHousehold() } }) {
-                InviteSheet(model: model)
+            .sheet(isPresented: $showsHousehold, onDismiss: { Task { await model.loadHousehold() } }) {
+                HouseholdView(model: model)
             }
             .sheet(isPresented: $showsNotifications) {
                 NotificationSettingsView(
@@ -93,15 +93,11 @@ struct ViewerHomeView: View {
                     }
                     .accessibilityIdentifier("notification-settings")
                 }
-                if isOwner {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            showsInvite = true
-                        } label: {
-                            Label("Invite", systemImage: "person.badge.plus")
-                        }
-                        .accessibilityIdentifier("invite")
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Household", systemImage: "person.2") {
+                        showsHousehold = true
                     }
+                    .accessibilityIdentifier("household")
                 }
             }
         }

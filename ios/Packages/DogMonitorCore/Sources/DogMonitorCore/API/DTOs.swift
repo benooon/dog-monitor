@@ -38,6 +38,12 @@ public struct MemberDTO: Codable, Sendable, Hashable {
     public let userId: UUID
     public let name: String?
     public let role: MemberRole
+
+    public init(userId: UUID, name: String?, role: MemberRole) {
+        self.userId = userId
+        self.name = name
+        self.role = role
+    }
 }
 
 public struct DogDTO: Codable, Sendable, Hashable, Identifiable {
@@ -103,6 +109,12 @@ public struct InviteDTO: Codable, Sendable, Hashable {
     /// 6-digit code to type instead of scanning.
     public let code: String
     public let expiresAt: Date
+
+    public init(token: String, code: String, expiresAt: Date) {
+        self.token = token
+        self.code = code
+        self.expiresAt = expiresAt
+    }
 }
 
 public struct MemberJoinResponse: Codable, Sendable, Hashable {

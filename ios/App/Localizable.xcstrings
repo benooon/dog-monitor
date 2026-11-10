@@ -121,6 +121,16 @@
         }
       }
     },
+    "%@'s phone": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפון של %@"
+          }
+        }
+      }
+    },
     "%lld watching": {
       "localizations": {
         "he": {
@@ -491,12 +501,32 @@
         }
       }
     },
+    "Family member": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בן משפחה"
+          }
+        }
+      }
+    },
     "Family members and cameras join your household later with an invite.": {
       "localizations": {
         "he": {
           "stringUnit": {
             "state": "translated",
             "value": "בני משפחה ומצלמות יצטרפו למשק הבית מאוחר יותר באמצעות הזמנה."
+          }
+        }
+      }
+    },
+    "Household": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "משק הבית"
           }
         }
       }
@@ -551,6 +581,16 @@
         }
       }
     },
+    "Invite family or pair a camera": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזמנת בני משפחה או צימוד מצלמה"
+          }
+        }
+      }
+    },
     "Join": {
       "localizations": {
         "he": {
@@ -567,6 +607,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הצטרפות למשק בית"
+          }
+        }
+      }
+    },
+    "Join our household in Dog Monitor.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצטרפו למשק הבית שלנו ב-Dog Monitor."
           }
         }
       }
@@ -617,6 +667,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "נביחות ממושכות"
+          }
+        }
+      }
+    },
+    "Members": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חברים"
           }
         }
       }
@@ -771,6 +831,16 @@
         }
       }
     },
+    "Owner": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בעלים"
+          }
+        }
+      }
+    },
     "Pair": {
       "localizations": {
         "he": {
@@ -791,6 +861,16 @@
         }
       }
     },
+    "Phones": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "טלפונים"
+          }
+        }
+      }
+    },
     "Plug this phone in so it stays on.": {
       "localizations": {
         "he": {
@@ -807,6 +887,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "שעות שקטות"
+          }
+        }
+      }
+    },
+    "Remove": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסרה"
+          }
+        }
+      }
+    },
+    "Remove %@?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "להסיר את %@?"
           }
         }
       }
@@ -847,6 +947,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "סרקו את קוד ה-QR של ההזמנה מהטלפון של הבעלים."
+          }
+        }
+      }
+    },
+    "Share invite link": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיתוף קישור הזמנה"
           }
         }
       }
@@ -1017,6 +1127,16 @@
         }
       }
     },
+    "Their phones stop getting alerts and can't watch live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפונים שלהם יפסיקו לקבל התראות ולא יוכלו לצפות בשידור חי."
+          }
+        }
+      }
+    },
     "These choices apply only to this camera.": {
       "localizations": {
         "he": {
@@ -1033,6 +1153,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "במצלמה הזו כבר צופים 5 אנשים."
+          }
+        }
+      }
+    },
+    "This camera stops watching until you pair it again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה תפסיק לצפות עד שתצמדו אותה שוב."
           }
         }
       }
@@ -1073,6 +1203,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "הטלפון הזה עדיין לא מצומד, לכן צפייה חיה כבויה. נביחות עדיין מזוהות כאן."
+          }
+        }
+      }
+    },
+    "This phone stops getting alerts and can't watch live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפון יפסיק לקבל התראות ולא יוכל לצפות בשידור חי."
           }
         }
       }

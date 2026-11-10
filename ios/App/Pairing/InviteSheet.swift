@@ -60,6 +60,12 @@ struct InviteSheet: View {
             Text("Expires in \(countdown.label(at: now))")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+            if let link = model.inviteLink(for: invite) {
+                ShareLink(item: link, message: Text("Join our household in Dog Monitor.")) {
+                    Label("Share invite link", systemImage: "square.and.arrow.up")
+                }
+                .buttonStyle(.bordered)
+            }
         }
     }
 

@@ -59,11 +59,16 @@ targets:
           - Default
         aps-environment: development
         com.apple.developer.usernotifications.time-sensitive: true
+        # Invite links open the app (the backend serves the apple-app-site-association file).
+        com.apple.developer.associated-domains:
+          - applinks:$(APP_LINK_HOST)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor
         # Backend URL; set to the Railway domain once it exists (see docs/HUMAN_TODO.md).
         API_BASE_URL: http://localhost:3000
+        # Host of API_BASE_URL, for invite Universal Links. Set together with API_BASE_URL.
+        APP_LINK_HOST: localhost
         TARGETED_DEVICE_FAMILY: "1"
         ENABLE_PREVIEWS: YES
 

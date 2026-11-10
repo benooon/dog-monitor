@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 import XCTest
 @testable import DogMonitorCore
 
@@ -29,6 +32,24 @@ final class PairingCodeTests: XCTestCase {
         XCTAssertNil(PairingCode.parse("http://evil.example/pair?t=\(token)"))
         XCTAssertNil(PairingCode.parse("hello"))
         XCTAssertNil(PairingCode.parse(""))
+    }
+
+    func testInviteLinksRoundTrip() throws {
+        let link = try XCTUnwrap(PairingCode.inviteLink(token: token, baseURL: URL(string: "https://api.dogmonitor.app/v1?x=1")!))
+        XCTAssertEqual(link.absoluteString, "https://api.dogmonitor.app/invite/\(token)")
+        XCTAssertEqual(PairingCode.parse(link.absoluteString), token)
+        XCTAssertNil(PairingCode.parse("https://api.dogmonitor.app/invite/"))
+        XCTAssertNil(PairingCode.parse("https://api.dogmonitor.app/invite/bad%20token"))
+        XCTAssertNil(PairingCode.parse("http://evil.example/invite/\(token)"))
+    }
+
+    func testRemoveMemberSendsDelete() async throws {
+        let stub = StubTransport(status: 204, json: "")
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)
+        try await api.removeMember(userId: try XCTUnwrap(UUID(uuidString: Fixtures.userID)))
+        let request = try XCTUnwrap(stub.requests.first)
+        XCTAssertEqual(request.httpMethod, "DELETE")
+        XCTAssertEqual(request.url?.path, "/v1/household/members/\(Fixtures.userID)")
     }
 }
 

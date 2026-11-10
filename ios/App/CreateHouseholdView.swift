@@ -57,6 +57,12 @@ struct CreateHouseholdView: View {
                 }
             }
             .navigationTitle("Create your household")
+            .onChange(of: DeepLinkRouter.shared.pendingInvite, initial: true) { _, token in
+                // Opened from an invite link: fill in the invite so one tap joins.
+                guard let token else { return }
+                inviteCode = token
+                DeepLinkRouter.shared.pendingInvite = nil
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Sign out") { model.signOut() }

@@ -13,11 +13,24 @@ public enum PairingCode {
         return components.string ?? "\(scheme)://pair?t=\(token)"
     }
 
+    /// Path prefix of invite links served by the backend (Universal Links).
+    public static let invitePath = "/invite/"
+
+    /// A shareable invite link: `https://<api host>/invite/<token>`. Opens the app when it is
+    /// installed (Universal Link), otherwise a short page about the 6-digit code.
+    public static func inviteLink(token: String, baseURL: URL) -> URL? {
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { return nil }
+        components.path = invitePath + token
+        components.query = nil
+        components.fragment = nil
+        return components.url
+    }
+
     /// The invite token or 6-digit code in scanned or typed text, ready for
     /// `POST /invites/:tokenOrCode/accept`, or nil if it is neither.
     ///
-    /// Accepts `dogmonitor://pair?t=…`, any https link with a `/pair` path and `t` (future
-    /// Universal Links), a bare token, or a 6-digit code typed with spaces or dashes.
+    /// Accepts `dogmonitor://pair?t=…`, invite links (`https://…/invite/<token>`), any https link
+    /// with a `/pair` path and `t`, a bare token, or a 6-digit code typed with spaces or dashes.
     public static func parse(_ text: String) -> String? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let digits = trimmed.filter { $0 != " " && $0 != "-" }
@@ -25,6 +38,10 @@ public enum PairingCode {
             return digits
         }
         if let components = URLComponents(string: trimmed), let scheme = components.scheme?.lowercased() {
+            if scheme == "https", components.path.hasPrefix(invitePath) {
+                let token = String(components.path.dropFirst(invitePath.count))
+                return isToken(token) ? token : nil
+            }
             let isAppLink = scheme == Self.scheme && components.host == "pair"
             let isWebLink = scheme == "https" && components.path.hasSuffix("/pair")
             guard isAppLink || isWebLink,

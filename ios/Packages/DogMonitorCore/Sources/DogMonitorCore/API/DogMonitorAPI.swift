@@ -78,6 +78,11 @@ public struct DogMonitorAPI: Sendable {
         try await send("PATCH", "devices/\(Self.path(id))", body: changes)
     }
 
+    /// Owner only: removes a member and revokes their phones. 400 `cannot_remove_owner`.
+    public func removeMember(userId: UUID) async throws {
+        try await sendWithoutResponse("DELETE", "household/members/\(Self.path(userId))")
+    }
+
     public func revokeDevice(id: UUID) async throws -> DeviceDTO {
         try await send("POST", "devices/\(Self.path(id))/revoke")
     }
