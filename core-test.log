@@ -20,16 +20,16 @@ Building for debugging...
 [20/31] Compiling DogMonitorCore CameraHealth.swift
 [21/31] Compiling DogMonitorCore Detection.swift
 [22/32] Wrapping AST for DogMonitorCore for debugging
-[24/35] Compiling DogMonitorCoreTests APITestSupport.swift
-[25/35] Compiling DogMonitorCoreTests DogMonitorAPITests.swift
-[26/35] Emitting module DogMonitorCoreTests
-[27/37] Compiling DogMonitorCoreTests ModelsTests.swift
-[28/37] Compiling DogMonitorCoreTests SessionTests.swift
+[24/35] Emitting module DogMonitorCoreTests
+[25/37] Compiling DogMonitorCoreTests ModelsTests.swift
+[26/37] Compiling DogMonitorCoreTests SessionTests.swift
+[27/37] Compiling DogMonitorCoreTests APITestSupport.swift
+[28/37] Compiling DogMonitorCoreTests DogMonitorAPITests.swift
 [29/38] /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/.build/x86_64-unknown-linux-gnu/debug/DogMonitorCorePackageDiscoveredTests.derived/all-discovered-tests.swift
 [30/38] Write sources
 [31/38] Wrapping AST for DogMonitorCoreTests for debugging
-[33/40] Emitting module DogMonitorCorePackageDiscoveredTests
-[34/40] Compiling DogMonitorCorePackageDiscoveredTests DogMonitorCoreTests.swift
+[33/40] Compiling DogMonitorCorePackageDiscoveredTests DogMonitorCoreTests.swift
+[34/41] Emitting module DogMonitorCorePackageDiscoveredTests
 [35/41] Compiling DogMonitorCorePackageDiscoveredTests all-discovered-tests.swift
 [36/42] /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/.build/x86_64-unknown-linux-gnu/debug/DogMonitorCorePackageTests.derived/runner.swift
 [37/42] Write sources
@@ -39,90 +39,90 @@ Building for debugging...
 [42/45] Wrapping AST for DogMonitorCorePackageTests for debugging
 [43/45] Write Objects.LinkFileList
 [44/45] Linking DogMonitorCorePackageTests.xctest
-Build complete! (15.26s)
-Test Suite 'All tests' started at 2026-11-10 07:45:25.155
-Test Suite 'debug.xctest' started at 2026-11-10 07:45:25.157
-Test Suite 'CredentialStoreTests' started at 2026-11-10 07:45:25.157
-Test Case 'CredentialStoreTests.testCorruptDataLoadsAsSignedOut' started at 2026-11-10 07:45:25.157
+Build complete! (14.78s)
+Test Suite 'All tests' started at 2026-11-10 07:50:46.712
+Test Suite 'debug.xctest' started at 2026-11-10 07:50:46.713
+Test Suite 'CredentialStoreTests' started at 2026-11-10 07:50:46.713
+Test Case 'CredentialStoreTests.testCorruptDataLoadsAsSignedOut' started at 2026-11-10 07:50:46.713
 Test Case 'CredentialStoreTests.testCorruptDataLoadsAsSignedOut' passed (0.001 seconds)
-Test Case 'CredentialStoreTests.testRoundTripsUserAndDeviceCredentials' started at 2026-11-10 07:45:25.158
-Test Case 'CredentialStoreTests.testRoundTripsUserAndDeviceCredentials' passed (0.001 seconds)
-Test Suite 'CredentialStoreTests' passed at 2026-11-10 07:45:25.158
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
-Test Suite 'DeviceRoleTests' started at 2026-11-10 07:45:25.158
-Test Case 'DeviceRoleTests.testWireFormat' started at 2026-11-10 07:45:25.158
+Test Case 'CredentialStoreTests.testRoundTripsUserAndDeviceCredentials' started at 2026-11-10 07:50:46.714
+Test Case 'CredentialStoreTests.testRoundTripsUserAndDeviceCredentials' passed (0.0 seconds)
+Test Suite 'CredentialStoreTests' passed at 2026-11-10 07:50:46.715
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'DeviceRoleTests' started at 2026-11-10 07:50:46.715
+Test Case 'DeviceRoleTests.testWireFormat' started at 2026-11-10 07:50:46.715
 Test Case 'DeviceRoleTests.testWireFormat' passed (0.0 seconds)
-Test Suite 'DeviceRoleTests' passed at 2026-11-10 07:45:25.159
+Test Suite 'DeviceRoleTests' passed at 2026-11-10 07:50:46.715
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.0 (0.0) seconds
-Test Suite 'DeviceStatusTests' started at 2026-11-10 07:45:25.159
-Test Case 'DeviceStatusTests.testOnlineWithinThreeMinutesOfHeartbeat' started at 2026-11-10 07:45:25.159
+Test Suite 'DeviceStatusTests' started at 2026-11-10 07:50:46.715
+Test Case 'DeviceStatusTests.testOnlineWithinThreeMinutesOfHeartbeat' started at 2026-11-10 07:50:46.715
 Test Case 'DeviceStatusTests.testOnlineWithinThreeMinutesOfHeartbeat' passed (0.005 seconds)
-Test Suite 'DeviceStatusTests' passed at 2026-11-10 07:45:25.164
+Test Suite 'DeviceStatusTests' passed at 2026-11-10 07:50:46.720
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.005 (0.005) seconds
-Test Suite 'DogMonitorAPITests' started at 2026-11-10 07:45:25.164
-Test Case 'DogMonitorAPITests.testDecodesDatesWithAndWithoutFractionalSeconds' started at 2026-11-10 07:45:25.164
+Test Suite 'DogMonitorAPITests' started at 2026-11-10 07:50:46.720
+Test Case 'DogMonitorAPITests.testDecodesDatesWithAndWithoutFractionalSeconds' started at 2026-11-10 07:50:46.720
 Test Case 'DogMonitorAPITests.testDecodesDatesWithAndWithoutFractionalSeconds' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testDecodingErrors' started at 2026-11-10 07:45:25.165
+Test Case 'DogMonitorAPITests.testDecodingErrors' started at 2026-11-10 07:50:46.722
 Test Case 'DogMonitorAPITests.testDecodingErrors' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testDeleteAcceptsEmptyNoContent' started at 2026-11-10 07:45:25.166
+Test Case 'DogMonitorAPITests.testDeleteAcceptsEmptyNoContent' started at 2026-11-10 07:50:46.723
 Test Case 'DogMonitorAPITests.testDeleteAcceptsEmptyNoContent' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testHTTPErrorWithoutJSONBody' started at 2026-11-10 07:45:25.167
+Test Case 'DogMonitorAPITests.testHTTPErrorWithoutJSONBody' started at 2026-11-10 07:50:46.723
 Test Case 'DogMonitorAPITests.testHTTPErrorWithoutJSONBody' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testHouseholdDecoding' started at 2026-11-10 07:45:25.167
+Test Case 'DogMonitorAPITests.testHouseholdDecoding' started at 2026-11-10 07:50:46.723
 Test Case 'DogMonitorAPITests.testHouseholdDecoding' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testJoiningAsMember' started at 2026-11-10 07:45:25.168
+Test Case 'DogMonitorAPITests.testJoiningAsMember' started at 2026-11-10 07:50:46.724
 Test Case 'DogMonitorAPITests.testJoiningAsMember' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testMapsHTTPErrorsToAPIError' started at 2026-11-10 07:45:25.168
+Test Case 'DogMonitorAPITests.testMapsHTTPErrorsToAPIError' started at 2026-11-10 07:50:46.725
 Test Case 'DogMonitorAPITests.testMapsHTTPErrorsToAPIError' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testOmitsNilFieldsInRequests' started at 2026-11-10 07:45:25.169
+Test Case 'DogMonitorAPITests.testOmitsNilFieldsInRequests' started at 2026-11-10 07:50:46.725
 Test Case 'DogMonitorAPITests.testOmitsNilFieldsInRequests' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testPairingAsCamera' started at 2026-11-10 07:45:25.169
+Test Case 'DogMonitorAPITests.testPairingAsCamera' started at 2026-11-10 07:50:46.725
 Test Case 'DogMonitorAPITests.testPairingAsCamera' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testSignInWithApplePostsJSONAndDecodes' started at 2026-11-10 07:45:25.170
+Test Case 'DogMonitorAPITests.testSignInWithApplePostsJSONAndDecodes' started at 2026-11-10 07:50:46.726
 Test Case 'DogMonitorAPITests.testSignInWithApplePostsJSONAndDecodes' passed (0.0 seconds)
-Test Case 'DogMonitorAPITests.testUpdateDeviceSendsOnlyChangedFields' started at 2026-11-10 07:45:25.170
+Test Case 'DogMonitorAPITests.testUpdateDeviceSendsOnlyChangedFields' started at 2026-11-10 07:50:46.726
 Test Case 'DogMonitorAPITests.testUpdateDeviceSendsOnlyChangedFields' passed (0.001 seconds)
-Test Case 'DogMonitorAPITests.testUserAndDeviceAuthorizationHeaders' started at 2026-11-10 07:45:25.171
+Test Case 'DogMonitorAPITests.testUserAndDeviceAuthorizationHeaders' started at 2026-11-10 07:50:46.727
 Test Case 'DogMonitorAPITests.testUserAndDeviceAuthorizationHeaders' passed (0.001 seconds)
-Test Suite 'DogMonitorAPITests' passed at 2026-11-10 07:45:25.171
+Test Suite 'DogMonitorAPITests' passed at 2026-11-10 07:50:46.728
 	 Executed 12 tests, with 0 failures (0 unexpected) in 0.007 (0.007) seconds
-Test Suite 'ModelsTests' started at 2026-11-10 07:45:25.171
-Test Case 'ModelsTests.testCameraHealthWarnings' started at 2026-11-10 07:45:25.172
+Test Suite 'ModelsTests' started at 2026-11-10 07:50:46.728
+Test Case 'ModelsTests.testCameraHealthWarnings' started at 2026-11-10 07:50:46.728
 Test Case 'ModelsTests.testCameraHealthWarnings' passed (0.001 seconds)
-Test Case 'ModelsTests.testDetectionClampsConfidenceAndThreshold' started at 2026-11-10 07:45:25.172
+Test Case 'ModelsTests.testDetectionClampsConfidenceAndThreshold' started at 2026-11-10 07:50:46.728
 Test Case 'ModelsTests.testDetectionClampsConfidenceAndThreshold' passed (0.001 seconds)
-Test Case 'ModelsTests.testDogEventDerivesStateAndDuration' started at 2026-11-10 07:45:25.173
+Test Case 'ModelsTests.testDogEventDerivesStateAndDuration' started at 2026-11-10 07:50:46.729
 Test Case 'ModelsTests.testDogEventDerivesStateAndDuration' passed (0.001 seconds)
-Test Case 'ModelsTests.testDogStateAlerting' started at 2026-11-10 07:45:25.174
+Test Case 'ModelsTests.testDogStateAlerting' started at 2026-11-10 07:50:46.730
 Test Case 'ModelsTests.testDogStateAlerting' passed (0.0 seconds)
-Test Case 'ModelsTests.testEventTypeDefaultsMatchSpec' started at 2026-11-10 07:45:25.174
+Test Case 'ModelsTests.testEventTypeDefaultsMatchSpec' started at 2026-11-10 07:50:46.730
 Test Case 'ModelsTests.testEventTypeDefaultsMatchSpec' passed (0.0 seconds)
-Test Case 'ModelsTests.testEventTypeWireFormat' started at 2026-11-10 07:45:25.174
+Test Case 'ModelsTests.testEventTypeWireFormat' started at 2026-11-10 07:50:46.731
 Test Case 'ModelsTests.testEventTypeWireFormat' passed (0.0 seconds)
-Test Case 'ModelsTests.testVersion' started at 2026-11-10 07:45:25.174
+Test Case 'ModelsTests.testVersion' started at 2026-11-10 07:50:46.731
 Test Case 'ModelsTests.testVersion' passed (0.0 seconds)
-Test Suite 'ModelsTests' passed at 2026-11-10 07:45:25.174
+Test Suite 'ModelsTests' passed at 2026-11-10 07:50:46.731
 	 Executed 7 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
-Test Suite 'OnboardingStateTests' started at 2026-11-10 07:45:25.174
-Test Case 'OnboardingStateTests.testHouseholdNameValidation' started at 2026-11-10 07:45:25.175
+Test Suite 'OnboardingStateTests' started at 2026-11-10 07:50:46.731
+Test Case 'OnboardingStateTests.testHouseholdNameValidation' started at 2026-11-10 07:50:46.731
 Test Case 'OnboardingStateTests.testHouseholdNameValidation' passed (0.0 seconds)
-Test Case 'OnboardingStateTests.testNeedsHouseholdWhenUserHasNone' started at 2026-11-10 07:45:25.175
+Test Case 'OnboardingStateTests.testNeedsHouseholdWhenUserHasNone' started at 2026-11-10 07:50:46.731
 Test Case 'OnboardingStateTests.testNeedsHouseholdWhenUserHasNone' passed (0.0 seconds)
-Test Case 'OnboardingStateTests.testReadyWithFirstHousehold' started at 2026-11-10 07:45:25.175
+Test Case 'OnboardingStateTests.testReadyWithFirstHousehold' started at 2026-11-10 07:50:46.732
 Test Case 'OnboardingStateTests.testReadyWithFirstHousehold' passed (0.0 seconds)
-Test Suite 'OnboardingStateTests' passed at 2026-11-10 07:45:25.175
+Test Suite 'OnboardingStateTests' passed at 2026-11-10 07:50:46.732
 	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'URLSessionTransportTests' started at 2026-11-10 07:45:25.175
-Test Case 'URLSessionTransportTests.testErrorStatusThroughURLSession' started at 2026-11-10 07:45:25.175
+Test Suite 'URLSessionTransportTests' started at 2026-11-10 07:50:46.732
+Test Case 'URLSessionTransportTests.testErrorStatusThroughURLSession' started at 2026-11-10 07:50:46.732
 Test Case 'URLSessionTransportTests.testErrorStatusThroughURLSession' passed (0.004 seconds)
-Test Case 'URLSessionTransportTests.testRoundTripThroughURLSession' started at 2026-11-10 07:45:25.180
+Test Case 'URLSessionTransportTests.testRoundTripThroughURLSession' started at 2026-11-10 07:50:46.736
 Test Case 'URLSessionTransportTests.testRoundTripThroughURLSession' passed (0.001 seconds)
-Test Suite 'URLSessionTransportTests' passed at 2026-11-10 07:45:25.180
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.005 (0.005) seconds
-Test Suite 'debug.xctest' passed at 2026-11-10 07:45:25.180
-	 Executed 28 tests, with 0 failures (0 unexpected) in 0.023 (0.023) seconds
-Test Suite 'All tests' passed at 2026-11-10 07:45:25.180
-	 Executed 28 tests, with 0 failures (0 unexpected) in 0.023 (0.023) seconds
+Test Suite 'URLSessionTransportTests' passed at 2026-11-10 07:50:46.736
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'debug.xctest' passed at 2026-11-10 07:50:46.736
+	 Executed 28 tests, with 0 failures (0 unexpected) in 0.022 (0.022) seconds
+Test Suite 'All tests' passed at 2026-11-10 07:50:46.736
+	 Executed 28 tests, with 0 failures (0 unexpected) in 0.022 (0.022) seconds
 ◇ Test run started.
 ↳ Testing Library Version: 6.1.3 (1d1f7e489c9c606)
 ↳ Target Platform: x86_64-unknown-linux-gnu

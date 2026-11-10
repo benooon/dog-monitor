@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 91892d27e030bbd5f17a800faf91758bee50640c
-- message: ios+backend: bind Apple sign-in to a nonce; show cameras and dogs on viewer home
-- time (UTC): 2026-11-10T07:49:52Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42777373173
+- commit: 7e5101a2ab53f96b180c620e52903fb1e95cdc5a
+- message: ci: stop cancelling running builds and never publish RED for a cancelled run
+- time (UTC): 2026-11-10T07:52:51Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42777652883
 
 | job | result | log |
 |---|---|---|
