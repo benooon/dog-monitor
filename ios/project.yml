@@ -27,10 +27,12 @@ targets:
     platform: iOS
     sources:
       - path: App
+      - path: Shared
     dependencies:
       - package: DogMonitorCore
       - package: LiveKit
       - target: NotificationService
+      - target: DogMonitorWidgets
     info:
       path: Config/DogMonitor-Info.plist
       properties:
@@ -42,6 +44,8 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
+        # A camera's dog state on the Lock Screen and in the Dynamic Island (DogMonitorWidgets).
+        NSSupportsLiveActivities: true
         DMAPIBaseURL: $(API_BASE_URL)
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
@@ -92,6 +96,31 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor.NotificationService
         TARGETED_DEVICE_FAMILY: "1"
+
+  DogMonitorWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+      - path: Shared
+      - path: App/Localizable.xcstrings
+    dependencies:
+      - package: DogMonitorCore
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    info:
+      path: Config/DogMonitorWidgets-Info.plist
+      properties:
+        CFBundleDisplayName: Dog Monitor
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.benooon.dogmonitor.Widgets
+        TARGETED_DEVICE_FAMILY: "1"
+        ENABLE_PREVIEWS: YES
 
   DogMonitorTests:
     type: bundle.unit-test

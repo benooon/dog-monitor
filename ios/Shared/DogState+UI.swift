@@ -16,3 +16,19 @@ extension DogState {
         }
     }
 }
+
+extension DogState {
+    /// SF Symbol for compact indicators (Dynamic Island, widgets).
+    var symbol: String {
+        switch self {
+        case .resting: "moon.zzz.fill"
+        case .barking: "speaker.wave.3.fill"
+        case .whining: "waveform"
+        case .restless: "pawprint.fill"
+        case .atDoor: "door.left.hand.closed"
+        case .forbiddenZone: "nosign"
+        case .notVisible: "eye.slash"
+        case .unknown: "pawprint"
+        }
+    }
+}

@@ -13,6 +13,7 @@ struct ViewerHomeView: View {
     @State private var summary: SummaryRequest?
     @State private var path: [UUID] = []
     private let router = DeepLinkRouter.shared
+    private let liveActivities = CameraLiveActivityController.shared
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -38,6 +39,8 @@ struct ViewerHomeView: View {
                             )
                         }
                         .accessibilityIdentifier("camera-\(camera.id.uuidString.lowercased())")
+                        .contextMenu { lockScreenButton(for: camera) }
+                        .swipeActions(edge: .leading) { lockScreenButton(for: camera) }
                     }
                 }
                 if let dogs = model.household?.dogs, !dogs.isEmpty {
@@ -105,6 +108,7 @@ struct ViewerHomeView: View {
                 model.startRealtime()
                 await model.loadHousehold()
                 await PushRegistry.shared.activate(api: model.authorizedAPI)
+                await liveActivities.activate(api: model.authorizedAPI)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -134,6 +138,28 @@ struct ViewerHomeView: View {
                     }
                     .accessibilityIdentifier("household")
                 }
+            }
+        }
+    }
+
+    /// Shows or hides the camera's Live Activity (Lock Screen and Dynamic Island).
+    @ViewBuilder
+    private func lockScreenButton(for camera: DeviceDTO) -> some View {
+        if liveActivities.isAvailable {
+            if liveActivities.isShowing(camera.id) {
+                Button("Hide from Lock Screen", systemImage: "lock.slash") {
+                    Task { await liveActivities.stop(cameraId: camera.id) }
+                }
+                .tint(.secondary)
+            } else {
+                Button("Show on Lock Screen", systemImage: "lock.iphone") {
+                    let content = CameraLiveActivityContent(
+                        state: model.realtime?.dogStates[camera.id] ?? camera.currentDogState,
+                        online: model.realtime?.presence[camera.id] ?? camera.isOnline(now: .now)
+                    )
+                    try? liveActivities.start(camera: camera, dogName: model.household?.dogs.first?.name, content: content)
+                }
+                .tint(.accentColor)
             }
         }
     }

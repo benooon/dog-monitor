@@ -2306,6 +2306,36 @@
           }
         }
       }
+    },
+    "Hide from Lock Screen": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסתרה ממסך הנעילה"
+          }
+        }
+      }
+    },
+    "Show on Lock Screen": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצגה במסך הנעילה"
+          }
+        }
+      }
+    },
+    "Watching": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צופה"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
