@@ -50,6 +50,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Ring-buffer recorder (`AVAssetWriter`, keeping the last ~5 s in memory). On an event, write a 10–20 s clip + snapshot.
 - [x] ios: Upload clips and snapshots for events through presigned URLs, with an offline queue that retries when the network returns. (2d45a0f)
 - [x] backend: Viewer timeline API: `GET /events` (household-scoped, newest first, filter by camera and types, cursor pagination) and `PUT /events/:id/feedback` (right/wrong).
+- [~] core: Timeline API client: `GET /events` (camera/type filters, cursor pages), `PUT /events/:id/feedback`, `GET /events/:id/media`, and `feedback` on `EventDTO`, with tests. Split out of the timeline screen (whose claim has had nothing pushed since 09:07). (in progress 2026-11-10)
 - [~] ios: Event timeline screen (filter by type, play clip via `GET /events/:id/media`, mark detection as right/wrong) using `GET /events` and `PUT /events/:id/feedback`. (in progress 2026-11-10)
 - [x] backend: Per-user notification settings API (types, cameras, quiet hours). `GET`/`PUT /notification-prefs`.
 - [x] ios: Notification settings screen (per event type on/off, per camera overrides, quiet hours) using `GET/PUT /notification-prefs`.
