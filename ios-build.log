@@ -1,1 +1,13 @@
-SKIPPED: ios/project.yml not created yet
+⚙️  Generating plists...
+⚙️  Generating project...
+⚙️  Writing project...
+Created project at /Users/runner/work/dog-monitor/dog-monitor/ios/DogMonitor.xcodeproj
+Simulator: A1285399-F2F4-46E9-8CF2-4AA227FF7EF3
+Scheme: DogMonitor
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
+{ platform:iOS Simulator, arch:x86_64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
+2026-11-10 06:59:07.881 xcodebuild[3400:13928] [MT] IDETestOperationsObserverDebug: 201.920 elapsed -- Testing started completed.
+2026-11-10 06:59:07.881 xcodebuild[3400:13928] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-10 06:59:07.881 xcodebuild[3400:13928] [MT] IDETestOperationsObserverDebug: 201.921 sec, +201.921 sec -- end
+Testing started

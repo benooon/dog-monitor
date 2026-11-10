@@ -1,12 +1,12 @@
-# CI status: RED
+# CI status: GREEN
 
-- commit: 4a5c9019195c89a6b02cad1d396b15ddc1880c7d
-- message: docs: claim XcodeGen project task
-- time (UTC): 2026-11-10T06:54:12Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42771524278
+- commit: 2e33b761193929d0853a1f91517c9800d576aa6c
+- message: ios: add XcodeGen project with role picker and unit tests
+- time (UTC): 2026-11-10T06:59:32Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42771591651
 
 | job | result | log |
 |---|---|---|
-| core (swift test, Linux) | cancelled | core-test.log |
-| ios (xcodebuild test, macOS) | success (carried over, no iOS changes) | ios-build.log |
+| core (swift test, Linux) | success | core-test.log |
+| ios (xcodebuild test, macOS) | success | ios-build.log |
 | backend (lint + test) | success | backend-test.log |
