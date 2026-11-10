@@ -15,6 +15,13 @@
       "when": 1794294838043,
       "tag": "0001_invite_code",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794299428403,
+      "tag": "0002_device_muted_until",
+      "breakpoints": true
     }
   ]
 }

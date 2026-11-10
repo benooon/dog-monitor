@@ -19,6 +19,7 @@ export function deviceDto(d: DeviceRow) {
     battery: d.battery,
     charging: d.charging,
     thermal: d.thermal,
+    mutedUntil: d.mutedUntil,
     createdAt: d.createdAt,
   };
 }

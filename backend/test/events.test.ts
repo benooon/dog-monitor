@@ -132,6 +132,21 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
     expect(apns.sent).toHaveLength(0);
   });
 
+  it("skips phones muted with the Mute 1h action", async () => {
+    const { camera, owner, ownerPhone } = await setup();
+    const until = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    const mute = await app.inject({ method: "PATCH", url: `/devices/${ownerPhone}`, headers: owner.auth, payload: { mutedUntil: until } });
+    expect(mute.statusCode).toBe(200);
+    expect(mute.json().mutedUntil).toBe(until);
+    await postEvent(camera.auth);
+    expect(apns.sent.map((n) => n.deviceToken)).toEqual([tokenB]);
+
+    await app.inject({ method: "PATCH", url: `/devices/${ownerPhone}`, headers: owner.auth, payload: { mutedUntil: null } });
+    apns.sent = [];
+    await postEvent(camera.auth, { id: "44444444-4444-4444-8444-444444444444" });
+    expect(apns.sent).toHaveLength(2);
+  });
+
   it("clears tokens APNs reports as dead", async () => {
     const { camera, memberPhone } = await setup();
     apns.respond = (n) => (n.deviceToken === tokenB ? { status: 410, reason: "Unregistered" } : { status: 200 });

@@ -26,7 +26,10 @@ interface RegisterBody {
   apnsToken?: string | null;
 }
 
-type UpdateBody = Partial<Pick<RegisterBody, "name" | "model" | "appVersion" | "apnsToken">>;
+type UpdateBody = Partial<Pick<RegisterBody, "name" | "model" | "appVersion" | "apnsToken">> & {
+  /** ISO time until which this phone gets no pushes, or null to unmute. */
+  mutedUntil?: string | null;
+};
 
 export async function deviceRoutes(app: FastifyInstance, opts: { db: Database }): Promise<void> {
   const { db } = opts;
@@ -106,7 +109,11 @@ export async function deviceRoutes(app: FastifyInstance, opts: { db: Database })
           type: "object",
           minProperties: 1,
           additionalProperties: false,
-          properties: { name: { type: "string", minLength: 1, maxLength: 100 }, ...optionalFields },
+          properties: {
+            name: { type: "string", minLength: 1, maxLength: 100 },
+            ...optionalFields,
+            mutedUntil: { type: ["string", "null"], format: "date-time" },
+          },
         },
       },
     },
@@ -120,7 +127,12 @@ export async function deviceRoutes(app: FastifyInstance, opts: { db: Database })
       if (device.status === "revoked") {
         return reply.code(409).send({ error: "device_revoked" });
       }
-      const [updated] = await db.update(devices).set(request.body).where(eq(devices.id, device.id)).returning();
+      const { mutedUntil, ...rest } = request.body;
+      const changes = {
+        ...rest,
+        ...(mutedUntil !== undefined && { mutedUntil: mutedUntil === null ? null : new Date(mutedUntil) }),
+      };
+      const [updated] = await db.update(devices).set(changes).where(eq(devices.id, device.id)).returning();
       return deviceDto(updated!);
     },
   );

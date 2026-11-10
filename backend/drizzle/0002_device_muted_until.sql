@@ -1,0 +1,1 @@
+ALTER TABLE "devices" ADD COLUMN "muted_until" timestamp with time zone;

@@ -118,6 +118,8 @@ export const devices = pgTable(
     battery: real("battery"),
     charging: boolean("charging"),
     thermal: text("thermal"),
+    /** Viewer devices: no pushes until this time ("Mute 1h" notification action). */
+    mutedUntil: timestamp("muted_until", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [index("devices_household_idx").on(t.householdId)],

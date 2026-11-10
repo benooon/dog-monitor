@@ -1,5 +1,5 @@
 import type { FastifyBaseLogger } from "fastify";
-import { and, asc, eq, inArray, isNotNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { devices, dogs, events, notificationPrefs, type EventType } from "../db/schema.js";
 import { isDeadToken, type ApnsSender } from "./apns.js";
@@ -51,6 +51,7 @@ export class EventNotifier {
           eq(devices.status, "active"),
           isNotNull(devices.apnsToken),
           isNotNull(devices.userId),
+          or(isNull(devices.mutedUntil), lte(devices.mutedUntil, new Date())),
         ),
       );
     if (recipients.length === 0) return result;
