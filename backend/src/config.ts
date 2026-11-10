@@ -81,6 +81,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   }
   const apnsEnv = apnsEnvRaw === "production" ? "production" : "sandbox";
   const s3 = group(env, ["S3_BUCKET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"] as const, "Clip storage", warnings);
+  const s3Endpoint = env.S3_ENDPOINT?.trim() || undefined;
   const retentionDays = Number(env.CLIP_RETENTION_DAYS ?? 7);
   if (!Number.isInteger(retentionDays) || retentionDays < 1) {
     throw new Error(`Invalid CLIP_RETENTION_DAYS: ${env.CLIP_RETENTION_DAYS}`);
@@ -112,7 +113,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       : undefined,
     s3: s3
       ? {
-          endpoint: env.S3_ENDPOINT?.trim() || undefined,
+          endpoint: s3Endpoint,
+          forcePathStyle: s3PathStyle(env.S3_FORCE_PATH_STYLE, s3Endpoint),
           region: env.S3_REGION ?? "auto",
           bucket: s3.S3_BUCKET,
           accessKeyId: s3.S3_ACCESS_KEY_ID,
@@ -129,6 +131,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     enforcePlanLimits: env.ENFORCE_PLAN_LIMITS === "true",
     warnings,
   };
+}
+
+/**
+ * Path-style unless told otherwise, except for Railway buckets (`*.storageapi.dev`), which use
+ * virtual-hosted URLs. `S3_FORCE_PATH_STYLE=true|false` overrides it (e.g. an older Railway bucket).
+ */
+function s3PathStyle(value: string | undefined, endpoint: string | undefined): boolean {
+  const explicit = value?.trim().toLowerCase();
+  if (explicit === "true") return true;
+  if (explicit === "false") return false;
+  if (!endpoint) return false;
+  return !/\.storageapi\.dev(?::\d+)?(?:\/|$)/.test(endpoint);
 }
 
 function list(value: string): string[] {

@@ -61,7 +61,17 @@ describe("loadConfig", () => {
     expect(loadConfig({}).s3).toBeUndefined();
     expect(
       loadConfig({ S3_BUCKET: "clips", S3_ACCESS_KEY_ID: "id", S3_SECRET_ACCESS_KEY: "secret", S3_ENDPOINT: "https://x.r2.cloudflarestorage.com" }).s3,
-    ).toEqual({ endpoint: "https://x.r2.cloudflarestorage.com", region: "auto", bucket: "clips", accessKeyId: "id", secretAccessKey: "secret" });
+    ).toEqual({
+      endpoint: "https://x.r2.cloudflarestorage.com",
+      region: "auto",
+      bucket: "clips",
+      accessKeyId: "id",
+      secretAccessKey: "secret",
+      forcePathStyle: true,
+    });
+    const railway = { S3_BUCKET: "clips-abc", S3_ACCESS_KEY_ID: "id", S3_SECRET_ACCESS_KEY: "secret", S3_ENDPOINT: "https://t3.storageapi.dev" };
+    expect(loadConfig(railway).s3?.forcePathStyle).toBe(false);
+    expect(loadConfig({ ...railway, S3_FORCE_PATH_STYLE: "true" }).s3?.forcePathStyle).toBe(true);
     const partial = loadConfig({ S3_BUCKET: "clips" });
     expect(partial.s3).toBeUndefined();
     expect(partial.warnings).toEqual([expect.stringMatching(/Clip storage is off: set S3_ACCESS_KEY_ID/)]);

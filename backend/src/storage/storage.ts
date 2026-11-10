@@ -10,6 +10,8 @@ export interface S3Config {
   bucket: string;
   accessKeyId: string;
   secretAccessKey: string;
+  /** Path-style URLs (bucket in the path). R2 wants them; Railway buckets use virtual-hosted. */
+  forcePathStyle?: boolean;
 }
 
 export interface PresignedUpload {
@@ -37,8 +39,10 @@ export class S3MediaStorage implements MediaStorage {
     this.client = new S3Client({
       region: config.region,
       endpoint: config.endpoint,
-      // R2 and most S3-compatible services want path-style URLs when a custom endpoint is used.
-      forcePathStyle: Boolean(config.endpoint),
+      forcePathStyle: config.forcePathStyle ?? Boolean(config.endpoint),
+      // Only add checksums S3 requires, so presigned uploads work on every S3-compatible service.
+      requestChecksumCalculation: "WHEN_REQUIRED",
+      responseChecksumValidation: "WHEN_REQUIRED",
       credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey },
     });
   }
