@@ -7,9 +7,8 @@ final class ClipRecorderTests: XCTestCase {
     /// Feeds 20 s of synthetic 10 fps video, triggers an event at 6 s, and expects a
     /// fragmented-MP4 clip and a JPEG snapshot on disk.
     func testSavesClipAndSnapshotForTrigger() async throws {
-        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        defer { try? FileManager.default.removeItem(at: directory) }
-        let recorder = ClipRecorder(directory: directory, includeAudio: false)
+        let directory = try makeDirectory()
+        let recorder = makeRecorder(in: directory)
         let media = recorder.media()
         let eventID = UUID()
 
@@ -20,34 +19,59 @@ final class ClipRecorderTests: XCTestCase {
             try await Task.sleep(for: .milliseconds(5))
         }
 
-        let kinds = await Self.collectKinds(of: eventID, from: media, timeout: .seconds(10))
-        // Whatever completed on its own, stopping saves the rest.
+        _ = await Self.collectKinds(of: eventID, from: media, timeout: .seconds(10))
+        // Whatever completed on its own, stopping saves the rest. Waiting for the write queue
+        // (instead of sleeping) means every save has finished before we read or clean up.
         recorder.stop()
-        if kinds.count < 2 {
-            try await Task.sleep(for: .seconds(1))
-        }
+        await recorder.waitForPendingWrites()
 
-        let snapshot = directory.appendingPathComponent(eventID.uuidString).appendingPathComponent("snapshot.jpg")
-        let clip = directory.appendingPathComponent(eventID.uuidString).appendingPathComponent("clip.mp4")
-        let jpeg = try Data(contentsOf: snapshot)
+        let folder = directory.appendingPathComponent(eventID.uuidString, isDirectory: true)
+        let jpeg = try XCTUnwrap(
+            FileManager.default.contents(atPath: folder.appendingPathComponent("snapshot.jpg").path),
+            "snapshot.jpg was not saved"
+        )
         XCTAssertEqual(Array(jpeg.prefix(2)), [0xFF, 0xD8])
-        let movie = try Data(contentsOf: clip)
+        let movie = try XCTUnwrap(
+            FileManager.default.contents(atPath: folder.appendingPathComponent("clip.mp4").path),
+            "clip.mp4 was not saved"
+        )
         XCTAssertGreaterThan(movie.count, 8)
+        guard movie.count > 8 else { return }
         XCTAssertEqual(String(decoding: movie[4..<8], as: UTF8.self), "ftyp")
     }
 
     func testTriggerBeforeFirstFrameIsIgnored() async throws {
-        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        defer { try? FileManager.default.removeItem(at: directory) }
-        let recorder = ClipRecorder(directory: directory, includeAudio: false)
+        let directory = try makeDirectory()
+        let recorder = makeRecorder(in: directory)
         let eventID = UUID()
         recorder.trigger(eventID: eventID)
         recorder.stop()
-        try await Task.sleep(for: .milliseconds(200))
+        await recorder.waitForPendingWrites()
         XCTAssertFalse(FileManager.default.fileExists(atPath: directory.appendingPathComponent(eventID.uuidString).path))
     }
 
     // MARK: - Helpers
+
+    /// A fresh folder per test, created up front so the recorder's pruning and writes never
+    /// race its creation.
+    private func makeDirectory() throws -> URL {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ClipRecorderTests-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
+    /// Cleanup runs after the recorder is stopped and its write queue has drained, so the
+    /// folder is never removed while a save (or an atomic write's temporary file) is in flight.
+    private func makeRecorder(in directory: URL) -> ClipRecorder {
+        let recorder = ClipRecorder(directory: directory, includeAudio: false)
+        addTeardownBlock {
+            recorder.stop()
+            await recorder.waitForPendingWrites()
+            try? FileManager.default.removeItem(at: directory)
+        }
+        return recorder
+    }
 
     private static func collectKinds(
         of eventID: UUID,

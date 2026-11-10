@@ -100,6 +100,14 @@ final class ClipRecorder: NSObject, @unchecked Sendable {
         }
     }
 
+    /// Waits until every file write queued so far has finished. `stop()` queues the last
+    /// saves, so awaiting this after it means the files are on disk (tests rely on it).
+    func waitForPendingWrites() async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            ioQueue.async { continuation.resume() }
+        }
+    }
+
     // MARK: - Samples
 
     // Internal (not private) so tests can feed synthetic frames synchronously.
