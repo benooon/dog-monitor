@@ -1,0 +1,211 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import type { FastifyInstance } from "fastify";
+import { eq } from "drizzle-orm";
+import type { DbHandle } from "../src/db/client.js";
+import { devices, events, notificationPrefs } from "../src/db/schema.js";
+import type { ApnsNotification, ApnsResult, ApnsSender } from "../src/notifications/apns.js";
+import { TEST_NONCE } from "./helpers/apple.js";
+import { buildTestApp } from "./helpers/app.js";
+import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
+
+class FakeApns implements ApnsSender {
+  sent: ApnsNotification[] = [];
+  respond: (n: ApnsNotification) => ApnsResult = () => ({ status: 200 });
+  async send(n: ApnsNotification) {
+    this.sent.push(n);
+    return this.respond(n);
+  }
+}
+
+const tokenA = "a".repeat(64);
+const tokenB = "b".repeat(64);
+
+describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
+  let h: DbHandle;
+  let ctx: Awaited<ReturnType<typeof buildTestApp>>;
+  let app: FastifyInstance;
+  const apns = new FakeApns();
+
+  beforeAll(async () => {
+    h = openTestDb();
+    ctx = await buildTestApp(h, { apns });
+    app = ctx.app;
+  });
+  afterAll(async () => {
+    await app.close();
+    await h.close();
+  });
+  beforeEach(async () => {
+    await truncateAll(h);
+    apns.sent = [];
+    apns.respond = () => ({ status: 200 });
+  });
+
+  async function signIn(sub: string) {
+    const res = await app.inject({
+      method: "POST",
+      url: "/auth/apple",
+      payload: { identityToken: await ctx.apple.sign({ sub }), nonce: TEST_NONCE, name: sub },
+    });
+    const body = res.json();
+    return { userId: body.user.id as string, auth: { authorization: `Bearer ${body.token}` } };
+  }
+
+  /** Owner + member with phones registered for push, a dog, and a paired camera. */
+  async function setup() {
+    const owner = await signIn("owner");
+    const household = (await app.inject({ method: "POST", url: "/households", headers: owner.auth, payload: { name: "Home" } })).json();
+    await app.inject({ method: "POST", url: "/dogs", headers: owner.auth, payload: { name: "Rex" } });
+    const ownerPhone = (
+      await app.inject({ method: "POST", url: "/devices", headers: owner.auth, payload: { name: "Owner phone", role: "viewer", apnsToken: tokenA } })
+    ).json();
+
+    const invite = (await app.inject({ method: "POST", url: "/invites", headers: owner.auth })).json();
+    const member = await signIn("member");
+    await app.inject({ method: "POST", url: `/invites/${invite.token}/accept`, headers: member.auth, payload: { as: "member" } });
+    const memberPhone = (
+      await app.inject({ method: "POST", url: "/devices", headers: member.auth, payload: { name: "Member phone", role: "viewer", apnsToken: tokenB } })
+    ).json();
+
+    const camInvite = (await app.inject({ method: "POST", url: "/invites", headers: owner.auth })).json();
+    const accepted = (
+      await app.inject({ method: "POST", url: `/invites/${camInvite.token}/accept`, payload: { as: "camera", deviceName: "Living room" } })
+    ).json();
+    return {
+      householdId: household.id as string,
+      owner,
+      member,
+      ownerPhone: ownerPhone.id as string,
+      memberPhone: memberPhone.id as string,
+      camera: { id: accepted.device.id as string, auth: { authorization: `Device ${accepted.device.id}:${accepted.deviceSecret}` } },
+    };
+  }
+
+  const eventId = "22222222-2222-4222-8222-222222222222";
+  const postEvent = (auth: Record<string, string>, extra: Record<string, unknown> = {}) =>
+    app.inject({
+      method: "POST",
+      url: "/events",
+      headers: auth,
+      payload: { id: eventId, type: "prolongedBarking", startedAt: "2026-11-10T08:00:00.000Z", confidence: 0.9, ...extra },
+    });
+
+  it("stores the event and pushes to every viewer phone", async () => {
+    const { camera, householdId } = await setup();
+    const res = await postEvent(camera.auth, { snapshotKey: "snaps/1.jpg" });
+    expect(res.statusCode).toBe(201);
+    expect(res.json()).toMatchObject({ id: eventId, householdId, cameraId: camera.id, type: "prolongedBarking", confidence: 0.9 });
+
+    expect(apns.sent.map((n) => n.deviceToken).sort()).toEqual([tokenA, tokenB]);
+    const push = apns.sent[0]!;
+    expect(push.collapseId).toBe(eventId);
+    expect(push.priority).toBe(10);
+    expect(push.payload).toMatchObject({
+      aps: { alert: { title: "Living room", "loc-key": "%@ has been barking", "loc-args": ["Rex"] }, "mutable-content": 1 },
+      cameraId: camera.id,
+      snapshotKey: "snaps/1.jpg",
+    });
+  });
+
+  it("is idempotent on the event id (offline queue retries)", async () => {
+    const { camera } = await setup();
+    expect((await postEvent(camera.auth)).statusCode).toBe(201);
+    const again = await postEvent(camera.auth);
+    expect(again.statusCode).toBe(200);
+    expect(apns.sent).toHaveLength(2); // only the first post pushed
+    expect(await h.db.select().from(events)).toHaveLength(1);
+  });
+
+  it("honors notification prefs: per-camera beats all-cameras beats the default", async () => {
+    const { camera, owner, member } = await setup();
+    await h.db.insert(notificationPrefs).values([
+      { userId: owner.userId, deviceId: null, eventType: "prolongedBarking", enabled: false },
+      { userId: member.userId, deviceId: null, eventType: "prolongedBarking", enabled: false },
+      { userId: member.userId, deviceId: camera.id, eventType: "prolongedBarking", enabled: true },
+    ]);
+    await postEvent(camera.auth);
+    expect(apns.sent.map((n) => n.deviceToken)).toEqual([tokenB]);
+
+    // atDoor is off by default (SPEC §5).
+    apns.sent = [];
+    await postEvent(camera.auth, { id: "33333333-3333-4333-8333-333333333333", type: "atDoor" });
+    expect(apns.sent).toHaveLength(0);
+  });
+
+  it("clears tokens APNs reports as dead", async () => {
+    const { camera, memberPhone } = await setup();
+    apns.respond = (n) => (n.deviceToken === tokenB ? { status: 410, reason: "Unregistered" } : { status: 200 });
+    await postEvent(camera.auth);
+    const [phone] = await h.db.select().from(devices).where(eq(devices.id, memberPhone));
+    expect(phone!.apnsToken).toBeNull();
+  });
+
+  it("ends events and pushes escalations that replace the alert", async () => {
+    const { camera } = await setup();
+    await postEvent(camera.auth);
+    apns.sent = [];
+
+    const esc = await app.inject({ method: "PATCH", url: `/events/${eventId}`, headers: camera.auth, payload: { escalationSeconds: 300 } });
+    expect(esc.statusCode).toBe(200);
+    expect(apns.sent).toHaveLength(2);
+    expect(apns.sent[0]!.collapseId).toBe(eventId);
+    expect(apns.sent[0]!.payload).toMatchObject({ aps: { alert: { "loc-args": ["Rex", "5"] } } });
+
+    apns.sent = [];
+    const end = await app.inject({
+      method: "PATCH",
+      url: `/events/${eventId}`,
+      headers: camera.auth,
+      payload: { endedAt: "2026-11-10T08:07:00.000Z", clipKey: "clips/1.mp4" },
+    });
+    expect(end.json()).toMatchObject({ endedAt: "2026-11-10T08:07:00.000Z", clipKey: "clips/1.mp4" });
+    expect(apns.sent).toHaveLength(0);
+  });
+
+  it("validates input and scopes events to the reporting camera", async () => {
+    const { camera, owner } = await setup();
+    expect((await postEvent(camera.auth, { type: "cameraOffline" })).statusCode).toBe(400);
+    expect((await postEvent(camera.auth, { confidence: 2 })).statusCode).toBe(400);
+    expect((await postEvent(owner.auth)).statusCode).toBe(401);
+    expect((await app.inject({ method: "PATCH", url: `/events/${eventId}`, headers: camera.auth, payload: { endedAt: null } })).statusCode).toBe(404);
+  });
+});
+
+describe.skipIf(!hasDatabase)("camera offline push", () => {
+  it("stores a cameraOffline event and pushes when presence goes offline", async () => {
+    const { RealtimeHub } = await import("../src/realtime/hub.js");
+    const h = openTestDb();
+    await truncateAll(h);
+    const apns = new FakeApns();
+    const hub = new RealtimeHub();
+    const ctx = await buildTestApp(h, { apns, hub });
+    const app = ctx.app;
+    try {
+      const signIn = await app.inject({
+        method: "POST",
+        url: "/auth/apple",
+        payload: { identityToken: await ctx.apple.sign({ sub: "owner" }), nonce: TEST_NONCE, name: "owner" },
+      });
+      const auth = { authorization: `Bearer ${signIn.json().token}` };
+      await app.inject({ method: "POST", url: "/households", headers: auth, payload: { name: "Home" } });
+      await app.inject({ method: "POST", url: "/devices", headers: auth, payload: { name: "Phone", role: "viewer", apnsToken: tokenA } });
+      const invite = (await app.inject({ method: "POST", url: "/invites", headers: auth })).json();
+      const cam = (
+        await app.inject({ method: "POST", url: `/invites/${invite.token}/accept`, payload: { as: "camera", deviceName: "Hall" } })
+      ).json();
+
+      hub.cameraConnected(cam.device.id, cam.householdId, { send() {} }, null, 0);
+      hub.heartbeat(cam.device.id, 0);
+      hub.sweep(3 * 60 * 1000);
+
+      for (let i = 0; i < 100 && apns.sent.length === 0; i++) await new Promise((r) => setTimeout(r, 20));
+      expect(apns.sent).toHaveLength(1);
+      expect(apns.sent[0]!.payload).toMatchObject({ type: "cameraOffline", aps: { alert: { title: "Hall", "loc-key": "The camera is offline" } } });
+      const stored = await h.db.select().from(events);
+      expect(stored).toMatchObject([{ type: "cameraOffline", deviceId: cam.device.id }]);
+    } finally {
+      await app.close();
+      await h.close();
+    }
+  });
+});

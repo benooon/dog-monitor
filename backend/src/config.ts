@@ -1,4 +1,5 @@
 import type { LiveKitConfig } from "./live/livekit.js";
+import type { ApnsConfig } from "./notifications/apns.js";
 
 /** Runtime configuration, read from environment variables (documented in .env.example). */
 export interface Config {
@@ -15,6 +16,8 @@ export interface Config {
   appleAudiences: string[];
   /** LiveKit Cloud credentials; undefined until all three LIVEKIT_* variables are set. */
   liveKit?: LiveKitConfig;
+  /** APNs token auth; undefined until APNS_KEY_ID, APNS_TEAM_ID and APNS_KEY_P8 are set. */
+  apns?: ApnsConfig;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -34,6 +37,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (env.LIVEKIT_URL && !/^wss?:\/\//.test(env.LIVEKIT_URL)) {
     throw new Error(`Invalid LIVEKIT_URL (expected wss://…): ${env.LIVEKIT_URL}`);
   }
+  const apnsVars = [env.APNS_KEY_ID, env.APNS_TEAM_ID, env.APNS_KEY_P8];
+  const apnsSet = apnsVars.filter(Boolean).length;
+  if (apnsSet > 0 && apnsSet < 3) {
+    throw new Error("Set all of APNS_KEY_ID, APNS_TEAM_ID and APNS_KEY_P8, or none of them");
+  }
+  const apnsEnv = env.APNS_ENV ?? "sandbox";
+  if (apnsEnv !== "sandbox" && apnsEnv !== "production") {
+    throw new Error(`Invalid APNS_ENV (sandbox or production): ${apnsEnv}`);
+  }
   return {
     port,
     host: env.HOST ?? "0.0.0.0",
@@ -49,6 +61,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     liveKit:
       setCount === 3
         ? { url: env.LIVEKIT_URL!, apiKey: env.LIVEKIT_API_KEY!, apiSecret: env.LIVEKIT_API_SECRET! }
+        : undefined,
+    apns:
+      apnsSet === 3
+        ? {
+            keyId: env.APNS_KEY_ID!,
+            teamId: env.APNS_TEAM_ID!,
+            // Railway variables can't hold newlines easily; accept "\n" escapes too.
+            privateKey: env.APNS_KEY_P8!.replace(/\\n/g, "\n"),
+            topic: env.APNS_TOPIC ?? "com.benooon.dogmonitor",
+            environment: apnsEnv,
+          }
         : undefined,
   };
 }

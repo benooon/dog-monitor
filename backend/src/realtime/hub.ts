@@ -37,7 +37,15 @@ export class RealtimeHub {
   /** cameraId → viewer peers watching it. */
   private readonly watchers = new Map<string, Set<Peer>>();
 
-  constructor(private readonly events: HubEvents = {}) {}
+  private readonly presenceListeners: NonNullable<HubEvents["onPresenceChange"]>[] = [];
+
+  constructor(events: HubEvents = {}) {
+    if (events.onPresenceChange) this.presenceListeners.push(events.onPresenceChange);
+  }
+
+  addPresenceListener(listener: NonNullable<HubEvents["onPresenceChange"]>): void {
+    this.presenceListeners.push(listener);
+  }
 
   // MARK: cameras
 
@@ -160,7 +168,7 @@ export class RealtimeHub {
     for (const [peer, viewer] of this.viewers) {
       if (viewer.householdId === state.householdId) peer.send({ type: "presence", cameraId, online });
     }
-    this.events.onPresenceChange?.(cameraId, state.householdId, online);
+    for (const listener of this.presenceListeners) listener(cameraId, state.householdId, online);
   }
 
   private notifyCamera(cameraId: string, change: "joined" | "left"): void {

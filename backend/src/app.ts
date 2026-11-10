@@ -6,12 +6,15 @@ import { deviceAuthPlugin } from "./auth/device-plugin.js";
 import { authPlugin } from "./auth/plugin.js";
 import type { Database } from "./db/client.js";
 import type { LiveTokenIssuer } from "./live/livekit.js";
+import type { ApnsSender } from "./notifications/apns.js";
+import { EventNotifier, recordCameraOffline } from "./notifications/notifier.js";
 import type { AttemptLimiter } from "./pairing/attempt-limiter.js";
 import { RealtimeHub } from "./realtime/hub.js";
 import { authRoutes } from "./routes/auth.js";
 import { deviceSelfRoutes } from "./routes/device-self.js";
 import { deviceRoutes } from "./routes/devices.js";
 import { dogRoutes } from "./routes/dogs.js";
+import { cameraEventRoutes } from "./routes/events.js";
 import { householdRoutes } from "./routes/households.js";
 import { inviteRoutes } from "./routes/invites.js";
 import { cameraLiveRoutes, viewerLiveRoutes } from "./routes/live.js";
@@ -24,6 +27,8 @@ export interface AppServices {
   apple: AppleTokenVerifier;
   /** LiveKit token minting; undefined when LIVEKIT_* is not configured (live routes answer 503). */
   live?: LiveTokenIssuer;
+  /** APNs; undefined when APNS_* is not configured (events are stored without pushes). */
+  apns?: ApnsSender;
   /** Realtime presence (tests pass their own to inspect it). */
   hub?: RealtimeHub;
   /** Clock for heartbeats and offline detection (tests). */
@@ -57,7 +62,13 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(deviceRoutes, { db: services.db });
     await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter });
     await app.register(deviceSelfRoutes, { db: services.db });
+    const notifier = new EventNotifier(services.db, services.apns, app.log);
+    await app.register(cameraEventRoutes, { db: services.db, notifier });
+
     const hub = services.hub ?? new RealtimeHub();
+    hub.addPresenceListener((cameraId, householdId, online) => {
+      if (!online) void recordCameraOffline(services.db, notifier, cameraId, householdId, app.log);
+    });
     const now = services.now ?? Date.now;
     await app.register(viewerLiveRoutes, { db: services.db, live: services.live, hub });
     await app.register(cameraLiveRoutes, { db: services.db, live: services.live });
