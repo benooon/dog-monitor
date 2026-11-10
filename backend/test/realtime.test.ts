@@ -130,15 +130,16 @@ describe.skipIf(!hasDatabase)("realtime channel (GET /ws)", () => {
   it("relays presence, heartbeats and viewer joins between camera and viewers", async () => {
     const { owner, camera } = await setup();
     const viewer = await connect(owner.auth);
-    expect(await viewer.next()).toEqual({ type: "cameras", cameras: [{ id: camera.id, online: false }] });
+    expect(await viewer.next()).toEqual({ type: "cameras", cameras: [{ id: camera.id, online: false, state: null }] });
 
     const cam = await connect(camera.auth);
-    cam.send({ type: "heartbeat", battery: 0.8, charging: true, thermal: "nominal" });
+    cam.send({ type: "heartbeat", battery: 0.8, charging: true, thermal: "nominal", state: "resting" });
     expect(await viewer.next()).toEqual({ type: "presence", cameraId: camera.id, online: true });
+    expect(await viewer.next()).toEqual({ type: "cameraState", cameraId: camera.id, state: "resting" });
 
     await eventually(async () => {
       const [row] = await h.db.select().from(devices).where(eq(devices.id, camera.id));
-      expect(row).toMatchObject({ battery: 0.8, charging: true, thermal: "nominal" });
+      expect(row).toMatchObject({ battery: 0.8, charging: true, thermal: "nominal", dogState: "resting" });
       expect(row!.lastHeartbeatAt?.getTime()).toBe(clock);
     });
 

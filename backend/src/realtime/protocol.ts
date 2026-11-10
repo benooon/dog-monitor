@@ -2,17 +2,20 @@
  * WebSocket protocol on `GET /ws` (SPEC §6 Realtime). Every message is one JSON object with a `type`.
  *
  * Camera (Authorization: Device <id>:<secret>):
- *   → { type: "heartbeat", battery?: 0...1, charging?: bool, thermal?: "nominal"|"fair"|"serious"|"critical" }
+ *   → { type: "heartbeat", battery?: 0...1, charging?: bool, thermal?: "nominal"|"fair"|"serious"|"critical", state?: DogState }
  *   ← { type: "viewers", count: n, change: "joined" | "left" }   (count 0 = all viewers left)
  *
  * Viewer (Authorization: Bearer <JWT>):
  *   → { type: "watch", cameraId } / { type: "unwatch", cameraId }
- *   ← { type: "cameras", cameras: [{ id, online }] }               (once, on connect)
+ *   ← { type: "cameras", cameras: [{ id, online, state }] }        (once, on connect; state may be null)
  *   ← { type: "presence", cameraId, online }                        (on every change)
+ *   ← { type: "cameraState", cameraId, state }                      (when the dog's state changes)
  *
  * Both:
  *   ← { type: "error", error: "<code>" }   (bad_message, not_found, viewer_limit_reached, camera_only, no_household)
  */
+
+import { DOG_STATES, type DogState } from "../db/schema.js";
 
 export const THERMAL_STATES = ["nominal", "fair", "serious", "critical"] as const;
 export type ThermalState = (typeof THERMAL_STATES)[number];
@@ -22,6 +25,7 @@ export interface HeartbeatMessage {
   battery?: number;
   charging?: boolean;
   thermal?: ThermalState;
+  state?: DogState;
 }
 
 export type CameraInbound = HeartbeatMessage;
@@ -29,8 +33,9 @@ export type ViewerInbound = { type: "watch"; cameraId: string } | { type: "unwat
 
 export type ServerMessage =
   | { type: "viewers"; count: number; change: "joined" | "left" }
-  | { type: "cameras"; cameras: { id: string; online: boolean }[] }
+  | { type: "cameras"; cameras: { id: string; online: boolean; state: DogState | null }[] }
   | { type: "presence"; cameraId: string; online: boolean }
+  | { type: "cameraState"; cameraId: string; state: DogState }
   | { type: "error"; error: string };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -59,6 +64,10 @@ export function parseCameraMessage(raw: string): CameraInbound | null {
   if (msg.thermal !== undefined) {
     if (!THERMAL_STATES.includes(msg.thermal as ThermalState)) return null;
     out.thermal = msg.thermal as ThermalState;
+  }
+  if (msg.state !== undefined) {
+    if (!DOG_STATES.includes(msg.state as DogState)) return null;
+    out.state = msg.state as DogState;
   }
   return out;
 }

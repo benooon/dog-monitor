@@ -1,3 +1,4 @@
+import type { DogState } from "../db/schema.js";
 import type { ServerMessage } from "./protocol.js";
 
 /** A camera without a heartbeat for this long is offline (SPEC §6 Health). */
@@ -12,6 +13,7 @@ interface CameraState {
   householdId: string;
   lastHeartbeatAt: number | null;
   online: boolean;
+  dogState: DogState | null;
   peers: Set<Peer>;
 }
 
@@ -70,11 +72,15 @@ export class RealtimeHub {
     this.cameras.get(cameraId)?.peers.delete(peer);
   }
 
-  heartbeat(cameraId: string, now: number): void {
+  heartbeat(cameraId: string, now: number, dogState?: DogState): void {
     const state = this.cameras.get(cameraId);
     if (!state) return;
     state.lastHeartbeatAt = now;
     this.updateOnline(cameraId, state, now);
+    if (dogState !== undefined && dogState !== state.dogState) {
+      state.dogState = dogState;
+      this.toHousehold(state.householdId, { type: "cameraState", cameraId, state: dogState });
+    }
   }
 
   isOnline(cameraId: string): boolean {
@@ -96,7 +102,7 @@ export class RealtimeHub {
   viewerConnected(
     peer: Peer,
     householdId: string,
-    cameras: { id: string; lastHeartbeatAt: number | null }[],
+    cameras: { id: string; lastHeartbeatAt: number | null; dogState?: DogState | null }[],
     now: number,
     userId: string | null = null,
   ): void {
@@ -106,7 +112,7 @@ export class RealtimeHub {
       cameras: cameras.map((c) => {
         const known = this.cameras.get(c.id);
         const online = known ? known.online : c.lastHeartbeatAt !== null && now - c.lastHeartbeatAt < OFFLINE_AFTER_MS;
-        return { id: c.id, online };
+        return { id: c.id, online, state: known?.dogState ?? c.dogState ?? null };
       }),
     });
   }
@@ -155,7 +161,7 @@ export class RealtimeHub {
   private camera(cameraId: string, householdId: string): CameraState {
     let state = this.cameras.get(cameraId);
     if (!state) {
-      state = { householdId, lastHeartbeatAt: null, online: false, peers: new Set() };
+      state = { householdId, lastHeartbeatAt: null, online: false, dogState: null, peers: new Set() };
       this.cameras.set(cameraId, state);
     }
     return state;
@@ -165,10 +171,14 @@ export class RealtimeHub {
     const online = state.lastHeartbeatAt !== null && now - state.lastHeartbeatAt < OFFLINE_AFTER_MS;
     if (online === state.online) return;
     state.online = online;
-    for (const [peer, viewer] of this.viewers) {
-      if (viewer.householdId === state.householdId) peer.send({ type: "presence", cameraId, online });
-    }
+    this.toHousehold(state.householdId, { type: "presence", cameraId, online });
     for (const listener of this.presenceListeners) listener(cameraId, state.householdId, online);
+  }
+
+  private toHousehold(householdId: string, message: ServerMessage): void {
+    for (const [peer, viewer] of this.viewers) {
+      if (viewer.householdId === householdId) peer.send(message);
+    }
   }
 
   private notifyCamera(cameraId: string, change: "joined" | "left"): void {

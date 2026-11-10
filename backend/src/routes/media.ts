@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { events } from "../db/schema.js";
+import { devices, events } from "../db/schema.js";
 import { requireHousehold } from "../households/scope.js";
 import { MEDIA_CONTENT_TYPES, eventMediaKey, type MediaKind, type MediaStorage, type PresignedUpload } from "../storage/storage.js";
 
@@ -51,6 +51,36 @@ export async function viewerMediaRoutes(app: FastifyInstance, opts: MediaRouteOp
   const { db } = opts;
   app.addHook("preHandler", app.authenticate);
   app.addHook("preHandler", requireHousehold(db));
+
+  /** Latest snapshot per camera, for the viewer home cards. */
+  app.get("/cameras/snapshots", async (request, reply) => {
+    if (!opts.storage) return reply.code(503).send({ error: "storage_not_configured" });
+    const rows = await db
+      .selectDistinctOn([events.deviceId], {
+        cameraId: events.deviceId,
+        eventId: events.id,
+        snapshotKey: events.snapshotKey,
+        takenAt: events.startedAt,
+      })
+      .from(events)
+      .innerJoin(devices, eq(devices.id, events.deviceId))
+      .where(
+        and(
+          eq(events.householdId, request.household!.householdId),
+          isNotNull(events.snapshotKey),
+          eq(devices.status, "active"),
+        ),
+      )
+      .orderBy(events.deviceId, desc(events.startedAt));
+    return Promise.all(
+      rows.map(async (row) => ({
+        cameraId: row.cameraId,
+        eventId: row.eventId,
+        takenAt: row.takenAt,
+        url: await opts.storage!.presignDownload(row.snapshotKey!, DOWNLOAD_URL_TTL_SECONDS),
+      })),
+    );
+  });
 
   app.get<{ Params: { id: string } }>(
     "/events/:id/media",

@@ -74,7 +74,7 @@ describe("RealtimeHub", () => {
     const stranger = new StubPeer();
     hub.viewerConnected(viewer, H, [{ id: CAM, lastHeartbeatAt: null }], T0);
     hub.viewerConnected(stranger, "other-household", [], T0);
-    expect(viewer.take()).toEqual([{ type: "cameras", cameras: [{ id: CAM, online: false }] }]);
+    expect(viewer.take()).toEqual([{ type: "cameras", cameras: [{ id: CAM, online: false, state: null }] }]);
 
     const camera = new StubPeer();
     hub.cameraConnected(CAM, H, camera, null, T0);
@@ -97,6 +97,26 @@ describe("RealtimeHub", () => {
     ]);
   });
 
+  it("relays dog state changes to the household, once per change", () => {
+    const hub = new RealtimeHub();
+    const viewer = new StubPeer();
+    hub.cameraConnected(CAM, H, new StubPeer(), null, T0);
+    hub.viewerConnected(viewer, H, [{ id: CAM, lastHeartbeatAt: null }], T0);
+    viewer.take();
+    hub.heartbeat(CAM, T0, "barking");
+    hub.heartbeat(CAM, T0 + 1, "barking");
+    hub.heartbeat(CAM, T0 + 2);
+    hub.heartbeat(CAM, T0 + 3, "resting");
+    expect(viewer.take()).toEqual([
+      { type: "presence", cameraId: CAM, online: true },
+      { type: "cameraState", cameraId: CAM, state: "barking" },
+      { type: "cameraState", cameraId: CAM, state: "resting" },
+    ]);
+    const late = new StubPeer();
+    hub.viewerConnected(late, H, [{ id: CAM, lastHeartbeatAt: T0, dogState: "barking" }], T0 + 4);
+    expect(late.take()).toEqual([{ type: "cameras", cameras: [{ id: CAM, online: true, state: "resting" }] }]);
+  });
+
   it("keeps a camera online across a quick reconnect using the stored heartbeat", () => {
     const hub = new RealtimeHub();
     hub.cameraConnected(CAM, H, new StubPeer(), T0, T0 + 10_000);
@@ -109,7 +129,7 @@ describe("RealtimeHub", () => {
     const hub = new RealtimeHub();
     const viewer = new StubPeer();
     hub.viewerConnected(viewer, H, [{ id: CAM, lastHeartbeatAt: T0 }], T0 + 60_000);
-    expect(viewer.take()).toEqual([{ type: "cameras", cameras: [{ id: CAM, online: true }] }]);
+    expect(viewer.take()).toEqual([{ type: "cameras", cameras: [{ id: CAM, online: true, state: null }] }]);
   });
 });
 
@@ -122,6 +142,8 @@ describe("protocol parsing", () => {
       charging: true,
       thermal: "fair",
     });
+    expect(parseCameraMessage('{"type":"heartbeat","state":"barking"}')).toEqual({ type: "heartbeat", state: "barking" });
+    expect(parseCameraMessage('{"type":"heartbeat","state":"dancing"}')).toBeNull();
     expect(parseCameraMessage('{"type":"heartbeat","battery":2}')).toBeNull();
     expect(parseCameraMessage('{"type":"heartbeat","thermal":"hot"}')).toBeNull();
     expect(parseCameraMessage('{"type":"heartbeat","charging":"yes"}')).toBeNull();

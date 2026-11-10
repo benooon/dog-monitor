@@ -79,7 +79,7 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
         const message = parseCameraMessage(raw);
         if (!message) return peer.send({ type: "error", error: "bad_message" });
         const at = now();
-        hub.heartbeat(deviceId, at);
+        hub.heartbeat(deviceId, at, message.state);
         await db
           .update(devices)
           .set({
@@ -87,6 +87,7 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
             ...(message.battery !== undefined && { battery: message.battery }),
             ...(message.charging !== undefined && { charging: message.charging }),
             ...(message.thermal !== undefined && { thermal: message.thermal }),
+            ...(message.state !== undefined && { dogState: message.state }),
           })
           .where(eq(devices.id, deviceId));
       };
@@ -98,13 +99,13 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
       const { householdId } = membership;
 
       const cameras = await db
-        .select({ id: devices.id, lastHeartbeatAt: devices.lastHeartbeatAt })
+        .select({ id: devices.id, lastHeartbeatAt: devices.lastHeartbeatAt, dogState: devices.dogState })
         .from(devices)
         .where(and(eq(devices.householdId, householdId), eq(devices.role, "camera"), eq(devices.status, "active")));
       hub.viewerConnected(
         peer,
         householdId,
-        cameras.map((c) => ({ id: c.id, lastHeartbeatAt: c.lastHeartbeatAt?.getTime() ?? null })),
+        cameras.map((c) => ({ id: c.id, lastHeartbeatAt: c.lastHeartbeatAt?.getTime() ?? null, dogState: c.dogState })),
         now(),
         request.user!.userId,
       );

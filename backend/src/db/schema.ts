@@ -118,6 +118,8 @@ export const devices = pgTable(
     battery: real("battery"),
     charging: boolean("charging"),
     thermal: text("thermal"),
+    /** Camera devices: the dog's state from the latest heartbeat. */
+    dogState: text("dog_state").$type<DogState>(),
     /** Viewer devices: no pushes until this time ("Mute 1h" notification action). */
     mutedUntil: timestamp("muted_until", { withTimezone: true }),
     createdAt: createdAt(),

@@ -120,6 +120,40 @@ describe.skipIf(!hasDatabase)("media routes and retention", () => {
     expect((await app.inject({ method: "GET", url: `/events/${eventId}/media`, headers: camera })).statusCode).toBe(401);
   });
 
+  it("lists the latest snapshot per camera", async () => {
+    const { owner, householdId, cameraId } = await setup();
+    const older = "55555555-5555-4555-8555-555555555555";
+    await h.db.insert(events).values([
+      {
+        id: older,
+        householdId,
+        deviceId: cameraId,
+        type: "prolongedBarking",
+        startedAt: new Date("2026-11-10T07:00:00Z"),
+        snapshotKey: eventMediaKey(householdId, cameraId, older, "snapshot"),
+      },
+      {
+        id: eventId,
+        householdId,
+        deviceId: cameraId,
+        type: "whining",
+        startedAt: new Date("2026-11-10T08:00:00Z"),
+        snapshotKey: eventMediaKey(householdId, cameraId, eventId, "snapshot"),
+      },
+      { householdId, deviceId: cameraId, type: "calmedDown", startedAt: new Date("2026-11-10T09:00:00Z") },
+    ]);
+    const res = await app.inject({ method: "GET", url: "/cameras/snapshots", headers: owner });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual([
+      {
+        cameraId,
+        eventId,
+        takenAt: "2026-11-10T08:00:00.000Z",
+        url: `https://bucket.test/${eventMediaKey(householdId, cameraId, eventId, "snapshot")}?get&ttl=600`,
+      },
+    ]);
+  });
+
   it("deletes media older than the retention period and clears the keys", async () => {
     const { householdId, cameraId } = await setup();
     const now = new Date("2026-11-10T08:00:00Z");
