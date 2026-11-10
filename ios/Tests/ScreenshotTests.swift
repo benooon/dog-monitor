@@ -52,6 +52,15 @@ final class ScreenshotTests: XCTestCase {
             },
             Screen(name: "08-daily-summary") { AnyView(DailySummaryView(model: .preview, dogName: "Rex")) },
             Screen(name: "09-household") { AnyView(HouseholdView(model: .demo)) },
+            Screen(name: "09a-dog-profile") {
+                AnyView(NavigationStack {
+                    DogProfileEditor(
+                        dog: HouseholdDTO.demo.dogs[0],
+                        api: sampleAPI,
+                        storedPhoto: DogPhotoStore.samplePortrait()
+                    ) { _, _ in }
+                })
+            },
             Screen(name: "10-invite") {
                 AnyView(InviteSheet(
                     model: .demo,

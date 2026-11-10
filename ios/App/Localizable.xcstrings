@@ -3017,6 +3017,116 @@
           }
         }
       }
+    },
+    "Name": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שם"
+          }
+        }
+      }
+    },
+    "Age": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "גיל"
+          }
+        }
+      }
+    },
+    "Alerts": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התראות"
+          }
+        }
+      }
+    },
+    "Remove photo": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסרת התמונה"
+          }
+        }
+      }
+    },
+    "%@'s profile": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפרופיל של %@"
+          }
+        }
+      }
+    },
+    "When %@ is alone": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כאשר %@ לבד"
+          }
+        }
+      }
+    },
+    "Update your alerts for %@?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לעדכן את ההתראות על %@?"
+          }
+        }
+      }
+    },
+    "Save and update alerts": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שמירה ועדכון ההתראות"
+          }
+        }
+      }
+    },
+    "Changing these updates your notification settings.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שינוי כאן מעדכן את הגדרות ההתראות שלך."
+          }
+        }
+      }
+    },
+    "Your notification settings will follow the new profile. You can still change them in Notifications.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הגדרות ההתראות יתאימו לפרופיל החדש. אפשר עדיין לשנות אותן בהתראות."
+          }
+        }
+      }
+    },
+    "Edit %@'s profile": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עריכת הפרופיל של %@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

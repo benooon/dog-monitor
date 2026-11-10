@@ -105,6 +105,51 @@ final class DogOnboardingModelTests: XCTestCase {
         XCTAssertEqual(model.promises.first, .barking)
     }
 
+    // MARK: Profile editor
+
+    /// The same dog as `dog(photo:)`, already decoded.
+    private static func profiledDog(photo: Bool = false) throws -> DogDTO {
+        DogDTO(
+            id: try XCTUnwrap(UUID(uuidString: dogId)), householdId: UUID(), name: "Rex",
+            lifeStage: .adult, traits: [.waitsAtDoor], alertStyle: .balanced,
+            photoUpdatedAt: photo ? .now : nil, createdAt: .now
+        )
+    }
+
+    func testNameAndPhotoAloneDoNotChangeAlerts() throws {
+        let model = DogOnboardingModel(api: DogMonitorAPI(baseURL: URL(string: "https://api.example.com")!), dog: try Self.profiledDog())
+        model.name = "Rexy"
+        model.removePhoto()
+        XCTAssertFalse(model.changesAlerts)
+        model.toggle(.whines)
+        XCTAssertTrue(model.changesAlerts)
+        model.toggle(.whines)
+        model.alertStyle = .everything
+        XCTAssertTrue(model.changesAlerts)
+    }
+
+    func testADogWithoutAProfileAlwaysChangesAlerts() {
+        let dog = DogDTO(id: UUID(), householdId: UUID(), name: "Bella", createdAt: .now)
+        let model = DogOnboardingModel(api: DogMonitorAPI(baseURL: URL(string: "https://api.example.com")!), dog: dog)
+        XCTAssertTrue(model.changesAlerts)
+    }
+
+    func testSavingWithoutAlertsRemovesThePhotoAndLeavesPrefsAlone() async throws {
+        let transport = ScriptedTransport([(200, Self.dog(photo: true)), (200, Self.dog())])
+        let api = DogMonitorAPI(baseURL: URL(string: "https://api.example.com")!, transport: transport)
+        let model = DogOnboardingModel(api: api, dog: try Self.profiledDog(photo: true))
+        model.name = "Rexy"
+        model.removePhoto()
+
+        let saved = await model.save(appliesAlerts: false)
+
+        XCTAssertTrue(saved)
+        XCTAssertEqual(transport.requests.map(\.httpMethod), ["PATCH", "DELETE"])
+        XCTAssertEqual(transport.requests.last?.url?.path, "/dogs/\(Self.dogId)/photo")
+        XCTAssertEqual(model.savedDog?.hasPhoto, false)
+        XCTAssertFalse(model.photoUploaded)
+    }
+
     func testNameIsRequired() async {
         let model = DogOnboardingModel(api: DogMonitorAPI(baseURL: URL(string: "https://api.example.com")!))
         model.name = "   "

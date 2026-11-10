@@ -18,6 +18,8 @@ final class DogOnboardingModel: Identifiable {
     var lifeStage: DogLifeStage?
     var traits: Set<DogTrait>
     var alertStyle: DogAlertStyle
+    /// The owner asked to remove the stored photo (profile editor).
+    private(set) var removesPhoto = false
     private(set) var isSaving = false
     private(set) var saveFailed = false
     /// Whether a camera already has a no-go zone, so the summary can say if one is still needed.
@@ -26,10 +28,13 @@ final class DogOnboardingModel: Identifiable {
     private let api: DogMonitorAPI
     /// The dog being described: one created by an earlier attempt, or one the household already had.
     private var dog: DogDTO?
+    /// The dog as it was when the screen opened, to tell what the owner changed.
+    private let original: DogDTO?
 
     init(api: DogMonitorAPI, dog: DogDTO? = nil, hasZones: Bool = false) {
         self.api = api
         self.dog = dog
+        original = dog
         self.hasZones = hasZones
         name = dog?.name ?? ""
         lifeStage = dog?.lifeStage
@@ -60,6 +65,15 @@ final class DogOnboardingModel: Identifiable {
         personalization.promises(hasZones: hasZones)
     }
 
+    /// Whether saving would change the alerts: the dog had no profile yet, or its age, habits
+    /// or alert style changed. Name and photo alone leave notification settings alone.
+    var changesAlerts: Bool {
+        guard let original, let originalStyle = original.alertStyle else { return true }
+        return lifeStage != original.lifeStage
+            || traits != Set(original.traits)
+            || alertStyle != originalStyle
+    }
+
     func toggle(_ trait: DogTrait) {
         if traits.contains(trait) {
             traits.remove(trait)
@@ -72,11 +86,19 @@ final class DogOnboardingModel: Identifiable {
     func setPhoto(data: Data) {
         guard let image = UIImage(data: data) else { return }
         photo = DogPhoto.square(image, side: DogPhoto.uploadSide)
+        removesPhoto = false
+    }
+
+    /// Drops the picked photo and, on save, the stored one.
+    func removePhoto() {
+        photo = nil
+        removesPhoto = true
     }
 
     /// Saves everything. Returns true when the dog and the alert settings are stored; a photo
     /// that fails to upload does not block the rest (it can be added again from the household).
-    func save() async -> Bool {
+    /// - Parameter appliesAlerts: false keeps the owner's notification settings as they are.
+    func save(appliesAlerts: Bool = true) async -> Bool {
         guard let name = validName, !isSaving else { return false }
         isSaving = true
         saveFailed = false
@@ -96,7 +118,11 @@ final class DogOnboardingModel: Identifiable {
                     dog = saved
                     photoUploaded = true
                 }
+            } else if removesPhoto, saved.hasPhoto {
+                saved = try await api.deleteDogPhoto(id: saved.id)
+                dog = saved
             }
+            guard appliesAlerts else { return true }
             var settings = NotificationSettings(try await api.notificationPrefs())
             personalization.apply(to: &settings)
             _ = try await api.replaceNotificationPrefs(settings.requestPrefs())

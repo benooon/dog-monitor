@@ -97,7 +97,26 @@ struct HouseholdView: View {
             if !household.dogs.isEmpty {
                 Section("Dogs") {
                     ForEach(household.dogs) { dog in
-                        DogRow(dog: dog, photo: model.dogPhotos.image(for: dog))
+                        if isOwner {
+                            NavigationLink {
+                                DogProfileEditor(
+                                    dog: dog,
+                                    api: model.authorizedAPI,
+                                    storedPhoto: model.dogPhotos.image(for: dog)
+                                ) { saved, photo in
+                                    if let photo {
+                                        model.dogPhotos.store(photo, for: saved)
+                                    }
+                                    Task { await model.loadHousehold() }
+                                }
+                            } label: {
+                                DogRow(dog: dog, photo: model.dogPhotos.image(for: dog))
+                            }
+                            .accessibilityHint(Text("Edit \(dog.name)'s profile"))
+                            .accessibilityIdentifier("household-dog-\(dog.id.uuidString.lowercased())")
+                        } else {
+                            DogRow(dog: dog, photo: model.dogPhotos.image(for: dog))
+                        }
                     }
                 }
             }
