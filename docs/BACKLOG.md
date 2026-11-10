@@ -25,7 +25,7 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [~] ios: Camera capture pipeline. One `AVCaptureSession` (video + audio) with an `AsyncStream` of sample buffers, fanned out to consumers (analysis, recorder, streamer). Add a camera-mode screen: black screen, `isIdleTimerDisabled`, minimum brightness, tap to show preview. (in progress 2026-11-10)
 - [~] ios: Bark detection with SoundAnalysis (`SNClassifySoundRequest` built-in classifier), mapping dog-related classes to `Detection` values in core. Show a debug overlay in camera mode. (in progress 2026-11-10)
 - [~] core: Event engine state machine. Detections in, events out, with duration thresholds, cooldowns, escalation and state transitions per SPEC §5. **Heavy unit tests** with simulated timelines (inject a clock). (in progress 2026-11-10)
-- [ ] backend: LiveKit. `POST /cameras/:id/live-token` mints a viewer token; the camera fetches a publisher token. Env: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`.
+- [~] backend: LiveKit. `POST /cameras/:id/live-token` mints a viewer token; the camera fetches a publisher token. Env: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`. (in progress 2026-11-10)
 - [ ] backend: WebSocket channel. Camera presence and heartbeats; tell the camera "viewer joined / all viewers left"; mark a camera offline after 3 min without a heartbeat.
 - [ ] ios: Camera publishes to LiveKit only while viewers are connected (driven by the WebSocket signal), with simulcast 720p/360p.
 - [ ] ios: Viewer mode with a camera list and a live view screen (LiveKit subscribe), with reconnect handling.
