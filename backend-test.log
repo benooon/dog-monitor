@@ -1,8 +1,8 @@
-npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
 
-added 225 packages, and audited 226 packages in 41s
+added 225 packages, and audited 226 packages in 23s
 
 73 packages are looking for funding
   run `npm fund` for details
@@ -27,20 +27,20 @@ Run `npm audit` for details.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/runner/work/dog-monitor/dog-monitor/backend[39m
 
- [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 710[2mms[22m[39m
- [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 498[2mms[22m[39m
- [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 200[2mms[22m[39m
- [32m✓[39m test/auth.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 2501[2mms[22m[39m
+ [32m✓[39m test/invites.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 456[2mms[22m[39m
+ [32m✓[39m test/households.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 367[2mms[22m[39m
+ [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 163[2mms[22m[39m
+ [32m✓[39m test/auth.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 2464[2mms[22m[39m
    [32m✓[39m JwtService [2m(2)[22m
-     [33m[2m✓[22m[39m rejects expired tokens[33m 2104[2mms[22m[39m
- [32m✓[39m test/config.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 7[2mms[22m[39m
- [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 92[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects expired tokens[33m 2103[2mms[22m[39m
+ [32m✓[39m test/config.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 54[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
 [2m      Tests [22m [1m[32m41 passed[39m[22m[90m (41)[39m
-[2m   Start at [22m 07:30:07
-[2m   Duration [22m 7.99s[2m (tests 60%, import 37%, transform 3%)[22m
+[2m   Start at [22m 07:35:22
+[2m   Duration [22m 5.84s[2m (tests 71%, import 26%, transform 3%)[22m
 
-[2m    Isolate [22m [33m6 workers spawned[39m[2m · ~100ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~500ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[2m    Isolate [22m [33m6 workers spawned[39m[2m · ~61ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~303ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
 
