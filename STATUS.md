@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: fe6b082938cf6ae0679a9012144bb1ddd201b93b
-- message: docs: claim household members task
-- time (UTC): 2026-11-10T12:21:45Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42813886401
+- commit: d2bb0b9160a661cdb6e12690f34fc57bd3c81258
+- message: ios: household screen with members, devices, removal and invite links
+- time (UTC): 2026-11-10T12:30:57Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42814531584
 
 | job | result | log |
 |---|---|---|
