@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import type { DbHandle } from "../src/db/client.js";
+import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
 
@@ -28,7 +29,7 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     const res = await app.inject({
       method: "POST",
       url: "/auth/apple",
-      payload: { identityToken: await ctx.apple.sign({ sub }), name },
+      payload: { identityToken: await ctx.apple.sign({ sub }), nonce: TEST_NONCE, name },
     });
     const body = res.json();
     return { userId: body.user.id as string, auth: { authorization: `Bearer ${body.token}` } };

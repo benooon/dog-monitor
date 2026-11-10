@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from "jose";
 
 export const APPLE_ISSUER = "https://appleid.apple.com";
@@ -10,7 +11,15 @@ export interface AppleIdentity {
 }
 
 export interface AppleTokenVerifier {
-  verify(identityToken: string): Promise<AppleIdentity>;
+  /**
+   * `rawNonce` is the random string the app generated; the app passed its SHA-256 (hex)
+   * to Apple, which echoes it in the token's `nonce` claim. This binds the token to one sign-in.
+   */
+  verify(identityToken: string, rawNonce: string): Promise<AppleIdentity>;
+}
+
+export function hashNonce(rawNonce: string): string {
+  return createHash("sha256").update(rawNonce).digest("hex");
 }
 
 export class InvalidAppleTokenError extends Error {}
@@ -25,7 +34,7 @@ export function createAppleTokenVerifier(options: {
 }): AppleTokenVerifier {
   const keySet = options.keySet ?? createRemoteJWKSet(APPLE_JWKS_URL);
   return {
-    async verify(identityToken) {
+    async verify(identityToken, rawNonce) {
       try {
         const { payload } = await jwtVerify(identityToken, keySet, {
           issuer: APPLE_ISSUER,
@@ -34,6 +43,9 @@ export function createAppleTokenVerifier(options: {
         });
         if (typeof payload.sub !== "string" || payload.sub.length === 0) {
           throw new InvalidAppleTokenError("token has no subject");
+        }
+        if (payload.nonce !== hashNonce(rawNonce)) {
+          throw new InvalidAppleTokenError("nonce mismatch");
         }
         const email = typeof payload.email === "string" ? payload.email : undefined;
         return { sub: payload.sub, email };

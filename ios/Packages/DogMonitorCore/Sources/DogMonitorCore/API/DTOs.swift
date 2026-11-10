@@ -53,6 +53,9 @@ public enum DeviceStatus: String, Codable, Sendable, Hashable {
 }
 
 public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
+    /// A camera is offline after this long without a heartbeat (SPEC §6).
+    public static let offlineAfter: TimeInterval = 3 * 60
+
     public let id: UUID
     public let householdId: UUID
     public let userId: UUID?
@@ -110,10 +113,13 @@ public struct HealthResponse: Codable, Sendable, Hashable {
 
 public struct AppleSignInRequest: Codable, Sendable, Hashable {
     public var identityToken: String
+    /// The raw nonce; its SHA-256 (hex) must have been set on the Apple request.
+    public var nonce: String
     public var name: String?
 
-    public init(identityToken: String, name: String? = nil) {
+    public init(identityToken: String, nonce: String, name: String? = nil) {
         self.identityToken = identityToken
+        self.nonce = nonce
         self.name = name
     }
 }
@@ -176,4 +182,18 @@ struct AcceptAsCameraRequest: Encodable {
     let appVersion: String?
 
     enum CodingKeys: String, CodingKey { case `as`, deviceName, model, appVersion }
+}
+
+extension DeviceDTO {
+    /// Active and heartbeat seen within `offlineAfter`.
+    public func isOnline(now: Date) -> Bool {
+        guard status == .active, let lastHeartbeatAt else { return false }
+        return now.timeIntervalSince(lastHeartbeatAt) < Self.offlineAfter
+    }
+}
+
+extension HouseholdDTO {
+    public var cameras: [DeviceDTO] {
+        devices.filter { $0.role == .camera && $0.status == .active }
+    }
 }

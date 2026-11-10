@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SignInView: View {
     let model: ViewerSessionModel
+    @State private var nonce: AppleNonce?
 
     var body: some View {
         VStack(spacing: 24) {
@@ -23,7 +24,10 @@ struct SignInView: View {
                     .multilineTextAlignment(.center)
             }
             SignInWithAppleButton(.signIn) { request in
+                let fresh = AppleNonce.random()
+                nonce = fresh
                 request.requestedScopes = [.fullName]
+                request.nonce = fresh.sha256
             } onCompletion: { result in
                 handle(result)
             }
@@ -39,7 +43,8 @@ struct SignInView: View {
         guard case .success(let authorization) = result,
               let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let tokenData = credential.identityToken,
-              let token = String(data: tokenData, encoding: .utf8)
+              let token = String(data: tokenData, encoding: .utf8),
+              let rawNonce = nonce?.raw
         else {
             if case .failure(let error) = result,
                (error as? ASAuthorizationError)?.code == .canceled {
@@ -51,6 +56,7 @@ struct SignInView: View {
         let name = credential.fullName.map {
             PersonNameComponentsFormatter.localizedString(from: $0, style: .default)
         }.flatMap { $0.isEmpty ? nil : $0 }
-        Task { await model.signIn(identityToken: token, name: name) }
+        self.nonce = nil
+        Task { await model.signIn(identityToken: token, nonce: rawNonce, name: name) }
     }
 }

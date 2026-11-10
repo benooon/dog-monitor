@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { JwtService } from "../src/auth/jwt.js";
 import type { DbHandle } from "../src/db/client.js";
+import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
 
@@ -40,8 +41,12 @@ describe.skipIf(!hasDatabase)("POST /auth/apple and GET /me", () => {
     await truncateAll(h);
   });
 
-  const signIn = (identityToken: string, name?: string) =>
-    app.inject({ method: "POST", url: "/auth/apple", payload: name ? { identityToken, name } : { identityToken } });
+  const signIn = (identityToken: string, name?: string, nonce = TEST_NONCE) =>
+    app.inject({
+      method: "POST",
+      url: "/auth/apple",
+      payload: name ? { identityToken, nonce, name } : { identityToken, nonce },
+    });
 
   it("creates a user and returns a JWT that works for /me", async () => {
     const res = await signIn(await ctx.apple.sign({ sub: "apple-123" }), "Ben");
@@ -79,6 +84,17 @@ describe.skipIf(!hasDatabase)("POST /auth/apple and GET /me", () => {
     const { createFakeApple } = await import("./helpers/apple.js");
     const other = await createFakeApple();
     expect((await signIn(await other.sign())).statusCode).toBe(401);
+  });
+
+  it("rejects a missing or mismatched nonce", async () => {
+    const withoutNonce = await ctx.apple.sign({ nonce: null });
+    expect((await signIn(withoutNonce)).statusCode).toBe(401);
+    const token = await ctx.apple.sign({ nonce: "another-nonce-value-123" });
+    expect((await signIn(token)).statusCode).toBe(401);
+    expect((await signIn(token, undefined, "another-nonce-value-123")).statusCode).toBe(200);
+    // The nonce field itself is required.
+    const res = await app.inject({ method: "POST", url: "/auth/apple", payload: { identityToken: token } });
+    expect(res.statusCode).toBe(400);
   });
 
   it("validates the body", async () => {

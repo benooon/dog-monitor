@@ -18,7 +18,11 @@ final class LocalizationTests: XCTestCase {
         "Create",
         "Create your household",
         "Sign out",
-        "Your household is ready.",
+        "Cameras",
+        "Dogs",
+        "Online",
+        "Offline",
+        "No cameras yet. Pair a spare iPhone as a camera.",
     ]
 
     private func bundle(for language: String) throws -> Bundle {

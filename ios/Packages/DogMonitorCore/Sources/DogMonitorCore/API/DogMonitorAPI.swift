@@ -28,8 +28,8 @@ public struct DogMonitorAPI: Sendable {
         try await send("GET", "health")
     }
 
-    public func signInWithApple(identityToken: String, name: String? = nil) async throws -> AuthResponse {
-        try await send("POST", "auth/apple", body: AppleSignInRequest(identityToken: identityToken, name: name))
+    public func signInWithApple(identityToken: String, nonce: String, name: String? = nil) async throws -> AuthResponse {
+        try await send("POST", "auth/apple", body: AppleSignInRequest(identityToken: identityToken, nonce: nonce, name: name))
     }
 
     public func me() async throws -> MeResponse {

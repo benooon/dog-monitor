@@ -23,3 +23,17 @@ final class ViewerSessionModelTests: XCTestCase {
         XCTAssertEqual(AppConfig.apiBaseURL.scheme, "http")
     }
 }
+
+final class AppleNonceTests: XCTestCase {
+    func testSHA256MatchesKnownVector() {
+        // echo -n abc | shasum -a 256
+        XCTAssertEqual(AppleNonce(raw: "abc").sha256, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+    }
+
+    func testRandomNoncesAreLongAndDistinct() {
+        let a = AppleNonce.random(), b = AppleNonce.random()
+        XCTAssertNotEqual(a, b)
+        XCTAssertGreaterThanOrEqual(a.raw.count, 32)
+        XCTAssertFalse(a.raw.contains("="))
+    }
+}

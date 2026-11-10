@@ -13,6 +13,8 @@ export interface AuthRoutesOptions {
 
 interface AppleSignInBody {
   identityToken: string;
+  /** The raw nonce whose SHA-256 the app sent to Apple. */
+  nonce: string;
   /** Apple only sends the name to the client on the first sign-in. */
   name?: string;
 }
@@ -26,10 +28,11 @@ export async function authRoutes(app: FastifyInstance, opts: AuthRoutesOptions):
       schema: {
         body: {
           type: "object",
-          required: ["identityToken"],
+          required: ["identityToken", "nonce"],
           additionalProperties: false,
           properties: {
             identityToken: { type: "string", minLength: 1, maxLength: 8192 },
+            nonce: { type: "string", minLength: 16, maxLength: 128 },
             name: { type: "string", minLength: 1, maxLength: 200 },
           },
         },
@@ -38,7 +41,7 @@ export async function authRoutes(app: FastifyInstance, opts: AuthRoutesOptions):
     async (request, reply) => {
       let identity;
       try {
-        identity = await apple.verify(request.body.identityToken);
+        identity = await apple.verify(request.body.identityToken, request.body.nonce);
       } catch (err) {
         if (err instanceof InvalidAppleTokenError) {
           request.log.info({ reason: err.message }, "rejected Apple identity token");

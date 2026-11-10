@@ -10,7 +10,7 @@ final class DogMonitorAPITests: XCTestCase {
         let stub = StubTransport(json: #"{"token":"jwt-1","user":{"id":"\#(Fixtures.userID)","name":"Ben"}}"#)
         let api = DogMonitorAPI(baseURL: Fixtures.baseURL, transport: stub)
 
-        let auth = try await api.signInWithApple(identityToken: "apple-token", name: "Ben")
+        let auth = try await api.signInWithApple(identityToken: "apple-token", nonce: "raw-nonce", name: "Ben")
 
         XCTAssertEqual(auth.token, "jwt-1")
         XCTAssertEqual(auth.user.id, UUID(uuidString: Fixtures.userID))
@@ -24,12 +24,13 @@ final class DogMonitorAPITests: XCTestCase {
         let body = try Fixtures.bodyJSON(request)
         XCTAssertEqual(body["identityToken"] as? String, "apple-token")
         XCTAssertEqual(body["name"] as? String, "Ben")
+        XCTAssertEqual(body["nonce"] as? String, "raw-nonce")
     }
 
     func testOmitsNilFieldsInRequests() async throws {
         let stub = StubTransport(json: #"{"token":"t","user":{"id":"\#(Fixtures.userID)","name":null}}"#)
         let api = DogMonitorAPI(baseURL: Fixtures.baseURL, transport: stub)
-        _ = try await api.signInWithApple(identityToken: "x")
+        _ = try await api.signInWithApple(identityToken: "x", nonce: "n")
         let body = try Fixtures.bodyJSON(try XCTUnwrap(stub.requests.first))
         XCTAssertNil(body["name"], "nil must be omitted, the backend rejects null names")
     }
@@ -185,5 +186,25 @@ final class URLSessionTransportTests: XCTestCase {
         } catch {
             XCTAssertEqual(error as? APIError, .http(status: 404, code: "not_found"))
         }
+    }
+}
+
+final class DeviceStatusTests: XCTestCase {
+    private func device(status: String = "active", role: String = "camera", heartbeat: String?) throws -> DeviceDTO {
+        let hb = heartbeat.map { "\"\($0)\"" } ?? "null"
+        let json = """
+        {"id":"\(UUID())","householdId":"\(UUID())","userId":null,"name":"Cam","role":"\(role)","model":null,
+         "appVersion":null,"hasPushToken":false,"status":"\(status)","lastHeartbeatAt":\(hb),"battery":null,
+         "charging":null,"thermal":null,"createdAt":"2026-11-10T07:00:00Z"}
+        """
+        return try JSONCoding.makeDecoder().decode(DeviceDTO.self, from: Data(json.utf8))
+    }
+
+    func testOnlineWithinThreeMinutesOfHeartbeat() throws {
+        let now = try XCTUnwrap(JSONCoding.parseISO8601("2026-11-10T08:00:00Z"))
+        XCTAssertTrue(try device(heartbeat: "2026-11-10T07:58:00.000Z").isOnline(now: now))
+        XCTAssertFalse(try device(heartbeat: "2026-11-10T07:56:59Z").isOnline(now: now))
+        XCTAssertFalse(try device(heartbeat: nil).isOnline(now: now))
+        XCTAssertFalse(try device(status: "revoked", heartbeat: "2026-11-10T07:59:00Z").isOnline(now: now))
     }
 }

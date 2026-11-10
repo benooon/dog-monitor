@@ -6,6 +6,7 @@ import { invites } from "../src/db/schema.js";
 import { AttemptLimiter } from "../src/pairing/attempt-limiter.js";
 import { parseDeviceAuthorization } from "../src/auth/device-plugin.js";
 import { hashSecret, newInviteCode, secretMatches } from "../src/pairing/secrets.js";
+import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
 
@@ -63,7 +64,7 @@ describe.skipIf(!hasDatabase)("invites and device auth", () => {
     const res = await app.inject({
       method: "POST",
       url: "/auth/apple",
-      payload: { identityToken: await ctx.apple.sign({ sub }), name: sub },
+      payload: { identityToken: await ctx.apple.sign({ sub }), nonce: TEST_NONCE, name: sub },
     });
     const body = res.json();
     return { userId: body.user.id as string, auth: { authorization: `Bearer ${body.token}` } };

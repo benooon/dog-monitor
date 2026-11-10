@@ -8,6 +8,8 @@ import Observation
 final class ViewerSessionModel {
     private(set) var state: OnboardingState = .loading
     private(set) var isWorking = false
+    /// Full household (cameras, dogs) for the viewer home, loaded once ready.
+    private(set) var household: HouseholdDTO?
     var errorMessage: String?
 
     private var api: DogMonitorAPI
@@ -28,9 +30,9 @@ final class ViewerSessionModel {
         await refresh()
     }
 
-    func signIn(identityToken: String, name: String?) async {
+    func signIn(identityToken: String, nonce: String, name: String?) async {
         await perform {
-            let auth = try await api.signInWithApple(identityToken: identityToken, name: name)
+            let auth = try await api.signInWithApple(identityToken: identityToken, nonce: nonce, name: name)
             let credential = APICredential.user(token: auth.token)
             try credentials.save(credential)
             api = api.with(credential: credential)
@@ -49,7 +51,14 @@ final class ViewerSessionModel {
         }
     }
 
+    func loadHousehold() async {
+        await perform {
+            household = try await api.household()
+        }
+    }
+
     func signOut() {
+        household = nil
         try? credentials.clear()
         api = api.with(credential: .none)
         state = .signedOut

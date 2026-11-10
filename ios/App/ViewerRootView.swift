@@ -24,19 +24,8 @@ struct ViewerRootView: View {
                 }
         case .needsHousehold:
             CreateHouseholdView(model: model)
-        case .ready(_, let household):
-            // Placeholder until the viewer home (camera list) exists.
-            VStack(spacing: 16) {
-                Image(systemName: "house.fill")
-                    .font(.system(size: 56))
-                    .foregroundStyle(.tint)
-                Text(household.name)
-                    .font(.title.bold())
-                Text("Your household is ready.")
-                    .foregroundStyle(.secondary)
-                Button("Sign out") { model.signOut() }
-            }
-            .padding()
+        case .ready(_, let membership):
+            ViewerHomeView(model: model, householdName: membership.name)
         }
     }
 }

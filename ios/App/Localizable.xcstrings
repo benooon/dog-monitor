@@ -11,6 +11,16 @@
         }
       }
     },
+    "Cameras": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מצלמות"
+          }
+        }
+      }
+    },
     "Change role": {
       "localizations": {
         "he": {
@@ -61,6 +71,16 @@
         }
       }
     },
+    "Dogs": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כלבים"
+          }
+        }
+      }
+    },
     "Family members and cameras join your household later with an invite.": {
       "localizations": {
         "he": {
@@ -97,6 +117,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "השאירו את הטלפון הזה בבית כדי לשמור על הכלב שלכם."
+          }
+        }
+      }
+    },
+    "No cameras yet. Pair a spare iPhone as a camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין עדיין מצלמות. חברו אייפון פנוי כמצלמה."
+          }
+        }
+      }
+    },
+    "Offline": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מנותקת"
+          }
+        }
+      }
+    },
+    "Online": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחוברת"
           }
         }
       }
@@ -157,16 +207,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "צפו בשידור חי וקבלו התראות בטלפון שלכם."
-          }
-        }
-      }
-    },
-    "Your household is ready.": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "משק הבית שלכם מוכן."
           }
         }
       }
