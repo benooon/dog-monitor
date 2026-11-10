@@ -1,4 +1,5 @@
 import AVFoundation
+import CoreImage
 import DogMonitorCore
 import Foundation
 import Observation
@@ -34,6 +35,8 @@ final class CameraModeModel {
     private(set) var isMotionActive = false
     /// The latest Vision result: where the dog is and its posture (empty when no dog was seen).
     private(set) var dogDetections: [Detection] = []
+    /// Door / forbidden / bed zones drawn in setup (cached on the phone, synced when paired).
+    private(set) var zones: [CameraZone] = CameraModeModel.cachedZones()
     /// Heat and power problems to show on the camera screen, most important first.
     private(set) var healthWarnings: [CameraHealth.Warning] = []
 
@@ -249,6 +252,58 @@ final class CameraModeModel {
         }
     }
 
+    // MARK: - Zones
+
+    nonisolated static let zonesKey = "camera.zones"
+
+    nonisolated static func cachedZones(defaults: UserDefaults = .standard) -> [CameraZone] {
+        guard let data = defaults.data(forKey: zonesKey) else { return [] }
+        return (try? JSONDecoder().decode([CameraZone].self, from: data)) ?? []
+    }
+
+    private func applyZones(_ zones: [CameraZone]) {
+        self.zones = zones
+        classifier.zones = DogZones(zones)
+        if let data = try? JSONEncoder().encode(zones) {
+            UserDefaults.standard.set(data, forKey: Self.zonesKey)
+        }
+    }
+
+    /// Picks up zones saved from another install of this camera; keeps the cache when offline.
+    private func refreshZones() async {
+        guard let api, let remote = try? await api.zones() else { return }
+        applyZones(remote)
+    }
+
+    /// Saves zones on the phone and, when paired, to the backend. Returns false if the upload
+    /// failed (the zones still apply on this phone).
+    func saveZones(_ zones: [CameraZone]) async -> Bool {
+        let valid = zones.filter(\.polygon.isValid)
+        applyZones(valid)
+        guard let api else { return true }
+        do {
+            applyZones(try await api.replaceZones(valid))
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    /// The next camera frame as an image, for drawing zones on. Nil when the camera isn't running.
+    func snapshot() async -> CGImage? {
+        guard status == .running else { return nil }
+        let samples = capture.samples(.video, bufferingNewest: 1)
+        let frame = await Task.detached(priority: .userInitiated) { () -> ImageBox? in
+            for await sample in samples where sample.kind == .video {
+                guard let pixelBuffer = CMSampleBufferGetImageBuffer(sample.buffer) else { continue }
+                let image = CIImage(cvPixelBuffer: pixelBuffer)
+                return CIContext().createCGImage(image, from: image.extent).map(ImageBox.init)
+            }
+            return nil
+        }.value
+        return frame?.image
+    }
+
     /// Called after `CameraPairingView` stored the new device credential.
     func didPair(with credential: APICredential) {
         self.credential = credential
@@ -303,7 +358,8 @@ final class CameraModeModel {
         let cameraID: UUID
         if case .device(let id, _) = credential { cameraID = id } else { cameraID = UUID() }
         engine = EventEngine(cameraID: cameraID)
-        classifier = DogStateClassifier(zones: classifier.zones)
+        classifier = DogStateClassifier(zones: DogZones(zones))
+        Task { await refreshZones() }
         healthMonitor = HealthMonitor(cameraID: cameraID)
         if healthReporter == nil { healthReporter = HealthReporter() }
         appliedFrameRate = nil
@@ -493,4 +549,9 @@ private struct VideoAnalysis: Sendable {
     var motion: MotionResult
     var gateOpen: Bool
     var dog: [Detection]?
+}
+
+/// Hands a freshly made frame image from the conversion task to the main actor.
+private struct ImageBox: @unchecked Sendable {
+    let image: CGImage
 }

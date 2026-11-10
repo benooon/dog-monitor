@@ -31,12 +31,12 @@ final class DogStateClassifierTests: XCTestCase {
     }
 
     func testZonesWinAndForbiddenBeatsDoor() {
-        var classifier = DogStateClassifier(zones: DogZones(door: [door], forbidden: [sofa]))
+        var classifier = DogStateClassifier(zones: DogZones(door: [ZonePolygon(rect: door)], forbidden: [ZonePolygon(rect: sofa)]))
         XCTAssertEqual(classifier.classify(dog(at: 0, center: (0.9, 0.5)), at: t0), .atDoor)
         XCTAssertEqual(classifier.classify(dog(at: 1, center: (0.1, 0.8)), at: at(1)), .forbiddenZone)
         XCTAssertEqual(classifier.classify(dog(at: 2, center: (0.5, 0.5)), at: at(2)), .unknown)
 
-        classifier.zones = DogZones(door: [sofa], forbidden: [sofa])
+        classifier.zones = DogZones(door: [ZonePolygon(rect: sofa)], forbidden: [ZonePolygon(rect: sofa)])
         XCTAssertEqual(classifier.classify(dog(at: 3, center: (0.1, 0.8)), at: at(3)), .forbiddenZone)
     }
 

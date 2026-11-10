@@ -8,6 +8,7 @@ struct CameraModeView: View {
     @State private var model = CameraModeModel()
     @Environment(\.scenePhase) private var scenePhase
     @State private var showsPairing = false
+    @State private var showsZones = false
     let onChangeRole: () -> Void
 
     init(onChangeRole: @escaping () -> Void) {
@@ -42,6 +43,9 @@ struct CameraModeView: View {
             model.scenePhaseChanged(isActive: phase == .active)
         }
         .onDisappear { model.stop() }
+        .sheet(isPresented: $showsZones) {
+            ZoneEditorView(model: model)
+        }
         .sheet(isPresented: $showsPairing) {
             CameraPairingView { credential in
                 model.didPair(with: credential)
@@ -103,6 +107,15 @@ struct CameraModeView: View {
                 }
                 Spacer()
                 if model.isPreviewVisible {
+                    Button {
+                        showsZones = true
+                    } label: {
+                        Label("Zones", systemImage: "square.dashed")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .accessibilityIdentifier("edit-zones")
                     Button(role: .destructive) {
                         model.stop()
                     } label: {

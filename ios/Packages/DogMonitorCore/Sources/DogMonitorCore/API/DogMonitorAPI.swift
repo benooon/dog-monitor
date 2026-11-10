@@ -150,6 +150,19 @@ public struct DogMonitorAPI: Sendable {
         _ = try await perform(request)
     }
 
+    // MARK: - Zones (camera device auth)
+
+    public func zones() async throws -> [CameraZone] {
+        let response: CameraZonesDTO = try await send("GET", "device/zones")
+        return response.zones
+    }
+
+    /// Replaces all of this camera's zones; returns what is now stored.
+    public func replaceZones(_ zones: [CameraZone]) async throws -> [CameraZone] {
+        let response: CameraZonesDTO = try await send("PUT", "device/zones", body: CameraZonesDTO(zones: zones))
+        return response.zones
+    }
+
     // MARK: - Notification preferences (user auth)
 
     /// The caller's push preferences and the defaults for types without a preference.

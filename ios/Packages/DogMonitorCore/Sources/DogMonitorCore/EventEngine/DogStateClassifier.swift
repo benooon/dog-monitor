@@ -1,13 +1,19 @@
 import Foundation
 
-/// Zones the user draws in camera setup (normalized, origin top-left).
+/// The door and forbidden zones the classifier checks the dog's position against.
 public struct DogZones: Codable, Sendable, Hashable {
-    public var door: [NormalizedRect]
-    public var forbidden: [NormalizedRect]
+    public var door: [ZonePolygon]
+    public var forbidden: [ZonePolygon]
 
-    public init(door: [NormalizedRect] = [], forbidden: [NormalizedRect] = []) {
+    public init(door: [ZonePolygon] = [], forbidden: [ZonePolygon] = []) {
         self.door = door
         self.forbidden = forbidden
+    }
+
+    /// From the zones drawn in camera setup; bed zones don't affect the state (yet).
+    public init(_ zones: [CameraZone]) {
+        door = zones.filter { $0.kind == .door }.map(\.polygon)
+        forbidden = zones.filter { $0.kind == .forbidden }.map(\.polygon)
     }
 }
 
@@ -71,8 +77,8 @@ public struct DogStateClassifier: Sendable {
         }
         if let box = dog.boundingBox {
             let center = (x: box.midX, y: box.midY)
-            if zones.forbidden.contains(where: { Self.contains($0, center) }) { return .forbiddenZone }
-            if zones.door.contains(where: { Self.contains($0, center) }) { return .atDoor }
+            if zones.forbidden.contains(where: { $0.contains(x: center.x, y: center.y) }) { return .forbiddenZone }
+            if zones.door.contains(where: { $0.contains(x: center.x, y: center.y) }) { return .atDoor }
         }
 
         let motion = motionFraction(at: time)
@@ -99,7 +105,4 @@ public struct DogStateClassifier: Sendable {
         return (Double(moving) / Double(recent.count), recent.count)
     }
 
-    private static func contains(_ rect: NormalizedRect, _ point: (x: Double, y: Double)) -> Bool {
-        point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height
-    }
 }
