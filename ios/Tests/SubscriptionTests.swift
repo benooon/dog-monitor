@@ -33,7 +33,7 @@ final class PremiumAppTests: XCTestCase {
     }
 
     func testStoreIsUnavailableWhenNoProductsComeBack() async {
-        let model = makeModel { _ in 0 }
+        let model = makeModel { _ in .init(count: 0) }
         await model.loadProducts()
         XCTAssertEqual(model.storeState, .unavailable)
     }
