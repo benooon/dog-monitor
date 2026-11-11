@@ -47,6 +47,27 @@ final class DailySummaryModel {
         DailySummaryInsights.dates(in: cameraSummaries)
     }
 
+    /// The stored day on display, for its highlight reel.
+    var selectedSummary: DailySummaryDTO? {
+        guard let date = insights.day?.date else { return nil }
+        return cameraSummaries.first { $0.date == date }
+    }
+
+    /// Downloads a day's highlight reel to a local file, so it plays smoothly and can be shared
+    /// as a video (a link would expire in minutes).
+    func reelFile(for summary: DailySummaryDTO) async throws -> URL {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("reels", isDirectory: true)
+        let file = folder.appendingPathComponent("\(summary.cameraId.uuidString)-\(summary.date).mp4")
+        if FileManager.default.fileExists(atPath: file.path) { return file }
+        let media = try await api.reel(cameraId: summary.cameraId, date: summary.date)
+        let (downloaded, response) = try await URLSession.shared.download(from: media.url)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try? FileManager.default.removeItem(at: file)
+        try FileManager.default.moveItem(at: downloaded, to: file)
+        return file
+    }
+
     var cameraName: String? {
         cameras.first { $0.id == cameraId }?.name
     }

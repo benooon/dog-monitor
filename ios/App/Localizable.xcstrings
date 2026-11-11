@@ -3625,6 +3625,66 @@
           }
         }
       }
+    },
+    "%@'s day in 30 seconds": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום של %@ ב-30 שניות"
+          }
+        }
+      }
+    },
+    "The day in 30 seconds": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום ב-30 שניות"
+          }
+        }
+      }
+    },
+    "Couldn't load the video.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו לטעון את הסרטון."
+          }
+        }
+      }
+    },
+    "Share": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיתוף"
+          }
+        }
+      }
+    },
+    "%@'s day in 30 seconds, ready to share.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום של %@ ב-30 שניות, מוכן לשיתוף."
+          }
+        }
+      }
+    },
+    "The day in 30 seconds, ready to share.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום ב-30 שניות, מוכן לשיתוף."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

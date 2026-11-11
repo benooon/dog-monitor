@@ -179,8 +179,8 @@ struct PremiumView: View {
 /// StoreKit hosts its marketing content without our environment, so the locale and
 /// layout direction are passed in and re-applied.
 ///
-/// Only features that have shipped are listed: the highlight reel and insights get their lines
-/// when they exist (DECISIONS 2026-11-11).
+/// Only features that have shipped are listed: insights get their line when they exist
+/// (DECISIONS 2026-11-11).
 private struct PremiumHeader: View {
     let dogName: String?
     let locale: Locale
@@ -211,6 +211,7 @@ private struct PremiumHeader: View {
 
             VStack(alignment: .leading, spacing: DS.Spacing.m) {
                 feature("Clips are kept for \(premium.clipRetentionDays) days, not one.", systemImage: "film.stack")
+                reelFeature
                 feature("Everyone in the household watches.", systemImage: "person.3")
                 feature("Up to \(premium.cameras) cameras.", systemImage: "video.badge.plus")
             }
@@ -231,6 +232,23 @@ private struct PremiumHeader: View {
         } else {
             Text("Keep a month of moments")
         }
+    }
+
+    private var reelFeature: some View {
+        Label {
+            Group {
+                if let dogName {
+                    Text("\(dogName)'s day in 30 seconds, ready to share.")
+                } else {
+                    Text("The day in 30 seconds, ready to share.")
+                }
+            }
+            .foregroundStyle(.primary)
+        } icon: {
+            Image(systemName: "play.rectangle.on.rectangle")
+                .foregroundStyle(.tint)
+        }
+        .font(.body)
     }
 
     private var freeAlerts: Text {

@@ -68,6 +68,9 @@ struct DailySummaryView: View {
 
     private func summaryList(_ insights: DailySummaryInsights) -> some View {
         List {
+            if let summary = model.selectedSummary, summary.hasReel == true {
+                HighlightReelSection(model: model, summary: summary, dogName: dogName)
+            }
             Section {
                 SummaryHeadline(insights: insights)
             } header: {
