@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: de5658aafd86fac90ab4a448cc6bf5ca0a53c0f7
-- message: ios: ask "Join <household>?" with the inviter's name before joining
-- time (UTC): 2026-11-11T09:13:51Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42990615357
+- commit: 804c409c9217bbd13d6d6ca8b4fef171150bfbe2
+- message: ios: "Premium keeps 30 days" on moments whose clip the free plan deleted
+- time (UTC): 2026-11-11T09:35:25Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42992949952
 
 | job | result | log |
 |---|---|---|

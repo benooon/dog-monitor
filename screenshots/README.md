@@ -1,4 +1,4 @@
-# Screenshots (de5658a)
+# Screenshots (804c409)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
@@ -93,6 +93,12 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="iphone-07-event-detail-light.jpg" width="260"> | <img src="iphone-07-event-detail-dark.jpg" width="260"> | <img src="iphone-07-event-detail-hebrew.jpg" width="260"> |
+
+### 07a-event-clip-expired
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-07a-event-clip-expired-light.jpg" width="260"> | <img src="iphone-07a-event-clip-expired-dark.jpg" width="260"> | <img src="iphone-07a-event-clip-expired-hebrew.jpg" width="260"> |
 
 ### 08-daily-summary
 
@@ -233,6 +239,12 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="ipad-07-event-detail-light.jpg" width="260"> | <img src="ipad-07-event-detail-dark.jpg" width="260"> | <img src="ipad-07-event-detail-hebrew.jpg" width="260"> |
+
+### 07a-event-clip-expired
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-07a-event-clip-expired-light.jpg" width="260"> | <img src="ipad-07a-event-clip-expired-dark.jpg" width="260"> | <img src="ipad-07a-event-clip-expired-hebrew.jpg" width="260"> |
 
 ### 08-daily-summary
 

@@ -164,16 +164,16 @@ Writing result bundle at path:
    |                            `- note: 'SKPaymentTransactionState' has been explicitly marked deprecated here
 15 |     SKPaymentTransactionStatePurchasing,    // Transaction is being added to the server queue.
 16 |     SKPaymentTransactionStatePurchased,     // Transaction is in queue, user has been charged.  Client should complete the transaction.
-2026-11-11 09:06:50.873 xcodebuild[4070:14703] [MT] IDETestOperationsObserverDebug: 476.231 elapsed -- Testing started completed.
-2026-11-11 09:06:50.873 xcodebuild[4070:14703] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 09:06:50.873 xcodebuild[4070:14703] [MT] IDETestOperationsObserverDebug: 476.231 sec, +476.231 sec -- end
+2026-11-11 09:24:35.830 xcodebuild[4451:16140] [MT] IDETestOperationsObserverDebug: 361.344 elapsed -- Testing started completed.
+2026-11-11 09:24:35.831 xcodebuild[4451:16140] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 09:24:35.832 xcodebuild[4451:16140] [MT] IDETestOperationsObserverDebug: 361.344 sec, +361.344 sec -- end
 Testing started
 iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
 { platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-2026-11-11 09:13:10.033 xcodebuild[19049:58066] [MT] IDETestOperationsObserverDebug: 355.408 elapsed -- Testing started completed.
-2026-11-11 09:13:10.033 xcodebuild[19049:58066] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 09:13:10.034 xcodebuild[19049:58066] [MT] IDETestOperationsObserverDebug: 355.408 sec, +355.408 sec -- end
+2026-11-11 09:34:47.919 xcodebuild[17731:55617] [MT] IDETestOperationsObserverDebug: 590.609 elapsed -- Testing started completed.
+2026-11-11 09:34:47.920 xcodebuild[17731:55617] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 09:34:47.920 xcodebuild[17731:55617] [MT] IDETestOperationsObserverDebug: 590.610 sec, +590.610 sec -- end
 Testing started
-Screenshots: 138
+Screenshots: 144
