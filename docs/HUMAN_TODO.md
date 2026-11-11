@@ -33,3 +33,4 @@ Agents add items here when they are blocked. The owner checks items off.
 - [ ] **Apple Sign in revocation key.** Create a Sign in with Apple key (.p8) in the developer account so the backend can revoke the Apple token on account deletion (Apple requirement). Add it as env vars when the backlog task is ready.
 - [ ] **Breach process.** Agree who gets alerted and who reports (Israel: Privacy Protection Authority for serious incidents; EU: 72 hours). One paragraph in `docs/PRIVACY.md` once decided.
 
+- [ ] **Waitlist admin token (Railway):** set `ADMIN_TOKEN` (`openssl rand -hex 32`) on the backend service to read sign-up counts: `curl -H "Authorization: Bearer $ADMIN_TOKEN" https://<railway host>/waitlist/stats`. Without it the stats route stays hidden; sign-ups are still stored.

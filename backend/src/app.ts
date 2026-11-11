@@ -35,6 +35,7 @@ import type { TransactionVerifier } from "./billing/app-store.js";
 import { appLinkRoutes } from "./routes/app-links.js";
 import { liveActivityRoutes } from "./routes/live-activities.js";
 import { LiveActivityNotifier } from "./notifications/live-activity.js";
+import { waitlistRoutes } from "./routes/waitlist.js";
 
 export interface AppServices {
   db: Database;
@@ -62,6 +63,10 @@ export interface AppServices {
   enforcePlanLimits?: boolean;
   /** Minimum time between Live Activity updates per camera (tests use 0). */
   liveActivityIntervalMs?: number;
+  /** Bearer token for admin-only routes (GET /waitlist/stats); undefined hides them. */
+  adminToken?: string;
+  /** Override the waitlist per-IP limiter (tests). */
+  waitlistLimiter?: AttemptLimiter;
 }
 
 export interface BuildAppOptions {
@@ -90,6 +95,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(accountRoutes, { db: services.db, storage: services.storage });
     await app.register(householdRoutes, { db: services.db, storage: services.storage });
     await app.register(dogRoutes, { db: services.db });
+    await app.register(waitlistRoutes, { db: services.db, adminToken: services.adminToken, limiter: services.waitlistLimiter });
     const enforcePlanLimits = services.enforcePlanLimits ?? false;
     await app.register(deviceRoutes, { db: services.db, enforcePlanLimits });
     await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter, enforcePlanLimits });

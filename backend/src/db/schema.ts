@@ -279,3 +279,16 @@ export const liveActivities = pgTable(
   },
   (t) => [index("live_activities_camera_idx").on(t.cameraId)],
 );
+
+/**
+ * Pre-launch waitlist from the landing page (`/join`). `email` is stored lowercased.
+ * Unsubscribing deletes the row; the token is the only way to do it, so it goes in every email.
+ */
+export const waitlist = pgTable("waitlist", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(),
+  locale: text("locale").notNull(),
+  source: text("source"),
+  unsubscribeToken: text("unsubscribe_token").notNull().unique(),
+  createdAt: createdAt(),
+});
