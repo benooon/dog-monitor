@@ -6,6 +6,8 @@ import SwiftUI
 /// a new key). Nothing is accepted and nothing is sent to the server.
 struct LiveKeyScanView: View {
     let onKey: (LiveKey) -> Void
+    /// Screenshots set camera access up front, so no permission prompt appears.
+    var fixedCameraAccess: Bool?
 
     @Environment(\.dismiss) private var dismiss
     @State private var cameraAllowed: Bool?
@@ -59,6 +61,10 @@ struct LiveKeyScanView: View {
                 }
             }
             .task {
+                if let fixedCameraAccess {
+                    cameraAllowed = fixedCameraAccess
+                    return
+                }
                 cameraAllowed = await CaptureService.requestAccess(for: .video)
             }
         }

@@ -48,6 +48,13 @@ final class ScreenshotTests: XCTestCase {
                     LiveView(camera: demoCamera, api: sampleAPI, realtime: ViewerRealtime(api: sampleAPI), dogName: "Rex")
                 })
             },
+            Screen(name: "05a-live-view-needs-key") { liveView(.needsLiveKey, camera: demoCamera, api: sampleAPI) },
+            Screen(name: "05b-live-view-wrong-key") { liveView(.wrongLiveKey, camera: demoCamera, api: sampleAPI) },
+            Screen(name: "05c-live-view-camera-needs-key") { liveView(.cameraNeedsKey, camera: demoCamera, api: sampleAPI) },
+            Screen(name: "05d-live-key-scan") { AnyView(LiveKeyScanView(onKey: { _ in }, fixedCameraAccess: false)) },
+            Screen(name: "05e-camera-start-needs-key") {
+                AnyView(CameraModeView(model: .preview(liveNeedsKey: true)) {})
+            },
             Screen(name: "06-timeline") { AnyView(ActivityTimelineView(model: .preview)) },
             Screen(name: "07-event-detail") {
                 let model = TimelineModel.preview
@@ -124,6 +131,15 @@ final class ScreenshotTests: XCTestCase {
             try? FileManager.default.copyItem(at: sample, to: target)
         }
         return model
+    }
+
+    /// Live view held in one state (it never connects).
+    private static func liveView(_ phase: LiveViewModel.Phase, camera: DeviceDTO, api: DogMonitorAPI) -> AnyView {
+        let realtime = ViewerRealtime(api: api)
+        let model = LiveViewModel.fixed(phase, cameraId: camera.id, api: api, realtime: realtime)
+        return AnyView(NavigationStack {
+            LiveView(camera: camera, model: model, realtime: realtime, dogName: "Rex")
+        })
     }
 
     /// "Meet your dog" at a given step, with sample answers for Rex.

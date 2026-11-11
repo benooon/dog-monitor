@@ -4089,6 +4089,46 @@
           }
         }
       }
+    },
+    "Scan the invite code again to watch live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סרקו שוב את קוד ההזמנה כדי לצפות בשידור חי."
+          }
+        }
+      }
+    },
+    "The key on this phone no longer opens your household's video. Scan the invite code on the owner's phone, and this phone can watch again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המפתח בטלפון הזה כבר לא פותח את הווידאו של משק הבית. סרקו את קוד ההזמנה בטלפון של הבעלים, והטלפון הזה יוכל לצפות שוב."
+          }
+        }
+      }
+    },
+    "Live view is off on this camera.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצפייה החיה כבויה במצלמה הזו."
+          }
+        }
+      }
+    },
+    "On the camera, scan the invite code on the owner's phone once. Then try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "במצלמה, סרקו פעם אחת את קוד ההזמנה בטלפון של הבעלים. אחר כך נסו שוב."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

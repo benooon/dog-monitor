@@ -19,6 +19,14 @@ struct LiveView: View {
         _model = State(initialValue: LiveViewModel(cameraId: camera.id, api: api, realtime: realtime))
     }
 
+    /// With a given model (previews and screenshots of each state).
+    init(camera: DeviceDTO, model: LiveViewModel, realtime: ViewerRealtime, dogName: String? = nil) {
+        self.camera = camera
+        self.dogName = dogName
+        self.realtime = realtime
+        _model = State(initialValue: model)
+    }
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -167,6 +175,25 @@ struct LiveView: View {
                 Button("Scan invite code") { showsLiveKeyScan = true }
                     .buttonStyle(.borderedProminent)
                     .accessibilityIdentifier("live-scan-key")
+            }
+        case .wrongLiveKey:
+            ContentUnavailableView {
+                Label("Scan the invite code again to watch live.", systemImage: "lock.fill")
+            } description: {
+                Text("The key on this phone no longer opens your household's video. Scan the invite code on the owner's phone, and this phone can watch again.")
+            } actions: {
+                Button("Scan invite code") { showsLiveKeyScan = true }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("live-rescan-key")
+            }
+        case .cameraNeedsKey:
+            ContentUnavailableView {
+                Label("Live view is off on this camera.", systemImage: "video.slash")
+            } description: {
+                Text("On the camera, scan the invite code on the owner's phone once. Then try again.")
+            } actions: {
+                Button("Try again") { model.retry() }
+                    .buttonStyle(.bordered)
             }
         case .notPrivate:
             ContentUnavailableView {

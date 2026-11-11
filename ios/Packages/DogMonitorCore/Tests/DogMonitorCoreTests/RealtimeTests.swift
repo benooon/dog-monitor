@@ -53,6 +53,10 @@ final class RealtimeMessageTests: XCTestCase {
             String(decoding: try RealtimeClientMessage.heartbeat(health, dogState: .barking).encoded(), as: UTF8.self),
             #"{"battery":0.5,"charging":true,"state":"barking","thermal":"fair","type":"heartbeat"}"#
         )
+        XCTAssertEqual(
+            String(decoding: try RealtimeClientMessage.heartbeat(health, liveKeyMissing: true).encoded(), as: UTF8.self),
+            #"{"battery":0.5,"charging":true,"liveKeyMissing":true,"thermal":"fair","type":"heartbeat"}"#
+        )
         let unknownBattery = CameraHealth(batteryLevel: nil, isCharging: false, thermalState: .nominal, network: .wifi, reportedAt: Date())
         XCTAssertEqual(
             String(decoding: try RealtimeClientMessage.heartbeat(unknownBattery).encoded(), as: UTF8.self),

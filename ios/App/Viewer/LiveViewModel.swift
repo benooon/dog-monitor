@@ -23,12 +23,18 @@ final class LiveViewModel {
         case needsLiveKey
         /// The camera sent clear video where it should be encrypted, so it isn't shown.
         case notPrivate
+        /// This phone has a key, but it doesn't open the camera's video (the owner made a new
+        /// one, or this phone scanned an old code): scan the invite code again.
+        case wrongLiveKey
+        /// The camera has no key, so it can't show live video until it scans the invite code.
+        case cameraNeedsKey
     }
 
     /// Ends a session for good (no reconnect) with an encryption problem.
     private enum EncryptionStop: Error {
         case needsKey
         case notPrivate
+        case wrongKey
     }
 
     static let cameraWaitTimeout: Duration = .seconds(30)
@@ -55,6 +61,8 @@ final class LiveViewModel {
     @ObservationIgnored private var session: Task<Void, Never>?
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let liveKeys: LiveKeyStore
+    /// Fixed in one phase for previews and screenshots: never connects.
+    @ObservationIgnored private var isFixed = false
 
     init(
         cameraId: UUID,
@@ -111,8 +119,16 @@ final class LiveViewModel {
         try? AudioManager.shared.setManualRenderingMode(false)
     }
 
+    /// A model that stays in `phase` and never connects (previews, screenshots).
+    static func fixed(_ phase: Phase, cameraId: UUID, api: DogMonitorAPI, realtime: ViewerRealtime) -> LiveViewModel {
+        let model = LiveViewModel(cameraId: cameraId, api: api, realtime: realtime, defaults: UserDefaults(suiteName: "live-preview") ?? .standard)
+        model.phase = phase
+        model.isFixed = true
+        return model
+    }
+
     func start() {
-        guard session == nil else { return }
+        guard session == nil, !isFixed else { return }
         realtime.watch(cameraId)
         session = Task { [weak self] in
             await self?.run()
@@ -120,6 +136,7 @@ final class LiveViewModel {
     }
 
     func stop() {
+        guard !isFixed else { return }
         session?.cancel()
         session = nil
         realtime.unwatch(cameraId)
@@ -165,6 +182,9 @@ final class LiveViewModel {
                 case .http(status: 503, _):
                     phase = .notConfigured
                     return
+                case .http(status: 409, code: "camera_needs_key"?):
+                    phase = .cameraNeedsKey
+                    return
                 case .http(status: 404, _), .http(status: 401, _), .http(status: 403, _), .http(status: 409, _):
                     phase = .failed
                     return
@@ -175,7 +195,11 @@ final class LiveViewModel {
                 return
             } catch let stop as EncryptionStop {
                 videoTrack = nil
-                phase = stop == .needsKey ? .needsLiveKey : .notPrivate
+                phase = switch stop {
+                case .needsKey: .needsLiveKey
+                case .notPrivate: .notPrivate
+                case .wrongKey: .wrongLiveKey
+                }
                 await disconnectRoom()
                 return
             } catch {
@@ -199,7 +223,8 @@ final class LiveViewModel {
             throw EncryptionStop.needsKey
         }
         let pins = EncryptedCameraPins(defaults: defaults)
-        let room = Room(roomOptions: LiveRoomOptions.make(key: key))
+        let e2ee = LiveE2EEObserver()
+        let room = Room(delegate: e2ee, roomOptions: LiveRoomOptions.make(key: key))
         self.room = room
         try await room.connect(url: token.url, token: token.token)
         phase = .waitingForCamera
@@ -216,7 +241,11 @@ final class LiveViewModel {
                     cameraPinned: pins.isPinned(cameraId)
                 ) {
                 case .show:
-                    if encrypted { pins.pin(cameraId) }
+                    if encrypted {
+                        // Frames that never decrypt mean our key is not the camera's.
+                        if e2ee.isWrongKey() { throw EncryptionStop.wrongKey }
+                        pins.pin(cameraId)
+                    }
                 case .needsKey:
                     throw EncryptionStop.needsKey
                 case .refuse:

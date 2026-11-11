@@ -372,6 +372,13 @@ final class CameraModeModel {
 
     private var rememberedLiveNeedsKey = CameraLiveController.rememberedNeedsLiveKey
 
+    /// A paired camera's start screen for previews and screenshots (nothing is stored).
+    static func preview(liveNeedsKey: Bool) -> CameraModeModel {
+        let model = CameraModeModel(credential: .device(id: UUID(), secret: "preview"))
+        model.rememberedLiveNeedsKey = liveNeedsKey
+        return model
+    }
+
     /// A key scanned from the owner's invite QR code (`LiveKeyScanView`).
     func saveLiveKey(_ key: LiveKey) {
         do {

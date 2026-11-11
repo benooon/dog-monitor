@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 /// Camera mode (SPEC §8): a start screen, then a black, dimmed screen while capturing.
 /// A tap shows the live preview with floating glass controls.
 struct CameraModeView: View {
-    @State private var model = CameraModeModel()
+    @State private var model: CameraModeModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var showsPairing = false
     @State private var showsLiveKeyScan = false
@@ -18,7 +18,8 @@ struct CameraModeView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let onChangeRole: () -> Void
 
-    init(onChangeRole: @escaping () -> Void) {
+    init(model: CameraModeModel = CameraModeModel(), onChangeRole: @escaping () -> Void) {
+        _model = State(initialValue: model)
         self.onChangeRole = onChangeRole
     }
 

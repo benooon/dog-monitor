@@ -36,6 +36,8 @@ final class CameraLiveController {
         guard needsLiveKey != needsKey else { return }
         needsLiveKey = needsKey
         UserDefaults.standard.set(needsKey, forKey: Self.needsLiveKeyDefaultsKey)
+        // Viewers learn right away that live view is off here (or back on).
+        Task { await sendHeartbeat() }
     }
 
     private let api: DogMonitorAPI
@@ -152,7 +154,11 @@ final class CameraLiveController {
 
     private func sendHeartbeat() async {
         let state = dogState()
-        await connection.send(.heartbeat(health.current(), dogState: state == .unknown ? nil : state))
+        await connection.send(.heartbeat(
+            health.current(),
+            dogState: state == .unknown ? nil : state,
+            liveKeyMissing: needsLiveKey
+        ))
     }
 
     /// Starts or stops publishing to match the policy, and schedules the linger stop.

@@ -75,8 +75,10 @@ public enum RealtimeServerMessage: Sendable, Equatable {
 }
 
 public enum RealtimeClientMessage: Sendable, Equatable {
-    /// From cameras, every 30–60 s and when the dog's state changes.
-    case heartbeat(CameraHealth, dogState: DogState? = nil)
+    /// From cameras, every 30–60 s and when the dog's state changes. `liveKeyMissing`: the
+    /// household's live video is end-to-end encrypted and this camera has no key, so it can't
+    /// publish (viewers are told right away instead of waiting).
+    case heartbeat(CameraHealth, dogState: DogState? = nil, liveKeyMissing: Bool = false)
     /// From viewers.
     case watch(cameraId: UUID)
     case unwatch(cameraId: UUID)
@@ -85,13 +87,14 @@ public enum RealtimeClientMessage: Sendable, Equatable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         switch self {
-        case .heartbeat(let health, let dogState):
+        case .heartbeat(let health, let dogState, let liveKeyMissing):
             return try encoder.encode(Heartbeat(
                 type: "heartbeat",
                 battery: health.batteryLevel,
                 charging: health.isCharging,
                 thermal: health.thermalState.rawValue,
-                state: dogState?.rawValue
+                state: dogState?.rawValue,
+                liveKeyMissing: liveKeyMissing ? true : nil
             ))
         case .watch(let cameraId):
             return try encoder.encode(Watch(type: "watch", cameraId: cameraId.uuidString.lowercased()))
@@ -106,6 +109,8 @@ public enum RealtimeClientMessage: Sendable, Equatable {
         let charging: Bool
         let thermal: String
         let state: String?
+        /// Only sent when true, so older servers see the same message as before.
+        let liveKeyMissing: Bool?
     }
 
     private struct Watch: Encodable {
