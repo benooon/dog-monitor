@@ -12,6 +12,72 @@ Writing result bundle at path:
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
 { platform:iOS Simulator, arch:x86_64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:39: warning: main actor-isolated property 'displayName' can not be referenced from a Sendable closure
                 DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
                                       ^
@@ -72,72 +138,6 @@ Writing result bundle at path:
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Household/DogProfileEditor.swift:29:17: note: property declared here
     private var shownPhoto: UIImage? {
                 ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
 <module-includes>:1:9: note: in file included from <module-includes>:1:
 1 | #import "Headers/StoreKitTest.h"
   |         `- note: in file included from <module-includes>:1:
@@ -167,16 +167,16 @@ Writing result bundle at path:
    |                            `- note: 'SKPaymentTransactionState' has been explicitly marked deprecated here
 15 |     SKPaymentTransactionStatePurchasing,    // Transaction is being added to the server queue.
 16 |     SKPaymentTransactionStatePurchased,     // Transaction is in queue, user has been charged.  Client should complete the transaction.
-2026-11-11 11:41:21.785 xcodebuild[3747:14292] [MT] IDETestOperationsObserverDebug: 899.048 elapsed -- Testing started completed.
-2026-11-11 11:41:21.787 xcodebuild[3747:14292] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 11:41:21.787 xcodebuild[3747:14292] [MT] IDETestOperationsObserverDebug: 899.048 sec, +899.048 sec -- end
+2026-11-11 12:07:47.097 xcodebuild[3735:14212] [MT] IDETestOperationsObserverDebug: 391.978 elapsed -- Testing started completed.
+2026-11-11 12:07:47.097 xcodebuild[3735:14212] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 12:07:47.097 xcodebuild[3735:14212] [MT] IDETestOperationsObserverDebug: 391.978 sec, +391.978 sec -- end
 Testing started
 iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
 { platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-2026-11-11 11:50:45.564 xcodebuild[38900:106591] [MT] IDETestOperationsObserverDebug: 531.093 elapsed -- Testing started completed.
-2026-11-11 11:50:45.564 xcodebuild[38900:106591] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 11:50:45.564 xcodebuild[38900:106591] [MT] IDETestOperationsObserverDebug: 531.093 sec, +531.093 sec -- end
+2026-11-11 12:18:55.706 xcodebuild[17696:54936] [MT] IDETestOperationsObserverDebug: 647.953 elapsed -- Testing started completed.
+2026-11-11 12:18:55.707 xcodebuild[17696:54936] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 12:18:55.708 xcodebuild[17696:54936] [MT] IDETestOperationsObserverDebug: 647.953 sec, +647.953 sec -- end
 Testing started
 Screenshots: 162
