@@ -2,11 +2,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import type { DbHandle } from "../src/db/client.js";
-import { dailySummaries, devices, events, households, users } from "../src/db/schema.js";
+import { dailySummaries, devices, events, households, mediaTombstones, users } from "../src/db/schema.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
-import { purgeExpiredRecords } from "../src/storage/retention.js";
+import { TOMBSTONE_KEEP_MS, purgeExpiredRecords, purgeMediaTombstones } from "../src/storage/retention.js";
 import { FakeStorage } from "./helpers/storage.js";
 
 describe.skipIf(!hasDatabase)("DELETE /me", () => {
@@ -27,6 +27,8 @@ describe.skipIf(!hasDatabase)("DELETE /me", () => {
   beforeEach(async () => {
     await truncateAll(h);
     storage.deleted = [];
+    storage.deletedPrefixes = [];
+    storage.failPrefixDeletes = false;
   });
 
   async function signIn(sub: string) {
@@ -162,6 +164,24 @@ describe.skipIf(!hasDatabase)("DELETE /me", () => {
       expect(await h.db.select().from(events)).toHaveLength(0);
       expect(await h.db.select().from(users).where(eq(users.id, userId))).toHaveLength(1);
       expect(await h.db.select().from(users).where(eq(users.id, member.userId))).toHaveLength(1);
+    });
+
+    // Security audit 2026-11, run 2: files uploaded during or after the delete are not in the key list.
+    it("deletes the household's whole storage prefix and tombstones it for late uploads", async () => {
+      const { auth, householdId } = await ownerWithHousehold();
+      storage.failPrefixDeletes = true;
+      expect((await app.inject({ method: "DELETE", url: "/household", headers: auth })).statusCode).toBe(204);
+      const prefix = `households/${householdId}/`;
+      expect(await h.db.select().from(mediaTombstones)).toMatchObject([{ prefix }]);
+
+      storage.failPrefixDeletes = false;
+      await purgeMediaTombstones(h.db, storage, new Date());
+      expect(storage.deletedPrefixes).toEqual([prefix]);
+      expect(await h.db.select().from(mediaTombstones)).toHaveLength(1);
+
+      await purgeMediaTombstones(h.db, storage, new Date(Date.now() + TOMBSTONE_KEEP_MS + 60_000));
+      expect(storage.deletedPrefixes).toEqual([prefix, prefix]);
+      expect(await h.db.select().from(mediaTombstones)).toHaveLength(0);
     });
   });
 

@@ -43,7 +43,7 @@ A camera can see and hear guests, dog walkers and cleaners. Today: the camera sc
 - Every API route is scoped to the caller's household; presigned media links are short-lived (upload 15 min, download 10 min).
 - Device secrets are stored hashed; devices can be revoked; removing a member revokes their phones and clears push tokens.
 - Training data sharing is **off by default** and chosen by the household owner.
-- Account deletion: `DELETE /me`; household deletion: `DELETE /household` (owner). In-app: "Delete account" in Household settings and on the create-household screen. The household-deletion button is not built yet.
+- Account deletion: `DELETE /me`; household deletion: `DELETE /household` (owner). In-app: "Delete account" in Household settings and on the create-household screen. The household-deletion button is not built yet. Deleting a household also deletes its whole storage prefix (`households/<id>/`), and records a tombstone that the daily retention job uses to delete the prefix again (late uploads with a URL presigned before the deletion), so a clip uploaded during the deletion is not left behind.
 - Data export: "Download my data" in Household settings (`GET /me/export`, JSON without clips).
 - Request logs carry only method and path; invite tokens, query strings and IP addresses are not logged by the app.
 

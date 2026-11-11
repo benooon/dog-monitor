@@ -1,4 +1,4 @@
-import { DeleteObjectsCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 /** S3-compatible bucket (Cloudflare R2, Railway bucket, AWS). Env: S3_*. */
@@ -27,6 +27,8 @@ export interface MediaStorage {
   presignUpload(key: string, contentType: string, expiresInSeconds: number): Promise<PresignedUpload>;
   presignDownload(key: string, expiresInSeconds: number): Promise<string>;
   deleteObjects(keys: string[]): Promise<void>;
+  /** Deletes every object whose key starts with `prefix`; returns how many. */
+  deletePrefix(prefix: string): Promise<number>;
 }
 
 export class S3MediaStorage implements MediaStorage {
@@ -76,6 +78,25 @@ export class S3MediaStorage implements MediaStorage {
       );
     }
   }
+
+  async deletePrefix(prefix: string): Promise<number> {
+    let deleted = 0;
+    let token: string | undefined;
+    do {
+      const page = await this.client.send(
+        new ListObjectsV2Command({ Bucket: this.config.bucket, Prefix: prefix, ContinuationToken: token, MaxKeys: 1000 }),
+      );
+      const keys = (page.Contents ?? []).map((o) => o.Key).filter((k): k is string => k !== undefined);
+      if (keys.length > 0) await this.deleteObjects(keys);
+      deleted += keys.length;
+      token = page.IsTruncated ? page.NextContinuationToken : undefined;
+    } while (token);
+    return deleted;
+  }
+}
+
+export function householdMediaPrefix(householdId: string): string {
+  return `households/${householdId}/`;
 }
 
 export type MediaKind = "clip" | "snapshot";
@@ -87,7 +108,7 @@ export const MEDIA_CONTENT_TYPES: Record<MediaKind, string> = {
 
 /** Every object for an event lives under this prefix, so ownership can be checked from the key. */
 export function eventMediaPrefix(householdId: string, cameraId: string, eventId: string): string {
-  return `households/${householdId}/cameras/${cameraId}/events/${eventId}/`;
+  return `${householdMediaPrefix(householdId)}cameras/${cameraId}/events/${eventId}/`;
 }
 
 export function eventMediaKey(householdId: string, cameraId: string, eventId: string, kind: MediaKind): string {

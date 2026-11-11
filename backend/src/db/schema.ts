@@ -307,3 +307,13 @@ export const waitlist = pgTable("waitlist", {
   unsubscribeToken: text("unsubscribe_token").notNull().unique(),
   createdAt: createdAt(),
 });
+
+/**
+ * Storage prefixes of deleted households. A camera can still upload with a URL presigned before
+ * the deletion (valid 15 minutes), so the retention job deletes the prefix again until the
+ * tombstone is older than that (security audit 2026-11, run 2).
+ */
+export const mediaTombstones = pgTable("media_tombstones", {
+  prefix: text("prefix").primaryKey(),
+  createdAt: createdAt(),
+});

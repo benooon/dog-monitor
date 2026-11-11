@@ -1,7 +1,7 @@
 import type { FastifyBaseLogger } from "fastify";
 import { and, eq, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { dailySummaries, events, households } from "../db/schema.js";
+import { dailySummaries, events, households, mediaTombstones } from "../db/schema.js";
 import type { MediaStorage } from "./storage.js";
 
 export const DEFAULT_RETENTION_DAYS = 7;
@@ -50,6 +50,25 @@ export async function purgeExpiredMedia(
   return keys.length;
 }
 
+/** Presigned upload URLs live 15 minutes; tombstones are kept well past that. */
+export const TOMBSTONE_KEEP_MS = 60 * 60 * 1000;
+
+/**
+ * Deletes the storage prefix of every deleted household again (late uploads), and drops
+ * tombstones once they are older than TOMBSTONE_KEEP_MS. Returns how many objects were deleted.
+ */
+export async function purgeMediaTombstones(db: Database, storage: MediaStorage, now: Date = new Date()): Promise<number> {
+  const rows = await db.select().from(mediaTombstones).limit(1000);
+  let deleted = 0;
+  for (const row of rows) {
+    deleted += await storage.deletePrefix(row.prefix);
+    if (now.getTime() - row.createdAt.getTime() > TOMBSTONE_KEEP_MS) {
+      await db.delete(mediaTombstones).where(eq(mediaTombstones.prefix, row.prefix));
+    }
+  }
+  return deleted;
+}
+
 /** Runs the purge now and then daily. Returns a function that stops it. */
 export function scheduleRetention(
   db: Database,
@@ -63,6 +82,11 @@ export function scheduleRetention(
         if (deleted > 0) log.info({ deleted }, "deleted expired clips and snapshots");
       })
       .catch((error: unknown) => log.error({ err: error }, "media retention failed"));
+    purgeMediaTombstones(db, storage)
+      .then((deleted) => {
+        if (deleted > 0) log.info({ deleted }, "deleted late uploads of deleted households");
+      })
+      .catch((error: unknown) => log.error({ err: error }, "tombstone purge failed"));
   };
   const first = setTimeout(run, 60_000);
   const daily = setInterval(run, 24 * 60 * 60 * 1000);
