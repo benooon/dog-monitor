@@ -201,4 +201,36 @@ describe.skipIf(!hasDatabase)("invite brute-force protection", () => {
       await h.close();
     }
   });
+
+  it("counts concurrent guesses before looking them up", async () => {
+    const h = openTestDb();
+    const ctx = await buildTestApp(h, { inviteLimiter: new AttemptLimiter(3, 60_000) });
+    try {
+      const burst = await Promise.all(
+        Array.from({ length: 30 }, () =>
+          ctx.app.inject({ method: "POST", url: "/invites/000000/accept", payload: { as: "camera", deviceName: "x" } }),
+        ),
+      );
+      const codes = burst.map((r) => r.statusCode);
+      expect(codes.filter((c) => c === 404)).toHaveLength(3);
+      expect(codes.filter((c) => c === 429)).toHaveLength(27);
+    } finally {
+      await ctx.app.close();
+      await h.close();
+    }
+  });
+
+  it("caps wrong codes from all addresses together", async () => {
+    const h = openTestDb();
+    const ctx = await buildTestApp(h, { inviteLimiter: new AttemptLimiter(100, 60_000), inviteCodeLimiter: new AttemptLimiter(4, 60_000) });
+    try {
+      const guess = (ip: string) =>
+        ctx.app.inject({ method: "POST", url: "/invites/000000/accept", payload: { as: "camera", deviceName: "x" }, remoteAddress: ip });
+      for (let i = 0; i < 4; i++) expect((await guess(`198.51.100.${i}`)).statusCode).toBe(404);
+      expect((await guess("198.51.100.99")).statusCode).toBe(429);
+    } finally {
+      await ctx.app.close();
+      await h.close();
+    }
+  });
 });

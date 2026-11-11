@@ -83,6 +83,8 @@ export const households = pgTable("households", {
   /** Identifies the App Store subscription across renewals, so one purchase unlocks one household. */
   planOriginalTransactionId: text("plan_original_transaction_id"),
   planEnvironment: text("plan_environment"),
+  /** When Apple refunded or revoked the current subscription; older transactions of it can't restore premium. */
+  planRevokedAt: timestamp("plan_revoked_at", { withTimezone: true }),
   /** Owner opted in to keep clips that members marked right/wrong, for training (SPEC §4 Calibration). */
   shareTrainingData: boolean("share_training_data").notNull().default(false),
   createdAt: createdAt(),

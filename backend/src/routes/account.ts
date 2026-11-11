@@ -4,6 +4,7 @@ import type { Database } from "../db/client.js";
 import { dailySummaries, devices, dogs, events, householdMembers, households, notificationPrefs, users } from "../db/schema.js";
 import { StorageUnavailableError, deleteHousehold } from "../households/delete.js";
 import type { MediaStorage } from "../storage/storage.js";
+import { RealtimeSessions } from "../realtime/sessions.js";
 
 /**
  * `DELETE /me`: permanently deletes the caller's account (App Store Guideline 5.1.1(v), GDPR Art. 17).
@@ -16,7 +17,10 @@ import type { MediaStorage } from "../storage/storage.js";
  *
  * Apple subscriptions are managed by Apple and are not cancelled here.
  */
-export async function accountRoutes(app: FastifyInstance, opts: { db: Database; storage?: MediaStorage }): Promise<void> {
+export async function accountRoutes(
+  app: FastifyInstance,
+  opts: { db: Database; storage?: MediaStorage; sessions?: RealtimeSessions },
+): Promise<void> {
   const { db, storage } = opts;
 
   /**
@@ -106,6 +110,8 @@ export async function accountRoutes(app: FastifyInstance, opts: { db: Database; 
       if (err instanceof StorageUnavailableError) return reply.code(503).send({ error: "storage_not_configured" });
       throw err;
     }
+    opts.sessions?.closeAll(RealtimeSessions.user(userId), "account_deleted");
+    if (membership?.role === "owner") opts.sessions?.closeAll(RealtimeSessions.household(membership.householdId), "no_household");
     request.log.info("account deleted");
     return reply.code(204).send();
   });

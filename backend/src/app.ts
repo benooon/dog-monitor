@@ -12,6 +12,7 @@ import { DEFAULT_RECORD_RETENTION_DAYS, DEFAULT_RETENTION_DAYS, scheduleRecordRe
 import { EventNotifier, recordCameraOffline } from "./notifications/notifier.js";
 import type { AttemptLimiter } from "./pairing/attempt-limiter.js";
 import { RealtimeHub } from "./realtime/hub.js";
+import { RealtimeSessions } from "./realtime/sessions.js";
 import { serializeRequest } from "./logging.js";
 import { accountRoutes } from "./routes/account.js";
 import { authRoutes } from "./routes/auth.js";
@@ -58,6 +59,8 @@ export interface AppServices {
   now?: () => number;
   /** Override the invite brute-force limiter (tests). */
   inviteLimiter?: AttemptLimiter;
+  /** Override the all-addresses limiter for wrong 6-digit codes (tests). */
+  inviteCodeLimiter?: AttemptLimiter;
   /** StoreKit 2 transaction verification; undefined answers 503 on POST /subscription/apple. */
   transactions?: TransactionVerifier;
   /** Apply free-plan limits (see billing/plans.ts). */
@@ -94,13 +97,15 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(authPlugin, { jwt: services.jwt });
     await app.register(deviceAuthPlugin, { db: services.db });
     await app.register(authRoutes, services);
-    await app.register(accountRoutes, { db: services.db, storage: services.storage });
-    await app.register(householdRoutes, { db: services.db, storage: services.storage });
+    // Open /ws sockets by principal, closed when access is taken away.
+    const sessions = new RealtimeSessions();
+    await app.register(accountRoutes, { db: services.db, storage: services.storage, sessions });
+    await app.register(householdRoutes, { db: services.db, storage: services.storage, sessions });
     await app.register(dogRoutes, { db: services.db });
     await app.register(waitlistRoutes, { db: services.db, adminToken: services.adminToken, limiter: services.waitlistLimiter });
     const enforcePlanLimits = services.enforcePlanLimits ?? false;
-    await app.register(deviceRoutes, { db: services.db, enforcePlanLimits });
-    await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter, enforcePlanLimits });
+    await app.register(deviceRoutes, { db: services.db, enforcePlanLimits, sessions });
+    await app.register(inviteRoutes, { db: services.db, limiter: services.inviteLimiter, codeLimiter: services.inviteCodeLimiter, enforcePlanLimits });
     await app.register(deviceSelfRoutes, { db: services.db });
     await app.register(cameraZoneRoutes, { db: services.db });
     await app.register(notificationPrefRoutes, { db: services.db });
@@ -148,7 +153,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(cameraLiveRoutes, { db: services.db, live: services.live });
 
     await app.register(websocket);
-    await app.register(realtimeRoutes, { db: services.db, hub, now });
+    await app.register(realtimeRoutes, { db: services.db, hub, now, sessions });
     // Marks cameras offline after 3 minutes without a heartbeat.
     const sweep = setInterval(() => hub.sweep(now()), 30_000);
     sweep.unref();

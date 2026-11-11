@@ -15,7 +15,7 @@ export const TEST_JWT_SECRET = "test-secret-test-secret-test-secret-123";
 
 export async function buildTestApp(
   h: DbHandle,
-  options: { inviteLimiter?: AttemptLimiter; live?: LiveTokenIssuer; hub?: RealtimeHub; now?: () => number; apns?: ApnsSender; storage?: MediaStorage; transactions?: TransactionVerifier; enforcePlanLimits?: boolean; liveActivityIntervalMs?: number; adminToken?: string; waitlistLimiter?: AttemptLimiter } = {},
+  options: { inviteLimiter?: AttemptLimiter; inviteCodeLimiter?: AttemptLimiter; live?: LiveTokenIssuer; hub?: RealtimeHub; now?: () => number; apns?: ApnsSender; storage?: MediaStorage; transactions?: TransactionVerifier; enforcePlanLimits?: boolean; liveActivityIntervalMs?: number; adminToken?: string; waitlistLimiter?: AttemptLimiter } = {},
 ): Promise<{
   app: FastifyInstance;
   apple: Awaited<ReturnType<typeof createFakeApple>>;
@@ -30,6 +30,7 @@ export async function buildTestApp(
       jwt,
       apple: createAppleTokenVerifier({ audiences: ["com.benooon.dogmonitor"], keySet: apple.keySet }),
       inviteLimiter: options.inviteLimiter,
+      inviteCodeLimiter: options.inviteCodeLimiter,
       live: options.live,
       hub: options.hub,
       apns: options.apns,

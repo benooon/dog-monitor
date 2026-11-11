@@ -6,6 +6,7 @@ import { deviceDto } from "../households/dto.js";
 import { householdCameraLimit } from "../billing/camera-limit.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
 import { isValidTimeZone } from "../notifications/quiet-hours.js";
+import { RealtimeSessions } from "../realtime/sessions.js";
 
 const idParams = {
   type: "object",
@@ -34,7 +35,10 @@ type UpdateBody = Partial<Pick<RegisterBody, "name" | "model" | "appVersion" | "
   mutedUntil?: string | null;
 };
 
-export async function deviceRoutes(app: FastifyInstance, opts: { db: Database; enforcePlanLimits?: boolean }): Promise<void> {
+export async function deviceRoutes(
+  app: FastifyInstance,
+  opts: { db: Database; enforcePlanLimits?: boolean; sessions?: RealtimeSessions },
+): Promise<void> {
   const { db } = opts;
   app.addHook("preHandler", app.authenticate);
   app.addHook("preHandler", requireHousehold(db));
@@ -159,6 +163,7 @@ export async function deviceRoutes(app: FastifyInstance, opts: { db: Database; e
         .set({ status: "revoked", apnsToken: null, deviceSecretHash: null })
         .where(eq(devices.id, device.id))
         .returning();
+      opts.sessions?.closeAll(RealtimeSessions.device(device.id), "device_revoked");
       return deviceDto(updated!);
     },
   );

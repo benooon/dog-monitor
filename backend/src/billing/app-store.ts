@@ -27,6 +27,8 @@ export interface VerifiedTransaction {
   bundleId: string;
   environment: string;
   expiresAt: Date;
+  /** When this transaction was bought or renewed (Apple's purchaseDate); null if Apple left it out. */
+  purchasedAt: Date | null;
   revokedAt: Date | null;
   /** The `appAccountToken` the app set at purchase (we use the household id), lowercased. */
   appAccountToken: string | null;
@@ -111,6 +113,7 @@ function parsePayload(payload: Record<string, unknown>): VerifiedTransaction {
     bundleId,
     environment: str("environment") ?? "Production",
     expiresAt,
+    purchasedAt: ms("purchaseDate"),
     revokedAt: ms("revocationDate"),
     appAccountToken: str("appAccountToken")?.toLowerCase() ?? null,
   };

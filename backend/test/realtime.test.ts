@@ -195,4 +195,35 @@ describe.skipIf(!hasDatabase)("realtime channel (GET /ws)", () => {
     cam.send({ type: "heartbeat", battery: 7 });
     expect(await cam.next()).toEqual({ type: "error", error: "bad_message" });
   });
+
+  // Security audit 2026-11: taking access away ends the realtime session.
+  it("closes a removed member's socket", async () => {
+    const { owner } = await setup();
+    const member = await signIn("member");
+    const invite = (await app.inject({ method: "POST", url: "/invites", headers: owner.auth })).json();
+    await app.inject({ method: "POST", url: `/invites/${invite.token}/accept`, headers: member.auth, payload: { as: "member" } });
+    const socket = await connect(member.auth);
+    const removed = await app.inject({ method: "DELETE", url: `/household/members/${member.userId}`, headers: owner.auth });
+    expect(removed.statusCode).toBe(204);
+    expect(await socket.closed).toBe(4003);
+  });
+
+  it("closes a revoked camera's socket and ignores its heartbeats", async () => {
+    const { owner, camera } = await setup();
+    const cam = await connect(camera.auth);
+    const revoked = await app.inject({ method: "POST", url: `/devices/${camera.id}/revoke`, headers: owner.auth });
+    expect(revoked.statusCode).toBe(200);
+    expect(await cam.closed).toBe(4003);
+    const [row] = await h.db.select({ battery: devices.battery }).from(devices).where(eq(devices.id, camera.id));
+    expect(row!.battery).toBeNull();
+  });
+
+  it("closes everyone's sockets when the household is deleted", async () => {
+    const { owner, camera } = await setup();
+    const viewer = await connect(owner.auth);
+    const cam = await connect(camera.auth);
+    expect((await app.inject({ method: "DELETE", url: "/household", headers: owner.auth })).statusCode).toBe(204);
+    expect(await viewer.closed).toBe(4003);
+    expect(await cam.closed).toBe(4003);
+  });
 });

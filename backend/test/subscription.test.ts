@@ -205,6 +205,17 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
 
     const revoked = await purchase(auth, transaction({ transactionId: "2", revocationDate: NOW.getTime() }));
     expect(revoked.json()).toMatchObject({ plan: "free", expiresAt: null });
+
+    // Replaying the pre-refund transaction must not bring premium back (audit 2026-11).
+    const replay = await purchase(auth, transaction({ transactionId: "2", expiresDate: NOW.getTime() + 60 * DAY }));
+    expect(replay.statusCode).toBe(200);
+    expect(replay.json()).toMatchObject({ plan: "free", expiresAt: null });
+    // A real purchase after the refund does.
+    const renewed = await purchase(
+      auth,
+      transaction({ transactionId: "3", purchaseDate: NOW.getTime() + 1000, expiresDate: NOW.getTime() + 30 * DAY }),
+    );
+    expect(renewed.json()).toMatchObject({ plan: "premium" });
   });
 
   it("lets one subscription unlock only one household", async () => {

@@ -221,6 +221,12 @@ describe.skipIf(!hasDatabase)("media routes and retention", () => {
       headers: { authorization: `Bearer ${exportToken.json().token}` },
     });
     expect(scripted.json().items).toHaveLength(1);
+    // The export key is not a session: no other route, and it can't mint a new key (audit 2026-11).
+    const exportKey = { authorization: `Bearer ${exportToken.json().token}` };
+    expect((await app.inject({ method: "GET", url: "/me", headers: exportKey })).statusCode).toBe(401);
+    expect((await app.inject({ method: "POST", url: "/invites", headers: exportKey })).statusCode).toBe(401);
+    expect((await app.inject({ method: "PATCH", url: "/household", headers: exportKey, payload: { name: "x" } })).statusCode).toBe(401);
+    expect((await app.inject({ method: "POST", url: "/training/export-token", headers: exportKey })).statusCode).toBe(401);
 
     await h.db.update(households).set({ shareTrainingData: false }).where(eq(households.id, householdId));
     expect((await app.inject({ method: "POST", url: "/training/export-token", headers: owner })).statusCode).toBe(403);

@@ -7,6 +7,7 @@ import { LIMITS } from "../households/limits.js";
 import { findMembership } from "../households/scope.js";
 import type { Peer, RealtimeHub } from "../realtime/hub.js";
 import { parseCameraMessage, parseViewerMessage, type ServerMessage } from "../realtime/protocol.js";
+import { RealtimeSessions } from "../realtime/sessions.js";
 
 /** Keeps idle connections alive through proxies (Railway) and detects dead peers. */
 const PING_INTERVAL_MS = 30_000;
@@ -14,6 +15,8 @@ const PING_INTERVAL_MS = 30_000;
 const CLOSE_FORBIDDEN = 4003;
 
 interface RealtimeOptions {
+  /** Closes sockets when access is taken away (member removed, device revoked, household deleted). */
+  sessions?: RealtimeSessions;
   db: Database;
   hub: RealtimeHub;
   now: () => number;
@@ -45,6 +48,7 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
     // Listeners must be attached synchronously; messages wait until the connection is set up.
     let onMessage: (raw: string) => Promise<void> = async () => {};
     let onClose: () => void = () => {};
+    let untrack: () => void = () => {};
     const ready = (request.device ? setUpCamera() : setUpViewer()).catch((error: unknown) => {
       request.log.error({ err: error }, "websocket setup failed");
       socket.close(1011, "internal_error");
@@ -57,6 +61,7 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
     });
     socket.on("close", () => {
       clearInterval(ping);
+      untrack();
       void ready.then(() => onClose());
     });
 
@@ -72,6 +77,7 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
         .from(devices)
         .where(eq(devices.id, deviceId));
       if (device?.role !== "camera") return reject("camera_only");
+      untrack = opts.sessions?.track([RealtimeSessions.device(deviceId), RealtimeSessions.household(device.householdId)], reject) ?? untrack;
 
       hub.cameraConnected(deviceId, device.householdId, peer, device.lastHeartbeatAt?.getTime() ?? null, now());
       onClose = () => hub.cameraDisconnected(deviceId, peer);
@@ -79,8 +85,8 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
         const message = parseCameraMessage(raw);
         if (!message) return peer.send({ type: "error", error: "bad_message" });
         const at = now();
-        hub.heartbeat(deviceId, at, message.state);
-        await db
+        // A revoked camera's socket stops here even if it was missed when it was revoked.
+        const updated = await db
           .update(devices)
           .set({
             lastHeartbeatAt: new Date(at),
@@ -89,7 +95,10 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
             ...(message.thermal !== undefined && { thermal: message.thermal }),
             ...(message.state !== undefined && { dogState: message.state }),
           })
-          .where(eq(devices.id, deviceId));
+          .where(and(eq(devices.id, deviceId), eq(devices.status, "active")))
+          .returning({ id: devices.id });
+        if (updated.length === 0) return reject("device_revoked");
+        hub.heartbeat(deviceId, at, message.state);
       };
     }
 
@@ -97,6 +106,8 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
       const membership = await findMembership(db, request.user!.userId);
       if (!membership) return reject("no_household");
       const { householdId } = membership;
+      const userId = request.user!.userId;
+      untrack = opts.sessions?.track([RealtimeSessions.user(userId), RealtimeSessions.household(householdId)], reject) ?? untrack;
 
       const cameras = await db
         .select({ id: devices.id, lastHeartbeatAt: devices.lastHeartbeatAt, dogState: devices.dogState })
@@ -114,6 +125,7 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
         const message = parseViewerMessage(raw);
         if (!message) return peer.send({ type: "error", error: "bad_message" });
         if (message.type === "unwatch") return hub.unwatch(peer, message.cameraId);
+        if ((await findMembership(db, userId))?.householdId !== householdId) return reject("no_household");
 
         const [camera] = await db
           .select({ id: devices.id })

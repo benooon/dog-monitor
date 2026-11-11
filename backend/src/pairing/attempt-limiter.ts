@@ -15,6 +15,26 @@ export class AttemptLimiter {
     return this.recent(key).length >= this.maxFailures;
   }
 
+  /**
+   * Counts an attempt before it is evaluated and says whether it may go ahead. Check and record
+   * happen together, so concurrent requests can't all slip under the limit (audit 2026-11).
+   */
+  tryAcquire(key: string): boolean {
+    const list = this.recent(key);
+    if (list.length >= this.maxFailures) return false;
+    list.push(this.now());
+    this.failures.set(key, list);
+    return true;
+  }
+
+  /** Gives back an attempt taken with `tryAcquire` that turned out not to be a failure. */
+  release(key: string): void {
+    const list = this.recent(key);
+    list.pop();
+    if (list.length === 0) this.failures.delete(key);
+    else this.failures.set(key, list);
+  }
+
   recordFailure(key: string): void {
     const list = this.recent(key);
     list.push(this.now());

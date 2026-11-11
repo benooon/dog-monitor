@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { and, asc, eq, gt, isNotNull, type SQL } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { events, households } from "../db/schema.js";
@@ -19,9 +19,17 @@ export async function trainingRoutes(
   opts: { db: Database; storage?: MediaStorage; jwt: JwtService },
 ): Promise<void> {
   const { db } = opts;
-  app.addHook("preHandler", app.authenticate);
-  app.addHook("preHandler", requireHousehold(db));
-  app.addHook("preHandler", requireOwner);
+  // The export key only reads GET /training/labeled; every other route (including minting a new key)
+  // needs a real session.
+  const sessionOrExportKey = async (request: FastifyRequest, reply: FastifyReply) => {
+    const header = request.headers.authorization;
+    const token = header?.startsWith("Bearer ") ? header.slice("Bearer ".length).trim() : undefined;
+    const claims = token ? ((await opts.jwt.verify(token)) ?? (await opts.jwt.verify(token, "trainingExport"))) : null;
+    if (!claims) return reply.code(401).send({ error: "unauthorized" });
+    request.user = claims;
+    return undefined;
+  };
+  const scoped = [requireHousehold(db), requireOwner];
 
   async function optedIn(householdId: string): Promise<boolean> {
     const [household] = await db.select({ optedIn: households.shareTrainingData }).from(households).where(eq(households.id, householdId));
@@ -29,15 +37,16 @@ export async function trainingRoutes(
   }
 
   /** A one-hour token for the export script, so the app's long-lived session never leaves the phone. */
-  app.post("/training/export-token", async (request, reply) => {
+  app.post("/training/export-token", { preHandler: [app.authenticate, ...scoped] }, async (request, reply) => {
     if (!(await optedIn(request.household!.householdId))) return reply.code(403).send({ error: "training_not_enabled" });
-    const token = await opts.jwt.issue({ userId: request.user!.userId }, EXPORT_TOKEN_TTL_SECONDS);
+    const token = await opts.jwt.issue({ userId: request.user!.userId }, EXPORT_TOKEN_TTL_SECONDS, "trainingExport");
     return { token, expiresAt: new Date(Date.now() + EXPORT_TOKEN_TTL_SECONDS * 1000).toISOString() };
   });
 
   app.get<{ Querystring: { after?: string } }>(
     "/training/labeled",
     {
+      preHandler: [sessionOrExportKey, ...scoped],
       schema: {
         querystring: {
           type: "object",

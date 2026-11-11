@@ -13,6 +13,8 @@ type AcceptBody =
   | { as: "member" }
   | { as: "camera"; deviceName: string; model?: string | null; appVersion?: string | null };
 
+const ALL_CODES = "all-codes";
+
 class AcceptError extends Error {
   constructor(
     readonly status: number,
@@ -25,10 +27,15 @@ class AcceptError extends Error {
 
 export async function inviteRoutes(
   app: FastifyInstance,
-  opts: { db: Database; limiter?: AttemptLimiter; now?: () => Date; enforcePlanLimits?: boolean },
+  opts: { db: Database; limiter?: AttemptLimiter; codeLimiter?: AttemptLimiter; now?: () => Date; enforcePlanLimits?: boolean },
 ): Promise<void> {
   const { db } = opts;
   const limiter = opts.limiter ?? new AttemptLimiter(10, 10 * 60 * 1000);
+  /**
+   * All wrong 6-digit codes together, whatever address they come from: guessing one of 10^6 codes
+   * takes far more than this, while families typing a code now and then never reach it.
+   */
+  const codeLimiter = opts.codeLimiter ?? new AttemptLimiter(200, 10 * 60 * 1000);
   const now = opts.now ?? (() => new Date());
 
   app.post(
@@ -84,23 +91,36 @@ export async function inviteRoutes(
     },
     async (request, reply) => {
       const limiterKey = request.ip;
-      if (limiter.isBlocked(limiterKey)) {
+      const param = request.params.token;
+      const byCode = /^\d{6}$/.test(param);
+      // Attempts are counted before the code is looked up and handed back unless it was wrong.
+      if (!limiter.tryAcquire(limiterKey)) {
         return reply.code(429).send({ error: "too_many_attempts" });
       }
+      if (byCode && !codeLimiter.tryAcquire(ALL_CODES)) {
+        limiter.release(limiterKey);
+        return reply.code(429).send({ error: "too_many_attempts" });
+      }
+      const notAFailure = () => {
+        limiter.release(limiterKey);
+        if (byCode) codeLimiter.release(ALL_CODES);
+      };
 
       // Members must be signed in; cameras need no user (SPEC §3).
       let userId: string | undefined;
       if (request.body.as === "member") {
         const authReply = await app.authenticate(request, reply);
-        if (authReply) return authReply;
+        if (authReply) {
+          notAFailure();
+          return authReply;
+        }
         userId = request.user!.userId;
         if (await findMembership(db, userId)) {
+          notAFailure();
           return reply.code(409).send({ error: "already_in_household" });
         }
       }
 
-      const param = request.params.token;
-      const byCode = /^\d{6}$/.test(param);
       const body = request.body;
 
       try {
@@ -156,10 +176,11 @@ export async function inviteRoutes(
           // The secret is returned exactly once; the camera stores it in its keychain.
           return { status: 201, payload: { householdId, device: deviceDto(device!), deviceSecret } };
         });
+        notAFailure();
         return reply.code(result.status).send(result.payload);
       } catch (err) {
         if (err instanceof AcceptError) {
-          if (err.status === 404) limiter.recordFailure(limiterKey);
+          if (err.status !== 404) notAFailure();
           return reply.code(err.status).send({ error: err.code, ...err.extra });
         }
         throw err;

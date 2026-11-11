@@ -7,8 +7,12 @@ import { findMembership, requireHousehold, requireOwner } from "../households/sc
 import { effectivePlan } from "../billing/plans.js";
 import { StorageUnavailableError, deleteHousehold } from "../households/delete.js";
 import type { MediaStorage } from "../storage/storage.js";
+import { RealtimeSessions } from "../realtime/sessions.js";
 
-export async function householdRoutes(app: FastifyInstance, opts: { db: Database; storage?: MediaStorage }): Promise<void> {
+export async function householdRoutes(
+  app: FastifyInstance,
+  opts: { db: Database; storage?: MediaStorage; sessions?: RealtimeSessions },
+): Promise<void> {
   const { db, storage } = opts;
 
   app.post<{ Body: { name: string } }>(
@@ -121,6 +125,7 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
           .where(and(eq(devices.householdId, householdId), eq(devices.userId, userId)));
         await tx.delete(notificationPrefs).where(eq(notificationPrefs.userId, userId));
       });
+      opts.sessions?.closeAll(RealtimeSessions.user(userId), "no_household");
       return reply.code(204).send();
     },
   );
@@ -133,6 +138,7 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
       if (err instanceof StorageUnavailableError) return reply.code(503).send({ error: "storage_not_configured" });
       throw err;
     }
+    opts.sessions?.closeAll(RealtimeSessions.household(request.household!.householdId), "no_household");
     return reply.code(204).send();
   });
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "households" ADD COLUMN "plan_revoked_at" timestamp with time zone;
