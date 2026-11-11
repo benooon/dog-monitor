@@ -167,17 +167,16 @@ Writing result bundle at path:
    |                            `- note: 'SKPaymentTransactionState' has been explicitly marked deprecated here
 15 |     SKPaymentTransactionStatePurchasing,    // Transaction is being added to the server queue.
 16 |     SKPaymentTransactionStatePurchased,     // Transaction is in queue, user has been charged.  Client should complete the transaction.
-2026-11-11 10:47:28.701 xcodebuild[4295:20075]  iOSSimulator: 📱<DVTiPhoneSimulator (0x12bfed2b0), iPhone SE (3rd generation), unknown class, 26.2 (23C54), A1285399-F2F4-46E9-8CF2-4AA227FF7EF3> unable to connect to "com.apple.instruments.deviceservice.lockdown" (Error Domain=DVTiPhoneSimulatorErrorDomain Code=-1 "DTServiceHubClient failed to bless service hub for simulator iPhone SE (3rd generation) (A1285399-F2F4-46E9-8CF2-4AA227FF7EF3)" UserInfo={NSLocalizedDescription=DTServiceHubClient failed to bless service hub for simulator iPhone SE (3rd generation) (A1285399-F2F4-46E9-8CF2-4AA227FF7EF3), NSUnderlyingError=0x600003b9a940 {Error Domain=DTServiceHubClient Code=2 "Connection to Simulator service hub (9133) interrupted. Simulator service hub IS still alive." UserInfo={NSLocalizedDescription=Connection to Simulator service hub (9133) interrupted. Simulator service hub IS still alive.}}})
-2026-11-11 10:51:39.223 xcodebuild[4295:15907] [MT] IDETestOperationsObserverDebug: 454.653 elapsed -- Testing started completed.
-2026-11-11 10:51:39.223 xcodebuild[4295:15907] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 10:51:39.223 xcodebuild[4295:15907] [MT] IDETestOperationsObserverDebug: 454.654 sec, +454.654 sec -- end
+2026-11-11 11:13:14.731 xcodebuild[4476:15907] [MT] IDETestOperationsObserverDebug: 528.229 elapsed -- Testing started completed.
+2026-11-11 11:13:14.732 xcodebuild[4476:15907] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 11:13:14.732 xcodebuild[4476:15907] [MT] IDETestOperationsObserverDebug: 528.229 sec, +528.229 sec -- end
 Testing started
 iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
 { platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-2026-11-11 10:58:23.231 xcodebuild[19272:59457] [MT] IDETestOperationsObserverDebug: 379.978 elapsed -- Testing started completed.
-2026-11-11 10:58:23.231 xcodebuild[19272:59457] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 10:58:23.231 xcodebuild[19272:59457] [MT] IDETestOperationsObserverDebug: 379.978 sec, +379.978 sec -- end
+2026-11-11 11:21:17.019 xcodebuild[20625:62282] [MT] IDETestOperationsObserverDebug: 452.443 elapsed -- Testing started completed.
+2026-11-11 11:21:17.019 xcodebuild[20625:62282] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 11:21:17.019 xcodebuild[20625:62282] [MT] IDETestOperationsObserverDebug: 452.443 sec, +452.443 sec -- end
 Testing started
-Screenshots: 144
+Screenshots: 150

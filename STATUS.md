@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 79d154588be7faa27435c51763ea213c1e3d1dd4
-- message: ios: bar background behind the lifetime offer so plans don't show through
-- time (UTC): 2026-11-11T10:59:00Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43003465174
+- commit: 5f9916a04c5e70f003205046952413d314f7c12e
+- message: core: weekly insights (week-over-week trends, sofa visits) and the 30-day vet report; subscription feature flags
+- time (UTC): 2026-11-11T11:21:57Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43007703588
 
 | job | result | log |
 |---|---|---|
