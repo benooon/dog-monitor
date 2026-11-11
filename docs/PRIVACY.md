@@ -22,7 +22,8 @@ Source of truth for the privacy policy, the App Store privacy label and the lega
 | Events: type, dog state, start/end, confidence, right/wrong feedback | Timeline, notifications | Postgres `events` | 365 days (`EVENT_RETENTION_DAYS`, min 30), deleted daily once their files are gone | Household members |
 | Daily summaries: rest minutes, bark count, activity per hour, minutes per dog state | Daily summary | Postgres `daily_summaries` | 365 days (`EVENT_RETENTION_DAYS`), deleted daily | Household members |
 | Event snapshots (JPEG) and clips (video **with audio** when microphone is allowed) | Show what happened | Bucket, keys on `events` | `CLIP_RETENTION_DAYS` (default 7 days), deleted daily. Labeled clips of households that opted in to "help improve detection" are kept up to 90 days | Household members through short-lived links (10 min) |
-| Live video and audio, and talk-back audio | Watch live | Streamed through LiveKit Cloud; not stored by Dog Monitor | Not stored | Household members who press "watch live" |
+| Live video and audio, and talk-back audio | Watch live | Streamed through LiveKit Cloud, end-to-end encrypted (LiveKit can't decrypt); not stored by Dog Monitor | Not stored | Household members who press "watch live" |
+| Household live video key (32 random bytes) | End-to-end encryption of live view | Only in the Keychain of the household's phones (this device only). Never sent to the server; the server stores only `households.live_encrypted` | Until the app is deleted, or the account is deleted | The household's phones |
 | Notification settings (per event type, quiet hours) | Pushes | Postgres | Until the account is deleted | The user |
 | Live Activity push tokens | Dynamic Island updates | Postgres | Until the activity ends or the account is deleted | Backend |
 | Subscription: plan, product id, expiry, original transaction id, environment | Premium | Postgres `households` | Until the household is deleted | Backend |
@@ -40,6 +41,7 @@ A camera can see and hear guests, dog walkers and cleaners. Today: the camera sc
 ## Protections that exist
 
 - Traffic to the API, LiveKit and the bucket uses TLS. Live video uses WebRTC (DTLS-SRTP) between the phones and LiveKit.
+- **End-to-end encrypted live view** (since 2026-11-11, SPEC §10): every video and audio frame, including talk-back, is encrypted on the sending phone with LiveKit frame encryption (AES-GCM) under the household's shared key, which reaches other phones only in the invite QR code and the invite link fragment. LiveKit relays ciphertext. Limits: phones on an older app version, or households whose owner hasn't opened the new version yet, still watch in the clear (TLS + DTLS-SRTP only); the key is not rotated when a member is removed (they can no longer get a room token); clips and snapshots are not end-to-end encrypted.
 - Every API route is scoped to the caller's household; presigned media links are short-lived (upload 15 min, download 10 min).
 - Device secrets are stored hashed; devices can be revoked; removing a member revokes their phones and clears push tokens.
 - Training data sharing is **off by default** and chosen by the household owner.
@@ -49,7 +51,7 @@ A camera can see and hear guests, dog walkers and cleaners. Today: the camera sc
 
 ## Protections that do NOT exist yet (never claim these)
 
-- **End-to-end encryption.** LiveKit Cloud can technically see the live stream. E2EE is a backlog task.
+- **End-to-end encryption of clips and snapshots.** Only live view is end-to-end encrypted. Uploaded clips and snapshots are readable by the operator and the bucket provider.
 - **A specific server region.** Railway, the bucket and LiveKit Cloud regions are not pinned or documented. Data may be processed outside the EU and Israel.
 - **Encryption of the database or bucket beyond what the providers do by default.**
 - **Revocation of the Sign in with Apple token on account deletion.**

@@ -11,7 +11,7 @@ Dog Monitor turns a spare iPhone into a camera for your dog. This page says what
 - **Your account.** When you sign in with Apple we get an Apple user ID and, if you share it, your name. We do not ask for or store your email.
 - **Your household.** Its name, members, dogs (name, photo, a few answers about your dog) and the phones you add (name, model, app version, notification token, battery level, time zone).
 - **What the camera notices.** Events such as barking or "at the door", the dog's state, a short clip and a snapshot, and a daily summary. The analysis runs on the camera phone. Clips include sound when you allow the microphone.
-- **Live view.** When someone in your household watches live, video and sound pass through our live-video provider. We do not save the live stream.
+- **Live view.** When someone in your household watches live, video and sound pass through our live-video provider. They are end-to-end encrypted with a key that only your household's phones hold, so the provider and we can't see or hear them. We do not save the live stream.
 - **Purchases.** Your plan and when it renews. Apple handles payment; we never see your card.
 - **Technical logs.** Our server records the address of each request, its time and any errors.
 
@@ -55,7 +55,7 @@ Dog Monitor is for adults. We do not knowingly collect data from children under 
 
 ## Security
 
-Connections are encrypted in transit. Live video is not end-to-end encrypted. We limit access to our systems, but no system is perfectly secure. If a breach affects you, we will tell you and the authorities as the law requires.
+Connections are encrypted in transit. Live video and sound are end-to-end encrypted between your household's phones once they run the current version of the app. Clips and snapshots are encrypted in transit and stored with our storage provider's encryption, not end-to-end. We limit access to our systems, but no system is perfectly secure. If a breach affects you, we will tell you and the authorities as the law requires.
 
 ## Changes
 

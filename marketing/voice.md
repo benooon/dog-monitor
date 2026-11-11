@@ -29,7 +29,7 @@ Use this file wherever an `ig-*` skill says `~/.claude/instagram/voice.md`.
 ## Off limits
 
 - No fake reviews, fake user counts or invented customers.
-- No "end-to-end encrypted" until LiveKit E2EE ships. No server-region claims until docs/PRIVACY.md exists.
+- No "end-to-end encrypted" until the owner has checked encrypted live view on real phones (HUMAN_TODO; the code shipped 2026-11-11). Then say "live view is end-to-end encrypted", never "everything is encrypted": clips are not. No server-region claims until docs/PRIVACY.md exists.
 - No shaming owners for leaving their dog alone; no anxiety bait ("Is your dog suffering?").
 - No real people, no known characters, no other brands' mascots.
 
