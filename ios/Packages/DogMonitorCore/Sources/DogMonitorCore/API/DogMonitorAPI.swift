@@ -263,6 +263,25 @@ public struct DogMonitorAPI: Sendable {
         return list.summaries
     }
 
+    // MARK: - Highlight reels
+
+    /// Camera: a presigned PUT for the day's reel. 404 `summary_not_found` before that day's
+    /// summary is uploaded, 403 `premium_required` on the free plan, 503 without a bucket.
+    public func requestReelUpload(date: String) async throws -> PresignedUploadDTO {
+        let response: ReelUploadDTO = try await send("POST", "device/reels/\(date)/upload")
+        return response.upload
+    }
+
+    /// Camera: the reel is uploaded; attach it to that day's summary.
+    public func attachReel(date: String) async throws {
+        let _: ReelAttachedDTO = try await send("PUT", "device/reels/\(date)")
+    }
+
+    /// Viewer: a download URL for a camera's reel of `date`. 404 when there is none.
+    public func reel(cameraId: UUID, date: String) async throws -> ReelMediaDTO {
+        try await send("GET", "summaries/\(Self.path(cameraId))/\(date)/reel")
+    }
+
     // MARK: - Notification preferences (user auth)
 
     /// The caller's push preferences and the defaults for types without a preference.

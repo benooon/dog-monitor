@@ -40,8 +40,20 @@ public struct DailySummaryDTO: Codable, Sendable, Hashable, Identifiable {
     public let activityByHour: [Int]
     public let stateMinutes: [String: Int]
     public let isFinal: Bool
+    /// The day's highlight reel is uploaded (nil from an older server).
+    public let hasReel: Bool?
 
-    public init(cameraId: UUID, date: String, restMinutes: Int, barkCount: Int, activityByHour: [Int], stateMinutes: [String: Int], isFinal: Bool) {
+    public init(
+        cameraId: UUID,
+        date: String,
+        restMinutes: Int,
+        barkCount: Int,
+        activityByHour: [Int],
+        stateMinutes: [String: Int],
+        isFinal: Bool,
+        hasReel: Bool? = nil
+    ) {
+        self.hasReel = hasReel
         self.cameraId = cameraId
         self.date = date
         self.restMinutes = restMinutes
@@ -64,6 +76,25 @@ struct DailySummaryUpload: Encodable {
     var activityByHour: [Int]
     var stateMinutes: [String: Int]
     var final: Bool
+}
+
+/// `GET /summaries/:cameraId/:date/reel`: a short-lived download URL for the day's reel.
+public struct ReelMediaDTO: Codable, Sendable, Hashable {
+    public let url: URL
+    public let expiresAt: Date
+
+    public init(url: URL, expiresAt: Date) {
+        self.url = url
+        self.expiresAt = expiresAt
+    }
+}
+
+struct ReelUploadDTO: Decodable {
+    var upload: PresignedUploadDTO
+}
+
+struct ReelAttachedDTO: Decodable {
+    var hasReel: Bool
 }
 
 struct DailySummaryList: Decodable {
