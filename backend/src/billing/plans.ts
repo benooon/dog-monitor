@@ -51,3 +51,13 @@ export function cameraLimit(household: HouseholdPlanFields, now: Date, enforce: 
 export function memberLimit(household: HouseholdPlanFields, now: Date, enforce: boolean): number {
   return enforce ? PLAN_FEATURES[effectivePlan(household, now)].members : LIMITS.usersPerHousehold;
 }
+
+/** Feature flags a household's apps show. Until limits are enforced every household gets them all. */
+export function featureFlags(
+  household: HouseholdPlanFields,
+  now: Date,
+  enforce: boolean,
+): { insights: boolean; highlightReel: boolean } {
+  const features = enforce ? PLAN_FEATURES[effectivePlan(household, now)] : PLAN_FEATURES.premium;
+  return { insights: features.insights, highlightReel: features.highlightReel };
+}

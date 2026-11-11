@@ -4,7 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { CompactSign } from "jose";
 import { LIFETIME_EXPIRES_AT, createAppStoreVerifier, isLifetimeExpiry, type TransactionVerifier } from "../src/billing/app-store.js";
-import { PLAN_FEATURES, cameraLimit, effectivePlan, memberLimit } from "../src/billing/plans.js";
+import { PLAN_FEATURES, cameraLimit, effectivePlan, featureFlags, memberLimit } from "../src/billing/plans.js";
 import type { DbHandle } from "../src/db/client.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
@@ -189,6 +189,14 @@ describe("plans", () => {
     expect(memberLimit({ planExpiresAt: null }, NOW, false)).toBe(6);
   });
 
+  it("unlocks insights and the reel with premium, or for everyone when not enforced", () => {
+    const paid = { planExpiresAt: new Date(NOW.getTime() + DAY) };
+    const free = { planExpiresAt: null };
+    expect(featureFlags(free, NOW, true)).toEqual({ insights: false, highlightReel: false });
+    expect(featureFlags(paid, NOW, true)).toEqual({ insights: true, highlightReel: true });
+    expect(featureFlags(free, NOW, false)).toEqual({ insights: true, highlightReel: true });
+  });
+
   it("matches the plan table (free: 1 camera, 2 people, 1 day of clips; premium: 4, everyone, 30 days)", () => {
     expect(PLAN_FEATURES).toEqual({
       free: { cameras: 1, members: 2, clipRetentionDays: 1, insights: false, highlightReel: false },
@@ -255,6 +263,7 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
       productId: null,
       limits: { cameras: 1, members: 2 },
       usage: { cameras: 0, members: 1 },
+      features: { insights: false, highlightReel: false },
     });
     expect((await pairCamera(auth, "Living room")).statusCode).toBe(201);
     const blocked = await pairCamera(auth, "Door");
@@ -263,7 +272,13 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
 
     const res = await purchase(auth, transaction({ appAccountToken: householdId }));
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toMatchObject({ plan: "premium", productId: MONTHLY, limits: { cameras: 4 }, usage: { cameras: 1 } });
+    expect(res.json()).toMatchObject({
+      plan: "premium",
+      productId: MONTHLY,
+      limits: { cameras: 4 },
+      usage: { cameras: 1 },
+      features: { insights: true, highlightReel: true },
+    });
     expect((await pairCamera(auth, "Door")).statusCode).toBe(201);
     expect((await app.inject({ method: "GET", url: "/household", headers: auth })).json().plan).toBe("premium");
 

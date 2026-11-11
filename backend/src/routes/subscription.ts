@@ -4,7 +4,7 @@ import type { Database } from "../db/client.js";
 import { devices, householdMembers, households } from "../db/schema.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
 import { TransactionError, isLifetimeExpiry, type TransactionVerifier } from "../billing/app-store.js";
-import { cameraLimit, effectivePlan, memberLimit } from "../billing/plans.js";
+import { cameraLimit, effectivePlan, featureFlags, memberLimit } from "../billing/plans.js";
 import { applyTransaction } from "../billing/apply-transaction.js";
 
 export interface SubscriptionRouteOptions {
@@ -43,6 +43,8 @@ export async function subscriptionRoutes(app: FastifyInstance, opts: Subscriptio
       productId: plan === "premium" ? household!.planProductId : null,
       limits: { cameras: cameraLimit(household!, at, enforcePlanLimits), members: memberLimit(household!, at, enforcePlanLimits) },
       usage: { cameras: cameras?.n ?? 0, members: members?.n ?? 0 },
+      /** What the apps unlock (all of it while plan limits aren't enforced). */
+      features: featureFlags(household!, at, enforcePlanLimits),
     };
   }
 
