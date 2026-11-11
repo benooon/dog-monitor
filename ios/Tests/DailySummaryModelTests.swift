@@ -82,4 +82,22 @@ final class DailySummaryModelTests: XCTestCase {
         await model.load()
         XCTAssertEqual(model.phase, .failed)
     }
+
+    func testReelPreviewShowsTheReelDayAndUsesTheCachedFile() async throws {
+        let model = DailySummaryModel.preview(reelOnDaysAgo: 1)
+        let summary = try XCTUnwrap(model.selectedSummary)
+        XCTAssertEqual(summary.hasReel, true)
+        XCTAssertTrue(summary.isFinal)
+
+        // The screenshot test relies on this fixture; a cached file is returned without the network.
+        let sample = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "sample-reel", withExtension: "mp4"))
+        let target = DailySummaryModel.reelCacheURL(for: summary)
+        try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? FileManager.default.removeItem(at: target)
+        try FileManager.default.copyItem(at: sample, to: target)
+        defer { try? FileManager.default.removeItem(at: target) }
+
+        let file = try await model.reelFile(for: summary)
+        XCTAssertEqual(file, target)
+    }
 }

@@ -3685,6 +3685,30 @@
           }
         }
       }
+    },
+    "%@'s day in 30 seconds is ready": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום של %@ ב-30 שניות מוכן"
+          }
+        }
+      }
+    },
+    "Your dog's day in 30 seconds is ready": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "היום של הכלב ב-30 שניות מוכן"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

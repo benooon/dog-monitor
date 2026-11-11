@@ -56,8 +56,8 @@ final class DailySummaryModel {
     /// Downloads a day's highlight reel to a local file, so it plays smoothly and can be shared
     /// as a video (a link would expire in minutes).
     func reelFile(for summary: DailySummaryDTO) async throws -> URL {
-        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("reels", isDirectory: true)
-        let file = folder.appendingPathComponent("\(summary.cameraId.uuidString)-\(summary.date).mp4")
+        let file = Self.reelCacheURL(for: summary)
+        let folder = file.deletingLastPathComponent()
         if FileManager.default.fileExists(atPath: file.path) { return file }
         let media = try await api.reel(cameraId: summary.cameraId, date: summary.date)
         let (downloaded, response) = try await URLSession.shared.download(from: media.url)
@@ -66,6 +66,13 @@ final class DailySummaryModel {
         try? FileManager.default.removeItem(at: file)
         try FileManager.default.moveItem(at: downloaded, to: file)
         return file
+    }
+
+    /// Where a day's downloaded reel is kept on this phone.
+    nonisolated static func reelCacheURL(for summary: DailySummaryDTO) -> URL {
+        FileManager.default.temporaryDirectory
+            .appendingPathComponent("reels", isDirectory: true)
+            .appendingPathComponent("\(summary.cameraId.uuidString)-\(summary.date).mp4")
     }
 
     var cameraName: String? {

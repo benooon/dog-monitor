@@ -291,10 +291,17 @@ final class CameraModeModel {
         guard let api else { return }
         for pending in summaries.pendingUploads(now: .now, calendar: .current) {
             do {
+                if pending.final {
+                    // Store the day, then try its reel before sending the day as final, so the
+                    // summary push can say the reel is ready. A reel that fails now is retried
+                    // later; the push doesn't wait for it.
+                    try await api.uploadSummary(pending.summary, final: false)
+                    await reelBuilder.dayFinished(pending.summary.date)
+                    await reelBuilder.uploadPending(using: api, calendar: .current)
+                }
                 try await api.uploadSummary(pending.summary, final: pending.final)
                 if pending.final {
                     summaries.markUploadedFinal(pending.summary.date)
-                    await reelBuilder.dayFinished(pending.summary.date)
                 }
             } catch {
                 return // offline: try again at the next upload

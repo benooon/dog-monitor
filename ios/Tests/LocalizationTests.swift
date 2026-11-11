@@ -312,6 +312,8 @@ final class LocalizationTests: XCTestCase {
         "The camera is overheating",
         "%@'s daily summary is ready",
         "Your dog's daily summary is ready",
+        "%@'s day in 30 seconds is ready",
+        "Your dog's day in 30 seconds is ready",
         "%1$@ has been barking for %2$@ min",
         "Your dog has been barking for %@ min",
         "%1$@ has been whining for %2$@ min",

@@ -63,6 +63,9 @@ final class ScreenshotTests: XCTestCase {
                 })
             },
             Screen(name: "08-daily-summary") { AnyView(DailySummaryView(model: .preview, dogName: "Rex")) },
+            Screen(name: "08a-daily-summary-reel", settle: .seconds(2.5)) {
+                AnyView(DailySummaryView(model: reelSummaryModel(), dogName: "Rex"))
+            },
             Screen(name: "09-household") { AnyView(HouseholdView(model: .demo)) },
             Screen(name: "09a-dog-profile") {
                 AnyView(NavigationStack {
@@ -93,6 +96,19 @@ final class ScreenshotTests: XCTestCase {
                 AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID()) { _ in .init(count: 0) }, dogName: "Rex"))
             },
         ]
+    }
+
+    /// Yesterday with a highlight reel: the bundled sample clip goes where the model caches downloads.
+    private static func reelSummaryModel() -> DailySummaryModel {
+        let model = DailySummaryModel.preview(reelOnDaysAgo: 1)
+        if let summary = model.selectedSummary,
+           let sample = Bundle(for: ScreenshotTests.self).url(forResource: "sample-reel", withExtension: "mp4") {
+            let target = DailySummaryModel.reelCacheURL(for: summary)
+            try? FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try? FileManager.default.removeItem(at: target)
+            try? FileManager.default.copyItem(at: sample, to: target)
+        }
+        return model
     }
 
     /// "Meet your dog" at a given step, with sample answers for Rex.

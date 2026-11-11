@@ -368,7 +368,11 @@ private extension DogMonitorAPI {
 
 extension DailySummaryModel {
     /// A week of sample days for one camera, no network.
-    static var preview: DailySummaryModel {
+    static var preview: DailySummaryModel { preview(reelOnDaysAgo: nil) }
+
+    /// Sample days with a highlight reel on the day `reelOnDaysAgo` days back, which is shown.
+    /// The reel file must already be in the model's cache (see `reelCacheURL(for:)`).
+    static func preview(reelOnDaysAgo reelOffset: Int?) -> DailySummaryModel {
         let camera = UUID()
         let calendar = Calendar.current
         let days: [DailySummaryDTO] = (0..<7).map { offset in
@@ -382,9 +386,14 @@ extension DailySummaryModel {
                 barkCount: 6 + (offset * 5) % 11,
                 activityByHour: activity,
                 stateMinutes: ["resting": 420 - offset * 15, "restless": 70, "barking": 9, "atDoor": 12],
-                isFinal: offset > 0
+                isFinal: offset > 0,
+                hasReel: offset == reelOffset
             )
         }
-        return DailySummaryModel(api: .offline, cameras: [], cameraId: camera, loaded: days)
+        let model = DailySummaryModel(api: .offline, cameras: [], cameraId: camera, loaded: days)
+        if let reelOffset, days.indices.contains(reelOffset) {
+            model.selectedDate = days[reelOffset].date
+        }
+        return model
     }
 }
