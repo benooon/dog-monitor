@@ -14,6 +14,7 @@ import {
   time,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -102,7 +103,9 @@ export const householdMembers = pgTable(
     role: memberRole("role").notNull().default("member"),
     createdAt: createdAt(),
   },
-  (t) => [primaryKey({ columns: [t.householdId, t.userId] }), index("household_members_user_idx").on(t.userId)],
+  // One household per user (security audit 2026-11, run 2): the unique index closes the
+  // check-then-insert race between creating a household and accepting an invite.
+  (t) => [primaryKey({ columns: [t.householdId, t.userId] }), uniqueIndex("household_members_user_unique").on(t.userId)],
 );
 
 /** Dog profile answers from onboarding. Stored as text so new values need no migration. */

@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
+import { HOUSEHOLD_MEMBER_USER_UNIQUE, isUniqueViolation } from "../db/errors.js";
 import { and, count, eq, gt, isNull } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices, householdMembers, invites } from "../db/schema.js";
+import { devices, householdMembers, households, invites } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
 import { LIMITS } from "../households/limits.js";
 import { householdCameraLimit } from "../billing/camera-limit.js";
@@ -140,6 +141,8 @@ export async function inviteRoutes(
             .returning();
           if (!invite) throw new AcceptError(404, "invalid_or_expired_invite");
           const householdId = invite.householdId;
+          // Serialise accepts per household so concurrent ones cannot all pass the limit counts below.
+          await tx.select({ id: households.id }).from(households).where(eq(households.id, householdId)).for("update");
 
           if (body.as === "member") {
             const [row] = await tx
@@ -179,6 +182,11 @@ export async function inviteRoutes(
         notAFailure();
         return reply.code(result.status).send(result.payload);
       } catch (err) {
+        if (isUniqueViolation(err, HOUSEHOLD_MEMBER_USER_UNIQUE)) {
+          // The user joined or created another household concurrently; the invite stays unused (rolled back).
+          notAFailure();
+          return reply.code(409).send({ error: "already_in_household" });
+        }
         if (err instanceof AcceptError) {
           if (err.status !== 404) notAFailure();
           return reply.code(err.status).send({ error: err.code, ...err.extra });

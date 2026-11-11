@@ -9,6 +9,7 @@ import type { ApnsSender } from "../../src/notifications/apns.js";
 import type { MediaStorage } from "../../src/storage/storage.js";
 import type { AttemptLimiter } from "../../src/pairing/attempt-limiter.js";
 import { createFakeApple } from "./apple.js";
+import { RealtimeSessions } from "../../src/realtime/sessions.js";
 import type { TransactionVerifier } from "../../src/billing/app-store.js";
 
 export const TEST_JWT_SECRET = "test-secret-test-secret-test-secret-123";
@@ -20,13 +21,16 @@ export async function buildTestApp(
   app: FastifyInstance;
   apple: Awaited<ReturnType<typeof createFakeApple>>;
   jwt: JwtService;
+  sessions: RealtimeSessions;
 }> {
   const apple = await createFakeApple();
   const jwt = new JwtService(TEST_JWT_SECRET, 3600);
+  const sessions = new RealtimeSessions();
   const app = await buildApp({
     logLevel: "silent",
     services: {
       db: h.db,
+      sessions,
       jwt,
       apple: createAppleTokenVerifier({ audiences: ["com.benooon.dogmonitor"], keySet: apple.keySet }),
       inviteLimiter: options.inviteLimiter,
@@ -45,5 +49,5 @@ export async function buildTestApp(
       waitlistLimiter: options.waitlistLimiter,
     },
   });
-  return { app, apple, jwt };
+  return { app, apple, jwt, sessions };
 }

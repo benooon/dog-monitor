@@ -1,8 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { DOG_ALERT_STYLES, DOG_LIFE_STAGES, DOG_TRAITS, dogPhotos, dogs } from "../db/schema.js";
+import { DOG_ALERT_STYLES, DOG_LIFE_STAGES, DOG_TRAITS, dogPhotos, dogs, households } from "../db/schema.js";
 import { dogDto } from "../households/dto.js";
+import { LIMITS } from "../households/limits.js";
 import { requireHousehold } from "../households/scope.js";
 
 const idParams = {
@@ -58,18 +59,27 @@ export async function dogRoutes(app: FastifyInstance, opts: { db: Database }): P
       },
     },
     async (request, reply) => {
-      const [dog] = await db
-        .insert(dogs)
-        .values({
-          householdId: request.household!.householdId,
-          name: request.body.name,
-          photoKey: request.body.photoKey ?? null,
-          lifeStage: request.body.lifeStage ?? null,
-          traits: request.body.traits ?? [],
-          alertStyle: request.body.alertStyle ?? null,
-        })
-        .returning();
-      return reply.code(201).send(dogDto(dog!));
+      const householdId = request.household!.householdId;
+      const dog = await db.transaction(async (tx) => {
+        // Lock the household so concurrent creates cannot all pass the count.
+        await tx.select({ id: households.id }).from(households).where(eq(households.id, householdId)).for("update");
+        const [row] = await tx.select({ n: count() }).from(dogs).where(eq(dogs.householdId, householdId));
+        if ((row?.n ?? 0) >= LIMITS.dogsPerHousehold) return undefined;
+        const [created] = await tx
+          .insert(dogs)
+          .values({
+            householdId,
+            name: request.body.name,
+            photoKey: request.body.photoKey ?? null,
+            lifeStage: request.body.lifeStage ?? null,
+            traits: request.body.traits ?? [],
+            alertStyle: request.body.alertStyle ?? null,
+          })
+          .returning();
+        return created!;
+      });
+      if (!dog) return reply.code(409).send({ error: "dog_limit_reached", limit: LIMITS.dogsPerHousehold });
+      return reply.code(201).send(dogDto(dog));
     },
   );
 

@@ -17,6 +17,11 @@ export class RealtimeSessions {
     return `household:${householdId}`;
   }
 
+  /** Number of tracked keys (for tests: zero once every socket has closed). */
+  get size(): number {
+    return this.sessions.size;
+  }
+
   /** Registers a socket's close function under each key; returns the function that unregisters it. */
   track(keys: string[], close: (reason: string) => void): () => void {
     for (const key of keys) {

@@ -13,6 +13,11 @@ import { RealtimeSessions } from "../realtime/sessions.js";
 const PING_INTERVAL_MS = 30_000;
 /** Close codes in the 4000–4999 application range. */
 const CLOSE_FORBIDDEN = 4003;
+/** Policy violation (RFC 6455), used when a peer floods the socket. */
+const CLOSE_POLICY = 1008;
+/** Per-socket message budget: a burst of 20, refilled at 5 per second. Heartbeats and watches are far below this. */
+export const WS_MESSAGE_BURST = 20;
+export const WS_MESSAGES_PER_SECOND = 5;
 
 interface RealtimeOptions {
   /** Closes sockets when access is taken away (member removed, device revoked, household deleted). */
@@ -54,15 +59,34 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
       socket.close(1011, "internal_error");
     });
 
+    // Messages are handled one at a time per socket, within a token bucket, so one client
+    // cannot fan out unbounded concurrent database work.
+    let tokens = WS_MESSAGE_BURST;
+    let refilledAt = Date.now();
+    let queue: Promise<void> = ready;
     socket.on("message", (data) => {
-      void ready.then(() => onMessage(data.toString())).catch((error: unknown) => {
-        request.log.error({ err: error }, "websocket message failed");
-      });
+      const at = Date.now();
+      tokens = Math.min(WS_MESSAGE_BURST, tokens + ((at - refilledAt) / 1000) * WS_MESSAGES_PER_SECOND);
+      refilledAt = at;
+      if (tokens < 1) {
+        socket.close(CLOSE_POLICY, "rate_limited");
+        return;
+      }
+      tokens -= 1;
+      const raw = data.toString();
+      queue = queue
+        .then(() => (socket.readyState === socket.OPEN ? onMessage(raw) : undefined))
+        .catch((error: unknown) => {
+          request.log.error({ err: error }, "websocket message failed");
+        });
     });
     socket.on("close", () => {
       clearInterval(ping);
-      untrack();
-      void ready.then(() => onClose());
+      // Setup may still be running; untrack only once it has registered the session, or the entry leaks.
+      void ready.then(() => {
+        untrack();
+        onClose();
+      });
     });
 
     function reject(error: string) {

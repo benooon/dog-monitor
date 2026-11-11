@@ -58,6 +58,26 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     expect(get.json()).toMatchObject({ ownerId: userId, members: [{ userId, role: "owner" }], dogs: [], devices: [] });
   });
 
+  it("creates households one at a time per user, even concurrently", async () => {
+    const { userId, auth } = await signIn("double");
+    const results = await Promise.all([createHousehold(auth, "A"), createHousehold(auth, "B"), createHousehold(auth, "C")]);
+    expect(results.map((r) => r.statusCode).sort()).toEqual([201, 409, 409]);
+    const { householdMembers } = await import("../src/db/schema.js");
+    const { eq } = await import("drizzle-orm");
+    expect(await h.db.select().from(householdMembers).where(eq(householdMembers.userId, userId))).toHaveLength(1);
+  });
+
+  it("caps dogs per household, even concurrently", async () => {
+    const { auth } = await signIn("dogs");
+    await createHousehold(auth);
+    const results = await Promise.all(
+      Array.from({ length: 12 }, (_, i) => app.inject({ method: "POST", url: "/dogs", headers: auth, payload: { name: `Dog ${i}` } })),
+    );
+    expect(results.filter((r) => r.statusCode === 201)).toHaveLength(10);
+    const refused = results.find((r) => r.statusCode === 409)!;
+    expect(refused.json()).toEqual({ error: "dog_limit_reached", limit: 10 });
+  });
+
   it("requires auth and a household", async () => {
     expect((await app.inject({ method: "GET", url: "/household" })).statusCode).toBe(401);
     const { auth } = await signIn("lonely");

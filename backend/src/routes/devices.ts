@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { and, asc, count, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices } from "../db/schema.js";
+import { devices, households } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
 import { householdCameraLimit } from "../billing/camera-limit.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
@@ -85,30 +85,34 @@ export async function deviceRoutes(
       if (request.body.timeZone && !isValidTimeZone(request.body.timeZone)) {
         return reply.code(400).send({ error: "invalid_time_zone" });
       }
-      if (request.body.role === "camera") {
-        const [row] = await db
-          .select({ n: count() })
-          .from(devices)
-          .where(and(eq(devices.householdId, householdId), eq(devices.role, "camera"), eq(devices.status, "active")));
-        const limit = await householdCameraLimit(db, householdId, new Date(), opts.enforcePlanLimits ?? false);
-        if ((row?.n ?? 0) >= limit) {
-          return reply.code(409).send({ error: "camera_limit_reached", limit });
+      const device = await db.transaction(async (tx) => {
+        if (request.body.role === "camera") {
+          // Lock the household so concurrent registrations cannot all pass the camera count.
+          await tx.select({ id: households.id }).from(households).where(eq(households.id, householdId)).for("update");
+          const [row] = await tx
+            .select({ n: count() })
+            .from(devices)
+            .where(and(eq(devices.householdId, householdId), eq(devices.role, "camera"), eq(devices.status, "active")));
+          const limit = await householdCameraLimit(tx, householdId, new Date(), opts.enforcePlanLimits ?? false);
+          if ((row?.n ?? 0) >= limit) return { limit };
         }
-      }
-      const [device] = await db
-        .insert(devices)
-        .values({
-          householdId,
-          userId: request.user!.userId,
-          name: request.body.name,
-          role: request.body.role,
-          model: request.body.model ?? null,
-          appVersion: request.body.appVersion ?? null,
-          apnsToken: request.body.apnsToken ?? null,
-          timeZone: request.body.timeZone ?? null,
-        })
-        .returning();
-      return reply.code(201).send(deviceDto(device!));
+        const [created] = await tx
+          .insert(devices)
+          .values({
+            householdId,
+            userId: request.user!.userId,
+            name: request.body.name,
+            role: request.body.role,
+            model: request.body.model ?? null,
+            appVersion: request.body.appVersion ?? null,
+            apnsToken: request.body.apnsToken ?? null,
+            timeZone: request.body.timeZone ?? null,
+          })
+          .returning();
+        return { created: created! };
+      });
+      if ("limit" in device) return reply.code(409).send({ error: "camera_limit_reached", limit: device.limit });
+      return reply.code(201).send(deviceDto(device.created));
     },
   );
 

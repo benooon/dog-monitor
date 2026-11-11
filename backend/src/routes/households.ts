@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { HOUSEHOLD_MEMBER_USER_UNIQUE, isUniqueViolation } from "../db/errors.js";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { devices, dogs, householdMembers, households, notificationPrefs, users, zones } from "../db/schema.js";
@@ -33,11 +34,18 @@ export async function householdRoutes(
       if (await findMembership(db, userId)) {
         return reply.code(409).send({ error: "already_in_household" });
       }
-      const household = await db.transaction(async (tx) => {
-        const [created] = await tx.insert(households).values({ name: request.body.name, ownerId: userId }).returning();
-        await tx.insert(householdMembers).values({ householdId: created!.id, userId, role: "owner" });
-        return created!;
-      });
+      let household;
+      try {
+        household = await db.transaction(async (tx) => {
+          const [created] = await tx.insert(households).values({ name: request.body.name, ownerId: userId }).returning();
+          await tx.insert(householdMembers).values({ householdId: created!.id, userId, role: "owner" });
+          return created!;
+        });
+      } catch (error) {
+        // A concurrent create or invite accept won the race for this user.
+        if (isUniqueViolation(error, HOUSEHOLD_MEMBER_USER_UNIQUE)) return reply.code(409).send({ error: "already_in_household" });
+        throw error;
+      }
       return reply.code(201).send({ id: household.id, name: household.name, plan: effectivePlan(household, new Date()), role: "owner" });
     },
   );

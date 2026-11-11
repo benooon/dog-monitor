@@ -8,6 +8,8 @@ import { OFFLINE_AFTER_MS, RealtimeHub } from "../src/realtime/hub.js";
 import type { ServerMessage } from "../src/realtime/protocol.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
+import { WS_MAX_PAYLOAD_BYTES } from "../src/app.js";
+import { WS_MESSAGE_BURST } from "../src/routes/realtime.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
 
 /** A test WebSocket client that queues incoming JSON messages. */
@@ -194,6 +196,31 @@ describe.skipIf(!hasDatabase)("realtime channel (GET /ws)", () => {
     const cam = await connect(camera.auth);
     cam.send({ type: "heartbeat", battery: 7 });
     expect(await cam.next()).toEqual({ type: "error", error: "bad_message" });
+  });
+
+  // Security audit 2026-11 (run 2): one client cannot flood the socket or send huge frames.
+  it("closes a socket that floods messages", async () => {
+    const { owner } = await setup();
+    const viewer = await connect(owner.auth);
+    await viewer.next();
+    for (let i = 0; i < WS_MESSAGE_BURST + 10; i++) viewer.send({ type: "unwatch", cameraId: "00000000-0000-0000-0000-000000000000" });
+    expect(await viewer.closed).toBe(1008);
+  });
+
+  it("refuses frames larger than the payload limit", async () => {
+    const { owner } = await setup();
+    const viewer = await connect(owner.auth);
+    await viewer.next();
+    viewer.ws.send("x".repeat(WS_MAX_PAYLOAD_BYTES + 1));
+    expect(await viewer.closed).toBe(1009);
+  });
+
+  it("does not leak a session when the socket closes during setup", async () => {
+    const { owner } = await setup();
+    const viewer = await connect(owner.auth);
+    viewer.ws.terminate();
+    await viewer.closed;
+    await eventually(async () => expect(ctx.sessions.size).toBe(0));
   });
 
   // Security audit 2026-11: taking access away ends the realtime session.

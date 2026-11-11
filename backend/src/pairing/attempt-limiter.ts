@@ -4,6 +4,7 @@
  */
 export class AttemptLimiter {
   private readonly failures = new Map<string, number[]>();
+  private lastSweep = 0;
 
   constructor(
     private readonly maxFailures: number,
@@ -41,7 +42,27 @@ export class AttemptLimiter {
     this.failures.set(key, list);
   }
 
+  /** Number of keys held (for tests). */
+  get size(): number {
+    return this.failures.size;
+  }
+
+  /**
+   * Drops keys whose attempts have all expired. Without it, one-off keys (spoofed or rotating
+   * IPs) would stay in memory forever (audit 2026-11, run 2). Runs at most once per window.
+   */
+  private sweep(): void {
+    const at = this.now();
+    if (at - this.lastSweep < this.windowMs) return;
+    this.lastSweep = at;
+    const cutoff = at - this.windowMs;
+    for (const [key, list] of this.failures) {
+      if (!list.some((t) => t > cutoff)) this.failures.delete(key);
+    }
+  }
+
   private recent(key: string): number[] {
+    this.sweep();
     const cutoff = this.now() - this.windowMs;
     const list = (this.failures.get(key) ?? []).filter((t) => t > cutoff);
     if (list.length === 0) this.failures.delete(key);

@@ -41,6 +41,8 @@ import { landingRoutes } from "./routes/landing.js";
 
 export interface AppServices {
   db: Database;
+  /** Open /ws sockets by principal; injectable for tests. */
+  sessions?: RealtimeSessions;
   jwt: JwtService;
   apple: AppleTokenVerifier;
   /** LiveKit token minting; undefined when LIVEKIT_* is not configured (live routes answer 503). */
@@ -81,11 +83,16 @@ export interface BuildAppOptions {
   services?: AppServices;
 }
 
+/** Largest accepted /ws frame. */
+export const WS_MAX_PAYLOAD_BYTES = 4096;
+
 /** Builds the Fastify app without listening, so tests can use `app.inject`. */
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({
     // Railway terminates TLS in front of us; trust X-Forwarded-For so request.ip is the client.
     trustProxy: true,
+    // Fastify's default (0) disables Node's request timeout; slow bodies must not hold sockets forever.
+    requestTimeout: 30_000,
     logger: options.logLevel === "silent" ? false : { level: options.logLevel ?? "info", serializers: { req: serializeRequest } },
   });
   await app.register(healthRoutes);
@@ -98,7 +105,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(deviceAuthPlugin, { db: services.db });
     await app.register(authRoutes, services);
     // Open /ws sockets by principal, closed when access is taken away.
-    const sessions = new RealtimeSessions();
+    const sessions = services.sessions ?? new RealtimeSessions();
     await app.register(accountRoutes, { db: services.db, storage: services.storage, sessions });
     await app.register(householdRoutes, { db: services.db, storage: services.storage, sessions });
     await app.register(dogRoutes, { db: services.db });
@@ -152,7 +159,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(viewerLiveRoutes, { db: services.db, live: services.live, hub });
     await app.register(cameraLiveRoutes, { db: services.db, live: services.live });
 
-    await app.register(websocket);
+    // Realtime messages are tiny JSON objects; the ws default (100 MiB) would let one frame exhaust memory.
+    await app.register(websocket, { options: { maxPayload: WS_MAX_PAYLOAD_BYTES } });
     await app.register(realtimeRoutes, { db: services.db, hub, now, sessions });
     // Marks cameras offline after 3 minutes without a heartbeat.
     const sweep = setInterval(() => hub.sweep(now()), 30_000);

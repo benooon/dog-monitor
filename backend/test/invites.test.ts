@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import type { DbHandle } from "../src/db/client.js";
-import { invites } from "../src/db/schema.js";
+import { householdMembers, invites } from "../src/db/schema.js";
 import { AttemptLimiter } from "../src/pairing/attempt-limiter.js";
 import { parseDeviceAuthorization } from "../src/auth/device-plugin.js";
 import { hashSecret, newInviteCode, secretMatches } from "../src/pairing/secrets.js";
@@ -29,6 +29,16 @@ describe("pairing helpers", () => {
     expect(parseDeviceAuthorization(`Device not-a-uuid:abc`)).toBeNull();
     expect(parseDeviceAuthorization(`Device ${id}:`)).toBeNull();
     expect(parseDeviceAuthorization(undefined)).toBeNull();
+  });
+
+  it("forgets expired keys so one-off addresses do not pile up", () => {
+    let t = 0;
+    const limiter = new AttemptLimiter(3, 1000, () => t);
+    for (let i = 0; i < 100; i++) limiter.recordFailure(`ip${i}`);
+    expect(limiter.size).toBe(100);
+    t = 2001;
+    limiter.isBlocked("fresh");
+    expect(limiter.size).toBe(0);
   });
 
   it("limits failures within a window", () => {
@@ -182,6 +192,42 @@ describe.skipIf(!hasDatabase)("invites and device auth", () => {
     expect(res.json()).toMatchObject({ error: "member_limit_reached", limit: 6 });
     const [row] = await h.db.select().from(invites).where(eq(invites.token, inv.token));
     expect(row!.usedAt).toBeNull();
+  });
+
+  // Security audit 2026-11, run 2: count-then-insert races.
+  it("keeps the camera limit under concurrent accepts", async () => {
+    const owner = await ownerWithHousehold();
+    const tokens = [];
+    for (let i = 0; i < 8; i++) tokens.push((await createInvite(owner.auth)).token);
+    // Its own app: the shared one's per-address limiter carries failures from earlier tests.
+    const local = await buildTestApp(h, { inviteLimiter: new AttemptLimiter(100, 60_000) });
+    try {
+      const results = await Promise.all(
+        tokens.map((t, i) => local.app.inject({ method: "POST", url: `/invites/${t}/accept`, payload: { as: "camera", deviceName: `Cam ${i}` } })),
+      );
+      const codes = results.map((r) => r.statusCode);
+      expect(codes.filter((c) => c === 201)).toHaveLength(4);
+      expect(codes.filter((c) => c === 409)).toHaveLength(4);
+    } finally {
+      await local.app.close();
+    }
+  });
+
+  it("puts a user in one household even when creating and joining at once", async () => {
+    const owner = await ownerWithHousehold();
+    for (let round = 0; round < 5; round++) {
+      const user = await signIn(`racer${round}`);
+      const inv = await createInvite(owner.auth);
+      const [created, joined] = await Promise.all([
+        app.inject({ method: "POST", url: "/households", headers: user.auth, payload: { name: "Mine" } }),
+        app.inject({ method: "POST", url: `/invites/${inv.token}/accept`, headers: user.auth, payload: { as: "member" } }),
+      ]);
+      const codes = [created.statusCode, joined.statusCode];
+      expect(codes.filter((c) => c === 409)).toHaveLength(1);
+      expect(codes.filter((c) => c === 200 || c === 201)).toHaveLength(1);
+      const rows = await h.db.select().from(householdMembers).where(eq(householdMembers.userId, user.userId));
+      expect(rows).toHaveLength(1);
+    }
   });
 });
 
