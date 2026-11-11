@@ -106,6 +106,7 @@ struct DailySummaryView: View {
                     }
                 }
             }
+            WeeklyInsightsSection(model: model, dogName: dogName)
         }
     }
 
@@ -332,7 +333,7 @@ private struct DayTitle: View {
     }
 }
 
-private extension Text {
+extension Text {
     /// "1 hr, 20 min" for a number of minutes, formatted at render time so it follows the
     /// environment's locale (Hebrew screens get Hebrew units).
     init(minutes: Int) {
@@ -367,7 +368,7 @@ private extension DogMonitorAPI {
 }
 
 extension DailySummaryModel {
-    /// A week of sample days for one camera, no network.
+    /// Two weeks of sample days for one camera (calmer this week), no network.
     static var preview: DailySummaryModel { preview(reelOnDaysAgo: nil) }
 
     /// Sample days with a highlight reel on the day `reelOnDaysAgo` days back, which is shown.
@@ -375,22 +376,35 @@ extension DailySummaryModel {
     static func preview(reelOnDaysAgo reelOffset: Int?) -> DailySummaryModel {
         let camera = UUID()
         let calendar = Calendar.current
-        let days: [DailySummaryDTO] = (0..<7).map { offset in
+        let days: [DailySummaryDTO] = (0..<15).map { offset in
             let date = calendar.date(byAdding: .day, value: -offset, to: .now) ?? .now
             var activity = Array(repeating: 0, count: 24)
             for hour in 7..<22 { activity[hour] = (hour * 7 + offset * 5) % 25 }
+            let lastWeek = offset > 7
             return DailySummaryDTO(
                 cameraId: camera,
                 date: DailySummaryAccumulator.dateKey(date, calendar: calendar),
-                restMinutes: 420 - offset * 15,
-                barkCount: 6 + (offset * 5) % 11,
+                restMinutes: 420 - (offset % 7) * 15 - (lastWeek ? 40 : 0),
+                barkCount: 6 + (offset * 5) % 11 + (lastWeek ? 6 : 0),
                 activityByHour: activity,
                 stateMinutes: ["resting": 420 - offset * 15, "restless": 70, "barking": 9, "atDoor": 12],
                 isFinal: offset > 0,
                 hasReel: offset == reelOffset
             )
         }
-        let model = DailySummaryModel(api: .offline, cameras: [], cameraId: camera, loaded: days)
+        // Three sofa visits this week, all in the afternoon.
+        let sofa = [(1, 15), (3, 14), (5, 17)].compactMap { daysAgo, hour -> Date? in
+            calendar.date(byAdding: .day, value: -daysAgo, to: .now)
+                .flatMap { calendar.date(bySettingHour: hour, minute: 20, second: 0, of: $0) }
+        }
+        let model = DailySummaryModel(
+            api: .offline,
+            cameras: [],
+            cameraId: camera,
+            loaded: days,
+            insightsUnlocked: true,
+            sofaVisits: [camera: sofa]
+        )
         if let reelOffset, days.indices.contains(reelOffset) {
             model.selectedDate = days[reelOffset].date
         }

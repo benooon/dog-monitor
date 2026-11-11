@@ -3709,6 +3709,256 @@
           }
         }
       }
+    },
+    "A steady week, close to the one before.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שבוע יציב, דומה לקודם."
+          }
+        }
+      }
+    },
+    "Comparisons start once there are two weeks of summaries.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ההשוואות יתחילו אחרי שבועיים של סיכומים."
+          }
+        }
+      }
+    },
+    "This week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השבוע"
+          }
+        }
+      }
+    },
+    "The last 30 days as a PDF: rest, barking, whining and time at the door.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 הימים האחרונים כקובץ PDF: מנוחה, נביחות, יבבות וזמן ליד הדלת."
+          }
+        }
+      }
+    },
+    "Compare %@'s weeks": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השוואת השבועות של %@"
+          }
+        }
+      }
+    },
+    "Compare weeks": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השוואת שבועות"
+          }
+        }
+      }
+    },
+    "Premium compares each week with the last and makes a report for your vet.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פרימיום משווה כל שבוע לקודם ומכין דוח לווטרינר."
+          }
+        }
+      }
+    },
+    "%@ barked %@ less than last week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ פחות נביחות מהשבוע שעבר"
+          }
+        }
+      }
+    },
+    "%@ barked %@ more than last week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$@ יותר נביחות מהשבוע שעבר"
+          }
+        }
+      }
+    },
+    "%@ less barking than last week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ פחות נביחות מהשבוע שעבר"
+          }
+        }
+      }
+    },
+    "%@ more barking than last week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ יותר נביחות מהשבוע שעבר"
+          }
+        }
+      }
+    },
+    "On the sofa once": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "על הספה פעם אחת"
+          }
+        }
+      }
+    },
+    "On the sofa %lld times, all after %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "על הספה %1$lld פעמים, כולן אחרי %2$@"
+          }
+        }
+      }
+    },
+    "On the sofa %lld times": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "על הספה %lld פעמים"
+          }
+        }
+      }
+    },
+    "%@ more rest a day than last week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ יותר מנוחה ביום מהשבוע שעבר"
+          }
+        }
+      }
+    },
+    "%@ less rest a day than last week": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ פחות מנוחה ביום מהשבוע שעבר"
+          }
+        }
+      }
+    },
+    "Most active around %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיא הפעילות בסביבות %@"
+          }
+        }
+      }
+    },
+    "Share with your vet": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיתוף עם הווטרינר"
+          }
+        }
+      }
+    },
+    "%@'s last 30 days": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 הימים האחרונים של %@"
+          }
+        }
+      }
+    },
+    "The last 30 days": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 הימים האחרונים"
+          }
+        }
+      }
+    },
+    "%@ – %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ – %2$@"
+          }
+        }
+      }
+    },
+    "Camera: %@": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מצלמה: %@"
+          }
+        }
+      }
+    },
+    "Date": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תאריך"
+          }
+        }
+      }
+    },
+    "Daily average": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממוצע יומי"
+          }
+        }
+      }
+    },
+    "Recorded by the Dog Monitor camera. These are the camera's estimates, not a diagnosis.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נרשם במצלמת Dog Monitor. אלה הערכות של המצלמה, לא אבחנה."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

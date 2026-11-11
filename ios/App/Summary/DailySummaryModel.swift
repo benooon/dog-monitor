@@ -10,8 +10,10 @@ final class DailySummaryModel {
         case loading, ready, failed
     }
 
-    /// How far back the screen looks (two weeks gives a full week chart for last week's days too).
-    static let daysLoaded = 14
+    /// How far back the screen looks: a month, for the vet report (and two full weeks to compare).
+    static let daysLoaded = VetReport.days + 1
+    /// Sofa visits are counted over the last two weeks (one page of the timeline is plenty).
+    static let sofaVisitPage = 100
 
     private(set) var phase: Phase = .loading
     let cameras: [DeviceDTO]
@@ -22,12 +24,25 @@ final class DailySummaryModel {
     var selectedDate: String?
 
     private(set) var summaries: [DailySummaryDTO] = []
+    /// Weekly insights and the vet report (Premium); nil until the plan is known.
+    private(set) var insightsUnlocked: Bool?
+    /// Start times of each camera's sofa alerts over the last two weeks.
+    private(set) var sofaVisits: [UUID: [Date]] = [:]
     private let api: DogMonitorAPI
 
-    init(api: DogMonitorAPI, cameras: [DeviceDTO], cameraId: UUID? = nil, loaded: [DailySummaryDTO]? = nil) {
+    init(
+        api: DogMonitorAPI,
+        cameras: [DeviceDTO],
+        cameraId: UUID? = nil,
+        loaded: [DailySummaryDTO]? = nil,
+        insightsUnlocked: Bool? = nil,
+        sofaVisits: [UUID: [Date]] = [:]
+    ) {
         self.api = api
         self.cameras = cameras
         self.cameraId = cameraId ?? cameras.first?.id
+        self.insightsUnlocked = insightsUnlocked
+        self.sofaVisits = sofaVisits
         if let loaded {
             summaries = loaded
             phase = .ready
@@ -45,6 +60,16 @@ final class DailySummaryModel {
     /// Days with a summary for the chosen camera, newest first.
     var dates: [String] {
         DailySummaryInsights.dates(in: cameraSummaries)
+    }
+
+    /// This camera's week compared with the one before (Premium).
+    func weeklyInsights(calendar: Calendar) -> WeeklyInsights {
+        WeeklyInsights(summaries: cameraSummaries, sofaVisits: cameraId.flatMap { sofaVisits[$0] } ?? [], calendar: calendar)
+    }
+
+    /// This camera's last 30 finished days, for "Share with your vet" (Premium).
+    var vetReport: VetReport {
+        VetReport(summaries: cameraSummaries)
     }
 
     /// The stored day on display, for its highlight reel.
@@ -84,11 +109,32 @@ final class DailySummaryModel {
         if summaries.isEmpty { phase = .loading }
         // No `to`: a camera in a time zone ahead of this phone may already be on tomorrow.
         let range = DailySummaryInsights.range(lastDays: Self.daysLoaded, now: now, calendar: calendar)
+        // The plan and sofa visits only add the weekly section; the summary shows without them.
+        let api = self.api
+        let sofaLimit = Self.sofaVisitPage
+        async let plan = try? api.subscription()
+        async let sofa = try? api.timeline(TimelineFilter(types: [.forbiddenZone]), limit: sofaLimit)
         do {
             summaries = try await api.summaries(from: range.from)
             phase = .ready
         } catch {
             if summaries.isEmpty { phase = .failed }
         }
+        if let status = await plan {
+            insightsUnlocked = status.insightsUnlocked
+        }
+        if let page = await sofa {
+            sofaVisits = Self.sofaVisits(in: page.events)
+        }
+    }
+
+    /// Sofa alerts grouped by camera.
+    nonisolated static func sofaVisits(in events: [EventDTO]) -> [UUID: [Date]] {
+        var visits: [UUID: [Date]] = [:]
+        for event in events where event.type == .forbiddenZone && event.place == "sofa" {
+            guard let camera = event.cameraId else { continue }
+            visits[camera, default: []].append(event.startedAt)
+        }
+        return visits
     }
 }

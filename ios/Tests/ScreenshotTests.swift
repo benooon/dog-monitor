@@ -66,6 +66,21 @@ final class ScreenshotTests: XCTestCase {
             Screen(name: "08a-daily-summary-reel", settle: .seconds(2.5)) {
                 AnyView(DailySummaryView(model: reelSummaryModel(), dogName: "Rex"))
             },
+            Screen(name: "08b-weekly-insights", settle: .seconds(2.5)) {
+                AnyView(NavigationStack {
+                    List { WeeklyInsightsSection(model: .preview, dogName: "Rex") }
+                })
+            },
+            Screen(name: "08c-vet-report", settle: .seconds(1)) {
+                AnyView(GeometryReader { proxy in
+                    let page = VetReportPDF.pageSize
+                    VetReportPage(report: DailySummaryModel.preview.vetReport, dogName: "Rex", cameraName: "Living room")
+                        .frame(width: page.width, height: page.height)
+                        .environment(\.colorScheme, .light)
+                        .scaleEffect(min(1, proxy.size.width / page.width), anchor: .top)
+                        .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+                })
+            },
             Screen(name: "09-household") { AnyView(HouseholdView(model: .demo)) },
             Screen(name: "09a-dog-profile") {
                 AnyView(NavigationStack {

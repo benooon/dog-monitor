@@ -59,9 +59,10 @@ final class DailySummaryModelTests: XCTestCase {
         XCTAssertEqual(model.dates, ["2026-11-10", "2026-11-09"])
         XCTAssertEqual(model.insights.day?.barkCount, 3)
         XCTAssertEqual(model.insights.barkChange, -5)
-        let url = try XCTUnwrap(transport.requests.first?.url)
-        XCTAssertEqual(url.path, "/summaries")
-        XCTAssertEqual(url.query, "from=2026-10-28")
+        // The plan and sofa alerts load alongside; this stub can't answer them, so no weekly section.
+        let url = try XCTUnwrap(transport.requests.compactMap(\.url).first { $0.path == "/summaries" })
+        XCTAssertEqual(url.query, "from=2026-10-11")
+        XCTAssertNil(model.insightsUnlocked)
     }
 
     func testSwitchingCameraShowsItsNewestDay() async {
@@ -99,5 +100,28 @@ final class DailySummaryModelTests: XCTestCase {
 
         let file = try await model.reelFile(for: summary)
         XCTAssertEqual(file, target)
+    }
+
+    func testSofaVisitsAreGroupedByCameraAndOnlySofa() {
+        func event(_ camera: UUID?, _ type: EventType, place: String?, minutesAgo: Double) -> EventDTO {
+            EventDTO(
+                id: UUID(),
+                householdId: UUID(),
+                cameraId: camera,
+                type: type,
+                startedAt: Date(timeIntervalSince1970: 1_800_000_000 - minutesAgo * 60),
+                place: place
+            )
+        }
+        let visits = DailySummaryModel.sofaVisits(in: [
+            event(Self.kitchen, .forbiddenZone, place: "sofa", minutesAgo: 10),
+            event(Self.kitchen, .forbiddenZone, place: "offLimits", minutesAgo: 20),
+            event(Self.hall, .forbiddenZone, place: "sofa", minutesAgo: 30),
+            event(Self.hall, .atDoor, place: nil, minutesAgo: 40),
+            event(nil, .forbiddenZone, place: "sofa", minutesAgo: 50),
+        ])
+        XCTAssertEqual(visits[Self.kitchen]?.count, 1)
+        XCTAssertEqual(visits[Self.hall]?.count, 1)
+        XCTAssertEqual(visits.count, 2)
     }
 }
