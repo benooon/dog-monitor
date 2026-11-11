@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 026d7e26f725477c8fabe6d3f34f4b34c8a5dfb7
-- message: docs: claim live view E2EE follow-ups
-- time (UTC): 2026-11-11T13:04:11Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43023389403
+- commit: d28bfdecdcf32be37df0aeb43fdb8865688de337
+- message: ios: live view E2EE follow-ups: wrong key shows the scan screen, camera without a key is reported to viewers, screenshots of the key states
+- time (UTC): 2026-11-11T13:30:28Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43024781458
 
 | job | result | log |
 |---|---|---|

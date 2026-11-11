@@ -1,4 +1,4 @@
-# Screenshots (026d7e2)
+# Screenshots (d28bfde)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
@@ -81,6 +81,36 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="iphone-05-live-view-light.jpg" width="260"> | <img src="iphone-05-live-view-dark.jpg" width="260"> | <img src="iphone-05-live-view-hebrew.jpg" width="260"> |
+
+### 05a-live-view-needs-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-05a-live-view-needs-key-light.jpg" width="260"> | <img src="iphone-05a-live-view-needs-key-dark.jpg" width="260"> | <img src="iphone-05a-live-view-needs-key-hebrew.jpg" width="260"> |
+
+### 05b-live-view-wrong-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-05b-live-view-wrong-key-light.jpg" width="260"> | <img src="iphone-05b-live-view-wrong-key-dark.jpg" width="260"> | <img src="iphone-05b-live-view-wrong-key-hebrew.jpg" width="260"> |
+
+### 05c-live-view-camera-needs-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-05c-live-view-camera-needs-key-light.jpg" width="260"> | <img src="iphone-05c-live-view-camera-needs-key-dark.jpg" width="260"> | <img src="iphone-05c-live-view-camera-needs-key-hebrew.jpg" width="260"> |
+
+### 05d-live-key-scan
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-05d-live-key-scan-light.jpg" width="260"> | <img src="iphone-05d-live-key-scan-dark.jpg" width="260"> | <img src="iphone-05d-live-key-scan-hebrew.jpg" width="260"> |
+
+### 05e-camera-start-needs-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-05e-camera-start-needs-key-light.jpg" width="260"> | <img src="iphone-05e-camera-start-needs-key-dark.jpg" width="260"> | <img src="iphone-05e-camera-start-needs-key-hebrew.jpg" width="260"> |
 
 ### 06-timeline
 
@@ -245,6 +275,36 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="ipad-05-live-view-light.jpg" width="260"> | <img src="ipad-05-live-view-dark.jpg" width="260"> | <img src="ipad-05-live-view-hebrew.jpg" width="260"> |
+
+### 05a-live-view-needs-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-05a-live-view-needs-key-light.jpg" width="260"> | <img src="ipad-05a-live-view-needs-key-dark.jpg" width="260"> | <img src="ipad-05a-live-view-needs-key-hebrew.jpg" width="260"> |
+
+### 05b-live-view-wrong-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-05b-live-view-wrong-key-light.jpg" width="260"> | <img src="ipad-05b-live-view-wrong-key-dark.jpg" width="260"> | <img src="ipad-05b-live-view-wrong-key-hebrew.jpg" width="260"> |
+
+### 05c-live-view-camera-needs-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-05c-live-view-camera-needs-key-light.jpg" width="260"> | <img src="ipad-05c-live-view-camera-needs-key-dark.jpg" width="260"> | <img src="ipad-05c-live-view-camera-needs-key-hebrew.jpg" width="260"> |
+
+### 05d-live-key-scan
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-05d-live-key-scan-light.jpg" width="260"> | <img src="ipad-05d-live-key-scan-dark.jpg" width="260"> | <img src="ipad-05d-live-key-scan-hebrew.jpg" width="260"> |
+
+### 05e-camera-start-needs-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-05e-camera-start-needs-key-light.jpg" width="260"> | <img src="ipad-05e-camera-start-needs-key-dark.jpg" width="260"> | <img src="ipad-05e-camera-start-needs-key-hebrew.jpg" width="260"> |
 
 ### 06-timeline
 
