@@ -51,7 +51,7 @@ export async function purgeExpiredMedia(
   await storage.deleteObjects(keys);
   await db
     .update(events)
-    .set({ clipKey: null, snapshotKey: null })
+    .set({ clipKey: null, snapshotKey: null, mediaPurgedAt: now })
     .where(
       inArray(
         events.id,

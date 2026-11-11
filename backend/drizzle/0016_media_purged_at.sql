@@ -1,0 +1,1 @@
+ALTER TABLE "events" ADD COLUMN "media_purged_at" timestamp with time zone;

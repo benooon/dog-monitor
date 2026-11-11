@@ -206,6 +206,8 @@ export const events = pgTable(
     confidence: real("confidence"),
     clipKey: text("clip_key"),
     snapshotKey: text("snapshot_key"),
+    /** When the retention job deleted this event's clip and snapshot (null: never had any, or still has them). */
+    mediaPurgedAt: timestamp("media_purged_at", { withTimezone: true }),
     feedback: eventFeedback("feedback"),
     /** forbiddenZone only (see EVENT_PLACES). */
     place: text("place").$type<EventPlace>(),

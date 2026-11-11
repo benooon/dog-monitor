@@ -83,7 +83,7 @@ describe.skipIf(!hasDatabase)("timeline routes", () => {
     expect(first.statusCode).toBe(200);
     const page1 = first.json();
     expect(page1.events.map((e: { id: string }) => e.id)).toEqual([id(5), id(4)]);
-    expect(page1.events[0]).toMatchObject({ cameraId: home.cameraId, type: "prolongedBarking", feedback: null });
+    expect(page1.events[0]).toMatchObject({ cameraId: home.cameraId, type: "prolongedBarking", feedback: null, mediaExpired: false });
     expect(page1.nextCursor).toBeTypeOf("string");
 
     const page2 = (

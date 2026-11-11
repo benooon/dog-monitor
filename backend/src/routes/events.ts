@@ -46,6 +46,8 @@ export function eventDto(e: EventRow) {
     confidence: e.confidence,
     clipKey: e.clipKey,
     snapshotKey: e.snapshotKey,
+    /** The clip and snapshot were deleted by retention (the timeline can say why they're gone). */
+    mediaExpired: e.mediaPurgedAt !== null,
     feedback: e.feedback,
     place: e.place,
   };

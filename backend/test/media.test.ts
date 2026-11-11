@@ -155,7 +155,7 @@ describe.skipIf(!hasDatabase)("media routes and retention", () => {
   });
 
   it("deletes media older than the retention period and clears the keys", async () => {
-    const { householdId, cameraId } = await setup();
+    const { owner, householdId, cameraId } = await setup();
     const now = new Date("2026-11-10T08:00:00Z");
     const old = eventMediaKey(householdId, cameraId, eventId, "clip");
     const recentId = "44444444-4444-4444-8444-444444444444";
@@ -175,10 +175,18 @@ describe.skipIf(!hasDatabase)("media routes and retention", () => {
     expect(storage.deleted).toEqual([old]);
     const [expired] = await h.db.select().from(events).where(eq(events.id, eventId));
     expect(expired!.clipKey).toBeNull();
+    expect(expired!.mediaPurgedAt).toEqual(now);
     const [recent] = await h.db.select().from(events).where(eq(events.id, recentId));
     expect(recent!.clipKey).not.toBeNull();
 
     expect(await purgeExpiredMedia(h.db, storage, 7, now)).toBe(0);
+
+    // The timeline says the clip was deleted by retention, not that there never was one.
+    const feed = (await app.inject({ method: "GET", url: "/events", headers: owner })).json();
+    expect(feed.events.map((e: { id: string; mediaExpired: boolean }) => [e.id, e.mediaExpired])).toEqual([
+      [recentId, false],
+      [eventId, true],
+    ]);
   });
 
   it("keeps clips as long as the household's plan allows when plan limits are enforced", async () => {
