@@ -12,6 +12,8 @@ import XCTest
 final class ScreenshotTests: XCTestCase {
     private struct Screen {
         let name: String
+        /// How long to let layout, `.task` work and async images settle before the shot.
+        var settle: Duration = .seconds(1.5)
         let make: @MainActor () -> AnyView
     }
 
@@ -76,7 +78,8 @@ final class ScreenshotTests: XCTestCase {
                     CameraNotificationsView(model: .preview, camera: demoCamera, dogName: "Rex")
                 })
             },
-            Screen(name: "13-premium") {
+            // The store loads its products from the StoreKit test session, which can take a few seconds.
+            Screen(name: "13-premium", settle: .seconds(6)) {
                 AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID())))
             },
             Screen(name: "13a-premium-unavailable") {
@@ -109,14 +112,14 @@ final class ScreenshotTests: XCTestCase {
 
         for screen in Self.screens {
             for variant in Variant.allCases {
-                let image = try await render(screen.make(), variant: variant, in: scene)
+                let image = try await render(screen.make(), variant: variant, settle: screen.settle, in: scene)
                 let file = output.appendingPathComponent("\(device)-\(screen.name)-\(variant.rawValue).png")
                 try XCTUnwrap(image.pngData()).write(to: file)
             }
         }
     }
 
-    private func render(_ view: AnyView, variant: Variant, in scene: UIWindowScene) async throws -> UIImage {
+    private func render(_ view: AnyView, variant: Variant, settle: Duration, in scene: UIWindowScene) async throws -> UIImage {
         let rooted = view
             .environment(\.locale, Locale(identifier: variant == .hebrew ? "he" : "en"))
             .environment(\.layoutDirection, variant == .hebrew ? .rightToLeft : .leftToRight)
@@ -126,7 +129,7 @@ final class ScreenshotTests: XCTestCase {
         window.makeKeyAndVisible()
         defer { window.isHidden = true }
         // Let layout, .task work, async images and symbol transitions settle.
-        try await Task.sleep(for: .seconds(1.5))
+        try await Task.sleep(for: settle)
         let renderer = UIGraphicsImageRenderer(bounds: window.bounds)
         return renderer.image { _ in
             _ = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
