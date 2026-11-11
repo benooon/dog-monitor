@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 8d460c90e6ebdf177f3baaeed8dcbc2a94f76ec8
-- message: backend: waitlist landing page at /join and /he/join
-- time (UTC): 2026-11-11T05:00:11Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42962690284
+- commit: 5e09332cf909c7b769c01dfcc0213e9efefd8b83
+- message: docs: claim sofa alert copy task
+- time (UTC): 2026-11-11T05:01:49Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42962704235
 
 | job | result | log |
 |---|---|---|
