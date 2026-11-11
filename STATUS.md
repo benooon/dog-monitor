@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: a572438acc5123b86d35b4a6372a8cb14f33ceed
-- message: backend: households.live_encrypted (owner turns it on, never off); live tokens say whether video is end-to-end encrypted
-- time (UTC): 2026-11-11T11:55:08Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43015549910
+- commit: 1c06dd2ed65d8539dcbba900a3c3ff15ead7631e
+- message: docs: reel follow-ups and weekly insights done (CI green), player follow-up, progress
+- time (UTC): 2026-11-11T11:57:27Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43015968717
 
 | job | result | log |
 |---|---|---|
