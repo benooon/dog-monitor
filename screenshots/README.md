@@ -1,4 +1,4 @@
-# Screenshots (c93fc44)
+# Screenshots (026d7e2)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
