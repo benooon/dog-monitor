@@ -3605,6 +3605,26 @@
           }
         }
       }
+    },
+    "Premium for good": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פרימיום לתמיד"
+          }
+        }
+      }
+    },
+    "Premium is yours for good. If a subscription is still running, cancel it here so it stops renewing.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפרימיום שלכם לתמיד. אם עדיין יש מינוי פעיל, אפשר לבטל אותו כאן כדי שלא יתחדש."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

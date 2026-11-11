@@ -1,7 +1,23 @@
 {
   "identifier": "9A1B2C3D",
   "nonRenewingSubscriptions": [],
-  "products": [],
+  "products": [
+    {
+      "displayPrice": "79.99",
+      "familyShareable": true,
+      "internalID": "6700000003",
+      "localizations": [
+        {
+          "description": "Premium for good. One payment.",
+          "displayName": "Premium Lifetime",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.benooon.dogmonitor.premium.lifetime",
+      "referenceName": "Premium Lifetime",
+      "type": "NonConsumable"
+    }
+  ],
   "settings": {
     "_applicationInternalID": "6700000000",
     "_developerTeamID": "",

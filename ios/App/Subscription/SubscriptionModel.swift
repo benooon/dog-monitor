@@ -28,12 +28,23 @@ final class SubscriptionModel {
 
     private(set) var status: SubscriptionDTO?
     private(set) var storeState: StoreState = .loading
-    /// The plans from the last successful load, handed to the store view so it doesn't load them again.
+    /// The plans from the last successful load (yearly, monthly, lifetime), handed to the store
+    /// views so they don't load them again.
     private(set) var products: [Product] = []
+
+    /// The auto-renewable plans, for `SubscriptionStoreView`.
+    var subscriptionProducts: [Product] {
+        products.filter { SubscriptionProducts.subscriptions.contains($0.id) }
+    }
+
+    /// Lifetime Premium, when the App Store returned it; the store shows it last.
+    var lifetimeProduct: Product? {
+        products.first { SubscriptionProducts.isLifetime($0.id) }
+    }
     private(set) var isRestoring = false
     var errorMessage: String?
 
-    /// Ties purchases to the household (`appAccountToken`), so one subscription unlocks one household.
+    /// Ties purchases to the household (`appAccountToken`), so one purchase unlocks one household.
     let householdId: UUID
     private let api: DogMonitorAPI
     private let productLoader: ProductLoader

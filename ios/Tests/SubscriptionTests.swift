@@ -59,6 +59,14 @@ final class PremiumAppTests: XCTestCase {
         await model.loadProducts()
         let ids = await asked.ids
         XCTAssertEqual(ids, SubscriptionProducts.all)
+        XCTAssertTrue(ids.contains(SubscriptionProducts.lifetime))
+    }
+
+    func testStoreHasNoLifetimeOfferUntilTheAppStoreReturnsIt() async {
+        let model = makeModel { ids in .init(count: ids.count) }
+        await model.loadProducts()
+        XCTAssertNil(model.lifetimeProduct)
+        XCTAssertTrue(model.subscriptionProducts.isEmpty)
     }
 
     private func makeModel(_ loader: @escaping SubscriptionModel.ProductLoader) -> SubscriptionModel {

@@ -50,14 +50,36 @@ struct PremiumView: View {
     private var store: some View {
         let model = model
         let householdId = model.householdId
+        // The purchase modifiers wrap the inset too, so the lifetime purchase is tied to the
+        // household and reported like a subscription.
         return storeView
             .storeButton(.hidden, for: .restorePurchases)
             .storeButton(.visible, for: .policies)
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: DS.Spacing.s) {
+                    if let lifetime = model.lifetimeProduct {
+                        lifetimeOffer(lifetime)
+                    }
+                    restoreButton
+                }
+            }
             .inAppPurchaseOptions { _ in [.appAccountToken(householdId)] }
             .onInAppPurchaseCompletion { _, result in
                 await model.handlePurchase(result)
             }
-            .safeAreaInset(edge: .bottom) { restoreButton }
+    }
+
+    /// Lifetime Premium, after the subscriptions: one payment, no renewals.
+    private func lifetimeOffer(_ product: Product) -> some View {
+        ProductView(product) {
+            Image(systemName: "infinity")
+                .font(.title2)
+                .foregroundStyle(.tint)
+                .accessibilityHidden(true)
+        }
+        .productViewStyle(.compact)
+        .padding(.horizontal, DS.Spacing.l)
+        .accessibilityIdentifier("premium-lifetime")
     }
 
     /// Uses the plans the model already loaded, so StoreKit doesn't show its own loading state again.
@@ -66,12 +88,13 @@ struct PremiumView: View {
         let locale = locale
         let layoutDirection = layoutDirection
         let dogName = dogName
-        if model.products.isEmpty {
-            SubscriptionStoreView(productIDs: SubscriptionProducts.all) {
+        let subscriptions = model.subscriptionProducts
+        if subscriptions.isEmpty {
+            SubscriptionStoreView(productIDs: SubscriptionProducts.subscriptions) {
                 PremiumHeader(dogName: dogName, locale: locale, layoutDirection: layoutDirection)
             }
         } else {
-            SubscriptionStoreView(subscriptions: model.products) {
+            SubscriptionStoreView(subscriptions: subscriptions) {
                 PremiumHeader(dogName: dogName, locale: locale, layoutDirection: layoutDirection)
             }
         }
@@ -123,8 +146,8 @@ struct PremiumView: View {
                     .listRowBackground(Color.clear)
             }
             Section {
-                LabeledContent("Plan", value: String(localized: "Premium"))
-                if let expiresAt = status.expiresAt {
+                LabeledContent("Plan", value: status.isLifetime ? String(localized: "Premium for good") : String(localized: "Premium"))
+                if !status.isLifetime, let expiresAt = status.expiresAt {
                     LabeledContent("Paid through") {
                         Text(expiresAt, format: .dateTime.day().month().year())
                     }
@@ -136,7 +159,11 @@ struct PremiumView: View {
             Section {
                 Button("Manage subscription", systemImage: "creditcard") { showsManage = true }
             } footer: {
-                Text("Change or cancel your plan in your App Store account.")
+                if status.isLifetime {
+                    Text("Premium is yours for good. If a subscription is still running, cancel it here so it stops renewing.")
+                } else {
+                    Text("Change or cancel your plan in your App Store account.")
+                }
             }
             if let message = model.errorMessage {
                 Section {

@@ -24,21 +24,34 @@ public struct SubscriptionDTO: Codable, Sendable, Hashable {
     }
 
     public let plan: HouseholdPlan
-    /// When premium ends unless it renews (nil on the free plan).
+    /// When premium ends unless it renews (nil on the free plan and for Lifetime Premium).
     public let expiresAt: Date?
+    /// Premium bought once, for good (nil from an older server).
+    public let lifetime: Bool?
     public let productId: String?
     public let limits: Counts
     public let usage: Counts
 
-    public init(plan: HouseholdPlan, expiresAt: Date?, productId: String?, limits: Counts, usage: Counts) {
+    public init(
+        plan: HouseholdPlan,
+        expiresAt: Date?,
+        lifetime: Bool? = nil,
+        productId: String?,
+        limits: Counts,
+        usage: Counts
+    ) {
         self.plan = plan
         self.expiresAt = expiresAt
+        self.lifetime = lifetime
         self.productId = productId
         self.limits = limits
         self.usage = usage
     }
 
     public var isPremium: Bool { plan == .premium }
+
+    /// Premium that never ends: no renewal date, nothing to manage or cancel.
+    public var isLifetime: Bool { isPremium && lifetime == true }
 
     /// What the household's plan includes.
     public var features: PlanFeatures { .for(plan) }

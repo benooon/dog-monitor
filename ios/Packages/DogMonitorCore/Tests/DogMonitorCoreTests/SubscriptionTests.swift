@@ -12,6 +12,39 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertEqual(ordered, [SubscriptionProducts.yearly, SubscriptionProducts.monthly, "other.b", "other.a"])
     }
 
+    func testLifetimeIsShownLast() {
+        let ids = [SubscriptionProducts.lifetime, SubscriptionProducts.monthly, SubscriptionProducts.yearly]
+        let ordered = SubscriptionProducts.inDisplayOrder(ids) { $0 }
+        XCTAssertEqual(ordered, [SubscriptionProducts.yearly, SubscriptionProducts.monthly, SubscriptionProducts.lifetime])
+        XCTAssertEqual(SubscriptionProducts.subscriptions, [SubscriptionProducts.yearly, SubscriptionProducts.monthly])
+        XCTAssertTrue(SubscriptionProducts.isPremium(SubscriptionProducts.lifetime))
+        XCTAssertTrue(SubscriptionProducts.isLifetime(SubscriptionProducts.lifetime))
+        XCTAssertFalse(SubscriptionProducts.isLifetime(SubscriptionProducts.yearly))
+    }
+
+    func testLifetimePremiumDecodesWithoutAnExpiry() throws {
+        let json = #"""
+        {"plan":"premium","expiresAt":null,"lifetime":true,
+         "productId":"com.benooon.dogmonitor.premium.lifetime","limits":{"cameras":4},"usage":{"cameras":1}}
+        """#
+        let subscription = try JSONCoding.makeDecoder().decode(SubscriptionDTO.self, from: Data(json.utf8))
+        XCTAssertTrue(subscription.isPremium)
+        XCTAssertTrue(subscription.isLifetime)
+        XCTAssertNil(subscription.expiresAt)
+        XCTAssertEqual(subscription.camerasLeft, 3)
+    }
+
+    func testOlderServerWithoutLifetimeFieldIsNotLifetime() throws {
+        let subscription = try JSONCoding.makeDecoder().decode(SubscriptionDTO.self, from: Data(Self.premiumJSON.utf8))
+        XCTAssertNil(subscription.lifetime)
+        XCTAssertFalse(subscription.isLifetime)
+        let lapsed = SubscriptionDTO(
+            plan: .free, expiresAt: nil, lifetime: true, productId: nil,
+            limits: .init(cameras: 1), usage: .init(cameras: 0)
+        )
+        XCTAssertFalse(lapsed.isLifetime)
+    }
+
     private static let freeFullJSON = """
     {"plan":"free","expiresAt":null,"productId":null,"limits":{"cameras":1},"usage":{"cameras":1}}
     """
