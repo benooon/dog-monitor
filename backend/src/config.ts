@@ -94,6 +94,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (!Number.isInteger(recordRetentionDays) || recordRetentionDays < 30) {
     throw new Error(`Invalid EVENT_RETENTION_DAYS (at least 30): ${env.EVENT_RETENTION_DAYS}`);
   }
+  const appStoreEnvironments = parseAppStoreEnvironments(env.APP_STORE_ENVIRONMENT, warnings);
   let adminToken = env.ADMIN_TOKEN?.trim() || undefined;
   if (adminToken && adminToken.length < 32) {
     warnings.push("Admin routes are off: ADMIN_TOKEN must be at least 32 characters");
@@ -141,6 +142,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       bundleId: env.APPLE_BUNDLE_ID || "com.benooon.dogmonitor",
       productIds: list(env.APP_STORE_PRODUCT_IDS ?? "com.benooon.dogmonitor.premium.monthly,com.benooon.dogmonitor.premium.yearly"),
       rootFingerprints: list(env.APPLE_ROOT_CA_SHA256 || APPLE_ROOT_CA_G3_SHA256),
+      environments: appStoreEnvironments,
     },
     enforcePlanLimits: env.ENFORCE_PLAN_LIMITS === "true",
     adminToken,
@@ -158,6 +160,25 @@ function s3PathStyle(value: string | undefined, endpoint: string | undefined): b
   if (explicit === "false") return false;
   if (!endpoint) return false;
   return !/\.storageapi\.dev(?::\d+)?(?:\/|$)/.test(endpoint);
+}
+
+const APP_STORE_ENVIRONMENTS = ["Production", "Sandbox"] as const;
+
+/**
+ * APP_STORE_ENVIRONMENT: comma-separated environments to accept (case-insensitive). Unset means
+ * both. An unknown value is ignored with a warning; if nothing valid is left we accept only
+ * Production, so a typo never opens the Sandbox on purpose-built production config.
+ */
+function parseAppStoreEnvironments(value: string | undefined, warnings: string[]): string[] | undefined {
+  const raw = list(value ?? "");
+  if (raw.length === 0) return undefined;
+  const accepted: string[] = [];
+  for (const item of raw) {
+    const match = APP_STORE_ENVIRONMENTS.find((name) => name.toLowerCase() === item.toLowerCase());
+    if (!match) warnings.push(`APP_STORE_ENVIRONMENT: unknown environment "${item}" (use Production and/or Sandbox)`);
+    else if (!accepted.includes(match)) accepted.push(match);
+  }
+  return accepted.length > 0 ? accepted : ["Production"];
 }
 
 function list(value: string): string[] {

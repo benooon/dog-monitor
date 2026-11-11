@@ -33,6 +33,15 @@ describe("loadConfig", () => {
     expect(config.enforcePlanLimits).toBe(true);
   });
 
+  it("reads APP_STORE_ENVIRONMENT", () => {
+    expect(loadConfig({}).appStore.environments).toBeUndefined();
+    expect(loadConfig({ APP_STORE_ENVIRONMENT: "production" }).appStore.environments).toEqual(["Production"]);
+    expect(loadConfig({ APP_STORE_ENVIRONMENT: "Production, sandbox" }).appStore.environments).toEqual(["Production", "Sandbox"]);
+    const typo = loadConfig({ APP_STORE_ENVIRONMENT: "prod" });
+    expect(typo.appStore.environments).toEqual(["Production"]);
+    expect(typo.warnings).toEqual([expect.stringMatching(/APP_STORE_ENVIRONMENT: unknown environment "prod"/)]);
+  });
+
   it("reads PORT from env (Railway sets it)", () => {
     expect(loadConfig({ PORT: "8080" }).port).toBe(8080);
   });

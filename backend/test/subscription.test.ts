@@ -105,6 +105,32 @@ describe("App Store transaction verification", () => {
   });
 });
 
+describe("App Store environments", () => {
+  const productionOnly = createAppStoreVerifier({
+    bundleId: BUNDLE,
+    productIds: [MONTHLY],
+    rootFingerprints: [new X509Certificate(root).fingerprint256],
+    environments: ["Production"],
+  });
+
+  it("rejects Sandbox transactions when only Production is accepted", async () => {
+    await expectRejected(productionOnly.verify(await signTransaction(transaction({ environment: "Sandbox" })), NOW), "wrong_environment");
+    await expectRejected(productionOnly.verify(await signTransaction(transaction({ environment: "Xcode" })), NOW), "wrong_environment");
+    const ok = await productionOnly.verify(await signTransaction(transaction({ environment: "Production" })), NOW);
+    expect(ok.environment).toBe("Production");
+  });
+
+  it("treats a missing environment as Production", async () => {
+    const ok = await productionOnly.verify(await signTransaction(transaction({ environment: undefined })), NOW);
+    expect(ok.environment).toBe("Production");
+  });
+
+  it("accepts both when no list is set (App Review buys in the Sandbox)", async () => {
+    expect((await verifier.verify(await signTransaction(transaction({ environment: "Sandbox" })), NOW)).environment).toBe("Sandbox");
+    expect((await verifier.verify(await signTransaction(transaction({ environment: "Production" })), NOW)).environment).toBe("Production");
+  });
+});
+
 describe("plans", () => {
   it("is premium only while paid up", () => {
     expect(effectivePlan({ planExpiresAt: null }, NOW)).toBe("free");

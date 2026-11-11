@@ -17,6 +17,11 @@ export interface AppStoreConfig {
   productIds: string[];
   /** Trusted root fingerprints ("AB:CD:…", case-insensitive). */
   rootFingerprints: string[];
+  /**
+   * App Store environments whose transactions we accept ("Production", "Sandbox"). Leave out to
+   * accept both: App Review buys in the Sandbox against the production server.
+   */
+  environments?: string[];
 }
 
 /** The fields we use from a StoreKit 2 `JWSTransactionDecodedPayload`. */
@@ -90,6 +95,9 @@ export function createAppStoreVerifier(config: AppStoreConfig): TransactionVerif
       const transaction = parsePayload(await verifyPayload(signedTransaction, now));
       if (transaction.bundleId !== config.bundleId) throw new TransactionError("wrong_bundle");
       if (!config.productIds.includes(transaction.productId)) throw new TransactionError("unknown_product");
+      if (config.environments && !config.environments.includes(transaction.environment)) {
+        throw new TransactionError("wrong_environment");
+      }
       return transaction;
     },
   };

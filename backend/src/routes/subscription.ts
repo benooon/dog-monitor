@@ -136,8 +136,10 @@ export async function appStoreNotificationRoutes(
         transaction = await verifier.verify(signedTransaction, at);
       } catch (err) {
         if (!(err instanceof TransactionError)) throw err;
-        // Another app or product on the same account is not ours to handle; Apple must not retry it.
-        if (err.code === "wrong_bundle" || err.code === "unknown_product") return { ok: true };
+        // Another app, product or environment is not ours to handle; Apple must not retry it.
+        if (err.code === "wrong_bundle" || err.code === "unknown_product" || err.code === "wrong_environment") {
+          return { ok: true };
+        }
         return reply.code(400).send({ error: err.code });
       }
 
