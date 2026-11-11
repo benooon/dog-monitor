@@ -26,7 +26,7 @@
           "introductoryOffer": null,
           "localizations": [
             {
-              "description": "Pair up to 4 cameras.",
+              "description": "A month of clips. Everyone watches.",
               "displayName": "Premium Yearly",
               "locale": "en_US"
             }
@@ -47,7 +47,7 @@
           "introductoryOffer": null,
           "localizations": [
             {
-              "description": "Pair up to 4 cameras.",
+              "description": "A month of clips. Everyone watches.",
               "displayName": "Premium Monthly",
               "locale": "en_US"
             }
