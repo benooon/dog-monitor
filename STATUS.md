@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: f0fc2524414abc437b10fadd1769073e805f2630
-- message: core: LiveKey (household live video key), key in invite QR (&k=) and link fragment (#k=), encryption policy with camera pins, live token and household flags
-- time (UTC): 2026-11-11T12:19:46Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43016080026
+- commit: c93fc44e017f4e6d4e228cad22bc61b2a78b9c1f
+- message: docs: E2EE in SPEC §10, decision, owner check, follow-ups
+- time (UTC): 2026-11-11T12:44:35Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43017131715
 
 | job | result | log |
 |---|---|---|

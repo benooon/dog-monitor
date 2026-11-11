@@ -78,6 +78,9 @@ Writing result bundle at path:
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
             self?.sessionQueue.async { self?.applyRotation(angle) }
                                        ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
+            self?.sessionQueue.async { self?.applyRotation(angle) }
+                                       ^
 /Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:39: warning: main actor-isolated property 'displayName' can not be referenced from a Sendable closure
                 DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
                                       ^
@@ -167,16 +170,16 @@ Writing result bundle at path:
    |                            `- note: 'SKPaymentTransactionState' has been explicitly marked deprecated here
 15 |     SKPaymentTransactionStatePurchasing,    // Transaction is being added to the server queue.
 16 |     SKPaymentTransactionStatePurchased,     // Transaction is in queue, user has been charged.  Client should complete the transaction.
-2026-11-11 12:07:47.097 xcodebuild[3735:14212] [MT] IDETestOperationsObserverDebug: 391.978 elapsed -- Testing started completed.
-2026-11-11 12:07:47.097 xcodebuild[3735:14212] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 12:07:47.097 xcodebuild[3735:14212] [MT] IDETestOperationsObserverDebug: 391.978 sec, +391.978 sec -- end
+2026-11-11 12:31:38.509 xcodebuild[4380:16085] [MT] IDETestOperationsObserverDebug: 458.260 elapsed -- Testing started completed.
+2026-11-11 12:31:38.509 xcodebuild[4380:16085] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 12:31:38.509 xcodebuild[4380:16085] [MT] IDETestOperationsObserverDebug: 458.260 sec, +458.260 sec -- end
 Testing started
 iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
 { platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-2026-11-11 12:18:55.706 xcodebuild[17696:54936] [MT] IDETestOperationsObserverDebug: 647.953 elapsed -- Testing started completed.
-2026-11-11 12:18:55.707 xcodebuild[17696:54936] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 12:18:55.708 xcodebuild[17696:54936] [MT] IDETestOperationsObserverDebug: 647.953 sec, +647.953 sec -- end
+2026-11-11 12:43:48.132 xcodebuild[19643:60562] [MT] IDETestOperationsObserverDebug: 704.378 elapsed -- Testing started completed.
+2026-11-11 12:43:48.132 xcodebuild[19643:60562] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 12:43:48.132 xcodebuild[19643:60562] [MT] IDETestOperationsObserverDebug: 704.378 sec, +704.378 sec -- end
 Testing started
 Screenshots: 162
