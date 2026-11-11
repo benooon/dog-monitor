@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 804c409c9217bbd13d6d6ca8b4fef171150bfbe2
-- message: ios: "Premium keeps 30 days" on moments whose clip the free plan deleted
-- time (UTC): 2026-11-11T09:35:25Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42992949952
+- commit: 37db247cc736c4ab1a3c698e255b4c89dd651821
+- message: docs: mark invite preview, plan entitlements, paywall, timeline upsell done; StoreKit copy; progress
+- time (UTC): 2026-11-11T09:58:51Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42996709805
 
 | job | result | log |
 |---|---|---|
