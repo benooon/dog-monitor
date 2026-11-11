@@ -1,4 +1,4 @@
-# Screenshots (5f9916a)
+# Screenshots (069ddc4)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
@@ -111,6 +111,18 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="iphone-08a-daily-summary-reel-light.jpg" width="260"> | <img src="iphone-08a-daily-summary-reel-dark.jpg" width="260"> | <img src="iphone-08a-daily-summary-reel-hebrew.jpg" width="260"> |
+
+### 08b-weekly-insights
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-08b-weekly-insights-light.jpg" width="260"> | <img src="iphone-08b-weekly-insights-dark.jpg" width="260"> | <img src="iphone-08b-weekly-insights-hebrew.jpg" width="260"> |
+
+### 08c-vet-report
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-08c-vet-report-light.jpg" width="260"> | <img src="iphone-08c-vet-report-dark.jpg" width="260"> | <img src="iphone-08c-vet-report-hebrew.jpg" width="260"> |
 
 ### 09-household
 
@@ -263,6 +275,18 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="ipad-08a-daily-summary-reel-light.jpg" width="260"> | <img src="ipad-08a-daily-summary-reel-dark.jpg" width="260"> | <img src="ipad-08a-daily-summary-reel-hebrew.jpg" width="260"> |
+
+### 08b-weekly-insights
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-08b-weekly-insights-light.jpg" width="260"> | <img src="ipad-08b-weekly-insights-dark.jpg" width="260"> | <img src="ipad-08b-weekly-insights-hebrew.jpg" width="260"> |
+
+### 08c-vet-report
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-08c-vet-report-light.jpg" width="260"> | <img src="ipad-08c-vet-report-dark.jpg" width="260"> | <img src="ipad-08c-vet-report-hebrew.jpg" width="260"> |
 
 ### 09-household
 

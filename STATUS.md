@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 5f9916a04c5e70f003205046952413d314f7c12e
-- message: core: weekly insights (week-over-week trends, sofa visits) and the 30-day vet report; subscription feature flags
-- time (UTC): 2026-11-11T11:21:57Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43007703588
+- commit: 069ddc475c4b362b03bc88d47609582e53c35a6c
+- message: ios: "This week" insights in the daily summary and a 30-day PDF to share with the vet (Premium); en/he, screenshots
+- time (UTC): 2026-11-11T11:51:34Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43008361942
 
 | job | result | log |
 |---|---|---|
