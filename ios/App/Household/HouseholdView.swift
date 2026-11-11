@@ -63,7 +63,7 @@ struct HouseholdView: View {
             }
             .sheet(isPresented: $showsPremium) {
                 if let subscription = model.subscription {
-                    PremiumView(model: subscription)
+                    PremiumView(model: subscription, dogName: model.household?.soleDogName)
                 }
             }
             .confirmationDialog(
@@ -291,7 +291,7 @@ private struct PlanSection: View {
             .accessibilityIdentifier("household-plan")
         } footer: {
             if let status, !status.isPremium {
-                Text("Premium lets your household pair up to \(SubscriptionProducts.premiumCameraLimit) cameras.")
+                Text("Premium keeps a month of clips, and everyone in the household can watch.")
             }
         }
     }

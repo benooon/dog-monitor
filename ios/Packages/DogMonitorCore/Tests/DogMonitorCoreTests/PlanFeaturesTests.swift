@@ -51,4 +51,15 @@ final class PlanFeaturesTests: XCTestCase {
         XCTAssertNil(subscription.limits.members)
         XCTAssertEqual(subscription.features, .premium)
     }
+
+    func testSoleDogName() {
+        let householdId = UUID()
+        let dog = { (name: String) in DogDTO(id: UUID(), householdId: householdId, name: name, createdAt: Date()) }
+        let household = { (dogs: [DogDTO]) in
+            HouseholdDTO(id: householdId, name: "Home", ownerId: UUID(), role: .owner, dogs: dogs)
+        }
+        XCTAssertEqual(household([dog("Rex")]).soleDogName, "Rex")
+        XCTAssertNil(household([]).soleDogName)
+        XCTAssertNil(household([dog("Rex"), dog("Bella")]).soleDogName)
+    }
 }

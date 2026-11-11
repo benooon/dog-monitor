@@ -3515,6 +3515,86 @@
           }
         }
       }
+    },
+    "Keep a month of %@'s moments": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל הרגעים של %@, חודש שלם"
+          }
+        }
+      }
+    },
+    "Keep a month of moments": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל הרגעים, חודש שלם"
+          }
+        }
+      }
+    },
+    "Clips are kept for %lld days, not one.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסרטונים נשמרים %lld ימים, לא יום אחד."
+          }
+        }
+      }
+    },
+    "Everyone in the household watches.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל משק הבית יכול לצפות."
+          }
+        }
+      }
+    },
+    "Up to %lld cameras.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עד %lld מצלמות."
+          }
+        }
+      }
+    },
+    "Alerts about %@ stay free on every plan.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התראות על %@ נשארות בחינם בכל תוכנית."
+          }
+        }
+      }
+    },
+    "Dog alerts stay free on every plan.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התראות על הכלב נשארות בחינם בכל תוכנית."
+          }
+        }
+      }
+    },
+    "Premium keeps a month of clips, and everyone in the household can watch.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בפרימיום הסרטונים נשמרים חודש, וכל משק הבית יכול לצפות."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

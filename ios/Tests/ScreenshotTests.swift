@@ -80,10 +80,10 @@ final class ScreenshotTests: XCTestCase {
             },
             // The store loads its products from the StoreKit test session, which can take a few seconds.
             Screen(name: "13-premium", settle: .seconds(6)) {
-                AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID())))
+                AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID()), dogName: "Rex"))
             },
             Screen(name: "13a-premium-unavailable") {
-                AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID()) { _ in .init(count: 0) }))
+                AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID()) { _ in .init(count: 0) }, dogName: "Rex"))
             },
         ]
     }

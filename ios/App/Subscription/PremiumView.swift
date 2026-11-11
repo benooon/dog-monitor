@@ -2,9 +2,12 @@ import DogMonitorCore
 import StoreKit
 import SwiftUI
 
-/// Owner only: buy Premium (more cameras), or see and manage the current subscription.
+/// Owner only: buy Premium (a month of clips, everyone watching, more cameras), or see and manage
+/// the current subscription.
 struct PremiumView: View {
     let model: SubscriptionModel
+    /// The household's dog when there is exactly one, so the pitch can name it.
+    var dogName: String? = nil
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
@@ -62,13 +65,14 @@ struct PremiumView: View {
     private var storeView: some View {
         let locale = locale
         let layoutDirection = layoutDirection
+        let dogName = dogName
         if model.products.isEmpty {
             SubscriptionStoreView(productIDs: SubscriptionProducts.all) {
-                PremiumHeader(locale: locale, layoutDirection: layoutDirection)
+                PremiumHeader(dogName: dogName, locale: locale, layoutDirection: layoutDirection)
             }
         } else {
             SubscriptionStoreView(subscriptions: model.products) {
-                PremiumHeader(locale: locale, layoutDirection: layoutDirection)
+                PremiumHeader(dogName: dogName, locale: locale, layoutDirection: layoutDirection)
             }
         }
     }
@@ -115,7 +119,7 @@ struct PremiumView: View {
     private func active(_ status: SubscriptionDTO) -> some View {
         List {
             Section {
-                PremiumHeader(locale: locale, layoutDirection: layoutDirection)
+                PremiumHeader(dogName: dogName, locale: locale, layoutDirection: layoutDirection)
                     .listRowBackground(Color.clear)
             }
             Section {
@@ -144,12 +148,18 @@ struct PremiumView: View {
     }
 }
 
-/// The pitch, shared by the store and the "you're on Premium" screen.
+/// The pitch, shared by the store and the "you're on Premium" screen, built from `PlanFeatures`.
 /// StoreKit hosts its marketing content without our environment, so the locale and
 /// layout direction are passed in and re-applied.
+///
+/// Only features that have shipped are listed: the highlight reel and insights get their lines
+/// when they exist (DECISIONS 2026-11-11).
 private struct PremiumHeader: View {
+    let dogName: String?
     let locale: Locale
     let layoutDirection: LayoutDirection
+
+    private let premium = PlanFeatures.premium
 
     var body: some View {
         content
@@ -158,32 +168,70 @@ private struct PremiumHeader: View {
     }
 
     private var content: some View {
-        VStack(spacing: DS.Spacing.m) {
-            Image(systemName: "video.badge.plus")
-                .font(.largeTitle)
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-                .accessibilityHidden(true)
-            Text("Watch every room")
-                .font(.title2.bold())
-                .multilineTextAlignment(.center)
-            Text("Premium lets your household pair up to \(SubscriptionProducts.premiumCameraLimit) cameras.")
-                .font(.body)
+        VStack(spacing: DS.Spacing.l) {
+            VStack(spacing: DS.Spacing.s) {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.largeTitle)
+                    .imageScale(.large)
+                    .foregroundStyle(.tint)
+                    .accessibilityHidden(true)
+                title
+                    .font(.title2.bold())
+                    .multilineTextAlignment(.center)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+
+            VStack(alignment: .leading, spacing: DS.Spacing.m) {
+                feature("Clips are kept for \(premium.clipRetentionDays) days, not one.", systemImage: "film.stack")
+                feature("Everyone in the household watches.", systemImage: "person.3")
+                feature("Up to \(premium.cameras) cameras.", systemImage: "video.badge.plus")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            freeAlerts
+                .font(.footnote)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, DS.Spacing.l)
-        .accessibilityElement(children: .combine)
+    }
+
+    private var title: Text {
+        if let dogName {
+            Text("Keep a month of \(dogName)'s moments")
+        } else {
+            Text("Keep a month of moments")
+        }
+    }
+
+    private var freeAlerts: Text {
+        if let dogName {
+            Text("Alerts about \(dogName) stay free on every plan.")
+        } else {
+            Text("Dog alerts stay free on every plan.")
+        }
+    }
+
+    private func feature(_ text: LocalizedStringKey, systemImage: String) -> some View {
+        Label {
+            Text(text)
+                .foregroundStyle(.primary)
+        } icon: {
+            Image(systemName: systemImage)
+                .foregroundStyle(.tint)
+        }
+        .font(.body)
     }
 }
 
 #Preview {
-    PremiumView(model: SubscriptionModel(api: DogMonitorAPI(baseURL: AppConfig.apiBaseURL), householdId: UUID()))
+    PremiumView(model: SubscriptionModel(api: DogMonitorAPI(baseURL: AppConfig.apiBaseURL), householdId: UUID()), dogName: "Rex")
 }
 
 #Preview("Hebrew (RTL)") {
-    PremiumView(model: SubscriptionModel(api: DogMonitorAPI(baseURL: AppConfig.apiBaseURL), householdId: UUID()))
+    PremiumView(model: SubscriptionModel(api: DogMonitorAPI(baseURL: AppConfig.apiBaseURL), householdId: UUID()), dogName: "רקס")
         .environment(\.locale, Locale(identifier: "he"))
         .environment(\.layoutDirection, .rightToLeft)
 }

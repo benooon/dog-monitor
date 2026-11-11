@@ -65,7 +65,7 @@ struct InviteSheet: View {
             }
             .sheet(isPresented: $showsPremium) {
                 if let subscription = model.subscription {
-                    PremiumView(model: subscription)
+                    PremiumView(model: subscription, dogName: model.household?.soleDogName)
                 }
             }
             .task {

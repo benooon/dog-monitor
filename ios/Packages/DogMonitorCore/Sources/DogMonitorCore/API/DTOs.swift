@@ -498,6 +498,11 @@ extension HouseholdDTO {
         devices.filter { $0.role == .camera && $0.status == .active }
     }
 
+    /// The dog's name when the household has exactly one, for copy that names the dog.
+    public var soleDogName: String? {
+        dogs.count == 1 ? dogs[0].name : nil
+    }
+
     /// Whether any active camera has a no-go zone (the sofa or another forbidden area).
     public var hasForbiddenZone: Bool {
         cameras.contains { $0.zones.contains(where: \.isOffLimits) }
