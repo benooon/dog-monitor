@@ -194,6 +194,9 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
     public let role: MemberRole
     /// The owner opted in to keep labeled clips for training (nil from older servers).
     public let shareTrainingData: Bool?
+    /// Live video is end-to-end encrypted with a key only the household's phones hold
+    /// (nil from older servers).
+    public let liveEncrypted: Bool?
     public let members: [MemberDTO]
     public let dogs: [DogDTO]
     public let devices: [DeviceDTO]
@@ -205,6 +208,7 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
         ownerId: UUID,
         role: MemberRole,
         shareTrainingData: Bool? = nil,
+        liveEncrypted: Bool? = nil,
         members: [MemberDTO] = [],
         dogs: [DogDTO] = [],
         devices: [DeviceDTO] = []
@@ -215,6 +219,7 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
         self.ownerId = ownerId
         self.role = role
         self.shareTrainingData = shareTrainingData
+        self.liveEncrypted = liveEncrypted
         self.members = members
         self.dogs = dogs
         self.devices = devices
@@ -277,6 +282,10 @@ public struct LiveTokenDTO: Codable, Sendable, Hashable {
     public let room: String
     public let identity: String
     public let expiresAt: Date
+    /// The household's live video is end-to-end encrypted (nil from older servers: not yet).
+    public let encrypted: Bool?
+
+    public var isHouseholdEncrypted: Bool { encrypted ?? false }
 }
 
 /// An event as stored by the backend (`POST /events`, `PATCH /events/:id`).

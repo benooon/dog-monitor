@@ -109,6 +109,14 @@ public struct DogMonitorAPI: Sendable {
         let _: Response = try await send("PATCH", "household", body: Body(shareTrainingData: enabled))
     }
 
+    /// Owner only: marks the household's live video as end-to-end encrypted, once the owner's
+    /// phone has made and saved the key. The key itself is never sent. There is no way back.
+    public func markLiveEncrypted() async throws {
+        struct Body: Encodable { let liveEncrypted = true }
+        struct Response: Decodable { let liveEncrypted: Bool }
+        let _: Response = try await send("PATCH", "household", body: Body())
+    }
+
     /// Owner only: a one-hour token for `scripts/export-training-data.mjs`.
     public func trainingExportToken() async throws -> String {
         struct Response: Decodable { let token: String }
