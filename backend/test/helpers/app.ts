@@ -15,7 +15,7 @@ export const TEST_JWT_SECRET = "test-secret-test-secret-test-secret-123";
 
 export async function buildTestApp(
   h: DbHandle,
-  options: { inviteLimiter?: AttemptLimiter; live?: LiveTokenIssuer; hub?: RealtimeHub; now?: () => number; apns?: ApnsSender; storage?: MediaStorage; transactions?: TransactionVerifier; enforcePlanLimits?: boolean; liveActivityIntervalMs?: number } = {},
+  options: { inviteLimiter?: AttemptLimiter; live?: LiveTokenIssuer; hub?: RealtimeHub; now?: () => number; apns?: ApnsSender; storage?: MediaStorage; transactions?: TransactionVerifier; enforcePlanLimits?: boolean; liveActivityIntervalMs?: number; adminToken?: string; waitlistLimiter?: AttemptLimiter } = {},
 ): Promise<{
   app: FastifyInstance;
   apple: Awaited<ReturnType<typeof createFakeApple>>;
@@ -39,6 +39,8 @@ export async function buildTestApp(
       transactions: options.transactions,
       enforcePlanLimits: options.enforcePlanLimits,
       liveActivityIntervalMs: options.liveActivityIntervalMs,
+      adminToken: options.adminToken,
+      waitlistLimiter: options.waitlistLimiter,
     },
   });
   return { app, apple, jwt };

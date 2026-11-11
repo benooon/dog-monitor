@@ -30,6 +30,8 @@ export interface Config {
   appStore: AppStoreConfig;
   /** Apply the free-plan limits (off until the app can sell premium). */
   enforcePlanLimits: boolean;
+  /** Bearer token for admin routes; undefined when unset or shorter than 32 characters. */
+  adminToken?: string;
   /** Optional features left off because their variables are incomplete or invalid; logged at startup. */
   warnings: string[];
 }
@@ -86,6 +88,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (!Number.isInteger(retentionDays) || retentionDays < 1) {
     throw new Error(`Invalid CLIP_RETENTION_DAYS: ${env.CLIP_RETENTION_DAYS}`);
   }
+  let adminToken = env.ADMIN_TOKEN?.trim() || undefined;
+  if (adminToken && adminToken.length < 32) {
+    warnings.push("Admin routes are off: ADMIN_TOKEN must be at least 32 characters");
+    adminToken = undefined;
+  }
   return {
     port,
     host: env.HOST ?? "0.0.0.0",
@@ -129,6 +136,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       rootFingerprints: list(env.APPLE_ROOT_CA_SHA256 || APPLE_ROOT_CA_G3_SHA256),
     },
     enforcePlanLimits: env.ENFORCE_PLAN_LIMITS === "true",
+    adminToken,
     warnings,
   };
 }

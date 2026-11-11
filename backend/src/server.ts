@@ -25,6 +25,7 @@ const app = await buildApp({
     retentionDays: config.retentionDays,
     transactions: createAppStoreVerifier(config.appStore),
     enforcePlanLimits: config.enforcePlanLimits,
+    adminToken: config.adminToken,
   },
 });
 
