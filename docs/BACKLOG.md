@@ -118,6 +118,19 @@ Add follow-up tasks you discover right below the task that produced them. Keep e
 - [x] ios: Premium store loads the products twice (our check, then `SubscriptionStoreView(productIDs:)` again), so it flashes StoreKit's "Loading Subscription" and the `13-premium` dark/Hebrew shots still show the spinner. Keep the loaded `Product`s in `SubscriptionModel` and hand them to `SubscriptionStoreView(subscriptions:)`. (CI green on 2f9a88e: all six `13-premium` shots render the store; plans sorted yearly first by core `SubscriptionProducts.inDisplayOrder`, tested)
 - [x] ios: Premium store header ("Watch every room" + the camera limit) stays English in the Hebrew screenshot: StoreKit hosts the marketing content without our `\.locale`/`\.layoutDirection` environment. Pass both through to `PremiumHeader`. See iphone-13-premium-hebrew. (CI green on 7ae5c76: header now Hebrew. StoreKit's own words — Subscribe, policies, auto-renew line — follow the device language, so they stay English only in the simulator shot; plan names/descriptions come from App Store Connect, see HUMAN_TODO)
 
+## Phase 5b — Legal and privacy (weekly legal review 2026-11-11; do before App Store submission)
+
+Texts: `docs/legal/`, data map: `docs/PRIVACY.md`, label: `docs/APP_STORE_PRIVACY.md`. `DELETE /me` exists in the backend (done).
+
+- [ ] core + ios: Delete account in the app (App Store 5.1.1(v), GDPR Art. 17). `api.deleteAccount()` in DogMonitorCore (`DELETE /me`, handles 409 `household_has_members`) with tests; Settings → Account → "Delete account" with the confirmation text from `docs/legal/in-app-notices.md`, both languages, then clear the Keychain and return to sign-in. Add the screen to ScreenshotTests.
+- [ ] ios: Privacy notices. Camera-setup notice about guests and sound, the "Help improve detection" footer, and the sign-in footer with links to Terms and Privacy (texts in `docs/legal/in-app-notices.md`; use `writing-for-interfaces`). Both languages, RTL previews.
+- [ ] backend: Serve the legal texts at `/privacy` and `/terms` (HTML, English and Hebrew by `?lang=he` or Accept-Language), rendered from `docs/legal/*.md` at build time. Only after the owner has filled the `[...]` fields (see HUMAN_TODO → Legal). Replaces the old "draft the privacy page" part of the region task below.
+- [ ] backend: Automatic retention for `events` and `daily_summaries` (default 365 days, env `EVENT_RETENTION_DAYS`, extend with the daily job in `storage/retention.ts`), with tests; update `docs/PRIVACY.md`.
+- [ ] backend: Revoke the Sign in with Apple token on `DELETE /me` (Apple REST `auth/revoke`; needs the Sign in with Apple key from HUMAN_TODO; store the refresh token from `auth/token` at sign-in). `[blocked]` until the key exists.
+- [ ] backend: Log hygiene. Fastify request logs include URLs, so the invite token in `/invite/:token` is logged. Redact it (custom `serializers.req`), and do not log IPs at full precision. Test that the token never appears in log output.
+- [ ] backend + ios: Data export ("Download my data"): JSON of the user's account, household, dogs, devices, events and summaries (no media), by email-free in-app share sheet.
+- [ ] backend: Household owner can delete the household and all its data without deleting the account (`DELETE /household`), then the account-deletion rule "owner with members" can point to it.
+
 ## Phase 6 — Growth, monetization and security (owner request 2026-11-11)
 
 Positioning (owner): the app is about **your dog**, not about cameras. "See what Rex does when you're out" (jumps on the sofa, waits at the door, steals the sock), funny and warm, using the old iPhone lying in a drawer, with your video kept private (no cheap camera that sends your living room to unknown servers). Pitch and ads must stay true: only claim privacy features that have shipped. See DECISIONS 2026-11-11.
