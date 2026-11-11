@@ -9,6 +9,7 @@ import { effectivePlan } from "../billing/plans.js";
 import { StorageUnavailableError, deleteHousehold } from "../households/delete.js";
 import type { MediaStorage } from "../storage/storage.js";
 import { RealtimeSessions } from "../realtime/sessions.js";
+import { LIVE_KEY_ID_PATTERN, requestLiveKeyRotation } from "../households/live-key.js";
 
 export async function householdRoutes(
   app: FastifyInstance,
@@ -77,6 +78,8 @@ export async function householdRoutes(
       ownerId: household!.ownerId,
       shareTrainingData: household!.shareTrainingData,
       liveEncrypted: household!.liveEncrypted,
+      liveKeyId: household!.liveKeyId,
+      liveKeyRotationNeeded: household!.liveKeyRotationNeeded,
       role,
       members,
       dogs: dogRows.map(dogDto),
@@ -87,9 +90,10 @@ export async function householdRoutes(
   /**
    * Owner only: rename the household, change the training-data opt-in, or mark live video as
    * end-to-end encrypted. `liveEncrypted` only turns on: going back to clear video would be a
-   * downgrade the server could otherwise force on every keyless camera.
+   * downgrade the server could otherwise force on every keyless camera. `liveKeyId` is the id of
+   * the key the owner's phone now holds (made or replaced); sending it clears the rotation flag.
    */
-  app.patch<{ Body: { name?: string; shareTrainingData?: boolean; liveEncrypted?: true } }>(
+  app.patch<{ Body: { name?: string; shareTrainingData?: boolean; liveEncrypted?: true; liveKeyId?: string } }>(
     "/household",
     {
       preHandler: [app.authenticate, requireHousehold(db), requireOwner],
@@ -102,24 +106,34 @@ export async function householdRoutes(
             name: { type: "string", minLength: 1, maxLength: 100 },
             shareTrainingData: { type: "boolean" },
             liveEncrypted: { type: "boolean", const: true },
+            liveKeyId: { type: "string", pattern: LIVE_KEY_ID_PATTERN },
           },
         },
       },
     },
     async (request) => {
       const { householdId } = request.household!;
-      const [updated] = await db.update(households).set(request.body).where(eq(households.id, householdId)).returning();
+      const changes = {
+        ...request.body,
+        ...(request.body.liveKeyId !== undefined && { liveKeyRotationNeeded: false }),
+      };
+      const [updated] = await db.update(households).set(changes).where(eq(households.id, householdId)).returning();
       return {
         id: updated!.id,
         name: updated!.name,
         plan: effectivePlan(updated!, new Date()),
         shareTrainingData: updated!.shareTrainingData,
         liveEncrypted: updated!.liveEncrypted,
+        liveKeyId: updated!.liveKeyId,
+        liveKeyRotationNeeded: updated!.liveKeyRotationNeeded,
       };
     },
   );
 
-  /** Owner only: removes a member, signs out their phones (revoked) and drops their push settings. */
+  /**
+   * Owner only: removes a member, signs out their phones (revoked) and drops their push settings.
+   * Their phones still hold the live key, so the owner's phone is asked to make a new one.
+   */
   app.delete<{ Params: { userId: string } }>(
     "/household/members/:userId",
     {
@@ -147,6 +161,7 @@ export async function householdRoutes(
           .set({ status: "revoked", apnsToken: null, deviceSecretHash: null })
           .where(and(eq(devices.householdId, householdId), eq(devices.userId, userId)));
         await tx.delete(notificationPrefs).where(eq(notificationPrefs.userId, userId));
+        await requestLiveKeyRotation(tx, householdId);
       });
       opts.sessions?.closeAll(RealtimeSessions.user(userId), "no_household");
       return reply.code(204).send();

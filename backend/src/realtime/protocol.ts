@@ -2,7 +2,7 @@
  * WebSocket protocol on `GET /ws` (SPEC §6 Realtime). Every message is one JSON object with a `type`.
  *
  * Camera (Authorization: Device <id>:<secret>):
- *   → { type: "heartbeat", battery?: 0...1, charging?: bool, thermal?: "nominal"|"fair"|"serious"|"critical", state?: DogState, liveKeyMissing?: bool }
+ *   → { type: "heartbeat", battery?: 0...1, charging?: bool, thermal?: "nominal"|"fair"|"serious"|"critical", state?: DogState, liveKeyMissing?: bool, liveKeyId?: string }
  *   ← { type: "viewers", count: n, change: "joined" | "left" }   (count 0 = all viewers left)
  *
  * Viewer (Authorization: Bearer <JWT>):
@@ -16,6 +16,7 @@
  */
 
 import { DOG_STATES, type DogState } from "../db/schema.js";
+import { isLiveKeyId } from "../households/live-key.js";
 
 export const THERMAL_STATES = ["nominal", "fair", "serious", "critical"] as const;
 export type ThermalState = (typeof THERMAL_STATES)[number];
@@ -28,6 +29,8 @@ export interface HeartbeatMessage {
   state?: DogState;
   /** The household's video is end-to-end encrypted and the camera has no key. Absent = false. */
   liveKeyMissing?: boolean;
+  /** Id of the live key the camera holds (never the key). Absent = no key or a key without an id. */
+  liveKeyId?: string;
 }
 
 export type CameraInbound = HeartbeatMessage;
@@ -74,6 +77,10 @@ export function parseCameraMessage(raw: string): CameraInbound | null {
   if (msg.liveKeyMissing !== undefined) {
     if (typeof msg.liveKeyMissing !== "boolean") return null;
     out.liveKeyMissing = msg.liveKeyMissing;
+  }
+  if (msg.liveKeyId !== undefined) {
+    if (!isLiveKeyId(msg.liveKeyId)) return null;
+    out.liveKeyId = msg.liveKeyId;
   }
   return out;
 }

@@ -327,6 +327,52 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     expect((await app.inject({ method: "GET", url: "/household", headers: member.auth })).json().liveEncrypted).toBe(true);
   });
 
+  it("asks the owner's phone for a new live key when someone holding it leaves", async () => {
+    const owner = await signIn("owner");
+    const member = await signIn("member");
+    const household = (await createHousehold(owner.auth)).json();
+    await addMember(household.id, member.userId);
+    const get = async () => (await app.inject({ method: "GET", url: "/household", headers: owner.auth })).json();
+    const patch = (auth: Record<string, string>, payload: object) =>
+      app.inject({ method: "PATCH", url: "/household", headers: auth, payload });
+    const camera = (
+      await app.inject({ method: "POST", url: "/devices", headers: owner.auth, payload: { name: "Cam", role: "camera" } })
+    ).json();
+
+    // Not encrypted yet: revoking changes nothing about keys.
+    await app.inject({ method: "POST", url: `/devices/${camera.id}/revoke`, headers: owner.auth });
+    expect(await get()).toMatchObject({ liveKeyId: null, liveKeyRotationNeeded: false });
+
+    expect((await patch(owner.auth, { liveEncrypted: true, liveKeyId: "first-key-id" })).json()).toMatchObject({
+      liveEncrypted: true,
+      liveKeyId: "first-key-id",
+      liveKeyRotationNeeded: false,
+    });
+    expect((await patch(member.auth, { liveKeyId: "members-key" })).statusCode).toBe(403);
+    expect((await patch(owner.auth, { liveKeyId: "short" })).statusCode).toBe(400);
+    expect((await patch(owner.auth, { liveKeyId: "has spaces in it" })).statusCode).toBe(400);
+
+    // Revoking an already revoked device doesn't ask again.
+    await app.inject({ method: "POST", url: `/devices/${camera.id}/revoke`, headers: owner.auth });
+    expect((await get()).liveKeyRotationNeeded).toBe(false);
+
+    const removed = await app.inject({ method: "DELETE", url: `/household/members/${member.userId}`, headers: owner.auth });
+    expect(removed.statusCode).toBe(204);
+    expect(await get()).toMatchObject({ liveKeyId: "first-key-id", liveKeyRotationNeeded: true });
+
+    // The owner's phone made a new key: sending its id clears the flag.
+    expect((await patch(owner.auth, { liveEncrypted: true, liveKeyId: "second-key-id" })).json()).toMatchObject({
+      liveKeyId: "second-key-id",
+      liveKeyRotationNeeded: false,
+    });
+
+    const camera2 = (
+      await app.inject({ method: "POST", url: "/devices", headers: owner.auth, payload: { name: "Cam 2", role: "camera" } })
+    ).json();
+    await app.inject({ method: "POST", url: `/devices/${camera2.id}/revoke`, headers: owner.auth });
+    expect((await get()).liveKeyRotationNeeded).toBe(true);
+  });
+
   it("lets only the owner revoke, and only the device's user or owner update", async () => {
     const owner = await signIn("owner");
     const member = await signIn("member");

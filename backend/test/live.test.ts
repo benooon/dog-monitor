@@ -3,7 +3,7 @@ import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import { TokenVerifier } from "livekit-server-sdk";
 import type { DbHandle } from "../src/db/client.js";
-import { devices } from "../src/db/schema.js";
+import { devices, households } from "../src/db/schema.js";
 import { LIVE_TOKEN_TTL_SECONDS, createLiveKitIssuer, roomForCamera } from "../src/live/livekit.js";
 import { RealtimeHub } from "../src/realtime/hub.js";
 import { TEST_NONCE } from "./helpers/apple.js";
@@ -142,6 +142,30 @@ describe.skipIf(!hasDatabase)("live token routes", () => {
 
     await h.db.update(devices).set({ liveKeyMissing: false }).where(eq(devices.id, camera.id));
     expect((await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth })).statusCode).toBe(200);
+  });
+
+  it("treats a camera holding an old live key as needing the key, and hands out the current key id", async () => {
+    const { owner, camera } = await setup();
+    // Keys from before ids existed are never called stale.
+    await h.db.update(households).set({ liveEncrypted: true });
+    expect((await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth })).json()).toMatchObject({
+      encrypted: true,
+      liveKeyId: null,
+    });
+
+    await h.db.update(households).set({ liveKeyId: "key-two-xyz" });
+    await h.db.update(devices).set({ liveKeyId: "key-one-abc" }).where(eq(devices.id, camera.id));
+    const stale = await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth });
+    expect(stale.statusCode).toBe(409);
+    expect(stale.json()).toEqual({ error: "camera_needs_key" });
+    // The camera learns the current id from its own token, so it can ask for a scan.
+    const cameraToken = await app.inject({ method: "POST", url: "/device/live-token", headers: camera.auth });
+    expect(cameraToken.json()).toMatchObject({ encrypted: true, liveKeyId: "key-two-xyz" });
+
+    await h.db.update(devices).set({ liveKeyId: "key-two-xyz" }).where(eq(devices.id, camera.id));
+    const current = await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth });
+    expect(current.statusCode).toBe(200);
+    expect(current.json()).toMatchObject({ encrypted: true, liveKeyId: "key-two-xyz" });
   });
 
   it("hides cameras of other households and non-camera devices", async () => {

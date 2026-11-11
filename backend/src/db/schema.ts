@@ -94,6 +94,17 @@ export const households = pgTable("households", {
    * then stay off live view instead of publishing in the clear.
    */
   liveEncrypted: boolean("live_encrypted").notNull().default(false),
+  /**
+   * A random id the owner's phone gives each live key (not derived from the key, so it says
+   * nothing about it). Phones and cameras compare it with the id of the key they hold to learn
+   * that the key was replaced. Null for keys made before ids existed.
+   */
+  liveKeyId: text("live_key_id"),
+  /**
+   * A member was removed or a device revoked while live video was encrypted: the owner's phone
+   * makes a new key the next time it loads the household (it clears this by sending the new id).
+   */
+  liveKeyRotationNeeded: boolean("live_key_rotation_needed").notNull().default(false),
   createdAt: createdAt(),
 });
 
@@ -178,6 +189,8 @@ export const devices = pgTable(
      * key (from the latest heartbeat), so it can't publish. Viewers are told instead of waiting.
      */
     liveKeyMissing: boolean("live_key_missing").notNull().default(false),
+    /** Camera devices: id of the live key the camera holds (latest heartbeat). */
+    liveKeyId: text("live_key_id"),
     /** Viewer devices: IANA time zone of the phone, for quiet hours. */
     timeZone: text("time_zone"),
     /** Viewer devices: no pushes until this time ("Mute 1h" notification action). */

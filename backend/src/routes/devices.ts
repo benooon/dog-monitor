@@ -7,6 +7,7 @@ import { householdCameraLimit } from "../billing/camera-limit.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
 import { isValidTimeZone } from "../notifications/quiet-hours.js";
 import { RealtimeSessions } from "../realtime/sessions.js";
+import { requestLiveKeyRotation } from "../households/live-key.js";
 
 const idParams = {
   type: "object",
@@ -168,6 +169,8 @@ export async function deviceRoutes(
         .where(eq(devices.id, device.id))
         .returning();
       opts.sessions?.closeAll(RealtimeSessions.device(device.id), "device_revoked");
+      // The revoked phone still holds the live key.
+      if (device.status === "active") await requestLiveKeyRotation(db, request.household!.householdId);
       return deviceDto(updated!);
     },
   );

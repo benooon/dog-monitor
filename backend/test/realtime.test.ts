@@ -157,6 +157,15 @@ describe.skipIf(!hasDatabase)("realtime channel (GET /ws)", () => {
       expect(row!.liveKeyMissing).toBe(false);
     });
 
+    // The id of the key it holds is stored with every heartbeat (never the key itself).
+    cam.send({ type: "heartbeat", liveKeyId: "kid_12345678" });
+    await eventually(async () => {
+      const [row] = await h.db.select().from(devices).where(eq(devices.id, camera.id));
+      expect(row!.liveKeyId).toBe("kid_12345678");
+    });
+    cam.send({ type: "heartbeat", liveKeyId: "no spaces allowed" });
+    expect(await cam.next()).toEqual({ type: "error", error: "bad_message" });
+
     viewer.send({ type: "watch", cameraId: camera.id });
     expect(await cam.next()).toEqual({ type: "viewers", count: 1, change: "joined" });
 
