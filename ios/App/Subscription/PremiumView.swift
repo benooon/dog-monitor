@@ -62,6 +62,9 @@ struct PremiumView: View {
                     }
                     restoreButton
                 }
+                .padding(.top, DS.Spacing.s)
+                .frame(maxWidth: .infinity)
+                .background(.bar)
             }
             .inAppPurchaseOptions { _ in [.appAccountToken(householdId)] }
             .onInAppPurchaseCompletion { _, result in
