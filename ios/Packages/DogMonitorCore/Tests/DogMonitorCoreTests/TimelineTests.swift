@@ -108,7 +108,7 @@ final class TimelineTests: XCTestCase {
         XCTAssertFalse(try decode(type: "forbiddenZone", place: #""somewhereNew""#).isOnSofa)
         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
-        XCTAssertEqual(try decode(type: "forbiddenZone", place: #""sofa""#).with(feedback: .right).place, "sofa")
+        XCTAssertEqual(try decode(type: "forbiddenZone", place: #""sofa""#).with(feedback: .correct).place, "sofa")
     }
 
     func testStaleCursorSurfacesItsCode() async throws {
