@@ -8,18 +8,44 @@ import StoreKit
 @MainActor
 @Observable
 final class SubscriptionModel {
+    /// Whether the App Store returned the Premium products, so the store can show real prices.
+    enum StoreState: Equatable {
+        case loading
+        case ready
+        /// No products came back (offline, App Store Connect not set up, or no StoreKit file).
+        case unavailable
+    }
+
+    /// Asks the App Store how many of the given product ids it sells.
+    typealias ProductLoader = @Sendable ([String]) async throws -> Int
+
     private(set) var status: SubscriptionDTO?
+    private(set) var storeState: StoreState = .loading
     private(set) var isRestoring = false
     var errorMessage: String?
 
     /// Ties purchases to the household (`appAccountToken`), so one subscription unlocks one household.
     let householdId: UUID
     private let api: DogMonitorAPI
+    private let productLoader: ProductLoader
     private var updatesTask: Task<Void, Never>?
 
-    init(api: DogMonitorAPI, householdId: UUID) {
+    init(
+        api: DogMonitorAPI,
+        householdId: UUID,
+        productLoader: @escaping ProductLoader = { try await Product.products(for: $0).count }
+    ) {
         self.api = api
         self.householdId = householdId
+        self.productLoader = productLoader
+    }
+
+    /// Loads the products before showing the store. `SubscriptionStoreView` spins forever when
+    /// none come back, so the view shows "not available" with Try again instead.
+    func loadProducts() async {
+        storeState = .loading
+        let count = (try? await productLoader(SubscriptionProducts.all)) ?? 0
+        storeState = count > 0 ? .ready : .unavailable
     }
 
     /// Listens for renewals and purchases made elsewhere, and reports what the Apple ID already owns.

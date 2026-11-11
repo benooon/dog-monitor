@@ -15,7 +15,15 @@ struct PremiumView: View {
                 if let status = model.status, status.isPremium {
                     active(status)
                 } else {
-                    store
+                    switch model.storeState {
+                    case .loading:
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    case .ready:
+                        store
+                    case .unavailable:
+                        unavailable
+                    }
                 }
             }
             .navigationTitle("Premium")
@@ -30,6 +38,7 @@ struct PremiumView: View {
                 if !isShown { Task { await model.refresh() } }
             }
             .task { await model.refresh() }
+            .task { await model.loadProducts() }
         }
     }
 
@@ -45,28 +54,46 @@ struct PremiumView: View {
         .onInAppPurchaseCompletion { _, result in
             await model.handlePurchase(result)
         }
-        .safeAreaInset(edge: .bottom) {
-            VStack(spacing: DS.Spacing.s) {
-                if let message = model.errorMessage {
-                    Label(message, systemImage: "exclamationmark.triangle.fill")
-                        .font(.footnote)
-                        .foregroundStyle(.red)
-                }
-                Button {
-                    Task { await model.restore() }
-                } label: {
-                    if model.isRestoring {
-                        ProgressView()
-                    } else {
-                        Text("Restore purchases")
-                    }
-                }
-                .font(.footnote)
-                .disabled(model.isRestoring)
-                .accessibilityIdentifier("premium-restore")
+        .safeAreaInset(edge: .bottom) { restoreButton }
+    }
+
+    /// The App Store didn't return the plans. Restore stays reachable for people who already paid.
+    private var unavailable: some View {
+        ContentUnavailableView {
+            Label("Premium isn't available right now", systemImage: "video.badge.plus")
+        } description: {
+            Text("Check your connection and try again in a moment.")
+        } actions: {
+            Button("Try again") {
+                Task { await model.loadProducts() }
             }
-            .padding(.bottom, DS.Spacing.s)
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("premium-retry")
         }
+        .safeAreaInset(edge: .bottom) { restoreButton }
+    }
+
+    private var restoreButton: some View {
+        VStack(spacing: DS.Spacing.s) {
+            if let message = model.errorMessage {
+                Label(message, systemImage: "exclamationmark.triangle.fill")
+                    .font(.footnote)
+                    .foregroundStyle(.red)
+            }
+            Button {
+                Task { await model.restore() }
+            } label: {
+                if model.isRestoring {
+                    ProgressView()
+                } else {
+                    Text("Restore purchases")
+                }
+            }
+            .font(.footnote)
+            .disabled(model.isRestoring)
+            .accessibilityIdentifier("premium-restore")
+        }
+        .padding(.bottom, DS.Spacing.s)
     }
 
     private func active(_ status: SubscriptionDTO) -> some View {

@@ -3277,6 +3277,26 @@
           }
         }
       }
+    },
+    "Premium isn't available right now": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פרימיום לא זמין כרגע"
+          }
+        }
+      }
+    },
+    "Check your connection and try again in a moment.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בדקו את החיבור ונסו שוב בעוד רגע."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

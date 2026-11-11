@@ -225,6 +225,8 @@ final class LocalizationTests: XCTestCase {
         "Plan",
         "Get Premium",
         "Restore purchases",
+        "Premium isn't available right now",
+        "Check your connection and try again in a moment.",
         "Manage subscription",
         "Premium lets your household pair up to %lld cameras.",
         "New cameras need Premium. Family members can still join with this code.",

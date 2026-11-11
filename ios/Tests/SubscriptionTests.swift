@@ -25,9 +25,62 @@ final class PremiumAppTests: XCTestCase {
         XCTAssertFalse(model.isRestoring)
     }
 
+    func testStoreIsReadyWhenTheAppStoreReturnsProducts() async {
+        let model = makeModel { ids in ids.count }
+        XCTAssertEqual(model.storeState, .loading)
+        await model.loadProducts()
+        XCTAssertEqual(model.storeState, .ready)
+    }
+
+    func testStoreIsUnavailableWhenNoProductsComeBack() async {
+        let model = makeModel { _ in 0 }
+        await model.loadProducts()
+        XCTAssertEqual(model.storeState, .unavailable)
+    }
+
+    func testStoreIsUnavailableWhenLoadingFailsAndCanTryAgain() async {
+        let attempts = Attempts()
+        let model = makeModel { ids in
+            if await attempts.next() == 1 { throw URLError(.notConnectedToInternet) }
+            return ids.count
+        }
+        await model.loadProducts()
+        XCTAssertEqual(model.storeState, .unavailable)
+        await model.loadProducts()
+        XCTAssertEqual(model.storeState, .ready)
+    }
+
+    func testStoreAsksForThePremiumProducts() async {
+        let asked = Asked()
+        let model = makeModel { ids in
+            await asked.set(ids)
+            return ids.count
+        }
+        await model.loadProducts()
+        let ids = await asked.ids
+        XCTAssertEqual(ids, SubscriptionProducts.all)
+    }
+
+    private func makeModel(_ loader: @escaping SubscriptionModel.ProductLoader) -> SubscriptionModel {
+        SubscriptionModel(api: DogMonitorAPI(baseURL: URL(string: "http://localhost:1")!), householdId: UUID(), productLoader: loader)
+    }
+
     func testSignedOutSessionHasNoSubscription() {
         let model = ViewerSessionModel(baseURL: URL(string: "http://localhost:1")!, store: InMemorySecureStore())
         model.signOut()
         XCTAssertNil(model.subscription)
     }
+}
+
+private actor Attempts {
+    private var count = 0
+    func next() -> Int {
+        count += 1
+        return count
+    }
+}
+
+private actor Asked {
+    private(set) var ids: [String] = []
+    func set(_ ids: [String]) { self.ids = ids }
 }

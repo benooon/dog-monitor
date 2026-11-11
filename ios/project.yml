@@ -144,6 +144,9 @@ targets:
     platform: iOS
     sources:
       - path: Tests
+      # Loaded with SKTestSession so the Premium screenshot shows the real store.
+      - path: StoreKit/DogMonitor.storekit
+        buildPhase: resources
     dependencies:
       - target: DogMonitor
       - package: DogMonitorCore

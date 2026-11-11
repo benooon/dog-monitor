@@ -1,4 +1,5 @@
 import DogMonitorCore
+import StoreKitTest
 import SwiftUI
 import UIKit
 import XCTest
@@ -78,6 +79,9 @@ final class ScreenshotTests: XCTestCase {
             Screen(name: "13-premium") {
                 AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID())))
             },
+            Screen(name: "13a-premium-unavailable") {
+                AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID()) { _ in 0 }))
+            },
         ]
     }
 
@@ -98,6 +102,10 @@ final class ScreenshotTests: XCTestCase {
             "The test host app has no window scene."
         )
         let device = UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone"
+        // Products for the Premium store come from the local StoreKit file.
+        let storeSession = try? SKTestSession(configurationFileNamed: "DogMonitor")
+        storeSession?.disableDialogs = true
+        defer { _ = storeSession }
 
         for screen in Self.screens {
             for variant in Variant.allCases {
