@@ -16,8 +16,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: false
 
+# Read-only by default: build and test jobs run third-party code (npm install scripts, SPM,
+# brew), so they must not hold a token that can push. Only `report` writes (security audit
+# 2026-11, run 2).
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   changes:
@@ -50,6 +53,7 @@ jobs:
     container: swift:6.1
     steps:
       - uses: actions/checkout@v4
+        with: { persist-credentials: false }
       - name: Swift package tests (Linux)
         shell: bash
         run: |
@@ -71,6 +75,7 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+        with: { persist-credentials: false }
       - name: Build and test app
         shell: bash
         run: |
@@ -169,6 +174,7 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/dogmonitor_test
     steps:
       - uses: actions/checkout@v4
+        with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: Lint and test backend
@@ -187,8 +193,11 @@ jobs:
 
   report:
     needs: [changes, core, ios, backend]
-    if: always()
+    # Only main's results are published: a manual run on another branch must not overwrite them.
+    if: always() && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       HEAD_MSG: ${{ github.event.head_commit.message }}
       CORE_RESULT: ${{ needs.core.result }}
