@@ -136,7 +136,7 @@ All analysis runs on the camera device. Video is never sent to the cloud for ana
 ## 10. Privacy and security
 
 - Analysis happens on the device only. Only event clips and snapshots are uploaded.
-- WebRTC is encrypted (DTLS-SRTP). LiveKit E2EE comes later.
+- WebRTC is encrypted (DTLS-SRTP), and live video and audio are end-to-end encrypted with LiveKit shared-key frame encryption (AES-GCM). The owner's phone makes a 32-byte household key and keeps it in the Keychain; it reaches other phones only out of band, in the invite QR code (`&k=`, read on the scanning phone) and the invite link fragment (`#k=`, never sent to a server). The server only stores `households.live_encrypted` and returns it with live tokens: then a camera without the key does not publish, a viewer without the key asks to scan the owner's invite QR, and a viewer never shows clear video from a household or camera known to be encrypted (cameras are pinned on first encrypted view). Clips and snapshots are not covered (stored with the provider's encryption at rest).
 - Every API route is scoped to the caller's household. Presigned URLs are short-lived.
 - Pairing tokens are single-use and short-lived. Devices can be revoked remotely.
 - Clips are auto-deleted after 7 days (configurable), and the user can delete all data.
