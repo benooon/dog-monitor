@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { HOUSEHOLD_MEMBER_USER_UNIQUE, isUniqueViolation } from "../db/errors.js";
-import { and, count, eq, gt, isNull } from "drizzle-orm";
+import { and, count, eq, gt, isNull, lte } from "drizzle-orm";
 import type { Database } from "../db/client.js";
+import { HOUSEHOLD_MEMBER_USER_UNIQUE, INVITE_CODE_UNIQUE, isUniqueViolation } from "../db/errors.js";
 import { devices, householdMembers, households, invites } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
 import { LIMITS } from "../households/limits.js";
@@ -46,17 +46,18 @@ export async function inviteRoutes(
       const { householdId } = request.household!;
       const createdAt = now();
       const expiresAt = new Date(createdAt.getTime() + INVITE_TTL_MS);
-      // Pick a code that no other active invite uses.
+      // Pick a code no other unused invite holds. The unique index decides under concurrency;
+      // an expired invite holding the code is deleted (it can never be accepted).
       for (let attempt = 0; attempt < 10; attempt++) {
         const code = newInviteCode();
-        const [clash] = await db
-          .select({ token: invites.token })
-          .from(invites)
-          .where(and(eq(invites.code, code), isNull(invites.usedAt), gt(invites.expiresAt, createdAt)))
-          .limit(1);
-        if (clash) continue;
+        await db.delete(invites).where(and(eq(invites.code, code), isNull(invites.usedAt), lte(invites.expiresAt, createdAt)));
         const token = newInviteToken();
-        await db.insert(invites).values({ token, code, householdId, createdBy: request.user!.userId, expiresAt });
+        try {
+          await db.insert(invites).values({ token, code, householdId, createdBy: request.user!.userId, expiresAt });
+        } catch (error) {
+          if (isUniqueViolation(error, INVITE_CODE_UNIQUE)) continue;
+          throw error;
+        }
         return reply.code(201).send({ token, code, expiresAt });
       }
       throw new Error("could not allocate a unique invite code");

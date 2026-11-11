@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { HOUSEHOLD_MEMBER_USER_UNIQUE, isUniqueViolation } from "../db/errors.js";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
+import { HOUSEHOLD_MEMBER_USER_UNIQUE, isUniqueViolation } from "../db/errors.js";
 import { devices, dogs, householdMembers, households, notificationPrefs, users, zones } from "../db/schema.js";
 import { deviceDto, dogDto } from "../households/dto.js";
 import { findMembership, requireHousehold, requireOwner } from "../households/scope.js";

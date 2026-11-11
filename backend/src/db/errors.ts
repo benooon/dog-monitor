@@ -1,5 +1,7 @@
 /** Unique index on household_members.user_id: one household per user. */
 export const HOUSEHOLD_MEMBER_USER_UNIQUE = "household_members_user_unique";
+/** Partial unique index on invites.code among unused invites. */
+export const INVITE_CODE_UNIQUE = "invites_code_unused_unique";
 
 /** True when a Postgres unique violation (23505) caused this error, directly or wrapped by Drizzle. */
 export function isUniqueViolation(error: unknown, constraint?: string): boolean {

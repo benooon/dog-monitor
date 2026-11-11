@@ -259,7 +259,7 @@ export const invites = pgTable(
   "invites",
   {
     token: text("token").primaryKey(),
-    /** 6-digit code for typing instead of scanning; only unique among active invites. */
+    /** 6-digit code for typing instead of scanning; unique among unused invites (expired ones are deleted on clash). */
     code: text("code").notNull(),
     householdId: uuid("household_id")
       .notNull()
@@ -269,7 +269,8 @@ export const invites = pgTable(
     usedAt: timestamp("used_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
-  (t) => [index("invites_code_idx").on(t.code)],
+  // Unique among unused invites, so a code can never point at two households (audit 2026-11, run 2).
+  (t) => [uniqueIndex("invites_code_unused_unique").on(t.code).where(sql`${t.usedAt} IS NULL`)],
 );
 
 /**
