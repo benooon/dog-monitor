@@ -1,4 +1,4 @@
-# Screenshots (db11308)
+# Screenshots (f12f8bd)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
@@ -165,6 +165,12 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="iphone-09a-dog-profile-light.jpg" width="260"> | <img src="iphone-09a-dog-profile-dark.jpg" width="260"> | <img src="iphone-09a-dog-profile-hebrew.jpg" width="260"> |
+
+### 09b-household-live-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-09b-household-live-key-light.jpg" width="260"> | <img src="iphone-09b-household-live-key-dark.jpg" width="260"> | <img src="iphone-09b-household-live-key-hebrew.jpg" width="260"> |
 
 ### 10-invite
 
@@ -359,6 +365,12 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="ipad-09a-dog-profile-light.jpg" width="260"> | <img src="ipad-09a-dog-profile-dark.jpg" width="260"> | <img src="ipad-09a-dog-profile-hebrew.jpg" width="260"> |
+
+### 09b-household-live-key
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-09b-household-live-key-light.jpg" width="260"> | <img src="ipad-09b-household-live-key-dark.jpg" width="260"> | <img src="ipad-09b-household-live-key-hebrew.jpg" width="260"> |
 
 ### 10-invite
 
