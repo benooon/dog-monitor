@@ -1,4 +1,4 @@
-# Screenshots (660ed53)
+# Screenshots (437af08)
 
 Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI run. Live video and the camera preview are not available in the simulator.
 
@@ -136,6 +136,12 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 |---|---|---|
 | <img src="iphone-13-premium-light.jpg" width="260"> | <img src="iphone-13-premium-dark.jpg" width="260"> | <img src="iphone-13-premium-hebrew.jpg" width="260"> |
 
+### 13a-premium-unavailable
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="iphone-13a-premium-unavailable-light.jpg" width="260"> | <img src="iphone-13a-premium-unavailable-dark.jpg" width="260"> | <img src="iphone-13a-premium-unavailable-hebrew.jpg" width="260"> |
+
 ## iPad
 
 ### 01-role-picker
@@ -269,4 +275,10 @@ Rendered by `ios/Tests/ScreenshotTests.swift` with sample data on every iOS CI r
 | Light | Dark | Hebrew |
 |---|---|---|
 | <img src="ipad-13-premium-light.jpg" width="260"> | <img src="ipad-13-premium-dark.jpg" width="260"> | <img src="ipad-13-premium-hebrew.jpg" width="260"> |
+
+### 13a-premium-unavailable
+
+| Light | Dark | Hebrew |
+|---|---|---|
+| <img src="ipad-13a-premium-unavailable-light.jpg" width="260"> | <img src="ipad-13a-premium-unavailable-dark.jpg" width="260"> | <img src="ipad-13a-premium-unavailable-hebrew.jpg" width="260"> |
 
