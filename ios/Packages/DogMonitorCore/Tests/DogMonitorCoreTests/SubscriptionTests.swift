@@ -6,6 +6,12 @@ import XCTest
 @testable import DogMonitorCore
 
 final class SubscriptionTests: XCTestCase {
+    func testProductsAreShownYearlyFirst() {
+        let ids = ["other.b", SubscriptionProducts.monthly, "other.a", SubscriptionProducts.yearly]
+        let ordered = SubscriptionProducts.inDisplayOrder(ids) { $0 }
+        XCTAssertEqual(ordered, [SubscriptionProducts.yearly, SubscriptionProducts.monthly, "other.b", "other.a"])
+    }
+
     private static let freeFullJSON = """
     {"plan":"free","expiresAt":null,"productId":null,"limits":{"cameras":1},"usage":{"cameras":1}}
     """

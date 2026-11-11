@@ -12,6 +12,15 @@ public enum SubscriptionProducts {
     /// Screens that check a real limit read `SubscriptionDTO.limits` instead.
     public static let premiumCameraLimit = 4
 
+    /// Puts App Store products in display order (yearly first); the App Store returns them unordered.
+    /// Ids that aren't Premium plans go last, in their original order.
+    public static func inDisplayOrder<Item>(_ items: [Item], id: (Item) -> String) -> [Item] {
+        let rank = { (item: Item) in all.firstIndex(of: id(item)) ?? all.count }
+        return items.enumerated()
+            .sorted { (rank($0.element), $0.offset) < (rank($1.element), $1.offset) }
+            .map(\.element)
+    }
+
     public static func isPremium(_ productId: String) -> Bool {
         all.contains(productId)
     }

@@ -43,7 +43,8 @@ final class SubscriptionModel {
         api: DogMonitorAPI,
         householdId: UUID,
         productLoader: @escaping ProductLoader = { ids in
-            let products = try await Product.products(for: ids)
+            let loaded = try await Product.products(for: ids)
+            let products = SubscriptionProducts.inDisplayOrder(loaded) { $0.id }
             return LoadedProducts(count: products.count, products: products)
         }
     ) {
