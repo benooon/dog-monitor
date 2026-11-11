@@ -114,3 +114,8 @@ export function eventMediaPrefix(householdId: string, cameraId: string, eventId:
 export function eventMediaKey(householdId: string, cameraId: string, eventId: string, kind: MediaKind): string {
   return `${eventMediaPrefix(householdId, cameraId, eventId)}${kind === "clip" ? "clip.mp4" : "snapshot.jpg"}`;
 }
+
+/** The day's highlight reel of one camera (`date` is the camera's local YYYY-MM-DD). */
+export function reelMediaKey(householdId: string, cameraId: string, date: string): string {
+  return `${householdMediaPrefix(householdId)}cameras/${cameraId}/reels/${date}.mp4`;
+}

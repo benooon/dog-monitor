@@ -1,0 +1,1 @@
+ALTER TABLE "daily_summaries" ADD COLUMN "reel_key" text;

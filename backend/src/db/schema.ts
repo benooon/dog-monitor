@@ -235,6 +235,8 @@ export const dailySummaries = pgTable(
     stateMinutes: jsonb("state_minutes").$type<Partial<Record<DogState, number>>>().notNull().default(sql`'{}'::jsonb`),
     /** Set when the "daily summary is ready" push went out (once per camera and day). */
     notifiedAt: timestamp("notified_at", { withTimezone: true }),
+    /** Storage key of the day's highlight reel (Premium), set once the camera uploaded it. */
+    reelKey: text("reel_key"),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.deviceId, t.date] }), index("daily_summaries_household_date_idx").on(t.householdId, t.date)],

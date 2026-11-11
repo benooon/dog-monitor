@@ -1,5 +1,5 @@
 import type { FastifyBaseLogger } from "fastify";
-import { and, eq, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt, or, sql, type SQL } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { dailySummaries, events, households, mediaTombstones } from "../db/schema.js";
 import { PLAN_FEATURES } from "../billing/plans.js";
@@ -45,7 +45,8 @@ export async function purgeExpiredMedia(
       ),
     )
     .limit(5000);
-  if (expired.length === 0) return 0;
+  const reelsDeleted = await purgeExpiredReels(db, storage, cutoff);
+  if (expired.length === 0) return reelsDeleted;
 
   const keys = expired.flatMap((e) => [e.clipKey, e.snapshotKey]).filter((k): k is string => k !== null);
   await storage.deleteObjects(keys);
@@ -58,7 +59,27 @@ export async function purgeExpiredMedia(
         expired.map((e) => e.id),
       ),
     );
-  return keys.length;
+  return keys.length + reelsDeleted;
+}
+
+/** Highlight reels follow the clip retention of their household, counted from the summary's day. */
+async function purgeExpiredReels(db: Database, storage: MediaStorage, cutoff: SQL): Promise<number> {
+  const expired = await db
+    .select({ deviceId: dailySummaries.deviceId, date: dailySummaries.date, reelKey: dailySummaries.reelKey })
+    .from(dailySummaries)
+    .innerJoin(households, eq(households.id, dailySummaries.householdId))
+    // The reel covers the whole day, so it goes once the end of that day is past the cutoff.
+    .where(and(isNotNull(dailySummaries.reelKey), sql`(${dailySummaries.date} + 1)::timestamptz < ${cutoff}`))
+    .limit(1000);
+  if (expired.length === 0) return 0;
+  await storage.deleteObjects(expired.map((row) => row.reelKey!));
+  for (const row of expired) {
+    await db
+      .update(dailySummaries)
+      .set({ reelKey: null })
+      .where(and(eq(dailySummaries.deviceId, row.deviceId), eq(dailySummaries.date, row.date)));
+  }
+  return expired.length;
 }
 
 /** Presigned upload URLs live 15 minutes; tombstones are kept well past that. */

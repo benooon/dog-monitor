@@ -25,6 +25,8 @@ function summaryDto(row: typeof dailySummaries.$inferSelect) {
     activityByHour: row.activityByHour,
     stateMinutes: row.stateMinutes,
     isFinal: row.notifiedAt !== null,
+    /** The day's highlight reel is uploaded (`GET /summaries/:cameraId/:date/reel`). */
+    hasReel: row.reelKey !== null,
     updatedAt: row.updatedAt.toISOString(),
   };
 }

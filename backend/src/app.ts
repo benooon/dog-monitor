@@ -30,6 +30,7 @@ import { timelineRoutes } from "./routes/timeline.js";
 import { cameraZoneRoutes } from "./routes/zones.js";
 import { trainingRoutes } from "./routes/training.js";
 import { cameraSummaryRoutes, viewerSummaryRoutes } from "./routes/summaries.js";
+import { cameraReelRoutes, viewerReelRoutes } from "./routes/reels.js";
 import { healthRoutes } from "./routes/health.js";
 import { appStoreNotificationRoutes, subscriptionRoutes } from "./routes/subscription.js";
 import type { TransactionVerifier } from "./billing/app-store.js";
@@ -131,6 +132,9 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(timelineRoutes, { db: services.db });
     await app.register(cameraSummaryRoutes, { db: services.db, notifier });
     await app.register(viewerSummaryRoutes, { db: services.db });
+    const reelOptions = { db: services.db, storage: services.storage, enforcePlanLimits, now: () => new Date(clock()) };
+    await app.register(cameraReelRoutes, reelOptions);
+    await app.register(viewerReelRoutes, reelOptions);
     await app.register(trainingRoutes, { db: services.db, storage: services.storage, jwt: services.jwt });
     if (services.storage && services.retentionDays !== 0) {
       const stop = scheduleRetention(
