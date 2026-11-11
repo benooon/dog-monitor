@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: c4cf7a9d8b8e9791302fd32adb3eb983fd1229c5
-- message: docs: live view E2EE done; privacy docs and policy (en/he) say live view is end-to-end encrypted, clips are not; marketing waits for the real-phone check
-- time (UTC): 2026-11-11T12:46:54Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43023034450
+- commit: 3795d5b3ca190a49fd13e85dc2158dcae265f9e3
+- message: docs: claim reel player sizing task; mark SIWA revoke [blocked]
+- time (UTC): 2026-11-11T12:48:48Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43023226274
 
 | job | result | log |
 |---|---|---|
