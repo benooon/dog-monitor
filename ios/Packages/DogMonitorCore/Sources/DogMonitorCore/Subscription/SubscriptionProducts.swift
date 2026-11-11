@@ -15,10 +15,12 @@ public enum SubscriptionProducts {
     /// Puts App Store products in display order (yearly first); the App Store returns them unordered.
     /// Ids that aren't Premium plans go last, in their original order.
     public static func inDisplayOrder<Item>(_ items: [Item], id: (Item) -> String) -> [Item] {
-        let rank = { (item: Item) in all.firstIndex(of: id(item)) ?? all.count }
-        return items.enumerated()
-            .sorted { (rank($0.element), $0.offset) < (rank($1.element), $1.offset) }
-            .map(\.element)
+        let ranked = items.enumerated().map { offset, item in
+            (rank: all.firstIndex(of: id(item)) ?? all.count, offset: offset, item: item)
+        }
+        return ranked
+            .sorted { ($0.rank, $0.offset) < ($1.rank, $1.offset) }
+            .map(\.item)
     }
 
     public static func isPremium(_ productId: String) -> Bool {
