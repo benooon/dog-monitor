@@ -31,6 +31,25 @@ public struct SubscriptionDTO: Codable, Sendable, Hashable {
     public let productId: String?
     public let limits: Counts
     public let usage: Counts
+    /// What the server unlocks for this household (`features` on the wire; nil from an older
+    /// server). Everything is unlocked while plan limits aren't enforced.
+    public let unlocked: Unlocked?
+
+    /// Feature flags from `GET /subscription`.
+    public struct Unlocked: Codable, Sendable, Hashable {
+        public let insights: Bool
+        public let highlightReel: Bool
+
+        public init(insights: Bool, highlightReel: Bool) {
+            self.insights = insights
+            self.highlightReel = highlightReel
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case plan, expiresAt, lifetime, productId, limits, usage
+        case unlocked = "features"
+    }
 
     public init(
         plan: HouseholdPlan,
@@ -38,7 +57,8 @@ public struct SubscriptionDTO: Codable, Sendable, Hashable {
         lifetime: Bool? = nil,
         productId: String?,
         limits: Counts,
-        usage: Counts
+        usage: Counts,
+        unlocked: Unlocked? = nil
     ) {
         self.plan = plan
         self.expiresAt = expiresAt
@@ -46,6 +66,7 @@ public struct SubscriptionDTO: Codable, Sendable, Hashable {
         self.productId = productId
         self.limits = limits
         self.usage = usage
+        self.unlocked = unlocked
     }
 
     public var isPremium: Bool { plan == .premium }
@@ -55,6 +76,9 @@ public struct SubscriptionDTO: Codable, Sendable, Hashable {
 
     /// What the household's plan includes.
     public var features: PlanFeatures { .for(plan) }
+
+    /// Weekly insights and the vet report: the server's flag, else the plan table.
+    public var insightsUnlocked: Bool { unlocked?.insights ?? features.insights }
 
     /// How many more cameras the household can pair.
     public var camerasLeft: Int { max(0, limits.cameras - usage.cameras) }

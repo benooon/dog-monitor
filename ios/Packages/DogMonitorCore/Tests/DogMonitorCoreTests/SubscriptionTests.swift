@@ -34,6 +34,22 @@ final class SubscriptionTests: XCTestCase {
         XCTAssertEqual(subscription.camerasLeft, 3)
     }
 
+    func testInsightsFollowTheServerFlagThenThePlan() throws {
+        let unlocked = #"""
+        {"plan":"free","expiresAt":null,"productId":null,"limits":{"cameras":4},"usage":{"cameras":1},
+         "features":{"insights":true,"highlightReel":true}}
+        """#
+        let free = try JSONCoding.makeDecoder().decode(SubscriptionDTO.self, from: Data(unlocked.utf8))
+        XCTAssertEqual(free.unlocked, SubscriptionDTO.Unlocked(insights: true, highlightReel: true))
+        XCTAssertTrue(free.insightsUnlocked)
+
+        let older = try JSONCoding.makeDecoder().decode(SubscriptionDTO.self, from: Data(Self.premiumJSON.utf8))
+        XCTAssertNil(older.unlocked)
+        XCTAssertTrue(older.insightsUnlocked)
+        let lapsed = SubscriptionDTO(plan: .free, expiresAt: nil, productId: nil, limits: .init(cameras: 1), usage: .init(cameras: 1))
+        XCTAssertFalse(lapsed.insightsUnlocked)
+    }
+
     func testOlderServerWithoutLifetimeFieldIsNotLifetime() throws {
         let subscription = try JSONCoding.makeDecoder().decode(SubscriptionDTO.self, from: Data(Self.premiumJSON.utf8))
         XCTAssertNil(subscription.lifetime)
