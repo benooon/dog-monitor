@@ -133,7 +133,13 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(viewerSummaryRoutes, { db: services.db });
     await app.register(trainingRoutes, { db: services.db, storage: services.storage, jwt: services.jwt });
     if (services.storage && services.retentionDays !== 0) {
-      const stop = scheduleRetention(services.db, services.storage, services.retentionDays ?? DEFAULT_RETENTION_DAYS, app.log);
+      const stop = scheduleRetention(
+        services.db,
+        services.storage,
+        services.retentionDays ?? DEFAULT_RETENTION_DAYS,
+        app.log,
+        services.enforcePlanLimits ?? false,
+      );
       app.addHook("onClose", async () => stop());
     }
 

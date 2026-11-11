@@ -2,6 +2,7 @@ import type { FastifyBaseLogger } from "fastify";
 import { and, eq, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { dailySummaries, events, households, mediaTombstones } from "../db/schema.js";
+import { PLAN_FEATURES } from "../billing/plans.js";
 import type { MediaStorage } from "./storage.js";
 
 export const DEFAULT_RETENTION_DAYS = 7;
@@ -11,23 +12,33 @@ export const TRAINING_RETENTION_DAYS = 90;
 /**
  * Deletes clips and snapshots of events older than the retention period (SPEC §10), and clears
  * their keys. Event rows stay for the timeline and daily summaries. Returns how many objects were deleted.
+ *
+ * With `byPlan` (ENFORCE_PLAN_LIMITS), each household keeps clips as long as its plan allows
+ * (PLAN_FEATURES.clipRetentionDays) instead of the global `retentionDays`.
  */
 export async function purgeExpiredMedia(
   db: Database,
   storage: MediaStorage,
   retentionDays: number,
   now: Date = new Date(),
+  options: { byPlan?: boolean } = {},
 ): Promise<number> {
   const day = 24 * 60 * 60 * 1000;
-  const cutoff = new Date(now.getTime() - retentionDays * day);
-  const trainingCutoff = new Date(now.getTime() - Math.max(TRAINING_RETENTION_DAYS, retentionDays) * day);
+  const before = (days: number) => new Date(now.getTime() - days * day).toISOString();
+  const cutoff = options.byPlan
+    ? sql`(CASE WHEN ${households.planExpiresAt} > ${now.toISOString()}::timestamptz
+            THEN ${before(PLAN_FEATURES.premium.clipRetentionDays)}::timestamptz
+            ELSE ${before(PLAN_FEATURES.free.clipRetentionDays)}::timestamptz END)`
+    : sql`${before(retentionDays)}::timestamptz`;
+  const longest = options.byPlan ? PLAN_FEATURES.premium.clipRetentionDays : retentionDays;
+  const trainingCutoff = new Date(now.getTime() - Math.max(TRAINING_RETENTION_DAYS, longest) * day);
   const expired = await db
     .select({ id: events.id, clipKey: events.clipKey, snapshotKey: events.snapshotKey })
     .from(events)
     .innerJoin(households, eq(households.id, events.householdId))
     .where(
       and(
-        lt(events.startedAt, cutoff),
+        sql`${events.startedAt} < ${cutoff}`,
         or(isNotNull(events.clipKey), isNotNull(events.snapshotKey)),
         // Labeled clips of opted-in households stay until the training cutoff.
         or(isNull(events.feedback), eq(households.shareTrainingData, false), lt(events.startedAt, trainingCutoff)),
@@ -75,9 +86,10 @@ export function scheduleRetention(
   storage: MediaStorage,
   retentionDays: number,
   log: FastifyBaseLogger,
+  byPlan = false,
 ): () => void {
   const run = () => {
-    purgeExpiredMedia(db, storage, retentionDays)
+    purgeExpiredMedia(db, storage, retentionDays, new Date(), { byPlan })
       .then((deleted) => {
         if (deleted > 0) log.info({ deleted }, "deleted expired clips and snapshots");
       })

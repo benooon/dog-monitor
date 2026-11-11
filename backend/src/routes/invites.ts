@@ -4,8 +4,8 @@ import type { Database } from "../db/client.js";
 import { HOUSEHOLD_MEMBER_USER_UNIQUE, INVITE_CODE_UNIQUE, isUniqueViolation } from "../db/errors.js";
 import { devices, householdMembers, households, invites, users } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
-import { LIMITS } from "../households/limits.js";
 import { householdCameraLimit } from "../billing/camera-limit.js";
+import { memberLimit } from "../billing/plans.js";
 import { findMembership, requireHousehold, requireOwner } from "../households/scope.js";
 import { AttemptLimiter } from "../pairing/attempt-limiter.js";
 import { INVITE_TTL_MS, hashSecret, newDeviceSecret, newInviteCode, newInviteToken } from "../pairing/secrets.js";
@@ -192,15 +192,20 @@ export async function inviteRoutes(
           if (!invite) throw new AcceptError(404, "invalid_or_expired_invite");
           const householdId = invite.householdId;
           // Serialise accepts per household so concurrent ones cannot all pass the limit counts below.
-          await tx.select({ id: households.id }).from(households).where(eq(households.id, householdId)).for("update");
+          const [household] = await tx
+            .select({ planExpiresAt: households.planExpiresAt })
+            .from(households)
+            .where(eq(households.id, householdId))
+            .for("update");
 
           if (body.as === "member") {
             const [row] = await tx
               .select({ n: count() })
               .from(householdMembers)
               .where(eq(householdMembers.householdId, householdId));
-            if ((row?.n ?? 0) >= LIMITS.usersPerHousehold) {
-              throw new AcceptError(409, "member_limit_reached", { limit: LIMITS.usersPerHousehold });
+            const limit = memberLimit({ planExpiresAt: household?.planExpiresAt ?? null }, at, opts.enforcePlanLimits ?? false);
+            if ((row?.n ?? 0) >= limit) {
+              throw new AcceptError(409, "member_limit_reached", { limit });
             }
             await tx.insert(householdMembers).values({ householdId, userId: userId!, role: "member" });
             return { status: 200, payload: { householdId, role: "member" } };

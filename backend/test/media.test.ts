@@ -181,6 +181,32 @@ describe.skipIf(!hasDatabase)("media routes and retention", () => {
     expect(await purgeExpiredMedia(h.db, storage, 7, now)).toBe(0);
   });
 
+  it("keeps clips as long as the household's plan allows when plan limits are enforced", async () => {
+    const { householdId, cameraId } = await setup();
+    const now = new Date("2026-11-10T08:00:00Z");
+    const ids = {
+      hoursOld: "77777777-7777-4777-8777-777777777771",
+      twoDays: "77777777-7777-4777-8777-777777777772",
+      monthOld: "77777777-7777-4777-8777-777777777773",
+    };
+    const key = (id: string) => eventMediaKey(householdId, cameraId, id, "clip");
+    await h.db.insert(events).values([
+      { id: ids.hoursOld, householdId, deviceId: cameraId, type: "whining", startedAt: new Date("2026-11-10T02:00:00Z"), clipKey: key(ids.hoursOld) },
+      { id: ids.twoDays, householdId, deviceId: cameraId, type: "whining", startedAt: new Date("2026-11-08T08:00:00Z"), clipKey: key(ids.twoDays) },
+      { id: ids.monthOld, householdId, deviceId: cameraId, type: "whining", startedAt: new Date("2026-10-05T08:00:00Z"), clipKey: key(ids.monthOld) },
+    ]);
+
+    // Premium keeps 30 days: only the clip from October goes.
+    await h.db.update(households).set({ planExpiresAt: new Date("2026-12-01T00:00:00Z") }).where(eq(households.id, householdId));
+    expect(await purgeExpiredMedia(h.db, storage, 7, now, { byPlan: true })).toBe(1);
+    expect(storage.deleted).toEqual([key(ids.monthOld)]);
+
+    // Free keeps one day.
+    await h.db.update(households).set({ planExpiresAt: null }).where(eq(households.id, householdId));
+    expect(await purgeExpiredMedia(h.db, storage, 7, now, { byPlan: true })).toBe(1);
+    expect(storage.deleted).toEqual([key(ids.monthOld), key(ids.twoDays)]);
+  });
+
   it("keeps labeled clips of households that share training data, up to 90 days", async () => {
     const { owner, householdId, cameraId } = await setup();
     const now = new Date("2026-11-10T08:00:00Z");

@@ -1,10 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { and, count, eq, gt, ne } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices, households } from "../db/schema.js";
+import { devices, householdMembers, households } from "../db/schema.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
 import { TransactionError, type TransactionVerifier } from "../billing/app-store.js";
-import { cameraLimit, effectivePlan } from "../billing/plans.js";
+import { cameraLimit, effectivePlan, memberLimit } from "../billing/plans.js";
 import { applyTransaction } from "../billing/apply-transaction.js";
 
 export interface SubscriptionRouteOptions {
@@ -31,14 +31,15 @@ export async function subscriptionRoutes(app: FastifyInstance, opts: Subscriptio
       .select({ n: count() })
       .from(devices)
       .where(and(eq(devices.householdId, householdId), eq(devices.role, "camera"), eq(devices.status, "active")));
+    const [members] = await db.select({ n: count() }).from(householdMembers).where(eq(householdMembers.householdId, householdId));
     const at = now();
     const plan = effectivePlan(household!, at);
     return {
       plan,
       expiresAt: plan === "premium" ? household!.planExpiresAt!.toISOString() : null,
       productId: plan === "premium" ? household!.planProductId : null,
-      limits: { cameras: cameraLimit(household!, at, enforcePlanLimits) },
-      usage: { cameras: cameras?.n ?? 0 },
+      limits: { cameras: cameraLimit(household!, at, enforcePlanLimits), members: memberLimit(household!, at, enforcePlanLimits) },
+      usage: { cameras: cameras?.n ?? 0, members: members?.n ?? 0 },
     };
   }
 

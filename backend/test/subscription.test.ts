@@ -4,7 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { CompactSign } from "jose";
 import { createAppStoreVerifier, type TransactionVerifier } from "../src/billing/app-store.js";
-import { cameraLimit, effectivePlan } from "../src/billing/plans.js";
+import { PLAN_FEATURES, cameraLimit, effectivePlan, memberLimit } from "../src/billing/plans.js";
 import type { DbHandle } from "../src/db/client.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
@@ -117,6 +117,19 @@ describe("plans", () => {
     expect(cameraLimit({ planExpiresAt: new Date(NOW.getTime() + DAY) }, NOW, true)).toBe(4);
     expect(cameraLimit({ planExpiresAt: null }, NOW, false)).toBe(4);
   });
+
+  it("limits free households to two people only when enforced", () => {
+    expect(memberLimit({ planExpiresAt: null }, NOW, true)).toBe(2);
+    expect(memberLimit({ planExpiresAt: new Date(NOW.getTime() + DAY) }, NOW, true)).toBe(6);
+    expect(memberLimit({ planExpiresAt: null }, NOW, false)).toBe(6);
+  });
+
+  it("matches the plan table (free: 1 camera, 2 people, 1 day of clips; premium: 4, everyone, 30 days)", () => {
+    expect(PLAN_FEATURES).toEqual({
+      free: { cameras: 1, members: 2, clipRetentionDays: 1, insights: false, highlightReel: false },
+      premium: { cameras: 4, members: 6, clipRetentionDays: 30, insights: true, highlightReel: true },
+    });
+  });
 });
 
 describe.skipIf(!hasDatabase)("subscription routes", () => {
@@ -174,8 +187,8 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
       plan: "free",
       expiresAt: null,
       productId: null,
-      limits: { cameras: 1 },
-      usage: { cameras: 0 },
+      limits: { cameras: 1, members: 2 },
+      usage: { cameras: 0, members: 1 },
     });
     expect((await pairCamera(auth, "Living room")).statusCode).toBe(201);
     const blocked = await pairCamera(auth, "Door");
@@ -194,6 +207,25 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
       plan: "free",
       limits: { cameras: 1 },
       usage: { cameras: 2 },
+    });
+  });
+
+  it("lets two people into a free household and everyone into a premium one", async () => {
+    const { auth, householdId } = await household("owner");
+    const join = async (sub: string) => {
+      const invite = (await app.inject({ method: "POST", url: "/invites", headers: auth })).json();
+      return app.inject({ method: "POST", url: `/invites/${invite.token}/accept`, headers: await signIn(sub), payload: { as: "member" } });
+    };
+    expect((await join("partner")).statusCode).toBe(200);
+    const blocked = await join("kid");
+    expect(blocked.statusCode).toBe(409);
+    expect(blocked.json()).toEqual({ error: "member_limit_reached", limit: 2 });
+
+    expect((await purchase(auth, transaction({ appAccountToken: householdId }))).statusCode).toBe(200);
+    expect((await join("kid")).statusCode).toBe(200);
+    expect((await app.inject({ method: "GET", url: "/subscription", headers: auth })).json()).toMatchObject({
+      limits: { members: 6 },
+      usage: { members: 3 },
     });
   });
 
