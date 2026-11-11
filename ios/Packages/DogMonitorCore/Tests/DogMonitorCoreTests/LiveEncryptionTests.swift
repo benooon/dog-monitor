@@ -29,7 +29,8 @@ final class LiveKeyTests: XCTestCase {
         XCTAssertFalse(encoded.contains("="))
         XCTAssertFalse(encoded.contains("+"))
         XCTAssertFalse(encoded.contains("/"))
-        XCTAssertEqual(LiveKey(encoded: encoded), key)
+        XCTAssertEqual(LiveKey(encoded: encoded, id: key.id), key)
+        XCTAssertEqual(LiveKey(encoded: encoded)?.data, key.data)
         XCTAssertEqual(key.passphrase, encoded)
 
         let allOnes = try XCTUnwrap(LiveKey(data: Data(repeating: 0xFF, count: 32)))
@@ -44,6 +45,36 @@ final class LiveKeyTests: XCTestCase {
         XCTAssertNil(LiveKey(encoded: String(repeating: "A", count: 43) + "="))
         XCTAssertNil(LiveKey(encoded: String(repeating: "A", count: 42) + "+"))
         XCTAssertNil(LiveKey(encoded: String(repeating: "A", count: 42) + "é"))
+    }
+
+    func testNewKeysHaveTheirOwnRandomID() throws {
+        let a = LiveKey.generate()
+        let b = LiveKey.generate()
+        let id = try XCTUnwrap(a.id)
+        XCTAssertEqual(id.count, 12)
+        XCTAssertTrue(LiveKey.isValidID(id))
+        XCTAssertNotEqual(a.id, b.id)
+        XCTAssertFalse(a.encoded.contains(id), "the id is not part of the key")
+    }
+
+    func testIDsAreValidated() {
+        let data = Data(repeating: 1, count: 32)
+        XCTAssertNotNil(LiveKey(data: data, id: "abcDEF-_0123"))
+        XCTAssertNil(LiveKey(data: data, id: "short"))
+        XCTAssertNil(LiveKey(data: data, id: "has space in"))
+        XCTAssertNil(LiveKey(data: data, id: "with.dot.here"))
+        XCTAssertNil(LiveKey(data: data, id: String(repeating: "a", count: 65)))
+    }
+
+    func testCurrentKey() throws {
+        let key = LiveKey.generate()
+        let id = try XCTUnwrap(key.id)
+        XCTAssertTrue(key.isCurrent(householdKeyId: nil), "households from before ids")
+        XCTAssertTrue(key.isCurrent(householdKeyId: id))
+        XCTAssertFalse(key.isCurrent(householdKeyId: "another-key-id"))
+        let legacy = try XCTUnwrap(LiveKey(encoded: key.encoded))
+        XCTAssertTrue(legacy.isCurrent(householdKeyId: nil))
+        XCTAssertFalse(legacy.isCurrent(householdKeyId: id))
     }
 
     func testNeverPrintsTheKey() {
@@ -66,6 +97,22 @@ final class LiveKeyTests: XCTestCase {
         XCTAssertNil(store.load())
     }
 
+    func testStoreKeepsTheIDAndReadsKeysFromBeforeIDs() throws {
+        let secure = InMemorySecureStore()
+        let store = LiveKeyStore(store: secure)
+        let key = LiveKey.generate()
+        try store.save(key)
+        XCTAssertEqual(store.load()?.id, key.id)
+
+        try secure.setData(Data(key.encoded.utf8), forKey: LiveKeyStore.storageKey)
+        let legacy = try XCTUnwrap(store.load())
+        XCTAssertEqual(legacy.data, key.data)
+        XCTAssertNil(legacy.id)
+
+        try secure.setData(Data("\(key.encoded).bad id".utf8), forKey: LiveKeyStore.storageKey)
+        XCTAssertNil(store.load())
+    }
+
     func testStoreIgnoresGarbage() throws {
         let secure = InMemorySecureStore()
         try secure.setData(Data("not a key".utf8), forKey: LiveKeyStore.storageKey)
@@ -79,20 +126,25 @@ final class LiveKeyPairingTests: XCTestCase {
     func testQRCarriesTheKeyNextToTheToken() throws {
         let key = LiveKey.generate()
         let content = PairingCode.qrContent(token: token, liveKey: key)
-        XCTAssertEqual(content, "dogmonitor://pair?t=\(token)&k=\(key.encoded)")
+        let id = try XCTUnwrap(key.id)
+        XCTAssertEqual(content, "dogmonitor://pair?t=\(token)&k=\(key.encoded)&kid=\(id)")
         XCTAssertEqual(PairingCode.parse(content), token, "only the token is sent to the server")
         XCTAssertEqual(PairingCode.liveKey(in: content), key)
         XCTAssertNil(PairingCode.liveKey(in: PairingCode.qrContent(token: token)))
+        // QR codes from before ids carry the key alone.
+        XCTAssertEqual(PairingCode.liveKey(in: "dogmonitor://pair?t=\(token)&k=\(key.encoded)"), LiveKey(encoded: key.encoded))
     }
 
     func testInviteLinkCarriesTheKeyInTheFragment() throws {
         let key = LiveKey.generate()
         let link = try XCTUnwrap(PairingCode.inviteLink(token: token, baseURL: URL(string: "https://api.dogmonitor.app")!, liveKey: key))
-        XCTAssertEqual(link.absoluteString, "https://api.dogmonitor.app/invite/\(token)#k=\(key.encoded)")
+        let id = try XCTUnwrap(key.id)
+        XCTAssertEqual(link.absoluteString, "https://api.dogmonitor.app/invite/\(token)#k=\(key.encoded)&kid=\(id)")
         XCTAssertNil(link.query, "the key must not be in anything a server receives")
         XCTAssertEqual(PairingCode.parse(link.absoluteString), token)
         XCTAssertEqual(PairingCode.liveKey(in: link.absoluteString), key)
-        XCTAssertEqual(PairingCode.liveKey(in: "https://api.dogmonitor.app/invite/\(token)#x=1&k=\(key.encoded)"), key)
+        XCTAssertEqual(PairingCode.liveKey(in: "https://api.dogmonitor.app/invite/\(token)#x=1&kid=\(id)&k=\(key.encoded)"), key)
+        XCTAssertEqual(PairingCode.liveKey(in: "https://api.dogmonitor.app/invite/\(token)#k=\(key.encoded)"), LiveKey(encoded: key.encoded))
     }
 
     func testTypedCodesAndBrokenKeysCarryNoKey() {
@@ -112,6 +164,15 @@ final class LiveEncryptionPolicyTests: XCTestCase {
         XCTAssertEqual(LiveEncryption.mode(key: nil, householdEncrypted: false), .clear)
     }
 
+    func testAReplacedKeyNeedsANewScan() throws {
+        let key = LiveKey.generate()
+        let id = try XCTUnwrap(key.id)
+        XCTAssertEqual(LiveEncryption.mode(key: key, householdEncrypted: true, householdKeyId: id), .encrypted(key))
+        XCTAssertEqual(LiveEncryption.mode(key: key, householdEncrypted: true, householdKeyId: "the-new-key"), .needsKey)
+        XCTAssertEqual(LiveEncryption.mode(key: key, householdEncrypted: true, householdKeyId: nil), .encrypted(key))
+        XCTAssertEqual(LiveEncryption.mode(key: nil, householdEncrypted: true, householdKeyId: id), .needsKey)
+    }
+
     func testTrackDecisions() {
         func decide(_ encrypted: Bool, key: Bool, household: Bool, pinned: Bool) -> LiveEncryption.TrackDecision {
             LiveEncryption.decision(trackEncrypted: encrypted, hasKey: key, householdEncrypted: household, cameraPinned: pinned)
@@ -124,11 +185,27 @@ final class LiveEncryptionPolicyTests: XCTestCase {
         XCTAssertEqual(decide(false, key: false, household: false, pinned: false), .show)
     }
 
-    func testOwnerActions() {
-        XCTAssertEqual(LiveEncryption.ownerAction(hasKey: false, householdEncrypted: false), .createKey)
-        XCTAssertEqual(LiveEncryption.ownerAction(hasKey: true, householdEncrypted: false), .markEncrypted)
-        XCTAssertEqual(LiveEncryption.ownerAction(hasKey: true, householdEncrypted: true), LiveEncryption.OwnerAction.none)
-        XCTAssertEqual(LiveEncryption.ownerAction(hasKey: false, householdEncrypted: true), .replaceLostKey)
+    func testOwnerActions() throws {
+        let key = LiveKey.generate()
+        let id = try XCTUnwrap(key.id)
+        let legacy = try XCTUnwrap(LiveKey(encoded: key.encoded))
+        func action(_ key: LiveKey?, encrypted: Bool, keyId: String? = nil, rotate: Bool = false) -> LiveEncryption.OwnerAction {
+            LiveEncryption.ownerAction(key: key, householdEncrypted: encrypted, householdKeyId: keyId, rotationNeeded: rotate)
+        }
+        XCTAssertEqual(action(nil, encrypted: false), .createKey)
+        XCTAssertEqual(action(key, encrypted: false), .markEncrypted)
+        XCTAssertEqual(action(key, encrypted: true, keyId: id), LiveEncryption.OwnerAction.none)
+        XCTAssertEqual(action(nil, encrypted: true), .replaceLostKey)
+        XCTAssertEqual(action(nil, encrypted: true, keyId: id, rotate: true), .replaceLostKey)
+        // Someone holding the key left.
+        XCTAssertEqual(action(key, encrypted: true, keyId: id, rotate: true), .rotateKey)
+        XCTAssertEqual(action(legacy, encrypted: true, rotate: true), .rotateKey)
+        // The server doesn't know this key's id yet (made before, or the earlier mark failed).
+        XCTAssertEqual(action(key, encrypted: true), .markEncrypted)
+        XCTAssertEqual(action(key, encrypted: true, keyId: "an-older-key"), .markEncrypted)
+        // Keys from before ids stay as they are until someone leaves.
+        XCTAssertEqual(action(legacy, encrypted: true), LiveEncryption.OwnerAction.none)
+        XCTAssertEqual(action(legacy, encrypted: true, keyId: id), .rotateKey)
     }
 
     func testPinsPersist() throws {
@@ -158,6 +235,26 @@ final class LiveEncryptionAPITests: XCTestCase {
         XCTAssertTrue(encrypted.isHouseholdEncrypted)
         XCTAssertFalse(clear.isHouseholdEncrypted)
         XCTAssertFalse(older.isHouseholdEncrypted, "older servers")
+        XCTAssertNil(encrypted.liveKeyId)
+        let named = try await api("{\(base),\"encrypted\":true,\"liveKeyId\":\"key-id-1234\"}").liveToken(cameraId: cameraId)
+        XCTAssertEqual(named.liveKeyId, "key-id-1234")
+    }
+
+    func testHouseholdSaysWhenTheOwnerShouldMakeANewKey() async throws {
+        let json = #"{"id":"\#(Fixtures.householdID)","name":"Home","plan":"free","ownerId":"\#(Fixtures.householdID)","role":"owner","liveEncrypted":true,"liveKeyId":"key-id-1234","liveKeyRotationNeeded":true,"members":[],"dogs":[],"devices":[]}"#
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: StubTransport(json: json))
+        let household = try await api.household()
+        XCTAssertEqual(household.liveKeyId, "key-id-1234")
+        XCTAssertEqual(household.liveKeyRotationNeeded, true)
+    }
+
+    func testMarkingSendsTheKeyIDButNeverTheKey() async throws {
+        let stub = StubTransport(json: #"{"id":"\#(Fixtures.householdID)","name":"Home","plan":"free","liveEncrypted":true}"#)
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)
+        try await api.markLiveEncrypted(keyId: "key-id-1234")
+        let body = try Fixtures.bodyJSON(try XCTUnwrap(stub.requests.first))
+        XCTAssertEqual(Set(body.keys), ["liveEncrypted", "liveKeyId"])
+        XCTAssertEqual(body["liveKeyId"] as? String, "key-id-1234")
     }
 
     func testMarkingSendsOnlyTheFlag() async throws {

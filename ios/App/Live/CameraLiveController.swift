@@ -15,6 +15,9 @@ final class CameraLiveController {
     }
 
     static let heartbeatInterval: Duration = .seconds(45)
+    /// How often a camera left running checks that its live key is still the household's (the
+    /// owner makes a new one when someone leaves). Viewers are told sooner by the server.
+    static let liveKeyCheckInterval: Duration = .seconds(15 * 60)
 
     private(set) var link: Link = .connecting
     private(set) var viewerCount = 0
@@ -82,7 +85,10 @@ final class CameraLiveController {
             }
         })
         tasks.append(Task { [weak self] in
-            await self?.checkLiveKey()
+            while !Task.isCancelled {
+                await self?.checkLiveKey()
+                try? await Task.sleep(for: Self.liveKeyCheckInterval)
+            }
         })
         tasks.append(Task { [weak self] in
             while !Task.isCancelled {
@@ -116,15 +122,16 @@ final class CameraLiveController {
 
     // MARK: - Private
 
-    /// A camera without the key learns right away whether it may publish, so its screen can
-    /// say so before anyone tries to watch.
+    /// A camera without the key, or with one the owner has since replaced, learns whether it
+    /// may publish, so its screen can say so before anyone tries to watch.
     private func checkLiveKey() async {
-        guard liveKeys.load() == nil else {
-            setNeedsLiveKey(false)
-            return
-        }
         guard let token = try? await api.deviceLiveToken() else { return }
-        setNeedsLiveKey(LiveEncryption.mode(key: nil, householdEncrypted: token.isHouseholdEncrypted) == .needsKey)
+        let mode = LiveEncryption.mode(
+            key: liveKeys.load(),
+            householdEncrypted: token.isHouseholdEncrypted,
+            householdKeyId: token.liveKeyId
+        )
+        setNeedsLiveKey(mode == .needsKey)
     }
 
     private func handle(_ event: RealtimeConnection.Event) {
@@ -157,7 +164,8 @@ final class CameraLiveController {
         await connection.send(.heartbeat(
             health.current(),
             dogState: state == .unknown ? nil : state,
-            liveKeyMissing: needsLiveKey
+            liveKeyMissing: needsLiveKey,
+            liveKeyId: liveKeys.load()?.id
         ))
     }
 
@@ -182,7 +190,11 @@ final class CameraLiveController {
                 do {
                     let token = try await api.deviceLiveToken()
                     let key: LiveKey?
-                    switch LiveEncryption.mode(key: liveKeys.load(), householdEncrypted: token.isHouseholdEncrypted) {
+                    switch LiveEncryption.mode(
+                        key: liveKeys.load(),
+                        householdEncrypted: token.isHouseholdEncrypted,
+                        householdKeyId: token.liveKeyId
+                    ) {
                     case .encrypted(let liveKey):
                         key = liveKey
                         setNeedsLiveKey(false)

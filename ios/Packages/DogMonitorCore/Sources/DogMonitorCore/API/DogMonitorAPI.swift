@@ -110,11 +110,17 @@ public struct DogMonitorAPI: Sendable {
     }
 
     /// Owner only: marks the household's live video as end-to-end encrypted, once the owner's
-    /// phone has made and saved the key. The key itself is never sent. There is no way back.
-    public func markLiveEncrypted() async throws {
-        struct Body: Encodable { let liveEncrypted = true }
+    /// phone has made and saved the key, and tells the server the key's id (random, not derived
+    /// from the key) so other phones notice a replaced key. The key itself is never sent. There
+    /// is no way back. Sending an id also clears the server's request for a new key.
+    public func markLiveEncrypted(keyId: String? = nil) async throws {
+        struct Body: Encodable {
+            let liveEncrypted = true
+            /// Left out when nil (synthesized `encodeIfPresent`).
+            let liveKeyId: String?
+        }
         struct Response: Decodable { let liveEncrypted: Bool }
-        let _: Response = try await send("PATCH", "household", body: Body())
+        let _: Response = try await send("PATCH", "household", body: Body(liveKeyId: keyId))
     }
 
     /// Owner only: a one-hour token for `scripts/export-training-data.mjs`.

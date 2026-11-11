@@ -19,8 +19,12 @@ public enum LiveEncryption {
         case needsKey
     }
 
-    public static func mode(key: LiveKey?, householdEncrypted: Bool) -> Mode {
-        if let key { return .encrypted(key) }
+    /// - Parameter householdKeyId: id of the household's current key (from the live token). A
+    ///   key with another id was replaced by the owner: this phone needs to scan the new one.
+    public static func mode(key: LiveKey?, householdEncrypted: Bool, householdKeyId: String? = nil) -> Mode {
+        if let key {
+            return key.isCurrent(householdKeyId: householdKeyId) ? .encrypted(key) : .needsKey
+        }
         return householdEncrypted ? .needsKey : .clear
     }
 
@@ -57,15 +61,28 @@ public enum LiveEncryption {
         /// The household is encrypted but this phone lost the key (new phone without iCloud
         /// Keychain). A new key is made; cameras and family must scan a new invite.
         case replaceLostKey
+        /// Someone who held the key left the household (member removed, device revoked). A new
+        /// key is made; cameras and family scan the owner's invite code again.
+        case rotateKey
     }
 
-    public static func ownerAction(hasKey: Bool, householdEncrypted: Bool) -> OwnerAction {
-        switch (hasKey, householdEncrypted) {
-        case (true, true): .none
-        case (true, false): .markEncrypted
-        case (false, false): .createKey
-        case (false, true): .replaceLostKey
-        }
+    /// - Parameters:
+    ///   - householdKeyId: the id the server has for the current key.
+    ///   - rotationNeeded: the server asks for a new key because someone holding it left.
+    public static func ownerAction(
+        key: LiveKey?,
+        householdEncrypted: Bool,
+        householdKeyId: String? = nil,
+        rotationNeeded: Bool = false
+    ) -> OwnerAction {
+        guard let key else { return householdEncrypted ? .replaceLostKey : .createKey }
+        if householdEncrypted && rotationNeeded { return .rotateKey }
+        // A key from before ids while the server already names another one: this phone's copy
+        // can't be told apart from a stale one, so it is replaced.
+        if householdEncrypted, key.id == nil, householdKeyId != nil { return .rotateKey }
+        // Not marked yet, or the server doesn't know this key's id (the earlier mark failed).
+        if !householdEncrypted || key.id != householdKeyId { return .markEncrypted }
+        return .none
     }
 }
 

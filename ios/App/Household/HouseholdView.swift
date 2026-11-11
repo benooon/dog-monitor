@@ -76,7 +76,11 @@ struct HouseholdView: View {
                     Task { _ = await model.removeMember(member) }
                 }
             } message: { _ in
-                Text("Their phones stop getting alerts and can't watch live.")
+                if liveVideoIsPrivate {
+                    Text("Their phones stop getting alerts and can't watch live. Other phones and cameras in the household scan your invite code once to keep watching live.")
+                } else {
+                    Text("Their phones stop getting alerts and can't watch live.")
+                }
             }
             .confirmationDialog(
                 deviceToRemove.map { Text("Remove \($0.name)?") } ?? Text(verbatim: ""),
@@ -88,15 +92,26 @@ struct HouseholdView: View {
                     Task { _ = await model.revokeDevice(device) }
                 }
             } message: { device in
-                if device.role == .camera {
+                switch (device.role == .camera, liveVideoIsPrivate) {
+                case (true, false):
                     Text("This camera stops watching until you pair it again.")
-                } else {
+                case (true, true):
+                    Text("This camera stops watching until you pair it again. Other phones and cameras in the household scan your invite code once to keep watching live.")
+                case (false, false):
                     Text("This phone stops getting alerts and can't watch live.")
+                case (false, true):
+                    Text("This phone stops getting alerts and can't watch live. Other phones and cameras in the household scan your invite code once to keep watching live.")
                 }
             }
             .refreshable { await model.loadHousehold() }
             .task { await model.loadHousehold() }
         }
+    }
+
+    /// Live video is end-to-end encrypted, so removing someone means a new key that the rest of
+    /// the household scans once (the owner's phone makes it right after).
+    private var liveVideoIsPrivate: Bool {
+        model.household?.liveEncrypted == true
     }
 
     private func list(for household: HouseholdDTO) -> some View {

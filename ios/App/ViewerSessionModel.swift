@@ -109,14 +109,21 @@ final class ViewerSessionModel {
         premium.start()
     }
 
-    /// Owner only: makes the household's live key the first time, then tells the server that
-    /// live video is encrypted. The key is saved before the server hears anything, and only the
-    /// flag is sent. Best effort: retried on the next load.
+    /// Owner only: makes the household's live key the first time, and a new one when someone
+    /// who held it left (the server asks), then tells the server that live video is encrypted
+    /// and the key's id. The key is saved before the server hears anything, and only the flag
+    /// and the id are sent. Best effort: retried on the next load.
     private func ensureLiveKey(for household: HouseholdDTO) async {
-        switch LiveEncryption.ownerAction(hasKey: liveKey != nil, householdEncrypted: household.liveEncrypted ?? false) {
+        let action = LiveEncryption.ownerAction(
+            key: liveKey,
+            householdEncrypted: household.liveEncrypted ?? false,
+            householdKeyId: household.liveKeyId,
+            rotationNeeded: household.liveKeyRotationNeeded ?? false
+        )
+        switch action {
         case .none:
             return
-        case .createKey, .replaceLostKey:
+        case .createKey, .replaceLostKey, .rotateKey:
             let key = LiveKey.generate()
             do {
                 try liveKeys.save(key)
@@ -124,11 +131,10 @@ final class ViewerSessionModel {
                 return
             }
             liveKey = key
-            guard household.liveEncrypted != true else { return }
         case .markEncrypted:
             break
         }
-        try? await api.markLiveEncrypted()
+        try? await api.markLiveEncrypted(keyId: liveKey?.id)
     }
 
     /// A key scanned from the owner's invite QR code by a phone already in the household.

@@ -6,8 +6,10 @@ public enum PairingCode {
 
     /// Name of the live video key in QR codes (`&k=`) and invite link fragments (`#k=`).
     static let liveKeyName = "k"
+    /// Name of the live key's id next to it (`&kid=`), so phones can tell a replaced key.
+    static let liveKeyIDName = "kid"
 
-    /// QR content for an invite: `dogmonitor://pair?t=<token>`, plus `&k=<live key>` when the
+    /// QR content for an invite: `dogmonitor://pair?t=<token>`, plus `&k=<live key>&kid=<key id>` when the
     /// household's live video is encrypted. The QR code is read on the scanning phone and only
     /// the token goes to the server.
     public static func qrContent(token: String, liveKey: LiveKey? = nil) -> String {
@@ -17,6 +19,9 @@ public enum PairingCode {
         components.queryItems = [URLQueryItem(name: "t", value: token)]
         if let liveKey {
             components.queryItems?.append(URLQueryItem(name: liveKeyName, value: liveKey.encoded))
+            if let id = liveKey.id {
+                components.queryItems?.append(URLQueryItem(name: liveKeyIDName, value: id))
+            }
         }
         return components.string ?? "\(scheme)://pair?t=\(token)"
     }
@@ -26,30 +31,36 @@ public enum PairingCode {
     public static func liveKey(in text: String) -> LiveKey? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let components = URLComponents(string: trimmed), components.scheme != nil else { return nil }
-        if let value = components.queryItems?.first(where: { $0.name == liveKeyName })?.value {
-            return LiveKey(encoded: value)
+        if let items = components.queryItems,
+           let value = items.first(where: { $0.name == liveKeyName })?.value {
+            return LiveKey(encoded: value, id: items.first(where: { $0.name == liveKeyIDName })?.value)
         }
         guard let fragment = components.fragment else { return nil }
+        var values: [String: String] = [:]
         for pair in fragment.split(separator: "&") {
             let parts = pair.split(separator: "=", maxSplits: 1)
-            if parts.count == 2, parts[0] == liveKeyName {
-                return LiveKey(encoded: String(parts[1]))
+            if parts.count == 2, values[String(parts[0])] == nil {
+                values[String(parts[0])] = String(parts[1])
             }
         }
-        return nil
+        guard let value = values[liveKeyName] else { return nil }
+        return LiveKey(encoded: value, id: values[liveKeyIDName])
     }
 
     /// Path prefix of invite links served by the backend (Universal Links).
     public static let invitePath = "/invite/"
 
-    /// A shareable invite link: `https://<api host>/invite/<token>`, plus `#k=<live key>` when
+    /// A shareable invite link: `https://<api host>/invite/<token>`, plus `#k=<live key>&kid=<key id>` when
     /// live video is encrypted (a fragment never reaches the server). Opens the app when it is
     /// installed (Universal Link), otherwise a short page about the 6-digit code.
     public static func inviteLink(token: String, baseURL: URL, liveKey: LiveKey? = nil) -> URL? {
         guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { return nil }
         components.path = invitePath + token
         components.query = nil
-        components.fragment = liveKey.map { "\(liveKeyName)=\($0.encoded)" }
+        components.fragment = liveKey.map { key in
+            let pair = "\(liveKeyName)=\(key.encoded)"
+            return key.id.map { "\(pair)&\(liveKeyIDName)=\($0)" } ?? pair
+        }
         return components.url
     }
 

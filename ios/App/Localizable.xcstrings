@@ -4129,6 +4129,36 @@
           }
         }
       }
+    },
+    "Their phones stop getting alerts and can't watch live. Other phones and cameras in the household scan your invite code once to keep watching live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפונים שלהם יפסיקו לקבל התראות ולא יוכלו לצפות בשידור חי. שאר הטלפונים והמצלמות במשק הבית יסרקו פעם אחת את קוד ההזמנה שלך כדי להמשיך לצפות בשידור חי."
+          }
+        }
+      }
+    },
+    "This camera stops watching until you pair it again. Other phones and cameras in the household scan your invite code once to keep watching live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המצלמה תפסיק לצפות עד שתצמדו אותה שוב. שאר הטלפונים והמצלמות במשק הבית יסרקו פעם אחת את קוד ההזמנה שלך כדי להמשיך לצפות בשידור חי."
+          }
+        }
+      }
+    },
+    "This phone stops getting alerts and can't watch live. Other phones and cameras in the household scan your invite code once to keep watching live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפון יפסיק לקבל התראות ולא יוכל לצפות בשידור חי. שאר הטלפונים והמצלמות במשק הבית יסרקו פעם אחת את קוד ההזמנה שלך כדי להמשיך לצפות בשידור חי."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

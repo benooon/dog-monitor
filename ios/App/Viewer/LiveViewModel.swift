@@ -219,8 +219,9 @@ final class LiveViewModel {
         try Task.checkCancellation()
         let key = liveKeys.load()
         let householdEncrypted = token.isHouseholdEncrypted
-        if case .needsKey = LiveEncryption.mode(key: key, householdEncrypted: householdEncrypted) {
-            throw EncryptionStop.needsKey
+        if case .needsKey = LiveEncryption.mode(key: key, householdEncrypted: householdEncrypted, householdKeyId: token.liveKeyId) {
+            // A key the owner has since replaced reads like a wrong key: scan again.
+            throw key == nil ? EncryptionStop.needsKey : EncryptionStop.wrongKey
         }
         let pins = EncryptedCameraPins(defaults: defaults)
         let e2ee = LiveE2EEObserver()

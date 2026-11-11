@@ -197,6 +197,10 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
     /// Live video is end-to-end encrypted with a key only the household's phones hold
     /// (nil from older servers).
     public let liveEncrypted: Bool?
+    /// Id of the household's current live key (never the key; nil for keys from before ids).
+    public let liveKeyId: String?
+    /// Someone holding the live key left: the owner's phone makes a new one (nil from older servers).
+    public let liveKeyRotationNeeded: Bool?
     public let members: [MemberDTO]
     public let dogs: [DogDTO]
     public let devices: [DeviceDTO]
@@ -209,6 +213,8 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
         role: MemberRole,
         shareTrainingData: Bool? = nil,
         liveEncrypted: Bool? = nil,
+        liveKeyId: String? = nil,
+        liveKeyRotationNeeded: Bool? = nil,
         members: [MemberDTO] = [],
         dogs: [DogDTO] = [],
         devices: [DeviceDTO] = []
@@ -220,6 +226,8 @@ public struct HouseholdDTO: Codable, Sendable, Hashable {
         self.role = role
         self.shareTrainingData = shareTrainingData
         self.liveEncrypted = liveEncrypted
+        self.liveKeyId = liveKeyId
+        self.liveKeyRotationNeeded = liveKeyRotationNeeded
         self.members = members
         self.dogs = dogs
         self.devices = devices
@@ -284,6 +292,9 @@ public struct LiveTokenDTO: Codable, Sendable, Hashable {
     public let expiresAt: Date
     /// The household's live video is end-to-end encrypted (nil from older servers: not yet).
     public let encrypted: Bool?
+    /// Id of the household's current live key; a phone holding a key with another id must scan
+    /// the new one (nil from older servers and for keys from before ids).
+    public let liveKeyId: String?
 
     public var isHouseholdEncrypted: Bool { encrypted ?? false }
 }
