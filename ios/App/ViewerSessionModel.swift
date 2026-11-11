@@ -178,6 +178,20 @@ final class ViewerSessionModel {
         realtime.start()
     }
 
+    /// Permanently deletes the account on the server, then signs out. An owner who still has other
+    /// members is asked to remove them first.
+    func deleteAccount() async {
+        await perform {
+            do {
+                try await api.deleteAccount()
+            } catch let error as APIError where error.isHouseholdHasMembers {
+                errorMessage = String(localized: "Others are still in your household. Remove them first, then delete your account.")
+                return
+            }
+            signOut()
+        }
+    }
+
     func signOut() {
         PushRegistry.shared.deactivate()
         realtime?.stop()

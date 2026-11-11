@@ -3297,6 +3297,46 @@
           }
         }
       }
+    },
+    "Delete account": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחיקת חשבון"
+          }
+        }
+      }
+    },
+    "Delete your account?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "למחוק את החשבון?"
+          }
+        }
+      }
+    },
+    "This removes your sign-in and phones. If you're the only member, it also removes your household, events, clips and snapshots. It can't be undone. Premium isn't cancelled: do that in your Apple ID subscriptions.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "זה מסיר את הכניסה והטלפונים שלכם. אם אתם החברים היחידים, זה מסיר גם את משק הבית, האירועים, הקטעים והתמונות. אי אפשר לבטל. Premium לא מתבטל: את זה עושים במנויים של מזהה Apple."
+          }
+        }
+      }
+    },
+    "Others are still in your household. Remove them first, then delete your account.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש עוד אנשים במשק הבית. הסירו אותם קודם, ואז מחקו את החשבון."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

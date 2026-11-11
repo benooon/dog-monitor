@@ -61,6 +61,27 @@ final class PairingCodeTests: XCTestCase {
         XCTAssertEqual(request.httpMethod, "DELETE")
         XCTAssertEqual(request.url?.path, "/v1/household/members/\(Fixtures.userID)")
     }
+
+    func testDeleteAccountSendsDeleteToMe() async throws {
+        let stub = StubTransport(status: 204, json: "")
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)
+        try await api.deleteAccount()
+        let request = try XCTUnwrap(stub.requests.first)
+        XCTAssertEqual(request.httpMethod, "DELETE")
+        XCTAssertEqual(request.url?.path, "/v1/me")
+    }
+
+    func testDeleteAccountReportsHouseholdWithMembers() async throws {
+        let stub = StubTransport(status: 409, json: #"{"error":"household_has_members"}"#)
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)
+        do {
+            try await api.deleteAccount()
+            XCTFail("expected an error")
+        } catch let error as APIError {
+            XCTAssertTrue(error.isHouseholdHasMembers)
+            XCTAssertFalse(error.isUnauthorized)
+        }
+    }
 }
 
 final class InviteCountdownTests: XCTestCase {

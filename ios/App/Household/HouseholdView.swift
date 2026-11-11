@@ -219,6 +219,7 @@ struct HouseholdView: View {
                     model.signOut()
                 }
                 .accessibilityIdentifier("sign-out")
+                DeleteAccountButton(model: model)
             }
         }
         .onChange(of: household.shareTrainingData, initial: true) { _, value in

@@ -45,6 +45,9 @@ struct CreateHouseholdView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Sign out") { model.signOut() }
                 }
+                ToolbarItem(placement: .bottomBar) {
+                    DeleteAccountButton(model: model)
+                }
             }
         }
     }

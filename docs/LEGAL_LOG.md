@@ -28,3 +28,5 @@ Weekly review by the legal agent. I am not a licensed lawyer: anything that need
 
 Fixed: events and daily summaries now expire after 365 days (`EVENT_RETENTION_DAYS`); request logs no longer contain invite tokens, query strings or IP addresses; owners can delete a household without deleting their account (`DELETE /household`). All with tests. Policy and `PRIVACY.md` updated to match.
 Still open: in-app delete-account and notices (iOS), publishing the texts (owner details), regions and DPAs, Apple token revocation, data export. Medium risks "events never expire" and "logs contain tokens" are closed.
+
+Also done: "Delete account" in the app (Household settings and the create-household screen), with confirmation, both languages, and `DogMonitorAPI.deleteAccount()` with tests. The High risk "no in-app account deletion" is closed once CI confirms the Swift builds (no Swift toolchain in this environment).
