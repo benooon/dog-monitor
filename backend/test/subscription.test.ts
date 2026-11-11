@@ -3,7 +3,7 @@ import { X509Certificate, createPrivateKey } from "node:crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { CompactSign } from "jose";
-import { createAppStoreVerifier, type TransactionVerifier } from "../src/billing/app-store.js";
+import { LIFETIME_EXPIRES_AT, createAppStoreVerifier, isLifetimeExpiry, type TransactionVerifier } from "../src/billing/app-store.js";
 import { PLAN_FEATURES, cameraLimit, effectivePlan, memberLimit } from "../src/billing/plans.js";
 import type { DbHandle } from "../src/db/client.js";
 import { TEST_NONCE } from "./helpers/apple.js";
@@ -18,14 +18,28 @@ const intermediate = fixture("intermediate.pem");
 const leaf = fixture("leaf.pem");
 const BUNDLE = "com.benooon.dogmonitor";
 const MONTHLY = "com.benooon.dogmonitor.premium.monthly";
+const LIFETIME = "com.benooon.dogmonitor.premium.lifetime";
 const NOW = new Date("2027-06-01T12:00:00Z");
 const DAY = 24 * 60 * 60 * 1000;
 
 const verifier = createAppStoreVerifier({
   bundleId: BUNDLE,
   productIds: [MONTHLY],
+  lifetimeProductIds: [LIFETIME],
   rootFingerprints: [new X509Certificate(root).fingerprint256.toLowerCase()],
 });
+
+/** A non-consumable purchase: no expiresDate. */
+function lifetimeTransaction(overrides: Record<string, unknown> = {}) {
+  return transaction({
+    transactionId: "3000000000000001",
+    originalTransactionId: "3000000000000001",
+    productId: LIFETIME,
+    expiresDate: undefined,
+    type: "Non-Consumable",
+    ...overrides,
+  });
+}
 
 interface SignOptions {
   chain?: string[];
@@ -102,6 +116,31 @@ describe("App Store transaction verification", () => {
     await expectRejected(verifier.verify(await signTransaction(transaction({ bundleId: "com.other.app" })), NOW), "wrong_bundle");
     await expectRejected(verifier.verify(await signTransaction(transaction({ productId: "coins" })), NOW), "unknown_product");
     await expectRejected(verifier.verify(await signTransaction(transaction({ expiresDate: undefined })), NOW), "invalid_transaction");
+  });
+});
+
+describe("Lifetime Premium transactions", () => {
+  it("accepts a non-consumable without an expiry and treats it as never ending", async () => {
+    const result = await verifier.verify(await signTransaction(lifetimeTransaction()), NOW);
+    expect(result.productId).toBe(LIFETIME);
+    expect(result.expiresAt).toEqual(LIFETIME_EXPIRES_AT);
+    expect(isLifetimeExpiry(result.expiresAt)).toBe(true);
+    expect(isLifetimeExpiry(new Date(NOW.getTime() + 365 * DAY))).toBe(false);
+  });
+
+  it("ignores an expiresDate on a lifetime product and still needs a subscription's expiry", async () => {
+    const result = await verifier.verify(await signTransaction(lifetimeTransaction({ expiresDate: NOW.getTime() + DAY })), NOW);
+    expect(result.expiresAt).toEqual(LIFETIME_EXPIRES_AT);
+    await expectRejected(verifier.verify(await signTransaction(transaction({ expiresDate: undefined })), NOW), "invalid_transaction");
+  });
+
+  it("is rejected when the lifetime product isn't configured", async () => {
+    const subscriptionsOnly = createAppStoreVerifier({
+      bundleId: BUNDLE,
+      productIds: [MONTHLY],
+      rootFingerprints: [new X509Certificate(root).fingerprint256],
+    });
+    await expectRejected(subscriptionsOnly.verify(await signTransaction(lifetimeTransaction()), NOW), "invalid_transaction");
   });
 });
 
@@ -212,6 +251,7 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
     expect((await app.inject({ method: "GET", url: "/subscription", headers: auth })).json()).toEqual({
       plan: "free",
       expiresAt: null,
+      lifetime: false,
       productId: null,
       limits: { cameras: 1, members: 2 },
       usage: { cameras: 0, members: 1 },
@@ -253,6 +293,35 @@ describe.skipIf(!hasDatabase)("subscription routes", () => {
       limits: { members: 6 },
       usage: { members: 3 },
     });
+  });
+
+  it("keeps Lifetime Premium over subscriptions, and ends it only on its own refund", async () => {
+    const { auth, householdId } = await household("owner");
+    await purchase(auth, transaction({ appAccountToken: householdId }));
+    const bought = await purchase(auth, lifetimeTransaction({ appAccountToken: householdId }));
+    expect(bought.statusCode).toBe(200);
+    expect(bought.json()).toMatchObject({ plan: "premium", lifetime: true, expiresAt: null, productId: LIFETIME, limits: { cameras: 4 } });
+
+    // The old subscription renewing or being refunded doesn't touch lifetime.
+    await purchase(auth, transaction({ transactionId: "8", expiresDate: NOW.getTime() + 300 * DAY }));
+    await purchase(auth, transaction({ transactionId: "8", revocationDate: NOW.getTime() }));
+    expect(await subscription(auth)).toMatchObject({ plan: "premium", lifetime: true, productId: LIFETIME });
+
+    clock = NOW.getTime() + 20 * 365 * DAY;
+    expect(await subscription(auth)).toMatchObject({ plan: "premium", lifetime: true });
+
+    clock = NOW.getTime(); // the test certificates have expired by then
+    const refunded = await purchase(auth, lifetimeTransaction({ revocationDate: clock }));
+    expect(refunded.json()).toMatchObject({ plan: "free", lifetime: false, expiresAt: null });
+  });
+
+  it("lets one lifetime purchase unlock only one household", async () => {
+    const first = await household("owner");
+    expect((await purchase(first.auth, lifetimeTransaction())).statusCode).toBe(200);
+    const second = await household("other");
+    const res = await purchase(second.auth, lifetimeTransaction());
+    expect(res.statusCode).toBe(409);
+    expect(res.json()).toEqual({ error: "subscription_in_use" });
   });
 
   it("never shortens premium with an older transaction and ends it on revocation", async () => {

@@ -3,7 +3,7 @@ import { and, count, eq, gt, ne } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { devices, householdMembers, households } from "../db/schema.js";
 import { requireHousehold, requireOwner } from "../households/scope.js";
-import { TransactionError, type TransactionVerifier } from "../billing/app-store.js";
+import { TransactionError, isLifetimeExpiry, type TransactionVerifier } from "../billing/app-store.js";
 import { cameraLimit, effectivePlan, memberLimit } from "../billing/plans.js";
 import { applyTransaction } from "../billing/apply-transaction.js";
 
@@ -34,9 +34,12 @@ export async function subscriptionRoutes(app: FastifyInstance, opts: Subscriptio
     const [members] = await db.select({ n: count() }).from(householdMembers).where(eq(householdMembers.householdId, householdId));
     const at = now();
     const plan = effectivePlan(household!, at);
+    const lifetime = plan === "premium" && isLifetimeExpiry(household!.planExpiresAt);
     return {
       plan,
-      expiresAt: plan === "premium" ? household!.planExpiresAt!.toISOString() : null,
+      // Lifetime Premium never ends, so there is no date to show.
+      expiresAt: plan === "premium" && !lifetime ? household!.planExpiresAt!.toISOString() : null,
+      lifetime,
       productId: plan === "premium" ? household!.planProductId : null,
       limits: { cameras: cameraLimit(household!, at, enforcePlanLimits), members: memberLimit(household!, at, enforcePlanLimits) },
       usage: { cameras: cameras?.n ?? 0, members: members?.n ?? 0 },
@@ -72,7 +75,7 @@ export async function subscriptionRoutes(app: FastifyInstance, opts: Subscriptio
       if (transaction.appAccountToken && transaction.appAccountToken !== householdId.toLowerCase()) {
         return reply.code(409).send({ error: "subscription_in_use" });
       }
-      // One App Store subscription unlocks one household.
+      // One App Store purchase (subscription or lifetime) unlocks one household.
       const [elsewhere] = await db
         .select({ id: households.id })
         .from(households)

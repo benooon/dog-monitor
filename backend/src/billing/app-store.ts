@@ -15,6 +15,8 @@ export interface AppStoreConfig {
   bundleId: string;
   /** Subscription product ids that unlock premium. */
   productIds: string[];
+  /** Non-consumable product ids that unlock premium for good (Lifetime Premium). */
+  lifetimeProductIds?: string[];
   /** Trusted root fingerprints ("AB:CD:…", case-insensitive). */
   rootFingerprints: string[];
   /**
@@ -39,6 +41,16 @@ export interface VerifiedTransaction {
   appAccountToken: string | null;
 }
 
+/**
+ * The expiry we store for a lifetime purchase, so every "premium while paid up" check keeps
+ * working unchanged. Non-consumables have no expiresDate.
+ */
+export const LIFETIME_EXPIRES_AT = new Date("9999-12-31T00:00:00Z");
+
+export function isLifetimeExpiry(expiresAt: Date | null | undefined): boolean {
+  return Boolean(expiresAt && expiresAt.getTime() >= LIFETIME_EXPIRES_AT.getTime());
+}
+
 export class TransactionError extends Error {
   constructor(readonly code: string) {
     super(code);
@@ -53,6 +65,7 @@ export interface TransactionVerifier {
 
 /** Verifies StoreKit 2 signed transactions offline: the x5c chain to Apple's root, then the JWS signature. */
 export function createAppStoreVerifier(config: AppStoreConfig): TransactionVerifier {
+  const lifetimeIds = config.lifetimeProductIds ?? [];
   const roots = new Set(config.rootFingerprints.map(normalizeFingerprint));
 
   async function verifyPayload(signed: string, now: Date): Promise<Record<string, unknown>> {
@@ -92,9 +105,12 @@ export function createAppStoreVerifier(config: AppStoreConfig): TransactionVerif
   return {
     verifyPayload,
     async verify(signedTransaction, now) {
-      const transaction = parsePayload(await verifyPayload(signedTransaction, now));
+      const payload = await verifyPayload(signedTransaction, now);
+      const productId = typeof payload.productId === "string" ? payload.productId : "";
+      const transaction = parsePayload(payload, lifetimeIds.includes(productId));
       if (transaction.bundleId !== config.bundleId) throw new TransactionError("wrong_bundle");
-      if (!config.productIds.includes(transaction.productId)) throw new TransactionError("unknown_product");
+      const known = config.productIds.includes(transaction.productId) || lifetimeIds.includes(transaction.productId);
+      if (!known) throw new TransactionError("unknown_product");
       if (config.environments && !config.environments.includes(transaction.environment)) {
         throw new TransactionError("wrong_environment");
       }
@@ -103,14 +119,15 @@ export function createAppStoreVerifier(config: AppStoreConfig): TransactionVerif
   };
 }
 
-function parsePayload(payload: Record<string, unknown>): VerifiedTransaction {
+/** `lifetime`: a non-consumable, which has no expiresDate; it gets `LIFETIME_EXPIRES_AT`. */
+function parsePayload(payload: Record<string, unknown>, lifetime: boolean): VerifiedTransaction {
   const str = (key: string) => (typeof payload[key] === "string" ? (payload[key] as string) : null);
   const ms = (key: string) => (typeof payload[key] === "number" ? new Date(payload[key] as number) : null);
   const transactionId = str("transactionId");
   const originalTransactionId = str("originalTransactionId");
   const productId = str("productId");
   const bundleId = str("bundleId");
-  const expiresAt = ms("expiresDate");
+  const expiresAt = lifetime ? LIFETIME_EXPIRES_AT : ms("expiresDate");
   if (!transactionId || !originalTransactionId || !productId || !bundleId || !expiresAt) {
     throw new TransactionError("invalid_transaction");
   }

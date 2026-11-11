@@ -141,6 +141,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     appStore: {
       bundleId: env.APPLE_BUNDLE_ID || "com.benooon.dogmonitor",
       productIds: list(env.APP_STORE_PRODUCT_IDS ?? "com.benooon.dogmonitor.premium.monthly,com.benooon.dogmonitor.premium.yearly"),
+      lifetimeProductIds: list(env.APP_STORE_LIFETIME_PRODUCT_IDS ?? "com.benooon.dogmonitor.premium.lifetime"),
       rootFingerprints: list(env.APPLE_ROOT_CA_SHA256 || APPLE_ROOT_CA_G3_SHA256),
       environments: appStoreEnvironments,
     },

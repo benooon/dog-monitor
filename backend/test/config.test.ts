@@ -19,6 +19,7 @@ describe("loadConfig", () => {
       appStore: {
         bundleId: "com.benooon.dogmonitor",
         productIds: ["com.benooon.dogmonitor.premium.monthly", "com.benooon.dogmonitor.premium.yearly"],
+        lifetimeProductIds: ["com.benooon.dogmonitor.premium.lifetime"],
         rootFingerprints: [APPLE_ROOT_CA_G3_SHA256],
       },
       enforcePlanLimits: false,
