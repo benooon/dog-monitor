@@ -7,6 +7,8 @@ struct PremiumView: View {
     let model: SubscriptionModel
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
+    @Environment(\.layoutDirection) private var layoutDirection
     @State private var showsManage = false
 
     var body: some View {
@@ -58,13 +60,15 @@ struct PremiumView: View {
     /// Uses the plans the model already loaded, so StoreKit doesn't show its own loading state again.
     @ViewBuilder
     private var storeView: some View {
+        let locale = locale
+        let layoutDirection = layoutDirection
         if model.products.isEmpty {
             SubscriptionStoreView(productIDs: SubscriptionProducts.all) {
-                PremiumHeader()
+                PremiumHeader(locale: locale, layoutDirection: layoutDirection)
             }
         } else {
             SubscriptionStoreView(subscriptions: model.products) {
-                PremiumHeader()
+                PremiumHeader(locale: locale, layoutDirection: layoutDirection)
             }
         }
     }
@@ -111,7 +115,7 @@ struct PremiumView: View {
     private func active(_ status: SubscriptionDTO) -> some View {
         List {
             Section {
-                PremiumHeader()
+                PremiumHeader(locale: locale, layoutDirection: layoutDirection)
                     .listRowBackground(Color.clear)
             }
             Section {
@@ -141,8 +145,19 @@ struct PremiumView: View {
 }
 
 /// The pitch, shared by the store and the "you're on Premium" screen.
+/// StoreKit hosts its marketing content without our environment, so the locale and
+/// layout direction are passed in and re-applied.
 private struct PremiumHeader: View {
+    let locale: Locale
+    let layoutDirection: LayoutDirection
+
     var body: some View {
+        content
+            .environment(\.locale, locale)
+            .environment(\.layoutDirection, layoutDirection)
+    }
+
+    private var content: some View {
         VStack(spacing: DS.Spacing.m) {
             Image(systemName: "video.badge.plus")
                 .font(.largeTitle)
