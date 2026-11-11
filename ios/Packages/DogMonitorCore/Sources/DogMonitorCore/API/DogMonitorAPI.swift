@@ -127,6 +127,11 @@ public struct DogMonitorAPI: Sendable {
         try await sendWithoutResponse("DELETE", "me")
     }
 
+    /// Everything the server holds about the signed-in user, as JSON (no clips or snapshots).
+    public func exportMyData() async throws -> Data {
+        try await perform(makeRequest("GET", "me/export", body: nil))
+    }
+
     public func revokeDevice(id: UUID) async throws -> DeviceDTO {
         try await send("POST", "devices/\(Self.path(id))/revoke")
     }

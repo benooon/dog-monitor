@@ -3347,6 +3347,36 @@
           }
         }
       }
+    },
+    "Download my data": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הורדת הנתונים שלי"
+          }
+        }
+      }
+    },
+    "Share my data": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיתוף הנתונים שלי"
+          }
+        }
+      }
+    },
+    "A copy of what Dog Monitor keeps about you and your household. Clips and snapshots aren't included.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עותק של מה ש-Dog Monitor שומרת עליכם ועל משק הבית. הקטעים והתמונות לא כלולים."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

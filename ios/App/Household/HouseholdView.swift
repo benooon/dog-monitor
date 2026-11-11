@@ -214,6 +214,12 @@ struct HouseholdView: View {
             }
 
             Section {
+                ExportDataButton(model: model)
+            } footer: {
+                Text("A copy of what Dog Monitor keeps about you and your household. Clips and snapshots aren't included.")
+            }
+
+            Section {
                 Button("Sign out", role: .destructive) {
                     dismiss()
                     model.signOut()

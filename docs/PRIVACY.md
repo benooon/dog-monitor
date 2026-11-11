@@ -44,6 +44,7 @@ A camera can see and hear guests, dog walkers and cleaners. Today: the camera sc
 - Device secrets are stored hashed; devices can be revoked; removing a member revokes their phones and clears push tokens.
 - Training data sharing is **off by default** and chosen by the household owner.
 - Account deletion: `DELETE /me`; household deletion: `DELETE /household` (owner). In-app: "Delete account" in Household settings and on the create-household screen. The household-deletion button is not built yet.
+- Data export: "Download my data" in Household settings (`GET /me/export`, JSON without clips).
 - Request logs carry only method and path; invite tokens, query strings and IP addresses are not logged by the app.
 
 ## Protections that do NOT exist yet (never claim these)
@@ -52,4 +53,3 @@ A camera can see and hear guests, dog walkers and cleaners. Today: the camera sc
 - **A specific server region.** Railway, the bucket and LiveKit Cloud regions are not pinned or documented. Data may be processed outside the EU and Israel.
 - **Encryption of the database or bucket beyond what the providers do by default.**
 - **Revocation of the Sign in with Apple token on account deletion.**
-- **An in-app data export button.** The server side exists (`GET /me/export`); users can also write to the privacy email.

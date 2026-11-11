@@ -128,7 +128,7 @@ Texts: `docs/legal/`, data map: `docs/PRIVACY.md`, label: `docs/APP_STORE_PRIVAC
 - [x] backend: Automatic retention for `events` and `daily_summaries` (default 365 days, env `EVENT_RETENTION_DAYS`, extend with the daily job in `storage/retention.ts`), with tests; update `docs/PRIVACY.md`.
 - [ ] backend: Revoke the Sign in with Apple token on `DELETE /me` (Apple REST `auth/revoke`; needs the Sign in with Apple key from HUMAN_TODO; store the refresh token from `auth/token` at sign-in). `[blocked]` until the key exists.
 - [x] backend: Log hygiene. Fastify request logs include URLs, so the invite token in `/invite/:token` is logged. Redact it (custom `serializers.req`), and do not log IPs at full precision. Test that the token never appears in log output.
-- [~] backend + ios: Data export ("Download my data"). Backend `GET /me/export` done and tested (JSON, no media or secrets). Still open: core `api.exportMyData()` and a "Download my data" row in Settings with a share sheet.
+- [x] backend + ios: Data export ("Download my data"): `GET /me/export` (tested), `api.exportMyData()` (tested), and a Household settings row with a share sheet (Swift unverified until CI on main).
 - [x] backend: Household owner can delete the household and all its data without deleting the account (`DELETE /household`), then the account-deletion rule "owner with members" can point to it.
 
 ## Phase 6 — Growth, monetization and security (owner request 2026-11-11)
