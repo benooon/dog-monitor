@@ -1,12 +1,12 @@
-# CI status: GREEN
+# CI status: RED
 
-- commit: 41c1136a7bc199589dd25a90904503044bbad0ec
-- message: ios: fix Subscription test loader for the new product result
-- time (UTC): 2026-11-11T02:12:46Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42942261793
+- commit: 28535d6278a0e692a991be6741f954b379f12604
+- message: ios: Premium store lists the yearly plan first
+- time (UTC): 2026-11-11T02:17:14Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42944598731
 
 | job | result | log |
 |---|---|---|
-| core (swift test, Linux) | success | core-test.log |
-| ios (xcodebuild test, macOS) | success | ios-build.log |
+| core (swift test, Linux) | failure | core-test.log |
+| ios (xcodebuild test, macOS) | failure | ios-build.log |
 | backend (lint + test) | success | backend-test.log |

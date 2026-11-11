@@ -12,168 +12,23 @@ Writing result bundle at path:
 --- xcodebuild: WARNING: Using the first of multiple matching destinations:
 { platform:iOS Simulator, arch:arm64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
 { platform:iOS Simulator, arch:x86_64, id:A1285399-F2F4-46E9-8CF2-4AA227FF7EF3, OS:26.2, name:iPhone SE (3rd generation) }
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Camera/CaptureService.swift:200:40: warning: reference to captured var 'self' in concurrently-executing code
-            self?.sessionQueue.async { self?.applyRotation(angle) }
-                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:39: warning: main actor-isolated property 'displayName' can not be referenced from a Sendable closure
-                DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
-                                      ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingModel.swift:78:9: note: property declared here
-    var displayName: String {
-        ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:33: warning: main actor-isolated property 'model' can not be referenced from a Sendable closure
-                DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
-                                ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:127:19: note: property declared here
-    @Bindable var model: DogOnboardingModel
-                  ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:65: warning: main actor-isolated property 'photo' can not be referenced from a Sendable closure
-                DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
-                                                                ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingModel.swift:17:9: note: property declared here
-    var photo: UIImage?
-        ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:59: warning: main actor-isolated property 'model' can not be referenced from a Sendable closure
-                DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
-                                                          ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:127:19: note: property declared here
-    @Bindable var model: DogOnboardingModel
-                  ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:142:82: warning: main actor-isolated property 'avatarSize' can not be referenced from a Sendable closure
-                DogAvatar(name: model.displayName, image: model.photo, size: min(avatarSize, 240))
-                                                                                 ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:132:56: note: property declared here
-    @ScaledMetric(relativeTo: .largeTitle) private var avatarSize: CGFloat = 168
-                                                       ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:144:49: warning: main actor-isolated property 'photo' can not be referenced from a nonisolated context
-                        Image(systemName: model.photo == nil ? "plus" : "pencil")
-                                                ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingModel.swift:17:9: note: property declared here
-    var photo: UIImage?
-        ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:144:43: warning: main actor-isolated property 'model' can not be referenced from a nonisolated context
-                        Image(systemName: model.photo == nil ? "plus" : "pencil")
-                                          ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:127:19: note: property declared here
-    @Bindable var model: DogOnboardingModel
-                  ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:147:43: warning: main actor-isolated property 'badgeSize' can not be referenced from a nonisolated context
-                            .frame(width: badgeSize, height: badgeSize)
-                                          ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:134:31: note: property declared here
-    @ScaledMetric private var badgeSize: CGFloat = 44
-                              ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:147:62: warning: main actor-isolated property 'badgeSize' can not be referenced from a nonisolated context
-                            .frame(width: badgeSize, height: badgeSize)
+Failed frontend command:
+/Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/APICredential.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/APIError.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/DTOs.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/DogMonitorAPI.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/HTTPTransport.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/JSONCoding.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Audio/DetectionLog.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Audio/LoudnessDetector.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Audio/SoundClassMapping.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Capture/Broadcaster.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Capture/CameraScreenState.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Capture/ClipAssembler.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Capture/DogPose.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Capture/FrameRateMeter.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Capture/MotionDetector.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/DogMonitorCore.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/EventEngine/DogStateClassifier.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/EventEngine/EventChannel.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/EventEngine/EventEngine.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/EventEngine/EventEngineConfiguration.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/EventEngine/HealthMonitor.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Events/DailySummary.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Events/DailySummaryInsights.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Events/EventUploadQueue.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Events/MediaUploadQueue.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Events/Timeline.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Events/TimelineFeed.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/LiveActivity/CameraLiveActivity.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/LiveActivity/LiveActivitySync.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/CameraHealth.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/CameraZone.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/Detection.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/DeviceRole.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/DogEvent.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/DogProfile.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/DogState.swift /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/EventType.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Models/NormalizedRect.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Notifications/NotificationSettings.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Notifications/TimeOfDay.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Pairing/PairingCode.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Profile/DogPersonalization.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Profile/DogPhotoVersion.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Profile/PhotoCrop.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Push/PushPayload.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Realtime/PublishPolicy.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Realtime/RealtimeMessage.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Realtime/ReconnectBackoff.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/CredentialStore.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/OnboardingState.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/SecureStore.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Subscription/SubscriptionDTO.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Subscription/SubscriptionProducts.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Widget/DogStatusSnapshot.swift -primary-file /Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Widget/SharedDogPhotoPlan.swift -supplementary-output-file-map /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/supplementaryOutputs-3 -target arm64-apple-ios17.0-simulator -load-resolved-plugin /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogMonitorCore-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -I /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 6 -enforce-exclusivity\=checked -Onone -D SWIFT_PACKAGE -D DEBUG -D SWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -D Xcode -serialize-debugging-options -const-gather-protocols-file /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogMonitorCore_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/runner/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/runner/work/dog-monitor/dog-monitor/ios/DogMonitor.xcodeproj -enable-anonymous-context-mangled-names -file-compilation-dir /Users/runner/work/dog-monitor/dog-monitor/ios/DogMonitor.xcodeproj -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/runner/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C57-dc75598d0054f22ec865fa860f139d72e244bd9a5feaf902f95f61bf06266e52.sdkstatcache -Xcc -I/Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/swift-overrides.hmap -Xcc -I/Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/DerivedSources/arm64 -Xcc -I/Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name DogMonitorCore -package-name dogmonitorcore -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.2 -target-sdk-name iphonesimulator26.2 -clang-target arm64-apple-ios26.2-simulator -in-process-plugin-server-path /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/NormalizedRect.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/NotificationSettings.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/TimeOfDay.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PairingCode.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogPersonalization.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogPhotoVersion.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PhotoCrop.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PushPayload.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PublishPolicy.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/RealtimeMessage.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/ReconnectBackoff.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/CredentialStore.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/OnboardingState.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SecureStore.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SubscriptionDTO.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SubscriptionProducts.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogStatusSnapshot.o -o /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Build/Intermediates.noindex/DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SharedDogPhotoPlan.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/NormalizedRect.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/NotificationSettings.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/TimeOfDay.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PairingCode.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogPersonalization.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogPhotoVersion.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PhotoCrop.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PushPayload.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/PublishPolicy.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/RealtimeMessage.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/ReconnectBackoff.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/CredentialStore.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/OnboardingState.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SecureStore.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SubscriptionDTO.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SubscriptionProducts.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/DogStatusSnapshot.o -index-unit-output-path /DogMonitorCore.build/Debug-iphonesimulator/DogMonitorCore.build/Objects-normal/arm64/SharedDogPhotoPlan.o -index-store-path /Users/runner/Library/Developer/Xcode/DerivedData/DogMonitor-abrqnpqzgnumipghmwonypncscgo/Index.noindex/DataStore -index-system-modules
+/Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Subscription/SubscriptionProducts.swift:18:20: error: escaping closure captures non-escaping parameter 'id'
+        let rank = { (item: Item) in all.firstIndex(of: id(item)) ?? all.count }
+                   ^
+/Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Subscription/SubscriptionProducts.swift:17:62: note: parameter 'id' is implicitly non-escaping
+    public static func inDisplayOrder<Item>(_ items: [Item], id: (Item) -> String) -> [Item] {
                                                              ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/DogOnboarding/DogOnboardingView.swift:134:31: note: property declared here
-    @ScaledMetric private var badgeSize: CGFloat = 44
-                              ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Household/DogProfileEditor.swift:136:26: warning: main actor-isolated property 'shownPhoto' can not be referenced from a Sendable closure
-                    Text(shownPhoto == nil ? "Choose a photo" : "Change photo")
-                         ^
-/Users/runner/work/dog-monitor/dog-monitor/ios/App/Household/DogProfileEditor.swift:29:17: note: property declared here
-    private var shownPhoto: UIImage? {
-                ^
-<module-includes>:1:9: note: in file included from <module-includes>:1:
-1 | #import "Headers/StoreKitTest.h"
-  |         `- note: in file included from <module-includes>:1:
-2 | 
+/Users/runner/work/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Subscription/SubscriptionProducts.swift:18:57: note: captured here
+        let rank = { (item: Item) in all.firstIndex(of: id(item)) ?? all.count }
+                                                        ^
+Testing failed:
+	Escaping closure captures non-escaping parameter 'id'
+	Testing cancelled because the build failed.
 
-/Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/Developer/Library/Frameworks/StoreKitTest.framework/Headers/StoreKitTest.h:14:9: note: in file included from /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/Developer/Library/Frameworks/StoreKitTest.framework/Headers/StoreKitTest.h:14:
-12 | #import <StoreKitTest/SKTestError.h>
-13 | #import <StoreKitTest/SKTestSession.h>
-14 | #import <StoreKitTest/SKTestTransaction.h>
-   |         `- note: in file included from /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/Developer/Library/Frameworks/StoreKitTest.framework/Headers/StoreKitTest.h:14:
-15 | 
-16 | 
+** TEST FAILED **
 
-1 warning generated.
-/Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks/StoreKitTest.framework/Headers/SKTestTransaction.h:34:32: warning: 'SKPaymentTransactionState' is deprecated: first deprecated in iOS 18.0 - Use PurchaseResult from Product.purchase(confirmIn:options:).
-32 | @property(nonatomic, readonly) NSDate *purchaseDate;
-33 | 
-34 | @property(nonatomic, readonly) SKPaymentTransactionState state;
-   |                                `- warning: 'SKPaymentTransactionState' is deprecated: first deprecated in iOS 18.0 - Use PurchaseResult from Product.purchase(confirmIn:options:).
-35 | 
-36 | @property(nonatomic, readonly) BOOL pendingPriceIncreaseConsent API_AVAILABLE(ios(15.4), macos(12.3), tvos(15.4), watchos(8.5), visionos(1.0)) NS_SWIFT_NAME(isPendingPriceIncreaseConsent);
-
-/Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/System/Library/Frameworks/StoreKit.framework/Headers/SKPaymentTransaction.h:14:28: note: 'SKPaymentTransactionState' has been explicitly marked deprecated here
-12 | @class SKPayment;
-13 | 
-14 | typedef NS_ENUM(NSInteger, SKPaymentTransactionState) {
-   |                            `- note: 'SKPaymentTransactionState' has been explicitly marked deprecated here
-15 |     SKPaymentTransactionStatePurchasing,    // Transaction is being added to the server queue.
-16 |     SKPaymentTransactionStatePurchased,     // Transaction is in queue, user has been charged.  Client should complete the transaction.
-2026-11-11 02:04:36.718 xcodebuild[9587:33328] [MT] IDETestOperationsObserverDebug: 398.500 elapsed -- Testing started completed.
-2026-11-11 02:04:36.718 xcodebuild[9587:33328] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 02:04:36.718 xcodebuild[9587:33328] [MT] IDETestOperationsObserverDebug: 398.500 sec, +398.500 sec -- end
-Testing started
-iPad screenshots on 06716521-45A3-4B83-9675-8E50641017F6
---- xcodebuild: WARNING: Using the first of multiple matching destinations:
-{ platform:iOS Simulator, arch:arm64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-{ platform:iOS Simulator, arch:x86_64, id:06716521-45A3-4B83-9675-8E50641017F6, OS:26.2, name:iPad (10th generation) }
-2026-11-11 02:12:05.014 xcodebuild[24897:75550] [MT] IDETestOperationsObserverDebug: 423.054 elapsed -- Testing started completed.
-2026-11-11 02:12:05.014 xcodebuild[24897:75550] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-11 02:12:05.014 xcodebuild[24897:75550] [MT] IDETestOperationsObserverDebug: 423.054 sec, +423.054 sec -- end
-Testing started
-Screenshots: 138
+--- Test failures ---
+passed: 0, failed: 0, skipped: 0
+Screenshots: 0
