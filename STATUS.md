@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: a1c2704e801d11370d4d97bc5b328bfb739f395a
-- message: docs: reel 3, six barks (daily summary), en + he
-- time (UTC): 2026-11-11T08:52:25Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42990243457
+- commit: f114816c3ecedfc939f4558191603a71d1114720
+- message: backend: GET /invites/:token/preview shows household and inviter first name
+- time (UTC): 2026-11-11T08:54:22Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42990313572
 
 | job | result | log |
 |---|---|---|
