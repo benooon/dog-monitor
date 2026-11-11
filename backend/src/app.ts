@@ -34,6 +34,7 @@ import { appLinkRoutes } from "./routes/app-links.js";
 import { liveActivityRoutes } from "./routes/live-activities.js";
 import { LiveActivityNotifier } from "./notifications/live-activity.js";
 import { waitlistRoutes } from "./routes/waitlist.js";
+import { landingRoutes } from "./routes/landing.js";
 
 export interface AppServices {
   db: Database;
@@ -82,6 +83,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   });
   await app.register(healthRoutes);
   await app.register(appLinkRoutes, { appIds: options.appLinkIds ?? [] });
+  await app.register(landingRoutes);
 
   const services = options.services;
   if (services) {

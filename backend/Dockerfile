@@ -13,6 +13,7 @@ WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY drizzle ./drizzle
+COPY public ./public
 COPY package.json ./
 USER node
 CMD ["node", "dist/server.js"]

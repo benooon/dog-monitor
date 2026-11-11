@@ -1,4 +1,5 @@
-import type { FastifyInstance, FastifyReply } from "fastify";
+import { parse as parseQuery } from "node:querystring";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { count, eq, gte, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { waitlist } from "../db/schema.js";
@@ -24,10 +25,24 @@ export async function waitlistRoutes(
   const limiter = opts.limiter ?? new AttemptLimiter(WAITLIST_MAX_PER_IP, WAITLIST_WINDOW_MS);
   const now = opts.now ?? (() => new Date());
 
+  // The landing page form works without JavaScript too: a plain form post gets a redirect back.
+  app.addContentTypeParser("application/x-www-form-urlencoded", { parseAs: "string", bodyLimit: 2048 }, (_req, body, done) => {
+    done(null, parseQuery(body as string));
+  });
+  const isFormPost = (request: FastifyRequest) =>
+    (request.headers["content-type"] ?? "").startsWith("application/x-www-form-urlencoded");
+  const backToPage = (request: FastifyRequest<{ Body: JoinBody }>, reply: FastifyReply, result: "joined" | "email" | "busy") => {
+    const body = (request.body ?? {}) as Partial<JoinBody>;
+    const params = new URLSearchParams(result === "joined" ? { joined: "1" } : { error: result });
+    if (typeof body.source === "string" && /^[A-Za-z0-9._-]{1,64}$/.test(body.source)) params.set("s", body.source);
+    return reply.redirect(`${landingPath(body.locale)}?${params}`, 303);
+  };
+
   app.post<{ Body: JoinBody }>(
     "/waitlist",
     {
       bodyLimit: 2048,
+      attachValidation: true,
       schema: {
         body: {
           type: "object",
@@ -42,13 +57,17 @@ export async function waitlistRoutes(
       },
     },
     async (request, reply) => {
+      const form = isFormPost(request);
       if (limiter.isBlocked(request.ip)) {
-        return reply.code(429).send({ error: "rate_limited" });
+        return form ? backToPage(request, reply, "busy") : reply.code(429).send({ error: "rate_limited" });
       }
       limiter.recordFailure(request.ip);
 
+      if (request.validationError) {
+        return form ? backToPage(request, reply, "email") : reply.code(400).send({ error: "invalid_body" });
+      }
       const email = normalizeEmail(request.body.email);
-      if (!email) return reply.code(400).send({ error: "invalid_email" });
+      if (!email) return form ? backToPage(request, reply, "email") : reply.code(400).send({ error: "invalid_email" });
 
       // An existing address is left as it is: the answer is the same either way, so the
       // endpoint can't be used to find out who signed up.
@@ -61,7 +80,7 @@ export async function waitlistRoutes(
           unsubscribeToken: newWaitlistToken(),
         })
         .onConflictDoNothing({ target: waitlist.email });
-      return reply.code(202).send({ status: "accepted" });
+      return form ? backToPage(request, reply, "joined") : reply.code(202).send({ status: "accepted" });
     },
   );
 
@@ -111,6 +130,10 @@ export async function waitlistRoutes(
       bySource: Object.fromEntries(bySource.map((r) => [r.key || "direct", r.n])),
     };
   });
+}
+
+function landingPath(locale: unknown): string {
+  return locale === "he" ? "/he/join" : "/join";
 }
 
 function unsubscribedPage(locale: WaitlistLocale): string {

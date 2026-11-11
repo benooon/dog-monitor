@@ -386,6 +386,8 @@ function draw(t) {
   // clock: 08:02:10 then the one-minute jump
   let clock = 8 * 3600 + 2 * 60 + 10 + t;
   if (t > 2.2) clock += easeInOut(prog(t, 2.2, 2.7)) * 61;
+  // window.clean: the scene only (landing page hero), no camera chrome or text.
+  if (window.clean) return;
   camChrome(t, clock);
 
   const L = COPY[LANG];

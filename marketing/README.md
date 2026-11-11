@@ -13,6 +13,7 @@ marketing/
     sofa.html                   reel 1, "He never gets on the sofa"
     door.html, sfx-door.py      reel 2, "Rex can't read a clock" (17:29 at the door)
     sfx.py                      original sound effects (no licensed music)
+    hero.js, og.js              landing page hero loop, share images and touch icon -> backend/public/media
   reels/YYYY-MM-DD-<slug>/      one folder per reel, ready to post
     reel-en.mp4, reel-he.mp4    1080x1920, 30 fps, 15 s, H.264 + AAC
     caption-en.txt, caption-he.txt

@@ -12,4 +12,6 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     },
   },
+  // The landing page script runs in the browser.
+  { files: ["public/**/*.js"], languageOptions: { globals: globals.browser, sourceType: "script" } },
 );
