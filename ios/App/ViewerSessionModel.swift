@@ -327,7 +327,35 @@ extension ViewerSessionModel {
     }
 }
 
+extension ViewerSessionModel {
+    /// The demo owner right after a new live key: the Kitchen camera still has the old one.
+    static var demoAfterLiveKeyChange: ViewerSessionModel {
+        let model = ViewerSessionModel.demo
+        if let household = model.household {
+            model.household = household.withLiveKeyNeeded(byCameraNamed: "Kitchen")
+        }
+        return model
+    }
+}
+
 extension HouseholdDTO {
+    /// A copy with live video encrypted and the named camera holding an old key (screenshots).
+    func withLiveKeyNeeded(byCameraNamed name: String) -> HouseholdDTO {
+        HouseholdDTO(
+            id: id, name: self.name, plan: plan, ownerId: ownerId, role: role,
+            shareTrainingData: shareTrainingData, liveEncrypted: true, liveKeyId: "demo-key-id",
+            members: members, dogs: dogs,
+            devices: devices.map { device in
+                guard device.name == name else { return device }
+                return DeviceDTO(
+                    id: device.id, householdId: device.householdId, userId: device.userId, name: device.name,
+                    role: device.role, status: device.status, lastHeartbeatAt: device.lastHeartbeatAt,
+                    battery: device.battery, charging: device.charging, needsLiveKey: true, createdAt: device.createdAt
+                )
+            }
+        )
+    }
+
     /// Two cameras (one resting dog, one offline), two phones and a dog.
     static var demo: HouseholdDTO {
         let id = UUID()

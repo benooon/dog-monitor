@@ -123,6 +123,10 @@ struct HouseholdView: View {
                 }
             }
 
+            if isOwner, !household.camerasNeedingLiveKey.isEmpty {
+                LiveKeyNeededSection(cameras: household.camerasNeedingLiveKey) { showsInvite = true }
+            }
+
             if !household.dogs.isEmpty || isOwner {
                 Section("Dogs") {
                     ForEach(household.dogs) { dog in

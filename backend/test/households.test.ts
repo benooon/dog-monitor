@@ -1,6 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import type { DbHandle } from "../src/db/client.js";
+import { eq } from "drizzle-orm";
+import { devices } from "../src/db/schema.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
@@ -371,6 +373,31 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     ).json();
     await app.inject({ method: "POST", url: `/devices/${camera2.id}/revoke`, headers: owner.auth });
     expect((await get()).liveKeyRotationNeeded).toBe(true);
+  });
+
+  it("tells the owner which cameras still hold an old live key", async () => {
+    const owner = await signIn("owner");
+    await createHousehold(owner.auth);
+    const camera = (
+      await app.inject({ method: "POST", url: "/devices", headers: owner.auth, payload: { name: "Cam", role: "camera" } })
+    ).json();
+    const viewer = (
+      await app.inject({ method: "POST", url: "/devices", headers: owner.auth, payload: { name: "Phone", role: "viewer" } })
+    ).json();
+    const needs = async () =>
+      Object.fromEntries(
+        ((await app.inject({ method: "GET", url: "/household", headers: owner.auth })).json().devices as { id: string; needsLiveKey: boolean }[]).map(
+          (d) => [d.id, d.needsLiveKey],
+        ),
+      );
+    expect(await needs()).toEqual({ [camera.id]: false, [viewer.id]: false });
+
+    await app.inject({ method: "PATCH", url: "/household", headers: owner.auth, payload: { liveEncrypted: true, liveKeyId: "current-key" } });
+    expect((await needs())[camera.id]).toBe(true);
+    await h.db.update(devices).set({ liveKeyId: "current-key" }).where(eq(devices.id, camera.id));
+    expect((await needs())[camera.id]).toBe(false);
+    await h.db.update(devices).set({ liveKeyMissing: true }).where(eq(devices.id, camera.id));
+    expect(await needs()).toEqual({ [camera.id]: true, [viewer.id]: false });
   });
 
   it("lets only the owner revoke, and only the device's user or owner update", async () => {

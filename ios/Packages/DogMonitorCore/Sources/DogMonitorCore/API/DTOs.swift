@@ -130,6 +130,9 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
     public let dogState: String?
     /// Cameras: the zone kinds drawn on this camera (raw values; only in `GET /household`).
     public let zoneKinds: [String]?
+    /// Cameras: live video is end-to-end encrypted and this camera has no key or an old one, so
+    /// it can't go live until someone shows it the owner's invite code (only in `GET /household`).
+    public let needsLiveKey: Bool?
     public let createdAt: Date
 
     public init(
@@ -148,6 +151,7 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
         thermal: String? = nil,
         dogState: String? = nil,
         zoneKinds: [CameraZone.Kind]? = nil,
+        needsLiveKey: Bool? = nil,
         createdAt: Date
     ) {
         self.id = id
@@ -165,6 +169,7 @@ public struct DeviceDTO: Codable, Sendable, Hashable, Identifiable {
         self.thermal = thermal
         self.dogState = dogState
         self.zoneKinds = zoneKinds?.map(\.rawValue)
+        self.needsLiveKey = needsLiveKey
         self.createdAt = createdAt
     }
 
@@ -530,6 +535,15 @@ extension HouseholdDTO {
     /// Whether any active camera has a no-go zone (the sofa or another forbidden area).
     public var hasForbiddenZone: Bool {
         cameras.contains { $0.zones.contains(where: \.isOffLimits) }
+    }
+
+    /// Cameras that can't go live until they scan the owner's invite code (no key yet, or the
+    /// key was replaced after someone left), sorted by name. Empty when video isn't encrypted.
+    public var camerasNeedingLiveKey: [DeviceDTO] {
+        guard liveEncrypted == true else { return [] }
+        return cameras
+            .filter { $0.needsLiveKey == true }
+            .sorted { $0.name.lowercased() < $1.name.lowercased() }
     }
 }
 

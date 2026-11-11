@@ -9,7 +9,7 @@ import { effectivePlan } from "../billing/plans.js";
 import { StorageUnavailableError, deleteHousehold } from "../households/delete.js";
 import type { MediaStorage } from "../storage/storage.js";
 import { RealtimeSessions } from "../realtime/sessions.js";
-import { LIVE_KEY_ID_PATTERN, requestLiveKeyRotation } from "../households/live-key.js";
+import { LIVE_KEY_ID_PATTERN, cameraNeedsLiveKey, requestLiveKeyRotation } from "../households/live-key.js";
 
 export async function householdRoutes(
   app: FastifyInstance,
@@ -83,7 +83,13 @@ export async function householdRoutes(
       role,
       members,
       dogs: dogRows.map(dogDto),
-      devices: deviceRows.map((d) => ({ ...deviceDto(d), zoneKinds: zoneKinds.get(d.id) ?? [] })),
+      devices: deviceRows.map((d) => ({
+        ...deviceDto(d),
+        zoneKinds: zoneKinds.get(d.id) ?? [],
+        // Cameras that can't publish video the household can decrypt (no key, or an old one),
+        // so the owner's phone can ask for the invite code to be shown to them.
+        needsLiveKey: d.role === "camera" && d.status === "active" && cameraNeedsLiveKey(d, household!),
+      })),
     };
   });
 

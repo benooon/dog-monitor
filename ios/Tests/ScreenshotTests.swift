@@ -89,6 +89,7 @@ final class ScreenshotTests: XCTestCase {
                 })
             },
             Screen(name: "09-household") { AnyView(HouseholdView(model: .demo)) },
+            Screen(name: "09b-household-live-key") { AnyView(HouseholdView(model: .demoAfterLiveKeyChange)) },
             Screen(name: "09a-dog-profile") {
                 AnyView(NavigationStack {
                     DogProfileEditor(

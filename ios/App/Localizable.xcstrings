@@ -4159,6 +4159,46 @@
           }
         }
       }
+    },
+    "%@ needs to scan your invite code before anyone can watch live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ צריכה לסרוק את קוד ההזמנה שלך לפני שאפשר יהיה לצפות בשידור חי."
+          }
+        }
+      }
+    },
+    "%lld cameras need to scan your invite code before anyone can watch live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld מצלמות צריכות לסרוק את קוד ההזמנה שלך לפני שאפשר יהיה לצפות בשידור חי."
+          }
+        }
+      }
+    },
+    "Show invite code": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצגת קוד ההזמנה"
+          }
+        }
+      }
+    },
+    "On the camera, stop it and tap Scan invite code.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "במצלמה, עצרו אותה והקישו על ״סריקת קוד הזמנה״."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

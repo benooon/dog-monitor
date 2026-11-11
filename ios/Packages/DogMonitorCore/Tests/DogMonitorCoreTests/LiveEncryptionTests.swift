@@ -248,6 +248,28 @@ final class LiveEncryptionAPITests: XCTestCase {
         XCTAssertEqual(household.liveKeyRotationNeeded, true)
     }
 
+    func testCamerasNeedingTheKey() {
+        let householdId = UUID()
+        let now = Date()
+        func camera(_ name: String, needs: Bool?, status: DeviceStatus = .active, role: DeviceRole = .camera) -> DeviceDTO {
+            DeviceDTO(id: UUID(), householdId: householdId, name: name, role: role, status: status, needsLiveKey: needs, createdAt: now)
+        }
+        let devices = [
+            camera("Kitchen", needs: true),
+            camera("Bedroom", needs: true),
+            camera("Living room", needs: false),
+            camera("Hall", needs: nil),
+            camera("Old", needs: true, status: .revoked),
+            camera("Phone", needs: true, role: .viewer),
+        ]
+        func household(encrypted: Bool?) -> HouseholdDTO {
+            HouseholdDTO(id: householdId, name: "Home", ownerId: UUID(), role: .owner, liveEncrypted: encrypted, devices: devices)
+        }
+        XCTAssertEqual(household(encrypted: true).camerasNeedingLiveKey.map(\.name), ["Bedroom", "Kitchen"])
+        XCTAssertEqual(household(encrypted: false).camerasNeedingLiveKey, [])
+        XCTAssertEqual(household(encrypted: nil).camerasNeedingLiveKey, [], "older servers")
+    }
+
     func testMarkingSendsTheKeyIDButNeverTheKey() async throws {
         let stub = StubTransport(json: #"{"id":"\#(Fixtures.householdID)","name":"Home","plan":"free","liveEncrypted":true}"#)
         let api = DogMonitorAPI(baseURL: Fixtures.baseURL, credential: .user(token: "t"), transport: stub)
