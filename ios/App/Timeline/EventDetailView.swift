@@ -28,6 +28,19 @@ private struct EventDetailList: View {
                         .listRowInsets(EdgeInsets())
                 }
             }
+            if event.clipExpiredWithPlan(model.plan) {
+                Section {
+                    Label {
+                        Text("This moment is older than a day. Premium keeps \(PlanFeatures.premium.clipRetentionDays) days.")
+                    } icon: {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .foregroundStyle(.tint)
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("clip-expired-upsell")
+                }
+            }
             Section {
                 if let name = model.cameraName(for: event) {
                     LabeledContent("Camera") { Text(verbatim: name) }
@@ -195,6 +208,13 @@ private struct EventMediaView: View {
         EventDetailView(model: model, eventId: model.feed.events[1].id)
     }
     .preferredColorScheme(.dark)
+}
+
+#Preview("Clip expired (free plan)") {
+    let model = TimelineModel.preview
+    NavigationStack {
+        EventDetailView(model: model, eventId: model.feed.events.first { $0.mediaExpired == true }!.id)
+    }
 }
 
 #Preview("Gone") {

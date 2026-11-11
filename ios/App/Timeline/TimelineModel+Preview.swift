@@ -15,13 +15,14 @@ extension TimelineModel {
         let camera = UUID()
         let now = Date.now
         func event(
-            _ type: EventType, hoursAgo: Double, minutes: Double? = nil, feedback: DogEvent.Feedback? = nil, place: String? = nil
+            _ type: EventType, hoursAgo: Double, minutes: Double? = nil, feedback: DogEvent.Feedback? = nil, place: String? = nil,
+            expired: Bool = false
         ) -> EventDTO {
             let start = now.addingTimeInterval(-hoursAgo * 3600)
             return EventDTO(
                 id: UUID(), householdId: household, cameraId: camera, type: type,
                 startedAt: start, endedAt: minutes.map { start.addingTimeInterval($0 * 60) },
-                clipKey: "clips/sample.mp4", feedback: feedback, place: place
+                clipKey: expired ? nil : "clips/sample.mp4", feedback: feedback, place: place, mediaExpired: expired
             )
         }
         let events = [
@@ -29,7 +30,7 @@ extension TimelineModel {
             event(.prolongedBarking, hoursAgo: 1, minutes: 4, feedback: .correct),
             event(.forbiddenZone, hoursAgo: 2, minutes: 3, place: "sofa"),
             event(.atDoor, hoursAgo: 3, minutes: 12),
-            event(.whining, hoursAgo: 26, minutes: 2, feedback: .wrong),
+            event(.whining, hoursAgo: 26, minutes: 2, feedback: .wrong, expired: true),
             event(.cameraOffline, hoursAgo: 30, minutes: 45),
             event(.dailySummary, hoursAgo: 36),
         ]

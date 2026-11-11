@@ -55,6 +55,13 @@ final class ScreenshotTests: XCTestCase {
                     EventDetailView(model: model, eventId: model.feed.events[1].id)
                 })
             },
+            Screen(name: "07a-event-clip-expired") {
+                let model = TimelineModel.preview
+                let expired = model.feed.events.first { $0.mediaExpired == true }!
+                return AnyView(NavigationStack {
+                    EventDetailView(model: model, eventId: expired.id)
+                })
+            },
             Screen(name: "08-daily-summary") { AnyView(DailySummaryView(model: .preview, dogName: "Rex")) },
             Screen(name: "09-household") { AnyView(HouseholdView(model: .demo)) },
             Screen(name: "09a-dog-profile") {

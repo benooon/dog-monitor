@@ -44,7 +44,11 @@ struct ViewerHomeView: View {
             }
             .sheet(isPresented: $showsTimeline) {
                 ActivityTimelineView(
-                    model: TimelineModel(api: model.authorizedAPI, cameras: model.household?.cameras ?? [])
+                    model: TimelineModel(
+                        api: model.authorizedAPI,
+                        cameras: model.household?.cameras ?? [],
+                        plan: HouseholdPlan(rawValue: model.household?.plan ?? "") ?? .free
+                    )
                 )
             }
             .sheet(item: $summary) { request in

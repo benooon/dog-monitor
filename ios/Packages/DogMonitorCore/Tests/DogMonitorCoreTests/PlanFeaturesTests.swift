@@ -62,4 +62,19 @@ final class PlanFeaturesTests: XCTestCase {
         XCTAssertNil(household([]).soleDogName)
         XCTAssertNil(household([dog("Rex"), dog("Bella")]).soleDogName)
     }
+
+    func testUpsellOnlyForClipsTheFreePlanDeleted() throws {
+        let base = #"{"id":"\#(UUID())","householdId":"\#(UUID())","cameraId":null,"type":"whining","state":null,"#
+            + #""startedAt":"2026-11-01T08:00:00.000Z","endedAt":null,"confidence":null,"snapshotKey":null,"feedback":null,"place":null,"#
+        let decoder = JSONCoding.makeDecoder()
+        func event(_ tail: String) throws -> EventDTO {
+            try decoder.decode(EventDTO.self, from: Data((base + tail).utf8))
+        }
+        let expired = try event(#""clipKey":null,"mediaExpired":true}"#)
+        XCTAssertTrue(expired.clipExpiredWithPlan(.free))
+        XCTAssertFalse(expired.clipExpiredWithPlan(.premium))
+        XCTAssertFalse(try event(#""clipKey":null,"mediaExpired":false}"#).clipExpiredWithPlan(.free))
+        XCTAssertFalse(try event(#""clipKey":null}"#).clipExpiredWithPlan(.free), "older server")
+        XCTAssertFalse(try event(#""clipKey":"k","mediaExpired":true}"#).clipExpiredWithPlan(.free))
+    }
 }

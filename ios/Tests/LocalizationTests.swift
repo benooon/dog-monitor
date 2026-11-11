@@ -242,6 +242,7 @@ final class LocalizationTests: XCTestCase {
         "Dog alerts stay free on every plan.",
         "Premium keeps a month of clips, and everyone in the household can watch.",
         "Join %@?",
+        "This moment is older than a day. Premium keeps %lld days.",
         "Invited by %@.",
         "This invite has expired or was already used. Ask for a new one.",
         "New cameras need Premium. Family members can still join with this code.",

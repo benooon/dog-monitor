@@ -296,6 +296,8 @@ public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
     /// forbiddenZone only: where it happened, `"sofa"` or `"offLimits"` (raw so new values can't
     /// break decoding); nil for other events and older servers.
     public let place: String?
+    /// The clip and snapshot were deleted by retention (nil from older servers).
+    public let mediaExpired: Bool?
 
     public init(
         id: UUID,
@@ -309,7 +311,8 @@ public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
         clipKey: String? = nil,
         snapshotKey: String? = nil,
         feedback: DogEvent.Feedback? = nil,
-        place: String? = nil
+        place: String? = nil,
+        mediaExpired: Bool? = nil
     ) {
         self.id = id
         self.householdId = householdId
@@ -323,6 +326,7 @@ public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
         self.snapshotKey = snapshotKey
         self.feedback = feedback
         self.place = place
+        self.mediaExpired = mediaExpired
     }
 
     /// The dog got on the sofa (a forbiddenZone event on a camera whose only no-go zones are sofas).

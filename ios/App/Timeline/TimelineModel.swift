@@ -22,6 +22,8 @@ final class TimelineModel {
     private(set) var feedbackFailed = false
 
     let cameras: [DeviceDTO]
+    /// The household's plan, for the "Premium keeps 30 days" line on clips the free plan deleted.
+    let plan: HouseholdPlan
     /// nil shows every camera.
     var cameraId: UUID? {
         didSet { if cameraId != oldValue { reload() } }
@@ -34,9 +36,10 @@ final class TimelineModel {
     private let api: DogMonitorAPI
     private var loadTask: Task<Void, Never>?
 
-    init(api: DogMonitorAPI, cameras: [DeviceDTO], loaded: [EventDTO]? = nil) {
+    init(api: DogMonitorAPI, cameras: [DeviceDTO], plan: HouseholdPlan = .free, loaded: [EventDTO]? = nil) {
         self.api = api
         self.cameras = cameras
+        self.plan = plan
         if let loaded {
             feed = TimelineFeed(events: loaded)
             phase = .ready

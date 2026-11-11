@@ -104,6 +104,12 @@ extension EventDTO {
     /// Whether `GET /events/:id/media` can return something to show.
     public var hasMedia: Bool { clipKey != nil || snapshotKey != nil }
 
+    /// Whether to say "Premium keeps 30 days" here: the clip was deleted by retention, and a
+    /// longer plan would still have it.
+    public func clipExpiredWithPlan(_ plan: HouseholdPlan) -> Bool {
+        mediaExpired == true && !hasMedia && PlanFeatures.for(plan).clipRetentionDays < PlanFeatures.premium.clipRetentionDays
+    }
+
     /// How long the event lasted, when it has ended.
     public var duration: TimeInterval? {
         endedAt.map { max(0, $0.timeIntervalSince(startedAt)) }

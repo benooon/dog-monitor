@@ -3595,6 +3595,16 @@
           }
         }
       }
+    },
+    "This moment is older than a day. Premium keeps %lld days.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הרגע הזה כבר בן יותר מיום. בפרימיום רגעים נשמרים %lld ימים."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
