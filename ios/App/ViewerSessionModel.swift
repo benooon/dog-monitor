@@ -26,14 +26,21 @@ final class ViewerSessionModel {
     /// Sample data for previews and CI screenshots: never touches the network or the keychain.
     private(set) var isDemo = false
 
+    /// This phone's copy of the household's live video key: made here on the owner's phone,
+    /// scanned or opened from an invite on every other phone (nil until then).
+    private(set) var liveKey: LiveKey?
+
     private var api: DogMonitorAPI
     private let credentials: CredentialStore
+    private let liveKeys: LiveKeyStore
 
     init(baseURL: URL = AppConfig.apiBaseURL, store: any SecureStore = KeychainStore()) {
         let credentials = CredentialStore(store: store)
         self.credentials = credentials
+        liveKeys = LiveKeyStore(store: store)
         dogPhotos = DogPhotoStore()
         api = DogMonitorAPI(baseURL: baseURL, credential: credentials.load())
+        liveKey = liveKeys.load()
     }
 
     /// Validates the stored token on launch.
@@ -72,6 +79,9 @@ final class ViewerSessionModel {
             household = try await api.household()
         }
         updateSubscription()
+        if let household, household.role == .owner {
+            await ensureLiveKey(for: household)
+        }
         await loadSnapshots()
         if let dogs = household?.dogs {
             await dogPhotos.load(dogs, api: api)
@@ -97,6 +107,38 @@ final class ViewerSessionModel {
         let premium = SubscriptionModel(api: api, householdId: household.id)
         subscription = premium
         premium.start()
+    }
+
+    /// Owner only: makes the household's live key the first time, then tells the server that
+    /// live video is encrypted. The key is saved before the server hears anything, and only the
+    /// flag is sent. Best effort: retried on the next load.
+    private func ensureLiveKey(for household: HouseholdDTO) async {
+        switch LiveEncryption.ownerAction(hasKey: liveKey != nil, householdEncrypted: household.liveEncrypted ?? false) {
+        case .none:
+            return
+        case .createKey, .replaceLostKey:
+            let key = LiveKey.generate()
+            do {
+                try liveKeys.save(key)
+            } catch {
+                return
+            }
+            liveKey = key
+            guard household.liveEncrypted != true else { return }
+        case .markEncrypted:
+            break
+        }
+        try? await api.markLiveEncrypted()
+    }
+
+    /// A key scanned from the owner's invite QR code by a phone already in the household.
+    func saveLiveKey(_ key: LiveKey) {
+        do {
+            try liveKeys.save(key)
+            liveKey = key
+        } catch {
+            errorMessage = String(localized: "Couldn't save the code. Try again.")
+        }
     }
 
     /// Best effort: storage may not be configured yet, which is fine for the home screen.
@@ -132,10 +174,15 @@ final class ViewerSessionModel {
     }
 
     /// Joins an existing household with an invite code (or scanned token) instead of creating one.
-    func joinHousehold(code: String) async {
+    /// - Parameter liveKey: the household's live key from the invite link, if it carried one.
+    func joinHousehold(code: String, liveKey: LiveKey? = nil) async {
         guard let tokenOrCode = PairingCode.parse(code) else { return }
         await perform {
             _ = try await api.acceptInviteAsMember(tokenOrCode)
+            if let key = liveKey ?? PairingCode.liveKey(in: code) {
+                try? liveKeys.save(key)
+                self.liveKey = key
+            }
             state = OnboardingState.from(try await api.me())
         }
     }
@@ -182,7 +229,7 @@ final class ViewerSessionModel {
     /// A shareable link for `invite`, or nil when the server address can't make one.
     func inviteLink(for invite: InviteDTO) -> URL? {
         guard api.baseURL.scheme == "https" else { return nil }
-        return PairingCode.inviteLink(token: invite.token, baseURL: api.baseURL)
+        return PairingCode.inviteLink(token: invite.token, baseURL: api.baseURL, liveKey: liveKey)
     }
 
     /// The signed-in API client, for screens that call it directly (live view).
@@ -217,6 +264,8 @@ final class ViewerSessionModel {
                 errorMessage = String(localized: "Others are still in your household. Remove them first, then delete your account.")
                 return
             }
+            try? liveKeys.clear()
+            liveKey = nil
             signOut()
         }
     }

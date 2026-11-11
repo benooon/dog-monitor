@@ -3959,6 +3959,136 @@
           }
         }
       }
+    },
+    "Scan the invite QR code on the owner's phone.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סרקו את קוד ה-QR של ההזמנה בטלפון של הבעלים."
+          }
+        }
+      }
+    },
+    "Allow camera access in Settings to scan the code.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כדי לסרוק את הקוד, אפשרו גישה למצלמה בהגדרות."
+          }
+        }
+      }
+    },
+    "On the owner's phone, open Household and tap Invite family or pair a camera. Scanning here only unlocks live view.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בטלפון של הבעלים, פתחו את משק הבית והקישו על ״הזמנת בני משפחה או צימוד מצלמה״. הסריקה כאן רק פותחת את הצפייה החיה."
+          }
+        }
+      }
+    },
+    "This code can't unlock live view. Ask the owner to update Dog Monitor and open a new invite.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הקוד הזה לא פותח צפייה חיה. בקשו מהבעלים לעדכן את Dog Monitor ולפתוח הזמנה חדשה."
+          }
+        }
+      }
+    },
+    "Unlock live view": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתיחת צפייה חיה"
+          }
+        }
+      }
+    },
+    "Live view is off until this phone scans the invite code on the owner's phone. That keeps your household's video private.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצפייה החיה כבויה עד שהטלפון הזה יסרוק את קוד ההזמנה בטלפון של הבעלים. כך הווידאו של משק הבית נשאר פרטי."
+          }
+        }
+      }
+    },
+    "Scan invite code": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סריקת קוד הזמנה"
+          }
+        }
+      }
+    },
+    "Live view is off. Stop the camera to scan the invite code.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצפייה החיה כבויה. עצרו את המצלמה כדי לסרוק את קוד ההזמנה."
+          }
+        }
+      }
+    },
+    "Scan the invite code to watch live.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סרקו את קוד ההזמנה כדי לצפות בשידור חי."
+          }
+        }
+      }
+    },
+    "Your household's video is private. Scan the invite code on the owner's phone once, and this phone can watch.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הווידאו של משק הבית פרטי. סרקו פעם אחת את קוד ההזמנה בטלפון של הבעלים, והטלפון הזה יוכל לצפות."
+          }
+        }
+      }
+    },
+    "This video isn't private, so it isn't shown.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הווידאו הזה לא פרטי, ולכן הוא לא מוצג."
+          }
+        }
+      }
+    },
+    "On the camera, stop it and scan a new invite code from the owner's phone. Then try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "במצלמה, עצרו אותה וסרקו קוד הזמנה חדש מהטלפון של הבעלים. אחר כך נסו שוב."
+          }
+        }
+      }
+    },
+    "Couldn't save the code. Try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא הצלחנו לשמור את הקוד. נסו שוב."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

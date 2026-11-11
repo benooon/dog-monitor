@@ -8,6 +8,7 @@ struct LiveView: View {
     let dogName: String?
     let realtime: ViewerRealtime
     @State private var model: LiveViewModel
+    @State private var showsLiveKeyScan = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let liveActivities = CameraLiveActivityController.shared
 
@@ -51,6 +52,11 @@ struct LiveView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear { model.start() }
         .onDisappear { model.stop() }
+        .sheet(isPresented: $showsLiveKeyScan) {
+            LiveKeyScanView { key in
+                model.useLiveKey(key)
+            }
+        }
     }
 
     /// Floating controls: camera sound, push-to-talk, and the Lock Screen Live Activity.
@@ -152,6 +158,25 @@ struct LiveView: View {
             }
         case .notConfigured:
             ContentUnavailableView("Live view isn't set up on the server yet.", systemImage: "video.slash")
+        case .needsLiveKey:
+            ContentUnavailableView {
+                Label("Scan the invite code to watch live.", systemImage: "lock.fill")
+            } description: {
+                Text("Your household's video is private. Scan the invite code on the owner's phone once, and this phone can watch.")
+            } actions: {
+                Button("Scan invite code") { showsLiveKeyScan = true }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("live-scan-key")
+            }
+        case .notPrivate:
+            ContentUnavailableView {
+                Label("This video isn't private, so it isn't shown.", systemImage: "exclamationmark.shield")
+            } description: {
+                Text("On the camera, stop it and scan a new invite code from the owner's phone. Then try again.")
+            } actions: {
+                Button("Try again") { model.retry() }
+                    .buttonStyle(.bordered)
+            }
         case .failed:
             ContentUnavailableView {
                 Label("Couldn't open live view.", systemImage: "exclamationmark.triangle")

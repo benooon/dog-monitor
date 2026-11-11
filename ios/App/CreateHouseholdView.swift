@@ -5,6 +5,8 @@ struct CreateHouseholdView: View {
     let model: ViewerSessionModel
     @State private var householdName = ""
     @State private var inviteCode = ""
+    /// The live key from an opened invite link, kept with the token it came with.
+    @State private var inviteKey: (token: String, key: LiveKey)?
     /// The household the invite leads to, asked about before joining.
     @State private var pendingJoin: InvitePreviewDTO?
     @State private var isConfirmingJoin = false
@@ -42,7 +44,9 @@ struct CreateHouseholdView: View {
                 // Opened from an invite link: fill in the invite and ask "Join <household>?" right away.
                 guard let token else { return }
                 inviteCode = token
+                inviteKey = DeepLinkRouter.shared.pendingLiveKey.map { (token, $0) }
                 DeepLinkRouter.shared.pendingInvite = nil
+                DeepLinkRouter.shared.pendingLiveKey = nil
                 Task { await reviewInvite() }
             }
             .alert(
@@ -51,7 +55,7 @@ struct CreateHouseholdView: View {
                 presenting: pendingJoin
             ) { _ in
                 Button("Join") {
-                    Task { await model.joinHousehold(code: inviteCode) }
+                    Task { await model.joinHousehold(code: inviteCode, liveKey: liveKeyForInvite) }
                 }
                 .accessibilityIdentifier("confirm-join-household")
                 Button("Cancel", role: .cancel) {}
@@ -69,6 +73,12 @@ struct CreateHouseholdView: View {
                 }
             }
         }
+    }
+
+    /// The link's key, only while the field still holds that link's invite.
+    private var liveKeyForInvite: LiveKey? {
+        guard let inviteKey, PairingCode.parse(inviteCode) == inviteKey.token else { return nil }
+        return inviteKey.key
     }
 
     private var joinTitle: Text {

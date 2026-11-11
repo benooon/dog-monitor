@@ -19,6 +19,16 @@ final class LiveViewModel {
         case viewerLimitReached
         case notConfigured
         case failed
+        /// The household's video is end-to-end encrypted and this phone has no key yet.
+        case needsLiveKey
+        /// The camera sent clear video where it should be encrypted, so it isn't shown.
+        case notPrivate
+    }
+
+    /// Ends a session for good (no reconnect) with an encryption problem.
+    private enum EncryptionStop: Error {
+        case needsKey
+        case notPrivate
     }
 
     static let cameraWaitTimeout: Duration = .seconds(30)
@@ -44,12 +54,20 @@ final class LiveViewModel {
     @ObservationIgnored private var room: Room?
     @ObservationIgnored private var session: Task<Void, Never>?
     @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let liveKeys: LiveKeyStore
 
-    init(cameraId: UUID, api: DogMonitorAPI, realtime: ViewerRealtime, defaults: UserDefaults = .standard) {
+    init(
+        cameraId: UUID,
+        api: DogMonitorAPI,
+        realtime: ViewerRealtime,
+        defaults: UserDefaults = .standard,
+        liveKeys: LiveKeyStore = LiveKeyStore(store: KeychainStore())
+    ) {
         self.cameraId = cameraId
         self.api = api
         self.realtime = realtime
         self.defaults = defaults
+        self.liveKeys = liveKeys
         isAudioMuted = defaults.bool(forKey: Self.audioMutedKey)
     }
 
@@ -113,6 +131,17 @@ final class LiveViewModel {
         Task { await room?.disconnect() }
     }
 
+    /// A key scanned from the owner's invite QR code: keep it and try again.
+    func useLiveKey(_ key: LiveKey) {
+        do {
+            try liveKeys.save(key)
+        } catch {
+            logger.error("Could not save the live key: \(String(describing: error), privacy: .public)")
+            return
+        }
+        retry()
+    }
+
     /// Restarts after a terminal failure (button on the error screen).
     func retry() {
         stop()
@@ -144,6 +173,11 @@ final class LiveViewModel {
                 }
             } catch is CancellationError {
                 return
+            } catch let stop as EncryptionStop {
+                videoTrack = nil
+                phase = stop == .needsKey ? .needsLiveKey : .notPrivate
+                await disconnectRoom()
+                return
             } catch {
                 logger.info("Live view error: \(String(describing: error), privacy: .public)")
             }
@@ -159,7 +193,13 @@ final class LiveViewModel {
     private func connectAndWatch() async throws {
         let token = try await api.liveToken(cameraId: cameraId)
         try Task.checkCancellation()
-        let room = Room()
+        let key = liveKeys.load()
+        let householdEncrypted = token.isHouseholdEncrypted
+        if case .needsKey = LiveEncryption.mode(key: key, householdEncrypted: householdEncrypted) {
+            throw EncryptionStop.needsKey
+        }
+        let pins = EncryptedCameraPins(defaults: defaults)
+        let room = Room(roomOptions: LiveRoomOptions.make(key: key))
         self.room = room
         try await room.connect(url: token.url, token: token.token)
         phase = .waitingForCamera
@@ -167,7 +207,21 @@ final class LiveViewModel {
         var waited: Duration = .zero
         while !Task.isCancelled {
             guard room.connectionState != .disconnected else { break }
-            if let track = Self.cameraVideoTrack(in: room) {
+            if let video = Self.cameraVideo(in: room) {
+                let (track, encrypted) = video
+                switch LiveEncryption.decision(
+                    trackEncrypted: encrypted,
+                    hasKey: key != nil,
+                    householdEncrypted: householdEncrypted,
+                    cameraPinned: pins.isPinned(cameraId)
+                ) {
+                case .show:
+                    if encrypted { pins.pin(cameraId) }
+                case .needsKey:
+                    throw EncryptionStop.needsKey
+                case .refuse:
+                    throw EncryptionStop.notPrivate
+                }
                 if videoTrack !== track {
                     videoTrack = track
                 }
@@ -207,14 +261,21 @@ final class LiveViewModel {
         }
     }
 
-    private static func cameraVideoTrack(in room: Room) -> VideoTrack? {
+    /// The camera's video track, and whether its frames are end-to-end encrypted.
+    private static func cameraVideo(in room: Room) -> (VideoTrack, Bool)? {
         for participant in room.remoteParticipants.values {
             for publication in participant.videoTracks {
                 if let track = publication.track as? VideoTrack {
-                    return track
+                    return (track, publication.encryptionType != EncryptionType.none)
                 }
             }
         }
         return nil
+    }
+
+    private func disconnectRoom() async {
+        let room = room
+        self.room = nil
+        await room?.disconnect()
     }
 }

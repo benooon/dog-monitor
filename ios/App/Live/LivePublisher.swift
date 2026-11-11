@@ -13,6 +13,9 @@ import os
 /// and gets our captured buffers through `AudioManager.shared.mixer.capture(appAudio:)`.
 /// Manual rendering also means remote audio is not played automatically, so viewers' push-to-talk
 /// audio goes through `TalkbackPlayer`.
+///
+/// With the household's live key, every video and audio frame is encrypted on this phone
+/// (LiveKit shared-key frame encryption, AES-GCM), so the media server only relays ciphertext.
 actor LivePublisher {
     enum PublishError: Error {
         case noBufferCapturer
@@ -32,10 +35,12 @@ actor LivePublisher {
 
     /// - Parameter audio: captured audio samples; publishing audio is best effort, so a failure
     ///   there leaves the video stream running.
-    func start(token: LiveTokenDTO, frames: AsyncStream<CaptureSample>, audio: AsyncStream<CaptureSample>) async throws {
+    /// - Parameter key: the household's live key; nil only for households not encrypted yet
+    ///   (the caller decides with `LiveEncryption.mode`).
+    func start(token: LiveTokenDTO, key: LiveKey?, frames: AsyncStream<CaptureSample>, audio: AsyncStream<CaptureSample>) async throws {
         await stop()
         Self.useCapturedAudio()
-        let room = Room()
+        let room = Room(roomOptions: LiveRoomOptions.make(key: key))
         try await room.connect(url: token.url, token: token.token)
         let track = await LocalVideoTrack.createBufferTrack(name: "camera", source: .camera)
         guard let capturer = track.capturer as? BufferCapturer else {

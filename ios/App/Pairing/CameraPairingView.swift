@@ -101,6 +101,13 @@ struct CameraPairingView: View {
             )
             let credential = APICredential.device(id: response.device.id, secret: response.deviceSecret)
             try CredentialStore(store: KeychainStore()).save(credential)
+            // A scanned QR code carries the household's live key; a typed code doesn't, and then
+            // the camera asks for a scan once it learns the household is encrypted. An existing
+            // key is kept: this phone may also be the owner's, whose key the household relies on.
+            if let key = PairingCode.liveKey(in: text) {
+                try LiveKeyStore(store: KeychainStore()).save(key)
+                UserDefaults.standard.set(false, forKey: CameraLiveController.needsLiveKeyDefaultsKey)
+            }
             onPaired(credential)
             dismiss()
         } catch {

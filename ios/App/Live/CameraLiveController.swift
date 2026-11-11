@@ -21,9 +21,26 @@ final class CameraLiveController {
     private(set) var isStreaming = false
     /// A viewer is talking through the camera's speaker right now (privacy: always shown).
     private(set) var isViewerTalking = false
+    /// The household's live video is end-to-end encrypted but this phone has no key, so it
+    /// never publishes (clear video would break the household's privacy). Fixed by scanning
+    /// an invite QR code from the owner's phone.
+    private(set) var needsLiveKey = CameraLiveController.rememberedNeedsLiveKey
+
+    /// Remembered so the camera's start screen can say live view is off before it connects.
+    nonisolated static let needsLiveKeyDefaultsKey = "camera.liveNeedsKey"
+    nonisolated static var rememberedNeedsLiveKey: Bool {
+        UserDefaults.standard.bool(forKey: needsLiveKeyDefaultsKey)
+    }
+
+    private func setNeedsLiveKey(_ needsKey: Bool) {
+        guard needsLiveKey != needsKey else { return }
+        needsLiveKey = needsKey
+        UserDefaults.standard.set(needsKey, forKey: Self.needsLiveKeyDefaultsKey)
+    }
 
     private let api: DogMonitorAPI
     private let capture: CaptureService
+    private let liveKeys = LiveKeyStore(store: KeychainStore())
     private let connection: RealtimeConnection
     private let publisher = LivePublisher()
     private let health = HealthReporter()
@@ -63,6 +80,9 @@ final class CameraLiveController {
             }
         })
         tasks.append(Task { [weak self] in
+            await self?.checkLiveKey()
+        })
+        tasks.append(Task { [weak self] in
             while !Task.isCancelled {
                 await self?.sendHeartbeat()
                 try? await Task.sleep(for: Self.heartbeatInterval)
@@ -84,7 +104,26 @@ final class CameraLiveController {
         Task { await publisher.stop() }
     }
 
+    /// A key was scanned: check again and publish if viewers are waiting.
+    func liveKeyChanged() {
+        Task {
+            await checkLiveKey()
+            await reconcile()
+        }
+    }
+
     // MARK: - Private
+
+    /// A camera without the key learns right away whether it may publish, so its screen can
+    /// say so before anyone tries to watch.
+    private func checkLiveKey() async {
+        guard liveKeys.load() == nil else {
+            setNeedsLiveKey(false)
+            return
+        }
+        guard let token = try? await api.deviceLiveToken() else { return }
+        setNeedsLiveKey(LiveEncryption.mode(key: nil, householdEncrypted: token.isHouseholdEncrypted) == .needsKey)
+    }
 
     private func handle(_ event: RealtimeConnection.Event) {
         switch event {
@@ -136,8 +175,22 @@ final class CameraLiveController {
             if !isStreaming || !connected {
                 do {
                     let token = try await api.deviceLiveToken()
+                    let key: LiveKey?
+                    switch LiveEncryption.mode(key: liveKeys.load(), householdEncrypted: token.isHouseholdEncrypted) {
+                    case .encrypted(let liveKey):
+                        key = liveKey
+                        setNeedsLiveKey(false)
+                    case .clear:
+                        key = nil
+                        setNeedsLiveKey(false)
+                    case .needsKey:
+                        setNeedsLiveKey(true)
+                        isStreaming = false
+                        return
+                    }
                     try await publisher.start(
                         token: token,
+                        key: key,
                         frames: capture.samples(.video, bufferingNewest: 1),
                         // ~20 ms per buffer: keep a few hundred ms so audio is not dropped.
                         audio: capture.samples(.audio, bufferingNewest: 16)

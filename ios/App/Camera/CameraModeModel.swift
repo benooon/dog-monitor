@@ -364,8 +364,29 @@ final class CameraModeModel {
     }
 
     /// Called after `CameraPairingView` stored the new device credential.
+    /// The household's live video is encrypted and this phone has no key, so live view is off
+    /// (remembered from the last check, until a key is scanned).
+    var liveNeedsKey: Bool {
+        live?.needsLiveKey ?? rememberedLiveNeedsKey
+    }
+
+    private var rememberedLiveNeedsKey = CameraLiveController.rememberedNeedsLiveKey
+
+    /// A key scanned from the owner's invite QR code (`LiveKeyScanView`).
+    func saveLiveKey(_ key: LiveKey) {
+        do {
+            try LiveKeyStore(store: KeychainStore()).save(key)
+        } catch {
+            return
+        }
+        UserDefaults.standard.set(false, forKey: CameraLiveController.needsLiveKeyDefaultsKey)
+        rememberedLiveNeedsKey = false
+        live?.liveKeyChanged()
+    }
+
     func didPair(with credential: APICredential) {
         self.credential = credential
+        rememberedLiveNeedsKey = CameraLiveController.rememberedNeedsLiveKey
         if status == .running, live == nil { startLive() }
         if status == .running { startRecorder() }
     }

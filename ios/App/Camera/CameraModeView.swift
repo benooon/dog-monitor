@@ -9,6 +9,7 @@ struct CameraModeView: View {
     @State private var model = CameraModeModel()
     @Environment(\.scenePhase) private var scenePhase
     @State private var showsPairing = false
+    @State private var showsLiveKeyScan = false
     @State private var showsZones = false
     @State private var hasCustomModel = CustomSoundModel.isInstalled
     @State private var showsModelImporter = false
@@ -62,6 +63,11 @@ struct CameraModeView: View {
         .sheet(isPresented: $showsPairing) {
             CameraPairingView { credential in
                 model.didPair(with: credential)
+            }
+        }
+        .sheet(isPresented: $showsLiveKeyScan) {
+            LiveKeyScanView { key in
+                model.saveLiveKey(key)
             }
         }
     }
@@ -119,6 +125,14 @@ struct CameraModeView: View {
                 Button("Pair this camera", systemImage: "qrcode") { showsPairing = true }
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("pair-camera")
+            } else if model.liveNeedsKey {
+                Text("Live view is off until this phone scans the invite code on the owner's phone. That keeps your household's video private.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button("Scan invite code", systemImage: "qrcode.viewfinder") { showsLiveKeyScan = true }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("camera-scan-live-key")
             }
             Text("Anyone the camera can see or hear should know it's there. Tell guests, your dog walker and your cleaner. Clips include sound.")
                 .font(.footnote)
@@ -268,6 +282,10 @@ struct CameraModeView: View {
                 } else if live.link == .offline {
                     Image(systemName: "wifi.slash")
                         .accessibilityLabel(Text("Offline"))
+                }
+                if live.needsLiveKey {
+                    Image(systemName: "video.slash.fill")
+                        .accessibilityLabel(Text("Live view is off. Stop the camera to scan the invite code."))
                 }
             }
             if model.live?.isViewerTalking == true {

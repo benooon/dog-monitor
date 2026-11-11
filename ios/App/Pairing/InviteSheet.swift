@@ -89,7 +89,7 @@ struct InviteSheet: View {
             }
         } else {
             VStack(spacing: DS.Spacing.l) {
-                QRCodeImage(text: PairingCode.qrContent(token: invite.token))
+                QRCodeImage(text: PairingCode.qrContent(token: invite.token, liveKey: model.liveKey))
                     .frame(maxWidth: Self.codeMaxWidth)
                     .padding(DS.Spacing.l)
                     // QR codes need dark modules on a light field to scan, in dark mode too.
