@@ -1,7 +1,7 @@
 import type { FastifyBaseLogger } from "fastify";
-import { and, eq, inArray, isNotNull, isNull, lt, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { events, households } from "../db/schema.js";
+import { dailySummaries, events, households } from "../db/schema.js";
 import type { MediaStorage } from "./storage.js";
 
 export const DEFAULT_RETENTION_DAYS = 7;
@@ -65,6 +65,45 @@ export function scheduleRetention(
       .catch((error: unknown) => log.error({ err: error }, "media retention failed"));
   };
   const first = setTimeout(run, 60_000);
+  const daily = setInterval(run, 24 * 60 * 60 * 1000);
+  first.unref();
+  daily.unref();
+  return () => {
+    clearTimeout(first);
+    clearInterval(daily);
+  };
+}
+
+export const DEFAULT_RECORD_RETENTION_DAYS = 365;
+
+/**
+ * Deletes timeline events and daily summaries older than `days` (storage limitation, GDPR Art. 5(1)(e)).
+ * Events that still point at stored files are kept until `purgeExpiredMedia` has removed the files.
+ * Returns how many rows were deleted.
+ */
+export async function purgeExpiredRecords(db: Database, days: number, now: Date = new Date()): Promise<number> {
+  const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  const oldEvents = await db
+    .delete(events)
+    .where(and(lt(events.startedAt, cutoff), isNull(events.clipKey), isNull(events.snapshotKey)))
+    .returning({ id: events.id });
+  const oldSummaries = await db
+    .delete(dailySummaries)
+    .where(lt(dailySummaries.date, sql`${cutoff.toISOString().slice(0, 10)}::date`))
+    .returning({ date: dailySummaries.date });
+  return oldEvents.length + oldSummaries.length;
+}
+
+/** Runs `purgeExpiredRecords` now and then daily. Returns a function that stops it. */
+export function scheduleRecordRetention(db: Database, days: number, log: FastifyBaseLogger): () => void {
+  const run = () => {
+    purgeExpiredRecords(db, days)
+      .then((deleted) => {
+        if (deleted > 0) log.info({ deleted }, "deleted expired events and daily summaries");
+      })
+      .catch((error: unknown) => log.error({ err: error }, "record retention failed"));
+  };
+  const first = setTimeout(run, 120_000);
   const daily = setInterval(run, 24 * 60 * 60 * 1000);
   first.unref();
   daily.unref();

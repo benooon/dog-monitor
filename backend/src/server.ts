@@ -23,6 +23,7 @@ const app = await buildApp({
     apns: config.apns ? new ApnsClient(config.apns) : undefined,
     storage: config.s3 ? new S3MediaStorage(config.s3) : undefined,
     retentionDays: config.retentionDays,
+    recordRetentionDays: config.recordRetentionDays,
     transactions: createAppStoreVerifier(config.appStore),
     enforcePlanLimits: config.enforcePlanLimits,
   },

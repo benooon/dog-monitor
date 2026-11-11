@@ -23,3 +23,8 @@ Weekly review by the legal agent. I am not a licensed lawyer: anything that need
 - **Low:** No data export; no stated breach process; Israeli Amendment 13 database duties not assessed (lawyer).
 
 **Checked, fine:** training-data sharing is opt-in and off by default; clips auto-delete; presigned links are short-lived; the camera shows when someone is watching or talking; no tracking, so no ATT prompt.
+
+### 2026-11-11 (follow-up, "closing corners")
+
+Fixed: events and daily summaries now expire after 365 days (`EVENT_RETENTION_DAYS`); request logs no longer contain invite tokens, query strings or IP addresses; owners can delete a household without deleting their account (`DELETE /household`). All with tests. Policy and `PRIVACY.md` updated to match.
+Still open: in-app delete-account and notices (iOS), publishing the texts (owner details), regions and DPAs, Apple token revocation, data export. Medium risks "events never expire" and "logs contain tokens" are closed.

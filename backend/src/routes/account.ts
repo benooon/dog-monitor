@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices, events, householdMembers, households, users } from "../db/schema.js";
+import { devices, householdMembers, users } from "../db/schema.js";
+import { StorageUnavailableError, deleteHousehold } from "../households/delete.js";
 import type { MediaStorage } from "../storage/storage.js";
 
 /**
@@ -28,7 +29,6 @@ export async function accountRoutes(app: FastifyInstance, opts: { db: Database; 
       .from(householdMembers)
       .where(eq(householdMembers.userId, userId));
 
-    let mediaKeys: string[] = [];
     if (membership?.role === "owner") {
       const members = await db
         .select({ userId: householdMembers.userId })
@@ -37,27 +37,24 @@ export async function accountRoutes(app: FastifyInstance, opts: { db: Database; 
       if (members.some((m) => m.userId !== userId)) {
         return reply.code(409).send({ error: "household_has_members" });
       }
-      const rows = await db
-        .select({ clipKey: events.clipKey, snapshotKey: events.snapshotKey })
-        .from(events)
-        .where(eq(events.householdId, membership.householdId));
-      mediaKeys = rows.flatMap((r) => [r.clipKey, r.snapshotKey]).filter((k): k is string => k !== null);
-      if (mediaKeys.length > 0 && !storage) return reply.code(503).send({ error: "storage_not_configured" });
     }
 
-    // Files first: if this fails the account is untouched and the call can be repeated.
-    if (storage && mediaKeys.length > 0) {
-      for (let i = 0; i < mediaKeys.length; i += 1000) await storage.deleteObjects(mediaKeys.slice(i, i + 1000));
-    }
-
-    await db.transaction(async (tx) => {
-      // Viewer phones keep their push token otherwise (devices.user_id only goes to null).
+    // Viewer phones keep their push token otherwise (devices.user_id only goes to null).
+    const removeUser = async (tx: Pick<Database, "delete">) => {
       await tx.delete(devices).where(eq(devices.userId, userId));
-      if (membership?.role === "owner") {
-        await tx.delete(households).where(eq(households.id, membership.householdId));
-      }
       await tx.delete(users).where(eq(users.id, userId));
-    });
+    };
+    try {
+      if (membership?.role === "owner") {
+        // The household row references the owner, so it goes first (and its files before that).
+        await deleteHousehold(db, storage, membership.householdId, removeUser);
+      } else {
+        await db.transaction(removeUser);
+      }
+    } catch (err) {
+      if (err instanceof StorageUnavailableError) return reply.code(503).send({ error: "storage_not_configured" });
+      throw err;
+    }
     request.log.info("account deleted");
     return reply.code(204).send();
   });

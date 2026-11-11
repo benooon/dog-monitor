@@ -33,7 +33,8 @@ These companies process data for us under their terms. [Server regions: to be fi
 ## How long we keep it
 
 - Clips and snapshots: 7 days. If the household owner chooses "help improve detection", clips you mark right or wrong are kept up to 90 days.
-- Everything else: until you delete your account. [Events and daily summaries will get an automatic limit.]
+- Timeline events and daily summaries: 12 months.
+- Everything else: until you delete your account.
 - Server logs: [period set by our hosting provider].
 
 ## Your choices and rights

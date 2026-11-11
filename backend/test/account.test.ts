@@ -2,10 +2,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import type { DbHandle } from "../src/db/client.js";
-import { devices, events, households, users } from "../src/db/schema.js";
+import { dailySummaries, devices, events, households, users } from "../src/db/schema.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
+import { purgeExpiredRecords } from "../src/storage/retention.js";
 import { FakeStorage } from "./helpers/storage.js";
 
 describe.skipIf(!hasDatabase)("DELETE /me", () => {
@@ -111,5 +112,54 @@ describe.skipIf(!hasDatabase)("DELETE /me", () => {
     expect(await h.db.select().from(devices)).toHaveLength(0);
     expect(await h.db.select().from(households)).toHaveLength(1);
     expect(await h.db.select().from(users).where(eq(users.id, member.userId))).toHaveLength(0);
+  });
+
+  describe("DELETE /household", () => {
+    it("is owner only", async () => {
+      const { householdId } = await ownerWithHousehold();
+      const member = await signIn("member");
+      const { householdMembers } = await import("../src/db/schema.js");
+      await h.db.insert(householdMembers).values({ householdId, userId: member.userId, role: "member" });
+      expect((await app.inject({ method: "DELETE", url: "/household", headers: member.auth })).statusCode).toBe(403);
+      expect(await h.db.select().from(households)).toHaveLength(1);
+    });
+
+    it("removes the household and its files but keeps every account", async () => {
+      const { userId, auth, householdId } = await ownerWithHousehold();
+      const member = await signIn("member");
+      const { householdMembers } = await import("../src/db/schema.js");
+      await h.db.insert(householdMembers).values({ householdId, userId: member.userId, role: "member" });
+      await h.db.insert(events).values({ householdId, type: "whining", startedAt: new Date(), clipKey: "c1" });
+
+      expect((await app.inject({ method: "DELETE", url: "/household", headers: auth })).statusCode).toBe(204);
+
+      expect(storage.deleted).toEqual(["c1"]);
+      expect(await h.db.select().from(households)).toHaveLength(0);
+      expect(await h.db.select().from(events)).toHaveLength(0);
+      expect(await h.db.select().from(users).where(eq(users.id, userId))).toHaveLength(1);
+      expect(await h.db.select().from(users).where(eq(users.id, member.userId))).toHaveLength(1);
+    });
+  });
+
+  describe("record retention", () => {
+    it("deletes old events and summaries, keeps recent ones and events that still have files", async () => {
+      const { householdId } = await ownerWithHousehold();
+      const [camera] = await h.db.insert(devices).values({ householdId, name: "Cam", role: "camera" }).returning();
+      const now = new Date("2026-11-11T12:00:00Z");
+      await h.db.insert(events).values([
+        { householdId, type: "whining", startedAt: new Date("2025-01-01T00:00:00Z") },
+        { householdId, type: "whining", startedAt: new Date("2025-01-01T00:00:00Z"), clipKey: "still-there" },
+        { householdId, type: "whining", startedAt: new Date("2026-11-01T00:00:00Z") },
+      ]);
+      await h.db.insert(dailySummaries).values([
+        { householdId, deviceId: camera!.id, date: "2025-01-01" },
+        { householdId, deviceId: camera!.id, date: "2026-11-10" },
+      ]);
+
+      expect(await purgeExpiredRecords(h.db, 365, now)).toBe(2);
+
+      expect(await h.db.select().from(events)).toHaveLength(2);
+      expect(await h.db.select().from(dailySummaries)).toHaveLength(1);
+    });
   });
 });
