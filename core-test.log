@@ -2,71 +2,64 @@ Building for debugging...
 [0/13] Write sources
 [2/13] Write swift-version-24593BA9C3E375BF.txt
 [4/56] Emitting module DogMonitorCore
-[5/69] Compiling DogMonitorCore DogPhotoVersion.swift
-[6/69] Compiling DogMonitorCore PhotoCrop.swift
-[7/69] Compiling DogMonitorCore PushPayload.swift
-[8/69] Compiling DogMonitorCore PublishPolicy.swift
-[9/69] Compiling DogMonitorCore RealtimeMessage.swift
-[10/69] Compiling DogMonitorCore ReconnectBackoff.swift
-[11/69] Compiling DogMonitorCore CredentialStore.swift
-[12/69] Compiling DogMonitorCore OnboardingState.swift
-[13/69] Compiling DogMonitorCore SecureStore.swift
-[14/69] Compiling DogMonitorCore SubscriptionDTO.swift
-[15/69] Compiling DogMonitorCore SubscriptionProducts.swift
-[16/69] Compiling DogMonitorCore DogStatusSnapshot.swift
-[17/69] Compiling DogMonitorCore SharedDogPhotoPlan.swift
-[18/69] Compiling DogMonitorCore APICredential.swift
-[19/69] Compiling DogMonitorCore APIError.swift
-[20/69] Compiling DogMonitorCore DTOs.swift
-[21/69] Compiling DogMonitorCore DogMonitorAPI.swift
-[22/69] Compiling DogMonitorCore HTTPTransport.swift
-[23/69] Compiling DogMonitorCore JSONCoding.swift
-[24/69] Compiling DogMonitorCore DetectionLog.swift
-[25/69] Compiling DogMonitorCore LoudnessDetector.swift
-[26/69] Compiling DogMonitorCore SoundClassMapping.swift
-[27/69] Compiling DogMonitorCore Broadcaster.swift
-[28/69] Compiling DogMonitorCore CameraScreenState.swift
-[29/69] Compiling DogMonitorCore ClipAssembler.swift
-[30/69] Compiling DogMonitorCore DogPose.swift
-[31/69] Compiling DogMonitorCore FrameRateMeter.swift
-[32/69] Compiling DogMonitorCore MotionDetector.swift
-[33/69] Compiling DogMonitorCore DogMonitorCore.swift
-[34/69] Compiling DogMonitorCore DogStateClassifier.swift
-[35/69] Compiling DogMonitorCore EventChannel.swift
-[36/69] Compiling DogMonitorCore EventEngine.swift
-[37/69] Compiling DogMonitorCore EventEngineConfiguration.swift
-[38/69] Compiling DogMonitorCore HealthMonitor.swift
-[39/69] Compiling DogMonitorCore DailySummary.swift
-[40/69] Compiling DogMonitorCore DailySummaryInsights.swift
-[41/69] Compiling DogMonitorCore EventUploadQueue.swift
-[42/69] Compiling DogMonitorCore MediaUploadQueue.swift
-[43/69] Compiling DogMonitorCore Timeline.swift
-[44/69] Compiling DogMonitorCore TimelineFeed.swift
-[45/69] Compiling DogMonitorCore CameraLiveActivity.swift
-[46/69] Compiling DogMonitorCore LiveActivitySync.swift
-[47/69] Compiling DogMonitorCore CameraHealth.swift
-[48/69] Compiling DogMonitorCore CameraZone.swift
-[49/69] Compiling DogMonitorCore Detection.swift
-[50/69] Compiling DogMonitorCore DeviceRole.swift
-[51/69] Compiling DogMonitorCore DogEvent.swift
-[52/69] Compiling DogMonitorCore DogProfile.swift
-[53/69] Compiling DogMonitorCore DogState.swift
-[54/69] Compiling DogMonitorCore EventType.swift
-[55/69] Compiling DogMonitorCore NormalizedRect.swift
-[56/69] Compiling DogMonitorCore NotificationSettings.swift
-[57/69] Compiling DogMonitorCore TimeOfDay.swift
-[58/69] Compiling DogMonitorCore PairingCode.swift
-[59/69] Compiling DogMonitorCore DogPersonalization.swift
+[5/69] Compiling DogMonitorCore LiveActivitySync.swift
+[6/69] Compiling DogMonitorCore CameraHealth.swift
+[7/69] Compiling DogMonitorCore CameraZone.swift
+[8/69] Compiling DogMonitorCore Detection.swift
+[9/69] Compiling DogMonitorCore DeviceRole.swift
+[10/69] Compiling DogMonitorCore DogEvent.swift
+[11/69] Compiling DogMonitorCore DogProfile.swift
+[12/69] Compiling DogMonitorCore DogState.swift
+[13/69] Compiling DogMonitorCore EventType.swift
+[14/69] Compiling DogMonitorCore NormalizedRect.swift
+[15/69] Compiling DogMonitorCore NotificationSettings.swift
+[16/69] Compiling DogMonitorCore TimeOfDay.swift
+[17/69] Compiling DogMonitorCore PairingCode.swift
+[18/69] Compiling DogMonitorCore DogPersonalization.swift
+[19/69] Compiling DogMonitorCore MotionDetector.swift
+[20/69] Compiling DogMonitorCore DogMonitorCore.swift
+[21/69] Compiling DogMonitorCore DogStateClassifier.swift
+[22/69] Compiling DogMonitorCore EventChannel.swift
+[23/69] Compiling DogMonitorCore EventEngine.swift
+[24/69] Compiling DogMonitorCore EventEngineConfiguration.swift
+[25/69] Compiling DogMonitorCore HealthMonitor.swift
+[26/69] Compiling DogMonitorCore DailySummary.swift
+[27/69] Compiling DogMonitorCore DailySummaryInsights.swift
+[28/69] Compiling DogMonitorCore EventUploadQueue.swift
+[29/69] Compiling DogMonitorCore MediaUploadQueue.swift
+[30/69] Compiling DogMonitorCore Timeline.swift
+[31/69] Compiling DogMonitorCore TimelineFeed.swift
+[32/69] Compiling DogMonitorCore CameraLiveActivity.swift
+[33/69] Compiling DogMonitorCore DogPhotoVersion.swift
+[34/69] Compiling DogMonitorCore PhotoCrop.swift
+[35/69] Compiling DogMonitorCore PushPayload.swift
+[36/69] Compiling DogMonitorCore PublishPolicy.swift
+[37/69] Compiling DogMonitorCore RealtimeMessage.swift
+[38/69] Compiling DogMonitorCore ReconnectBackoff.swift
+[39/69] Compiling DogMonitorCore CredentialStore.swift
+[40/69] Compiling DogMonitorCore OnboardingState.swift
+[41/69] Compiling DogMonitorCore SecureStore.swift
+[42/69] Compiling DogMonitorCore SubscriptionDTO.swift
+[43/69] Compiling DogMonitorCore SubscriptionProducts.swift
+[44/69] Compiling DogMonitorCore DogStatusSnapshot.swift
+[45/69] Compiling DogMonitorCore SharedDogPhotoPlan.swift
+[46/69] Compiling DogMonitorCore APICredential.swift
+[47/69] Compiling DogMonitorCore APIError.swift
+[48/69] Compiling DogMonitorCore DTOs.swift
+[49/69] Compiling DogMonitorCore DogMonitorAPI.swift
+[50/69] Compiling DogMonitorCore HTTPTransport.swift
+[51/69] Compiling DogMonitorCore JSONCoding.swift
+[52/69] Compiling DogMonitorCore DetectionLog.swift
+[53/69] Compiling DogMonitorCore LoudnessDetector.swift
+[54/69] Compiling DogMonitorCore SoundClassMapping.swift
+[55/69] Compiling DogMonitorCore Broadcaster.swift
+[56/69] Compiling DogMonitorCore CameraScreenState.swift
+[57/69] Compiling DogMonitorCore ClipAssembler.swift
+[58/69] Compiling DogMonitorCore DogPose.swift
+[59/69] Compiling DogMonitorCore FrameRateMeter.swift
 [60/70] Wrapping AST for DogMonitorCore for debugging
-[62/95] Compiling DogMonitorCoreTests DogPhotoCacheTests.swift
-[63/95] Compiling DogMonitorCoreTests DogPoseTests.swift
-[64/95] Compiling DogMonitorCoreTests DogProfileTests.swift
-[65/95] Compiling DogMonitorCoreTests DogStateClassifierTests.swift
-[66/95] Compiling DogMonitorCoreTests DogStatusSnapshotTests.swift
-[67/95] Compiling DogMonitorCoreTests EventEngineTests.swift
-[68/95] Compiling DogMonitorCoreTests EventUploaderTests.swift
-[69/95] Compiling DogMonitorCoreTests HealthMonitorTests.swift
-[70/102] Compiling DogMonitorCoreTests PushTests.swift
+[62/95] Emitting module DogMonitorCoreTests
+[63/102] Compiling DogMonitorCoreTests PushTests.swift
 /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Tests/DogMonitorCoreTests/TimelineTests.swift:111:93: error: type 'DogEvent.Feedback?' has no member 'right'
 109 |         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
 110 |         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
@@ -74,7 +67,7 @@ Building for debugging...
     |                                                                                             `- error: type 'DogEvent.Feedback?' has no member 'right'
 112 |     }
 113 | 
-[71/102] Compiling DogMonitorCoreTests RealtimeTests.swift
+[64/102] Compiling DogMonitorCoreTests RealtimeTests.swift
 /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Tests/DogMonitorCoreTests/TimelineTests.swift:111:93: error: type 'DogEvent.Feedback?' has no member 'right'
 109 |         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
 110 |         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
@@ -82,7 +75,7 @@ Building for debugging...
     |                                                                                             `- error: type 'DogEvent.Feedback?' has no member 'right'
 112 |     }
 113 | 
-[72/102] Compiling DogMonitorCoreTests SessionTests.swift
+[65/102] Compiling DogMonitorCoreTests SessionTests.swift
 /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Tests/DogMonitorCoreTests/TimelineTests.swift:111:93: error: type 'DogEvent.Feedback?' has no member 'right'
 109 |         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
 110 |         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
@@ -90,7 +83,7 @@ Building for debugging...
     |                                                                                             `- error: type 'DogEvent.Feedback?' has no member 'right'
 112 |     }
 113 | 
-[73/102] Compiling DogMonitorCoreTests SharedDogPhotoPlanTests.swift
+[66/102] Compiling DogMonitorCoreTests SharedDogPhotoPlanTests.swift
 /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Tests/DogMonitorCoreTests/TimelineTests.swift:111:93: error: type 'DogEvent.Feedback?' has no member 'right'
 109 |         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
 110 |         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
@@ -98,7 +91,7 @@ Building for debugging...
     |                                                                                             `- error: type 'DogEvent.Feedback?' has no member 'right'
 112 |     }
 113 | 
-[74/102] Compiling DogMonitorCoreTests SubscriptionTests.swift
+[67/102] Compiling DogMonitorCoreTests SubscriptionTests.swift
 /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Tests/DogMonitorCoreTests/TimelineTests.swift:111:93: error: type 'DogEvent.Feedback?' has no member 'right'
 109 |         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
 110 |         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
@@ -106,7 +99,7 @@ Building for debugging...
     |                                                                                             `- error: type 'DogEvent.Feedback?' has no member 'right'
 112 |     }
 113 | 
-[75/102] Compiling DogMonitorCoreTests TimelineFeedTests.swift
+[68/102] Compiling DogMonitorCoreTests TimelineFeedTests.swift
 /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Tests/DogMonitorCoreTests/TimelineTests.swift:111:93: error: type 'DogEvent.Feedback?' has no member 'right'
 109 |         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
 110 |         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
@@ -114,7 +107,7 @@ Building for debugging...
     |                                                                                             `- error: type 'DogEvent.Feedback?' has no member 'right'
 112 |     }
 113 | 
-[76/102] Compiling DogMonitorCoreTests TimelineTests.swift
+[69/102] Compiling DogMonitorCoreTests TimelineTests.swift
 /__w/dog-monitor/dog-monitor/ios/Packages/DogMonitorCore/Tests/DogMonitorCoreTests/TimelineTests.swift:111:93: error: type 'DogEvent.Feedback?' has no member 'right'
 109 |         XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
 110 |         XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
@@ -122,15 +115,22 @@ Building for debugging...
     |                                                                                             `- error: type 'DogEvent.Feedback?' has no member 'right'
 112 |     }
 113 | 
-[77/102] Compiling DogMonitorCoreTests LiveActivitySyncTests.swift
-[78/102] Compiling DogMonitorCoreTests LiveActivityTests.swift
-[79/102] Compiling DogMonitorCoreTests MediaUploaderTests.swift
-[80/102] Compiling DogMonitorCoreTests ModelsTests.swift
-[81/102] Compiling DogMonitorCoreTests MotionDetectorTests.swift
-[82/102] Compiling DogMonitorCoreTests NotificationSettingsTests.swift
-[83/102] Compiling DogMonitorCoreTests PairingTests.swift
-[84/102] Compiling DogMonitorCoreTests PhotoCropTests.swift
-[85/102] Emitting module DogMonitorCoreTests
+[70/102] Compiling DogMonitorCoreTests DogPhotoCacheTests.swift
+[71/102] Compiling DogMonitorCoreTests DogPoseTests.swift
+[72/102] Compiling DogMonitorCoreTests DogProfileTests.swift
+[73/102] Compiling DogMonitorCoreTests DogStateClassifierTests.swift
+[74/102] Compiling DogMonitorCoreTests DogStatusSnapshotTests.swift
+[75/102] Compiling DogMonitorCoreTests EventEngineTests.swift
+[76/102] Compiling DogMonitorCoreTests EventUploaderTests.swift
+[77/102] Compiling DogMonitorCoreTests HealthMonitorTests.swift
+[78/102] Compiling DogMonitorCoreTests LiveActivitySyncTests.swift
+[79/102] Compiling DogMonitorCoreTests LiveActivityTests.swift
+[80/102] Compiling DogMonitorCoreTests MediaUploaderTests.swift
+[81/102] Compiling DogMonitorCoreTests ModelsTests.swift
+[82/102] Compiling DogMonitorCoreTests MotionDetectorTests.swift
+[83/102] Compiling DogMonitorCoreTests NotificationSettingsTests.swift
+[84/102] Compiling DogMonitorCoreTests PairingTests.swift
+[85/102] Compiling DogMonitorCoreTests PhotoCropTests.swift
 [86/102] Compiling DogMonitorCoreTests APITestSupport.swift
 [87/102] Compiling DogMonitorCoreTests AudioTests.swift
 [88/102] Compiling DogMonitorCoreTests CameraZoneTests.swift
