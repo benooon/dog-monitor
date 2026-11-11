@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: fd2361ca316fb78ad2075298f9ac8a784792e7b3
-- message: docs: sofa alert task done (CI green on 884a569)
-- time (UTC): 2026-11-11T05:46:16Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42967668150
+- commit: fadc20a91f14f947fb119d1d65167d72a29b82d4
+- message: docs: claim App Store environment check; mark /privacy pages blocked on owner's legal fields
+- time (UTC): 2026-11-11T05:47:53Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42967947509
 
 | job | result | log |
 |---|---|---|
