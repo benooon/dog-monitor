@@ -3475,6 +3475,46 @@
           }
         }
       }
+    },
+    "Invited by %@.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזמנה מאת %@."
+          }
+        }
+      }
+    },
+    "Join %@?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "להצטרף למשק הבית ״%@״?"
+          }
+        }
+      }
+    },
+    "This invite has expired or was already used. Ask for a new one.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תוקף ההזמנה פג או שכבר השתמשו בה. אפשר לבקש הזמנה חדשה."
+          }
+        }
+      }
+    },
+    "Too many tries. Wait a few minutes, then try again.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יותר מדי ניסיונות. כדאי לחכות כמה דקות ולנסות שוב."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

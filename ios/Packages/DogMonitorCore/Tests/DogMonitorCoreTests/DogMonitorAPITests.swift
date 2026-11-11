@@ -136,6 +136,23 @@ final class DogMonitorAPITests: XCTestCase {
         XCTAssertEqual(body["as"] as? String, "member")
     }
 
+    func testInvitePreview() async throws {
+        let stub = StubTransport(json: #"{"household":{"name":"The Levis"},"inviter":{"firstName":"Dana"}}"#)
+        let api = DogMonitorAPI(baseURL: Fixtures.baseURL, transport: stub)
+        let preview = try await api.invitePreview("tok_abc-123")
+        XCTAssertEqual(preview, InvitePreviewDTO(householdName: "The Levis", inviterFirstName: "Dana"))
+        let request = try XCTUnwrap(stub.requests.first)
+        XCTAssertEqual(request.httpMethod, "GET")
+        XCTAssertEqual(request.url?.path, "/v1/invites/tok_abc-123/preview")
+        XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
+    }
+
+    func testInvitePreviewWithoutInviterName() async throws {
+        let stub = StubTransport(json: #"{"household":{"name":"Home"},"inviter":{"firstName":null}}"#)
+        let preview = try await DogMonitorAPI(baseURL: Fixtures.baseURL, transport: stub).invitePreview("123456")
+        XCTAssertNil(preview.inviter.firstName)
+    }
+
     func testHouseholdDecoding() async throws {
         let json = """
         {"id":"\(Fixtures.householdID)","name":"Home","plan":"free","ownerId":"\(Fixtures.userID)","role":"owner",

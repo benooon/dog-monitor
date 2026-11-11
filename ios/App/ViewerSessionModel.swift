@@ -114,6 +114,23 @@ final class ViewerSessionModel {
         return invite
     }
 
+    /// Looks up who an invite comes from, so the person can confirm before joining
+    /// (nil on failure; see `errorMessage`).
+    func previewInvite(code: String) async -> InvitePreviewDTO? {
+        guard let tokenOrCode = PairingCode.parse(code) else { return nil }
+        var preview: InvitePreviewDTO?
+        await perform {
+            do {
+                preview = try await api.invitePreview(tokenOrCode)
+            } catch let error as APIError where error.code == "invalid_or_expired_invite" {
+                errorMessage = String(localized: "This invite has expired or was already used. Ask for a new one.")
+            } catch let error as APIError where error.code == "too_many_attempts" {
+                errorMessage = String(localized: "Too many tries. Wait a few minutes, then try again.")
+            }
+        }
+        return preview
+    }
+
     /// Joins an existing household with an invite code (or scanned token) instead of creating one.
     func joinHousehold(code: String) async {
         guard let tokenOrCode = PairingCode.parse(code) else { return }

@@ -5,6 +5,9 @@ struct CreateHouseholdView: View {
     let model: ViewerSessionModel
     @State private var householdName = ""
     @State private var inviteCode = ""
+    /// The household the invite leads to, asked about before joining.
+    @State private var pendingJoin: InvitePreviewDTO?
+    @State private var isConfirmingJoin = false
 
     private var canSubmit: Bool {
         HouseholdNameRules.validated(householdName) != nil && !model.isWorking
@@ -36,10 +39,26 @@ struct CreateHouseholdView: View {
             .navigationTitle("Create your household")
             .navigationBarTitleDisplayMode(.inline)
             .onChange(of: DeepLinkRouter.shared.pendingInvite, initial: true) { _, token in
-                // Opened from an invite link: fill in the invite so one tap joins.
+                // Opened from an invite link: fill in the invite and ask "Join <household>?" right away.
                 guard let token else { return }
                 inviteCode = token
                 DeepLinkRouter.shared.pendingInvite = nil
+                Task { await reviewInvite() }
+            }
+            .alert(
+                joinTitle,
+                isPresented: $isConfirmingJoin,
+                presenting: pendingJoin
+            ) { _ in
+                Button("Join") {
+                    Task { await model.joinHousehold(code: inviteCode) }
+                }
+                .accessibilityIdentifier("confirm-join-household")
+                Button("Cancel", role: .cancel) {}
+            } message: { preview in
+                if let inviter = preview.inviter.firstName {
+                    Text("Invited by \(inviter).")
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -50,6 +69,18 @@ struct CreateHouseholdView: View {
                 }
             }
         }
+    }
+
+    private var joinTitle: Text {
+        Text("Join \(pendingJoin?.household.name ?? "")?")
+    }
+
+    /// Shows which household the invite is for; joining waits for the person to confirm.
+    private func reviewInvite() async {
+        guard let preview = await model.previewInvite(code: inviteCode) else { return }
+        // Kept after the alert closes so its title doesn't change while it animates away.
+        pendingJoin = preview
+        isConfirmingJoin = true
     }
 
     private var form: some View {
@@ -77,7 +108,7 @@ struct CreateHouseholdView: View {
                     .textContentType(.oneTimeCode)
                     .accessibilityIdentifier("invite-code-field")
                 Button("Join") {
-                    Task { await model.joinHousehold(code: inviteCode) }
+                    Task { await reviewInvite() }
                 }
                 .accessibilityIdentifier("join-household")
                 .disabled(PairingCode.parse(inviteCode) == nil || model.isWorking)

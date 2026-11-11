@@ -147,6 +147,11 @@ public struct DogMonitorAPI: Sendable {
         try await send("POST", "invites")
     }
 
+    /// The household and inviter behind an invite, without using it up. Needs no credential.
+    public func invitePreview(_ tokenOrCode: String) async throws -> InvitePreviewDTO {
+        try await send("GET", "invites/\(tokenOrCode)/preview")
+    }
+
     /// Joins the inviting household as a member. `tokenOrCode` is the QR token or the 6-digit code.
     public func acceptInviteAsMember(_ tokenOrCode: String) async throws -> MemberJoinResponse {
         try await send("POST", "invites/\(tokenOrCode)/accept", body: AcceptAsMemberRequest())

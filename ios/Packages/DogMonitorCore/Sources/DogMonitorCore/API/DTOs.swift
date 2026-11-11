@@ -235,6 +235,28 @@ public struct InviteDTO: Codable, Sendable, Hashable {
     }
 }
 
+/// What an invite leads to, shown before joining (`GET /invites/:token/preview`).
+public struct InvitePreviewDTO: Codable, Sendable, Hashable {
+    public struct Household: Codable, Sendable, Hashable {
+        public let name: String
+        public init(name: String) { self.name = name }
+    }
+
+    public struct Inviter: Codable, Sendable, Hashable {
+        /// Nil when the inviter never shared a name (or has since left).
+        public let firstName: String?
+        public init(firstName: String?) { self.firstName = firstName }
+    }
+
+    public let household: Household
+    public let inviter: Inviter
+
+    public init(householdName: String, inviterFirstName: String?) {
+        household = Household(name: householdName)
+        inviter = Inviter(firstName: inviterFirstName)
+    }
+}
+
 public struct MemberJoinResponse: Codable, Sendable, Hashable {
     public let householdId: UUID
     public let role: MemberRole
