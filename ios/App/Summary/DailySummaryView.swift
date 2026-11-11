@@ -8,6 +8,7 @@ struct DailySummaryView: View {
     let dogName: String?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.calendar) private var calendar
+    @State private var listHeight: CGFloat = 0
 
     init(model: DailySummaryModel, dogName: String?) {
         _model = State(initialValue: model)
@@ -69,7 +70,12 @@ struct DailySummaryView: View {
     private func summaryList(_ insights: DailySummaryInsights) -> some View {
         List {
             if let summary = model.selectedSummary, summary.hasReel == true {
-                HighlightReelSection(model: model, summary: summary, dogName: dogName)
+                HighlightReelSection(
+                    model: model,
+                    summary: summary,
+                    dogName: dogName,
+                    containerHeight: listHeight
+                )
             }
             Section {
                 SummaryHeadline(insights: insights)
@@ -107,6 +113,11 @@ struct DailySummaryView: View {
                 }
             }
             WeeklyInsightsSection(model: model, dogName: dogName)
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+        } action: { height in
+            listHeight = height
         }
     }
 

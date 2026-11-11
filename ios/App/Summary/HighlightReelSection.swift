@@ -8,6 +8,8 @@ struct HighlightReelSection: View {
     let model: DailySummaryModel
     let summary: DailySummaryDTO
     let dogName: String?
+    /// Visible height of the list, so the player can be capped at ~60% of it. Zero while unknown.
+    var containerHeight: CGFloat = 0
 
     private enum Phase {
         case loading
@@ -16,6 +18,7 @@ struct HighlightReelSection: View {
     }
 
     @State private var phase: Phase = .loading
+    @State private var rowWidth: CGFloat = 0
 
     var body: some View {
         Section {
@@ -59,6 +62,12 @@ struct HighlightReelSection: View {
 
     @ViewBuilder
     private var player: some View {
+        // Sized from the row width (9:16, capped by the screen height); `containerRelativeFrame`
+        // doesn't resolve to the screen inside a List row, which left the video letterboxed.
+        let size = ReelPlayerLayout.size(
+            availableWidth: Double(rowWidth),
+            containerHeight: Double(containerHeight)
+        )
         ZStack {
             Rectangle().fill(.quaternary)
             switch phase {
@@ -80,10 +89,14 @@ struct HighlightReelSection: View {
                 .padding(DS.Spacing.l)
             }
         }
-        .aspectRatio(9 / 16, contentMode: .fit)
-        .frame(maxWidth: .infinity)
-        .containerRelativeFrame(.vertical) { height, _ in height * 0.6 }
+        .frame(width: CGFloat(size.width), height: CGFloat(size.height))
         .clipShape(RoundedRectangle(cornerRadius: DS.Radius.medium, style: .continuous))
+        .frame(maxWidth: .infinity)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            rowWidth = width
+        }
     }
 
     private func load() async {
