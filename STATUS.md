@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 3746d02f2c0b7d4bcf27322e2e5dd818dd91bf58
-- message: docs: claim LiveKit E2EE
-- time (UTC): 2026-11-11T11:53:10Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43014777975
+- commit: a572438acc5123b86d35b4a6372a8cb14f33ceed
+- message: backend: households.live_encrypted (owner turns it on, never off); live tokens say whether video is end-to-end encrypted
+- time (UTC): 2026-11-11T11:55:08Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43015549910
 
 | job | result | log |
 |---|---|---|
