@@ -91,6 +91,17 @@ final class HighlightReelTests: XCTestCase {
         XCTAssertNil(clip(.dailySummary, hour: 1).moment)
     }
 
+    func testPlaceFollowsTheCamerasZones() {
+        let square = ZonePolygon(points: [.init(x: 0, y: 0), .init(x: 1, y: 0), .init(x: 1, y: 1)])
+        let sofa = CameraZone(kind: .sofa, polygon: square)
+        let forbidden = CameraZone(kind: .forbidden, polygon: square)
+        let door = CameraZone(kind: .door, polygon: square)
+        XCTAssertEqual(ReelCandidate.place(for: .forbiddenZone, zones: [sofa, door]), "sofa")
+        XCTAssertEqual(ReelCandidate.place(for: .forbiddenZone, zones: [sofa, forbidden]), "offLimits")
+        XCTAssertEqual(ReelCandidate.place(for: .forbiddenZone, zones: []), "offLimits")
+        XCTAssertNil(ReelCandidate.place(for: .atDoor, zones: [sofa]))
+    }
+
     func testLibraryKeepsADayAndAHalfAndAtMostSixty() {
         var library = ReelClipLibrary()
         let old = clip(.atDoor, hour: 0)

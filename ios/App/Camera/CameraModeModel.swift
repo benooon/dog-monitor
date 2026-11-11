@@ -69,6 +69,10 @@ final class CameraModeModel {
         store: FileEventQueueStore(url: CameraModeModel.mediaQueueURL)
     )
     private var mediaTask: Task<Void, Never>?
+    /// Keeps clips for the daily highlight reel and uploads it once a day is final (Premium).
+    private let reelBuilder = HighlightReelBuilder()
+    /// Started dog events, until their clip is saved and handed to the reel builder.
+    private var reelEvents: [UUID: HighlightReelBuilder.EventInfo] = [:]
     /// Engine outputs are published one batch at a time, in order (see `publish`).
     private var outputContinuation: AsyncStream<[EngineOutput]>.Continuation?
     /// Started events whose snapshot is uploaded before `POST /events`, so the push has it.
@@ -288,12 +292,16 @@ final class CameraModeModel {
         for pending in summaries.pendingUploads(now: .now, calendar: .current) {
             do {
                 try await api.uploadSummary(pending.summary, final: pending.final)
-                if pending.final { summaries.markUploadedFinal(pending.summary.date) }
+                if pending.final {
+                    summaries.markUploadedFinal(pending.summary.date)
+                    await reelBuilder.dayFinished(pending.summary.date)
+                }
             } catch {
                 return // offline: try again at the next upload
             }
         }
         saveSummaries()
+        await reelBuilder.uploadPending(using: api, calendar: .current)
     }
 
     // MARK: - Zones
@@ -480,6 +488,13 @@ final class CameraModeModel {
             for case .started(let event) in outputs where event.type.dogState != nil && event.type != .calmedDown {
                 recorder.trigger(eventID: event.id)
                 inlineSnapshots.insert(event.id)
+                if reelEvents.count > 100 { reelEvents.removeAll() }
+                reelEvents[event.id] = HighlightReelBuilder.EventInfo(
+                    type: event.type,
+                    place: ReelCandidate.place(for: event.type, zones: zones),
+                    startedAt: event.startedAt,
+                    confidence: event.confidence
+                )
             }
         }
         outputContinuation?.yield(outputs)
@@ -531,6 +546,10 @@ final class CameraModeModel {
         let kind = item.kind
         // Inline snapshots are handled by `uploadSnapshotInline`.
         if kind == .snapshot, inlineSnapshots.contains(item.eventID) { return }
+        // Copy the clip for the reel before the uploader can delete it.
+        if kind == .clip, let info = reelEvents.removeValue(forKey: item.eventID) {
+            await reelBuilder.keep(clipAt: item.url, eventID: item.eventID, info: info)
+        }
         await mediaUploader.enqueue(eventID: item.eventID, kind: kind)
         if let api {
             await uploader.flush(using: api)

@@ -29,6 +29,14 @@ public struct ReelCandidate: Codable, Sendable, Hashable, Identifiable {
         self.confidence = confidence
     }
 
+    /// Where a forbiddenZone event happened, like the backend says it: `"sofa"` when every
+    /// off-limits zone on the camera is a sofa, `"offLimits"` otherwise; nil for other events.
+    public static func place(for type: EventType, zones: [CameraZone]) -> String? {
+        guard type == .forbiddenZone else { return nil }
+        let offLimits = zones.filter(\.kind.isOffLimits)
+        return !offLimits.isEmpty && offLimits.allSatisfy { $0.kind == .sofa } ? "sofa" : "offLimits"
+    }
+
     /// What kind of moment this is, for ranking and variety.
     public var moment: ReelMoment? {
         switch type {
