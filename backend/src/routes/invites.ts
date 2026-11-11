@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { and, count, eq, gt, isNull, lte } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { HOUSEHOLD_MEMBER_USER_UNIQUE, INVITE_CODE_UNIQUE, isUniqueViolation } from "../db/errors.js";
-import { devices, householdMembers, households, invites } from "../db/schema.js";
+import { devices, householdMembers, households, invites, users } from "../db/schema.js";
 import { deviceDto } from "../households/dto.js";
 import { LIMITS } from "../households/limits.js";
 import { householdCameraLimit } from "../billing/camera-limit.js";
@@ -61,6 +61,55 @@ export async function inviteRoutes(
         return reply.code(201).send({ token, code, expiresAt });
       }
       throw new Error("could not allocate a unique invite code");
+    },
+  );
+
+  /**
+   * What the joiner sees before accepting: the household's name and the inviter's first name,
+   * nothing else. Guessing costs the same attempts as accepting, so it reveals nothing accept wouldn't.
+   */
+  app.get<{ Params: { token: string } }>(
+    "/invites/:token/preview",
+    {
+      schema: {
+        params: {
+          type: "object",
+          required: ["token"],
+          properties: { token: { type: "string", minLength: 6, maxLength: 64 } },
+        },
+      },
+    },
+    async (request, reply) => {
+      const limiterKey = request.ip;
+      const param = request.params.token;
+      const byCode = /^\d{6}$/.test(param);
+      if (!limiter.tryAcquire(limiterKey)) {
+        return reply.code(429).send({ error: "too_many_attempts" });
+      }
+      if (byCode && !codeLimiter.tryAcquire(ALL_CODES)) {
+        limiter.release(limiterKey);
+        return reply.code(429).send({ error: "too_many_attempts" });
+      }
+      const [row] = await db
+        .select({ householdName: households.name, inviterName: users.name })
+        .from(invites)
+        .innerJoin(households, eq(households.id, invites.householdId))
+        .leftJoin(users, eq(users.id, invites.createdBy))
+        .where(
+          and(
+            byCode ? eq(invites.code, param) : eq(invites.token, param),
+            isNull(invites.usedAt),
+            gt(invites.expiresAt, now()),
+          ),
+        )
+        .limit(1);
+      if (!row) return reply.code(404).send({ error: "invalid_or_expired_invite" });
+      limiter.release(limiterKey);
+      if (byCode) codeLimiter.release(ALL_CODES);
+      return reply.header("cache-control", "no-store").send({
+        household: { name: row.householdName },
+        inviter: { firstName: firstName(row.inviterName) },
+      });
     },
   );
 
@@ -196,4 +245,10 @@ export async function inviteRoutes(
       }
     },
   );
+}
+
+/** "Dana Levi" → "Dana"; no name (Apple only shares it once, or the inviter left) → null. */
+export function firstName(name: string | null | undefined): string | null {
+  const first = name?.trim().split(/\s+/)[0];
+  return first ? first.slice(0, 50) : null;
 }

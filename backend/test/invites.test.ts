@@ -8,9 +8,18 @@ import { parseDeviceAuthorization } from "../src/auth/device-plugin.js";
 import { hashSecret, newInviteCode, secretMatches } from "../src/pairing/secrets.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
+import { firstName } from "../src/routes/invites.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
 
 describe("pairing helpers", () => {
+  it("keeps only the inviter's first name", () => {
+    expect(firstName("Dana Levi")).toBe("Dana");
+    expect(firstName("  Noa  ")).toBe("Noa");
+    expect(firstName("")).toBeNull();
+    expect(firstName("   ")).toBeNull();
+    expect(firstName(null)).toBeNull();
+  });
+
   it("makes 6-digit codes", () => {
     for (let i = 0; i < 100; i++) expect(newInviteCode()).toMatch(/^\d{6}$/);
   });
@@ -108,6 +117,27 @@ describe.skipIf(!hasDatabase)("invites and device auth", () => {
     const join = await app.inject({ method: "POST", url: `/invites/${invite.token}/accept`, headers: member.auth, payload: { as: "member" } });
     expect(join.statusCode).toBe(200);
     expect((await app.inject({ method: "POST", url: "/invites", headers: member.auth })).statusCode).toBe(403);
+  });
+
+  it("previews an invite with only the household name and the inviter's first name", async () => {
+    const owner = await signIn("Dana Levi");
+    await app.inject({ method: "POST", url: "/households", headers: owner.auth, payload: { name: "The Levis" } });
+    const invite = await createInvite(owner.auth);
+
+    for (const key of [invite.token, invite.code]) {
+      const res = await app.inject({ method: "GET", url: `/invites/${key}/preview` });
+      expect(res.statusCode).toBe(200);
+      expect(res.headers["cache-control"]).toBe("no-store");
+      expect(res.json()).toEqual({ household: { name: "The Levis" }, inviter: { firstName: "Dana" } });
+    }
+
+    // Previewing does not use the invite up.
+    const member = await signIn("member");
+    const join = await app.inject({ method: "POST", url: `/invites/${invite.token}/accept`, headers: member.auth, payload: { as: "member" } });
+    expect(join.statusCode).toBe(200);
+    // A used invite has nothing to preview.
+    expect((await app.inject({ method: "GET", url: `/invites/${invite.token}/preview` })).statusCode).toBe(404);
+    expect((await app.inject({ method: "GET", url: "/invites/not-a-real-token/preview" })).statusCode).toBe(404);
   });
 
   it("pairs a camera that then authenticates with its device secret", async () => {
@@ -242,6 +272,21 @@ describe.skipIf(!hasDatabase)("invite brute-force protection", () => {
       }
       const blocked = await ctx.app.inject({ method: "POST", url: "/invites/000000/accept", payload: { as: "camera", deviceName: "x" } });
       expect(blocked.statusCode).toBe(429);
+    } finally {
+      await ctx.app.close();
+      await h.close();
+    }
+  });
+
+  it("counts wrong previews like wrong accepts", async () => {
+    const h = openTestDb();
+    const ctx = await buildTestApp(h, { inviteLimiter: new AttemptLimiter(3, 60_000) });
+    try {
+      for (let i = 0; i < 2; i++) {
+        expect((await ctx.app.inject({ method: "GET", url: "/invites/000000/preview" })).statusCode).toBe(404);
+      }
+      expect((await ctx.app.inject({ method: "POST", url: "/invites/000000/accept", payload: { as: "camera", deviceName: "x" } })).statusCode).toBe(404);
+      expect((await ctx.app.inject({ method: "GET", url: "/invites/000000/preview" })).statusCode).toBe(429);
     } finally {
       await ctx.app.close();
       await h.close();
