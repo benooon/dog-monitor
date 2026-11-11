@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 968ebe43eefe025a92237c1e4204feec8196ae77
-- message: docs: owner live key hint done (CI green on f12f8bd), progress
-- time (UTC): 2026-11-11T14:55:11Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43042755604
+- commit: 18cd25393a2a077bdb70e76e8ba39ba99cf29350
+- message: docs: progress, backlog still waiting on the owner
+- time (UTC): 2026-11-11T15:48:15Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43051748996
 
 | job | result | log |
 |---|---|---|
