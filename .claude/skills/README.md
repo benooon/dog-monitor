@@ -12,6 +12,8 @@ All are MIT-licensed; each folder keeps its original LICENSE. Source list: https
 | `ios-accessibility` | VoiceOver, Dynamic Type, Voice Control, testing | Daniel Devesa, dadederk/iOS-Accessibility-Agent-Skill |
 | `writing-for-interfaces` | UI copy: voice, errors, empty states, buttons | Andrew Gleave, andrewgleave/skills |
 | `swift-concurrency-pro` | Swift 6 concurrency review | Paul Hudson, twostraws/Swift-Concurrency-Agent-Skill |
+| `security-audit` | Multi-phase security audit with verified, machine-readable findings (backend + core) | Cloudflare, cloudflare/security-audit-skill |
+| `ig-reel`, `ig-caption`, `ig-human`, `ig-plan`, `ig-carousel`, `ig-story`, `ig-repurpose`, `ig-audit`, `ig-profile`, `ig-viral`, `ig-comment`, `ig-reply`, `ig-dm` | Instagram content for marketing (reel scripts, hooks, captions, weekly plans). They write content only; nothing posts. Their voice file is `marketing/voice.md` (use it wherever a skill says `~/.claude/instagram/voice.md`). | Jake Schincariol, Jakeschincariol/instagram-agent-skill |
 
 Note: some skills assume iOS 26/27 and newer Xcode. This app targets iOS 17: gate newer APIs with
 `#available` (and `#if compiler(>=6.2)` for iOS 26 SDK symbols) and keep a fallback.

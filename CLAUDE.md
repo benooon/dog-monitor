@@ -55,6 +55,8 @@ The app must look and feel like a first-party Apple app. Vendored skills in `.cl
 - **New components/screens:** `swiftui-ui-patterns`. **Glass surfaces and floating controls:** `swiftui-liquid-glass`.
 - **Accessibility (not optional):** `ios-accessibility` — VoiceOver labels, Dynamic Type to AX5, Reduce Motion, 44pt targets.
 - **Any user-facing text:** `writing-for-interfaces`, with the voice below.
+- **Security work (auth, pairing, invites, storage URLs, payments):** `security-audit`.
+- **Marketing (reels, captions, Instagram):** the `ig-*` skills, with `marketing/voice.md` as the voice file. See `marketing/README.md`.
 
 House rules:
 
