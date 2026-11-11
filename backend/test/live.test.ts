@@ -117,6 +117,18 @@ describe.skipIf(!hasDatabase)("live token routes", () => {
     expect(claims.sub).toMatch(new RegExp(`^viewer:${owner.userId}:`));
   });
 
+  it("tells viewer and camera whether live video is end-to-end encrypted", async () => {
+    const { owner, camera } = await setup();
+    const viewerToken = () => app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth });
+    const cameraToken = () => app.inject({ method: "POST", url: "/device/live-token", headers: camera.auth });
+    expect((await viewerToken()).json().encrypted).toBe(false);
+    expect((await cameraToken()).json().encrypted).toBe(false);
+
+    await app.inject({ method: "PATCH", url: "/household", headers: owner.auth, payload: { liveEncrypted: true } });
+    expect((await viewerToken()).json().encrypted).toBe(true);
+    expect((await cameraToken()).json().encrypted).toBe(true);
+  });
+
   it("hides cameras of other households and non-camera devices", async () => {
     const { camera } = await setup();
     const stranger = await signIn("stranger");

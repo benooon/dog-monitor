@@ -1,0 +1,1 @@
+ALTER TABLE "households" ADD COLUMN "live_encrypted" boolean DEFAULT false NOT NULL;

@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { and, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices, users } from "../db/schema.js";
+import { devices, households, users } from "../db/schema.js";
 import { LIMITS } from "../households/limits.js";
 import { requireHousehold } from "../households/scope.js";
 import type { LiveTokenIssuer } from "../live/livekit.js";
@@ -20,6 +20,12 @@ interface ViewerLiveRouteOptions extends LiveRouteOptions {
 
 function notConfigured(reply: FastifyReply) {
   return reply.code(503).send({ error: "live_not_configured" });
+}
+
+/** Whether the household's live video is end-to-end encrypted (the key itself never reaches us). */
+async function isLiveEncrypted(db: Database, householdId: string): Promise<boolean> {
+  const [row] = await db.select({ liveEncrypted: households.liveEncrypted }).from(households).where(eq(households.id, householdId));
+  return row?.liveEncrypted ?? false;
 }
 
 /** Viewer side: `POST /cameras/:id/live-token` (user auth, scoped to the household). */
@@ -56,7 +62,8 @@ export async function viewerLiveRoutes(app: FastifyInstance, opts: ViewerLiveRou
       if (!opts.live) return notConfigured(reply);
 
       const [user] = await db.select({ name: users.name }).from(users).where(eq(users.id, userId));
-      return opts.live.viewerToken({ deviceId: camera.id, userId, name: user?.name });
+      const token = await opts.live.viewerToken({ deviceId: camera.id, userId, name: user?.name });
+      return { ...token, encrypted: await isLiveEncrypted(db, request.household!.householdId) };
     },
   );
 }
@@ -68,11 +75,12 @@ export async function cameraLiveRoutes(app: FastifyInstance, opts: LiveRouteOpti
 
   app.post("/device/live-token", async (request, reply) => {
     const [device] = await db
-      .select({ id: devices.id, role: devices.role, name: devices.name })
+      .select({ id: devices.id, role: devices.role, name: devices.name, householdId: devices.householdId })
       .from(devices)
       .where(eq(devices.id, request.device!.deviceId));
     if (device?.role !== "camera") return reply.code(403).send({ error: "camera_only" });
     if (!opts.live) return notConfigured(reply);
-    return opts.live.cameraToken({ deviceId: device.id, name: device.name });
+    const token = await opts.live.cameraToken({ deviceId: device.id, name: device.name });
+    return { ...token, encrypted: await isLiveEncrypted(db, device.householdId) };
   });
 }

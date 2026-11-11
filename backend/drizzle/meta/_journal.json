@@ -127,6 +127,13 @@
       "when": 1794391197055,
       "tag": "0017_highlight_reel",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794397878325,
+      "tag": "0018_live_encrypted",
+      "breakpoints": true
     }
   ]
 }

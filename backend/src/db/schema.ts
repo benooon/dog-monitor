@@ -88,6 +88,12 @@ export const households = pgTable("households", {
   planRevokedAt: timestamp("plan_revoked_at", { withTimezone: true }),
   /** Owner opted in to keep clips that members marked right/wrong, for training (SPEC §4 Calibration). */
   shareTrainingData: boolean("share_training_data").notNull().default(false),
+  /**
+   * Live video is end-to-end encrypted with a key only the household's phones hold (the server
+   * never sees it). Set by the owner's phone once it has made the key; cameras without the key
+   * then stay off live view instead of publishing in the clear.
+   */
+  liveEncrypted: boolean("live_encrypted").notNull().default(false),
   createdAt: createdAt(),
 });
 

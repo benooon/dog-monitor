@@ -76,6 +76,7 @@ export async function householdRoutes(
       plan: effectivePlan(household!, new Date()),
       ownerId: household!.ownerId,
       shareTrainingData: household!.shareTrainingData,
+      liveEncrypted: household!.liveEncrypted,
       role,
       members,
       dogs: dogRows.map(dogDto),
@@ -83,8 +84,12 @@ export async function householdRoutes(
     };
   });
 
-  /** Owner only: rename the household or change the training-data opt-in. */
-  app.patch<{ Body: { name?: string; shareTrainingData?: boolean } }>(
+  /**
+   * Owner only: rename the household, change the training-data opt-in, or mark live video as
+   * end-to-end encrypted. `liveEncrypted` only turns on: going back to clear video would be a
+   * downgrade the server could otherwise force on every keyless camera.
+   */
+  app.patch<{ Body: { name?: string; shareTrainingData?: boolean; liveEncrypted?: true } }>(
     "/household",
     {
       preHandler: [app.authenticate, requireHousehold(db), requireOwner],
@@ -93,14 +98,24 @@ export async function householdRoutes(
           type: "object",
           additionalProperties: false,
           minProperties: 1,
-          properties: { name: { type: "string", minLength: 1, maxLength: 100 }, shareTrainingData: { type: "boolean" } },
+          properties: {
+            name: { type: "string", minLength: 1, maxLength: 100 },
+            shareTrainingData: { type: "boolean" },
+            liveEncrypted: { type: "boolean", const: true },
+          },
         },
       },
     },
     async (request) => {
       const { householdId } = request.household!;
       const [updated] = await db.update(households).set(request.body).where(eq(households.id, householdId)).returning();
-      return { id: updated!.id, name: updated!.name, plan: effectivePlan(updated!, new Date()), shareTrainingData: updated!.shareTrainingData };
+      return {
+        id: updated!.id,
+        name: updated!.name,
+        plan: effectivePlan(updated!, new Date()),
+        shareTrainingData: updated!.shareTrainingData,
+        liveEncrypted: updated!.liveEncrypted,
+      };
     },
   );
 

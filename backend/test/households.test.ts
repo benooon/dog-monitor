@@ -310,6 +310,23 @@ describe.skipIf(!hasDatabase)("households, dogs and devices", () => {
     expect(renamed.json()).toMatchObject({ name: "Beach house", shareTrainingData: false });
   });
 
+  it("lets only the owner turn on end-to-end encrypted live video, and never off", async () => {
+    const owner = await signIn("owner");
+    const member = await signIn("member");
+    const household = (await createHousehold(owner.auth)).json();
+    await addMember(household.id, member.userId);
+    expect((await app.inject({ method: "GET", url: "/household", headers: member.auth })).json().liveEncrypted).toBe(false);
+
+    const patch = (auth: Record<string, string>, liveEncrypted: boolean) =>
+      app.inject({ method: "PATCH", url: "/household", headers: auth, payload: { liveEncrypted } });
+    expect((await patch(member.auth, true)).statusCode).toBe(403);
+    const on = await patch(owner.auth, true);
+    expect(on.statusCode).toBe(200);
+    expect(on.json()).toMatchObject({ liveEncrypted: true });
+    expect((await patch(owner.auth, false)).statusCode).toBe(400);
+    expect((await app.inject({ method: "GET", url: "/household", headers: member.auth })).json().liveEncrypted).toBe(true);
+  });
+
   it("lets only the owner revoke, and only the device's user or owner update", async () => {
     const owner = await signIn("owner");
     const member = await signIn("member");
