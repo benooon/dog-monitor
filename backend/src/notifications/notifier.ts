@@ -1,7 +1,7 @@
 import type { FastifyBaseLogger } from "fastify";
 import { and, asc, eq, inArray, isNotNull, isNull, lte, or } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices, dogs, events, notificationPrefs, type EventType } from "../db/schema.js";
+import { devices, dogs, events, notificationPrefs, type EventPlace, type EventType } from "../db/schema.js";
 import { isDeadToken, type ApnsSender } from "./apns.js";
 import type { MediaStorage } from "../storage/storage.js";
 import { buildEventPayload, enabledByDefault, interruptionLevel } from "./payload.js";
@@ -15,6 +15,8 @@ export interface EventNotification {
   cameraId: string;
   eventId: string;
   type: EventType;
+  /** forbiddenZone: which copy to use ("on the sofa" or "somewhere off-limits"). */
+  place?: EventPlace | null;
   snapshotKey?: string | null;
   escalationSeconds?: number;
 }
@@ -98,6 +100,7 @@ export class EventNotifier {
     const payload = buildEventPayload({
       eventId: event.eventId,
       type: event.type,
+      place: event.place,
       cameraId: event.cameraId,
       cameraName: camera?.name ?? "Dog Monitor",
       dogName: dog?.name,

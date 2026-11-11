@@ -14,7 +14,7 @@ struct MarkSofaSheet: View {
     private var steps: [Text] {
         [
             Text("On the camera phone at home, tap Zones."),
-            Text("Choose Forbidden, then tap the corners of the sofa."),
+            Text("Choose Sofa, then tap its corners."),
             Text("Tap Add zone, then Save."),
         ]
     }

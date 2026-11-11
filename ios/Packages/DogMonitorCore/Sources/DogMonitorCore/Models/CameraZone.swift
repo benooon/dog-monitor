@@ -50,7 +50,11 @@ public struct ZonePolygon: Codable, Sendable, Hashable {
 /// A zone drawn in camera setup (SPEC §4 Calibration), stored by the backend per camera.
 public struct CameraZone: Codable, Sendable, Hashable, Identifiable {
     public enum Kind: String, Codable, Sendable, CaseIterable, Hashable {
-        case door, forbidden, bed
+        /// `sofa` is a no-go zone we know is the sofa, so alerts can say "on the sofa".
+        case door, sofa, forbidden, bed
+
+        /// Sofa and forbidden zones both raise forbiddenZone events.
+        public var isOffLimits: Bool { self == .sofa || self == .forbidden }
     }
 
     public static let maxPoints = 32

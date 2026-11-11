@@ -10,7 +10,7 @@ extension DogState {
         case .whining: "Whining"
         case .restless: "Restless"
         case .atDoor: "At the door"
-        case .forbiddenZone: "In a forbidden zone"
+        case .forbiddenZone: "Somewhere off-limits"
         case .notVisible: "Not visible"
         case .unknown: nil
         }

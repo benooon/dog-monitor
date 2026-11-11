@@ -91,6 +91,24 @@ final class TimelineTests: XCTestCase {
         let event = try JSONCoding.makeDecoder().decode(EventDTO.self, from: Data(json.utf8))
         XCTAssertNil(event.feedback)
         XCTAssertNil(event.cameraId)
+        XCTAssertNil(event.place)
+    }
+
+    func testForbiddenZoneEventKnowsWhenItWasTheSofa() throws {
+        func decode(type: String, place: String) throws -> EventDTO {
+            let json = """
+            {"id":"\(Self.eventID)","householdId":"\(Fixtures.householdID)","cameraId":null,"type":"\(type)",
+             "state":null,"startedAt":"2026-11-10T09:00:00Z","endedAt":null,"confidence":null,
+             "clipKey":null,"snapshotKey":null,"feedback":null,"place":\(place)}
+            """
+            return try JSONCoding.makeDecoder().decode(EventDTO.self, from: Data(json.utf8))
+        }
+        XCTAssertTrue(try decode(type: "forbiddenZone", place: #""sofa""#).isOnSofa)
+        XCTAssertFalse(try decode(type: "forbiddenZone", place: #""offLimits""#).isOnSofa)
+        XCTAssertFalse(try decode(type: "forbiddenZone", place: #""somewhereNew""#).isOnSofa)
+        XCTAssertFalse(try decode(type: "forbiddenZone", place: "null").isOnSofa)
+        XCTAssertFalse(try decode(type: "atDoor", place: #""sofa""#).isOnSofa)
+        XCTAssertEqual(try decode(type: "forbiddenZone", place: #""sofa""#).with(feedback: .right).place, "sofa")
     }
 
     func testStaleCursorSurfacesItsCode() async throws {

@@ -11,10 +11,10 @@ struct TimelineRow: View {
     var body: some View {
         HStack(spacing: DS.Spacing.m) {
             if !dynamicTypeSize.isAccessibilitySize {
-                EventSymbol(type: event.type)
+                EventSymbol(type: event.type, symbol: event.timelineSymbol)
             }
             VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                Text(event.type.notificationTitle)
+                Text(event.timelineTitle)
                     .font(.body)
                 if let details {
                     Text(verbatim: details)
@@ -57,10 +57,12 @@ struct TimelineRow: View {
 /// The event's symbol in a tinted circle.
 struct EventSymbol: View {
     let type: EventType
+    /// Overrides the type's symbol (the sofa).
+    var symbol: String?
     @ScaledMetric(relativeTo: .body) private var size = 32
 
     var body: some View {
-        Image(systemName: type.notificationSymbol)
+        Image(systemName: symbol ?? type.notificationSymbol)
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(type.timelineTint)
             .frame(width: size, height: size)

@@ -59,7 +59,7 @@ private struct EventDetailList: View {
                 }
             }
         }
-        .navigationTitle(event.type.notificationTitle)
+        .navigationTitle(event.timelineTitle)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

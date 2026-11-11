@@ -271,6 +271,9 @@ public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
     public let snapshotKey: String?
     /// A viewer's verdict on the detection (`PUT /events/:id/feedback`); nil until someone answers.
     public let feedback: DogEvent.Feedback?
+    /// forbiddenZone only: where it happened, `"sofa"` or `"offLimits"` (raw so new values can't
+    /// break decoding); nil for other events and older servers.
+    public let place: String?
 
     public init(
         id: UUID,
@@ -283,7 +286,8 @@ public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
         confidence: Double? = nil,
         clipKey: String? = nil,
         snapshotKey: String? = nil,
-        feedback: DogEvent.Feedback? = nil
+        feedback: DogEvent.Feedback? = nil,
+        place: String? = nil
     ) {
         self.id = id
         self.householdId = householdId
@@ -296,7 +300,11 @@ public struct EventDTO: Codable, Sendable, Hashable, Identifiable {
         self.clipKey = clipKey
         self.snapshotKey = snapshotKey
         self.feedback = feedback
+        self.place = place
     }
+
+    /// The dog got on the sofa (a forbiddenZone event on a camera whose only no-go zones are sofas).
+    public var isOnSofa: Bool { type == .forbiddenZone && place == "sofa" }
 }
 
 /// Body of `POST /events` (camera device auth). The id is generated on the camera so retries are idempotent.
@@ -468,9 +476,9 @@ extension HouseholdDTO {
         devices.filter { $0.role == .camera && $0.status == .active }
     }
 
-    /// Whether any active camera has a no-go (forbidden) zone, e.g. around the sofa.
+    /// Whether any active camera has a no-go zone (the sofa or another forbidden area).
     public var hasForbiddenZone: Bool {
-        cameras.contains { $0.zones.contains(.forbidden) }
+        cameras.contains { $0.zones.contains(where: \.isOffLimits) }
     }
 }
 

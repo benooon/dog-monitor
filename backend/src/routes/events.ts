@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { DOG_STATES, events, type DogState, type EventType } from "../db/schema.js";
+import { DOG_STATES, events, zones, type DogState, type EventPlace, type EventType } from "../db/schema.js";
 import type { EventNotifier } from "../notifications/notifier.js";
 import { eventMediaPrefix } from "../storage/storage.js";
 
@@ -19,6 +19,20 @@ export const CAMERA_EVENT_TYPES = [
 
 type EventRow = typeof events.$inferSelect;
 
+/** `sofa` when every off-limits zone on the camera is a sofa; otherwise we can't say which place it was. */
+export function offLimitsPlace(zoneKinds: readonly string[]): EventPlace {
+  return zoneKinds.includes("sofa") && !zoneKinds.includes("forbidden") ? "sofa" : "offLimits";
+}
+
+async function placeFor(db: Database, deviceId: string, type: EventType): Promise<EventPlace | null> {
+  if (type !== "forbiddenZone") return null;
+  const rows = await db
+    .select({ kind: zones.kind })
+    .from(zones)
+    .where(and(eq(zones.deviceId, deviceId), inArray(zones.kind, ["forbidden", "sofa"])));
+  return offLimitsPlace(rows.map((r) => r.kind));
+}
+
 export function eventDto(e: EventRow) {
   return {
     id: e.id,
@@ -32,6 +46,7 @@ export function eventDto(e: EventRow) {
     clipKey: e.clipKey,
     snapshotKey: e.snapshotKey,
     feedback: e.feedback,
+    place: e.place,
   };
 }
 
@@ -107,6 +122,7 @@ export async function cameraEventRoutes(app: FastifyInstance, opts: { db: Databa
           confidence: body.confidence ?? null,
           clipKey: body.clipKey ?? null,
           snapshotKey: body.snapshotKey ?? null,
+          place: await placeFor(db, deviceId, body.type),
         })
         .onConflictDoNothing({ target: events.id })
         .returning();
@@ -120,7 +136,14 @@ export async function cameraEventRoutes(app: FastifyInstance, opts: { db: Databa
         return reply.code(200).send(eventDto(existing));
       }
 
-      await notifier.notify({ householdId, cameraId: deviceId, eventId: created.id, type: created.type, snapshotKey: created.snapshotKey });
+      await notifier.notify({
+        householdId,
+        cameraId: deviceId,
+        eventId: created.id,
+        type: created.type,
+        place: created.place,
+        snapshotKey: created.snapshotKey,
+      });
       return reply.code(201).send(eventDto(created));
     },
   );
@@ -166,6 +189,7 @@ export async function cameraEventRoutes(app: FastifyInstance, opts: { db: Databa
           cameraId: deviceId,
           eventId: event.id,
           type: event.type,
+          place: event.place,
           snapshotKey: event.snapshotKey,
           escalationSeconds,
         });

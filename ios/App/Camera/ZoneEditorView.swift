@@ -1,7 +1,7 @@
 import DogMonitorCore
 import SwiftUI
 
-/// Draw door, forbidden and bed zones over a frame from this camera. Tap to add corners, then
+/// Draw door, sofa, forbidden and bed zones over a frame from this camera. Tap to add corners, then
 /// add the zone. Coordinates are normalized to the frame, the same space the analysis uses.
 struct ZoneEditorView: View {
     let model: CameraModeModel
@@ -181,6 +181,7 @@ extension CameraZone.Kind {
     var title: LocalizedStringKey {
         switch self {
         case .door: "Door"
+        case .sofa: "Sofa"
         case .forbidden: "Forbidden"
         case .bed: "Bed"
         }
@@ -189,6 +190,7 @@ extension CameraZone.Kind {
     var symbol: String {
         switch self {
         case .door: "door.left.hand.closed"
+        case .sofa: "sofa.fill"
         case .forbidden: "nosign"
         case .bed: "bed.double"
         }
@@ -197,6 +199,7 @@ extension CameraZone.Kind {
     var color: Color {
         switch self {
         case .door: .blue
+        case .sofa: .orange
         case .forbidden: .red
         case .bed: .green
         }

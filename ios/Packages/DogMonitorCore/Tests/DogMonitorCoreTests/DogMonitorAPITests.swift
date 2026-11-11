@@ -169,6 +169,14 @@ final class DogMonitorAPITests: XCTestCase {
         let older = try await olderAPI.household()
         XCTAssertEqual(older.devices.first?.zones, [])
         XCTAssertFalse(older.hasForbiddenZone)
+
+        let sofaOnlyAPI = DogMonitorAPI(
+            baseURL: Fixtures.baseURL, credential: .user(token: "t"),
+            transport: StubTransport(json: json.replacingOccurrences(of: #"["door","forbidden","garden"]"#, with: #"["sofa"]"#))
+        )
+        let sofaOnly = try await sofaOnlyAPI.household()
+        XCTAssertEqual(sofaOnly.devices.first?.zones, [.sofa])
+        XCTAssertTrue(sofaOnly.hasForbiddenZone)
     }
 
     func testUpdateDeviceSendsOnlyChangedFields() async throws {

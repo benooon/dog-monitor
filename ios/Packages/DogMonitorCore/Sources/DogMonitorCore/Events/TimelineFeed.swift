@@ -114,7 +114,7 @@ extension EventDTO {
         EventDTO(
             id: id, householdId: householdId, cameraId: cameraId, type: type, state: state,
             startedAt: startedAt, endedAt: endedAt, confidence: confidence,
-            clipKey: clipKey, snapshotKey: snapshotKey, feedback: feedback
+            clipKey: clipKey, snapshotKey: snapshotKey, feedback: feedback, place: place
         )
     }
 }

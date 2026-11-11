@@ -1,4 +1,4 @@
-import type { EventType } from "../db/schema.js";
+import type { EventPlace, EventType } from "../db/schema.js";
 
 /** Push copy. Keys are English format strings, localized on the device (Localizable.xcstrings). */
 interface Copy {
@@ -9,7 +9,8 @@ interface Copy {
 const COPY: Record<EventType, Copy> = {
   prolongedBarking: { withDog: "%@ has been barking", withoutDog: "Your dog has been barking" },
   whining: { withDog: "%@ is whining or howling", withoutDog: "Your dog is whining or howling" },
-  forbiddenZone: { withDog: "%@ is in a forbidden zone", withoutDog: "Your dog is in a forbidden zone" },
+  // place "sofa" uses SOFA below; the camera can also have other no-go areas we can't name.
+  forbiddenZone: { withDog: "%@ is somewhere off-limits", withoutDog: "Your dog is somewhere off-limits" },
   atDoor: { withDog: "%@ is waiting at the door", withoutDog: "Your dog is waiting at the door" },
   notVisible: { withDog: "%@ hasn't been seen for a while", withoutDog: "Your dog hasn't been seen for a while" },
   calmedDown: { withDog: "%@ has calmed down", withoutDog: "Your dog has calmed down" },
@@ -18,6 +19,8 @@ const COPY: Record<EventType, Copy> = {
   overheating: { withDog: "The camera is overheating", withoutDog: "The camera is overheating" },
   dailySummary: { withDog: "%@'s daily summary is ready", withoutDog: "Your dog's daily summary is ready" },
 };
+
+const SOFA: Copy = { withDog: "%@ is on the sofa", withoutDog: "Your dog is on the sofa" };
 
 const ESCALATION: Partial<Record<EventType, Copy>> = {
   prolongedBarking: { withDog: "%1$@ has been barking for %2$@ min", withoutDog: "Your dog has been barking for %@ min" },
@@ -55,6 +58,8 @@ export const EVENT_CATEGORY = "DOG_EVENT";
 export interface EventPushInput {
   eventId: string;
   type: EventType;
+  /** forbiddenZone: where it happened (events.place). */
+  place?: EventPlace | null;
   cameraId: string;
   cameraName: string;
   dogName?: string | null;
@@ -67,7 +72,7 @@ export interface EventPushInput {
 
 export function buildEventPayload(input: EventPushInput): Record<string, unknown> {
   const escalation = input.escalationSeconds !== undefined ? ESCALATION[input.type] : undefined;
-  const copy = escalation ?? COPY[input.type];
+  const copy = escalation ?? (input.type === "forbiddenZone" && input.place === "sofa" ? SOFA : COPY[input.type]);
   const minutes = input.escalationSeconds !== undefined ? String(Math.round(input.escalationSeconds / 60)) : undefined;
   const dog = input.dogName?.trim() || null;
   const locArgs = [...(dog ? [dog] : []), ...(escalation && minutes ? [minutes] : [])];

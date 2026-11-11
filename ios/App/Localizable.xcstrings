@@ -73,18 +73,6 @@
         }
       }
     },
-    "%@ is in a forbidden zone": {
-      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
-      "extractionState": "manual",
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ באזור אסור"
-          }
-        }
-      }
-    },
     "%@ is waiting at the door": {
       "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
       "extractionState": "manual",
@@ -837,16 +825,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "איך ישמש המכשיר הזה?"
-          }
-        }
-      }
-    },
-    "In a forbidden zone": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "באזור אסור"
           }
         }
       }
@@ -2029,18 +2007,6 @@
         }
       }
     },
-    "Your dog is in a forbidden zone": {
-      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
-      "extractionState": "manual",
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "הכלב באזור אסור"
-          }
-        }
-      }
-    },
     "Your dog is waiting at the door": {
       "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
       "extractionState": "manual",
@@ -3168,16 +3134,6 @@
         }
       }
     },
-    "Choose Forbidden, then tap the corners of the sofa.": {
-      "localizations": {
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "יש לבחור ״אסור״ ולהקיש על הפינות של הספה."
-          }
-        }
-      }
-    },
     "Tap Add zone, then Save.": {
       "localizations": {
         "he": {
@@ -3294,6 +3250,104 @@
           "stringUnit": {
             "state": "translated",
             "value": "בדקו את החיבור ונסו שוב בעוד רגע."
+          }
+        }
+      }
+    },
+    "%@ is on the sofa": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ על הספה"
+          }
+        }
+      }
+    },
+    "Your dog is on the sofa": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב על הספה"
+          }
+        }
+      }
+    },
+    "%@ is somewhere off-limits": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ במקום אסור"
+          }
+        }
+      }
+    },
+    "Your dog is somewhere off-limits": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב במקום אסור"
+          }
+        }
+      }
+    },
+    "On the sofa": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "על הספה"
+          }
+        }
+      }
+    },
+    "Somewhere off-limits": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "במקום אסור"
+          }
+        }
+      }
+    },
+    "On the sofa or off-limits": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "על הספה או במקום אסור"
+          }
+        }
+      }
+    },
+    "Sofa": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ספה"
+          }
+        }
+      }
+    },
+    "Choose Sofa, then tap its corners.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש לבחור ״ספה״ ולהקיש על הפינות שלה."
           }
         }
       }

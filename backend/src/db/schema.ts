@@ -50,7 +50,15 @@ export type DogState = (typeof DOG_STATES)[number];
 export const memberRole = pgEnum("member_role", ["owner", "member"]);
 export const deviceRole = pgEnum("device_role", ["camera", "viewer"]);
 export const deviceStatus = pgEnum("device_status", ["active", "revoked"]);
-export const zoneKind = pgEnum("zone_kind", ["door", "forbidden", "bed"]);
+/** `sofa` is a forbidden zone we know is the sofa, so alerts can say "on the sofa". */
+export const zoneKind = pgEnum("zone_kind", ["door", "forbidden", "bed", "sofa"]);
+
+/**
+ * Where a forbiddenZone event happened, decided from the camera's zones when it's created:
+ * `sofa` when the camera's only off-limits zones are sofas, otherwise `offLimits`.
+ */
+export const EVENT_PLACES = ["sofa", "offLimits"] as const;
+export type EventPlace = (typeof EVENT_PLACES)[number];
 export const eventFeedback = pgEnum("event_feedback", ["correct", "wrong"]);
 
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -194,6 +202,8 @@ export const events = pgTable(
     clipKey: text("clip_key"),
     snapshotKey: text("snapshot_key"),
     feedback: eventFeedback("feedback"),
+    /** forbiddenZone only (see EVENT_PLACES). */
+    place: text("place").$type<EventPlace>(),
     createdAt: createdAt(),
   },
   (t) => [index("events_household_started_idx").on(t.householdId, t.startedAt.desc())],

@@ -141,6 +141,23 @@ describe("buildEventPayload", () => {
     expect(payload.aps["mutable-content"]).toBeUndefined();
   });
 
+  it("says sofa when the place is the sofa, and off-limits otherwise", () => {
+    const alert = (input: Partial<Parameters<typeof buildEventPayload>[0]>) =>
+      (buildEventPayload({ ...base, type: "forbiddenZone", ...input }) as { aps: { alert: unknown } }).aps.alert;
+    expect(alert({ dogName: "Rex", place: "sofa" })).toEqual({ title: "Living room", "loc-key": "%@ is on the sofa", "loc-args": ["Rex"] });
+    expect(alert({ place: "sofa" })).toEqual({ title: "Living room", "loc-key": "Your dog is on the sofa" });
+    expect(alert({ dogName: "Rex", place: "offLimits" })).toEqual({
+      title: "Living room",
+      "loc-key": "%@ is somewhere off-limits",
+      "loc-args": ["Rex"],
+    });
+    expect(alert({})).toEqual({ title: "Living room", "loc-key": "Your dog is somewhere off-limits" });
+    // place only matters for forbiddenZone
+    expect(
+      (buildEventPayload({ ...base, type: "atDoor", place: "sofa" }) as { aps: { alert: { "loc-key": string } } }).aps.alert["loc-key"],
+    ).toBe("Your dog is waiting at the door");
+  });
+
   it("formats escalations in minutes", () => {
     const withDog = buildEventPayload({ ...base, type: "prolongedBarking", dogName: "Rex", escalationSeconds: 300 }) as {
       aps: { alert: unknown };

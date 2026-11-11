@@ -7,7 +7,7 @@ extension EventType {
         switch self {
         case .prolongedBarking: "Long barking"
         case .whining: "Whining or howling"
-        case .forbiddenZone: "In a forbidden zone"
+        case .forbiddenZone: "On the sofa or off-limits"
         case .atDoor: "Waiting at the door"
         case .notVisible: "Out of view"
         case .calmedDown: "Calmed down"

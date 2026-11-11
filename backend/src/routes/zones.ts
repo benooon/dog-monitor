@@ -3,7 +3,7 @@ import { asc, eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
 import { zones, type PolygonPoint } from "../db/schema.js";
 
-type ZoneKind = "door" | "forbidden" | "bed";
+type ZoneKind = "door" | "forbidden" | "bed" | "sofa";
 
 interface ZoneInput {
   kind: ZoneKind;
@@ -21,7 +21,7 @@ function zoneDto(row: typeof zones.$inferSelect) {
   return { id: row.id, kind: row.kind, polygon: row.polygon };
 }
 
-/** The camera's zones (door, forbidden, bed), drawn in camera setup (SPEC §4 Calibration). */
+/** The camera's zones (door, forbidden, bed, sofa), drawn in camera setup (SPEC §4 Calibration). */
 export async function cameraZoneRoutes(app: FastifyInstance, opts: { db: Database }): Promise<void> {
   const { db } = opts;
   app.addHook("preHandler", app.authenticateDevice);
@@ -51,7 +51,7 @@ export async function cameraZoneRoutes(app: FastifyInstance, opts: { db: Databas
                 required: ["kind", "polygon"],
                 additionalProperties: false,
                 properties: {
-                  kind: { type: "string", enum: ["door", "forbidden", "bed"] },
+                  kind: { type: "string", enum: ["door", "forbidden", "bed", "sofa"] },
                   polygon: { type: "array", minItems: 3, maxItems: 32, items: point },
                 },
               },

@@ -1,6 +1,6 @@
 import Foundation
 
-/// The door and forbidden zones the classifier checks the dog's position against.
+/// The door and off-limits (sofa or forbidden) zones the classifier checks the dog's position against.
 public struct DogZones: Codable, Sendable, Hashable {
     public var door: [ZonePolygon]
     public var forbidden: [ZonePolygon]
@@ -13,7 +13,7 @@ public struct DogZones: Codable, Sendable, Hashable {
     /// From the zones drawn in camera setup; bed zones don't affect the state (yet).
     public init(_ zones: [CameraZone]) {
         door = zones.filter { $0.kind == .door }.map(\.polygon)
-        forbidden = zones.filter { $0.kind == .forbidden }.map(\.polygon)
+        forbidden = zones.filter(\.kind.isOffLimits).map(\.polygon)
     }
 }
 

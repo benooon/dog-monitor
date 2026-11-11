@@ -1,9 +1,21 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
+import { randomUUID } from "node:crypto";
 import type { DbHandle } from "../src/db/client.js";
+import { offLimitsPlace } from "../src/routes/events.js";
 import { TEST_NONCE } from "./helpers/apple.js";
 import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
+
+describe("offLimitsPlace", () => {
+  it("is the sofa only when every off-limits zone is a sofa", () => {
+    expect(offLimitsPlace(["sofa"])).toBe("sofa");
+    expect(offLimitsPlace(["sofa", "sofa", "door"])).toBe("sofa");
+    expect(offLimitsPlace(["sofa", "forbidden"])).toBe("offLimits");
+    expect(offLimitsPlace(["forbidden"])).toBe("offLimits");
+    expect(offLimitsPlace([])).toBe("offLimits");
+  });
+});
 
 describe.skipIf(!hasDatabase)("camera zones", () => {
   let h: DbHandle;
@@ -74,6 +86,35 @@ describe.skipIf(!hasDatabase)("camera zones", () => {
     const sofa2 = { ...sofa, polygon: [{ x: 0.5, y: 0.5 }, { x: 0.6, y: 0.5 }, { x: 0.6, y: 0.6 }] };
     await app.inject({ method: "PUT", url: "/device/zones", headers: camera, payload: { zones: [sofa, door, sofa2] } });
     expect((await cameraOf()).zoneKinds).toEqual(["door", "forbidden"]);
+  });
+
+  it("accepts sofa zones and lists them", async () => {
+    const { owner, camera } = await pairCamera("owner", "Hall");
+    const realSofa = { ...sofa, kind: "sofa" };
+    const put = await app.inject({ method: "PUT", url: "/device/zones", headers: camera, payload: { zones: [realSofa, door] } });
+    expect(put.statusCode).toBe(200);
+    const household = (await app.inject({ method: "GET", url: "/household", headers: owner })).json();
+    expect(household.devices.find((d: { role: string }) => d.role === "camera").zoneKinds).toEqual(["door", "sofa"]);
+  });
+
+  it("records where a forbidden-zone event happened", async () => {
+    const { camera } = await pairCamera("owner", "Hall");
+    const post = async (type: string) =>
+      (
+        await app.inject({
+          method: "POST",
+          url: "/events",
+          headers: camera,
+          payload: { id: randomUUID(), type, startedAt: new Date().toISOString() },
+        })
+      ).json();
+
+    await app.inject({ method: "PUT", url: "/device/zones", headers: camera, payload: { zones: [{ ...sofa, kind: "sofa" }, door] } });
+    expect((await post("forbiddenZone")).place).toBe("sofa");
+    expect((await post("atDoor")).place).toBeNull();
+
+    await app.inject({ method: "PUT", url: "/device/zones", headers: camera, payload: { zones: [{ ...sofa, kind: "sofa" }, sofa] } });
+    expect((await post("forbiddenZone")).place).toBe("offLimits");
   });
 
   it("validates shapes and requires device auth", async () => {

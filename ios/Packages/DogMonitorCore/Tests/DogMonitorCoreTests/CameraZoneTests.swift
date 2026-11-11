@@ -44,6 +44,16 @@ final class CameraZoneTests: XCTestCase {
         XCTAssertEqual(zones.forbidden.count, 1)
     }
 
+    func testSofaZonesAreOffLimits() {
+        let zones = DogZones([
+            CameraZone(kind: .sofa, polygon: triangle),
+            CameraZone(kind: .forbidden, polygon: triangle),
+        ])
+        XCTAssertEqual(zones.forbidden.count, 2)
+        XCTAssertEqual(CameraZone.Kind.allCases.filter(\.isOffLimits), [.sofa, .forbidden])
+        XCTAssertEqual(CameraZone.Kind(rawValue: "sofa"), .sofa)
+    }
+
     func testZonesAPIUsesBarePointArrays() async throws {
         let json = #"{"zones":[{"id":"\#(Fixtures.deviceID)","kind":"door","polygon":[{"x":0.1,"y":0.1},{"x":0.9,"y":0.1},{"x":0.5,"y":0.9}]}]}"#
         let stub = StubTransport(json: json)
