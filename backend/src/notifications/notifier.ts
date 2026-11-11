@@ -19,6 +19,8 @@ export interface EventNotification {
   place?: EventPlace | null;
   snapshotKey?: string | null;
   escalationSeconds?: number;
+  /** dailySummary: the day's highlight reel is already attached. */
+  hasReel?: boolean;
 }
 
 export interface NotifyResult {
@@ -106,6 +108,7 @@ export class EventNotifier {
       dogName: dog?.name,
       snapshotKey: event.snapshotKey,
       escalationSeconds: event.escalationSeconds,
+      hasReel: event.hasReel,
       snapshotUrl,
     });
 

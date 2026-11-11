@@ -158,6 +158,22 @@ describe("buildEventPayload", () => {
     ).toBe("Your dog is waiting at the door");
   });
 
+  it("mentions the reel in the daily summary push when it is attached", () => {
+    const alert = (input: Partial<Parameters<typeof buildEventPayload>[0]>) =>
+      buildEventPayload({ ...base, type: "dailySummary", ...input }) as { aps: { alert: unknown }; hasReel?: boolean };
+    expect(alert({ dogName: "Rex", hasReel: true }).aps.alert).toEqual({
+      title: "Living room",
+      "loc-key": "%@'s day in 30 seconds is ready",
+      "loc-args": ["Rex"],
+    });
+    expect(alert({ hasReel: true }).aps.alert).toEqual({ title: "Living room", "loc-key": "Your dog's day in 30 seconds is ready" });
+    expect(alert({ hasReel: true }).hasReel).toBe(true);
+    expect(alert({ dogName: "Rex" }).aps.alert).toEqual({ title: "Living room", "loc-key": "%@'s daily summary is ready", "loc-args": ["Rex"] });
+    expect(alert({}).hasReel).toBeUndefined();
+    // hasReel only matters for dailySummary
+    expect((buildEventPayload({ ...base, type: "atDoor", hasReel: true }) as { hasReel?: boolean }).hasReel).toBeUndefined();
+  });
+
   it("formats escalations in minutes", () => {
     const withDog = buildEventPayload({ ...base, type: "prolongedBarking", dogName: "Rex", escalationSeconds: 300 }) as {
       aps: { alert: unknown };

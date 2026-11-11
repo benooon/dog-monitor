@@ -82,7 +82,13 @@ export async function cameraSummaryRoutes(app: FastifyInstance, opts: { db: Data
             .insert(events)
             .values({ householdId, deviceId, type: "dailySummary", startedAt: now, endedAt: now })
             .returning();
-          await notifier.notify({ householdId, cameraId: deviceId, eventId: event!.id, type: "dailySummary" });
+          await notifier.notify({
+            householdId,
+            cameraId: deviceId,
+            eventId: event!.id,
+            type: "dailySummary",
+            hasReel: claimed.reelKey !== null,
+          });
           return summaryDto(claimed);
         }
       }

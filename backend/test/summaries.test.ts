@@ -92,6 +92,20 @@ describe.skipIf(!hasDatabase)("daily summaries", () => {
     expect(timeline.events.map((e: { type: string }) => e.type)).toEqual(["dailySummary"]);
   });
 
+  it("says the reel is ready when the camera attached it before the day went final", async () => {
+    const { camera } = await setup();
+    await app.inject({ method: "PUT", url: "/device/summaries/2026-11-09", headers: camera, payload: day() });
+    const attach = await app.inject({ method: "PUT", url: "/device/reels/2026-11-09", headers: camera });
+    expect(attach.statusCode).toBe(200);
+    const final = await app.inject({ method: "PUT", url: "/device/summaries/2026-11-09", headers: camera, payload: day({ final: true }) });
+    expect(final.json()).toMatchObject({ isFinal: true, hasReel: true });
+
+    expect(apns.sent).toHaveLength(1);
+    const payload = apns.sent[0]!.payload as { aps: { alert: { "loc-key": string } }; hasReel?: boolean };
+    expect(payload.aps.alert["loc-key"]).toBe("Your dog's day in 30 seconds is ready");
+    expect(payload.hasReel).toBe(true);
+  });
+
   it("validates input and auth", async () => {
     const { owner, camera } = await setup();
     const bad = [

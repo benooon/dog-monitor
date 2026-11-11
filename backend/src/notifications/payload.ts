@@ -22,6 +22,9 @@ const COPY: Record<EventType, Copy> = {
 
 const SOFA: Copy = { withDog: "%@ is on the sofa", withoutDog: "Your dog is on the sofa" };
 
+/** dailySummary when the camera attached the day's highlight reel before sending the day as final. */
+const SUMMARY_WITH_REEL: Copy = { withDog: "%@'s day in 30 seconds is ready", withoutDog: "Your dog's day in 30 seconds is ready" };
+
 const ESCALATION: Partial<Record<EventType, Copy>> = {
   prolongedBarking: { withDog: "%1$@ has been barking for %2$@ min", withoutDog: "Your dog has been barking for %@ min" },
   whining: { withDog: "%1$@ has been whining for %2$@ min", withoutDog: "Your dog has been whining for %@ min" },
@@ -68,11 +71,19 @@ export interface EventPushInput {
   snapshotUrl?: string;
   /** Set for escalation updates ("barking for 5 minutes"). */
   escalationSeconds?: number;
+  /** dailySummary: the day's highlight reel is attached, so the push says so. */
+  hasReel?: boolean;
+}
+
+function baseCopy(input: EventPushInput): Copy {
+  if (input.type === "forbiddenZone" && input.place === "sofa") return SOFA;
+  if (input.type === "dailySummary" && input.hasReel) return SUMMARY_WITH_REEL;
+  return COPY[input.type];
 }
 
 export function buildEventPayload(input: EventPushInput): Record<string, unknown> {
   const escalation = input.escalationSeconds !== undefined ? ESCALATION[input.type] : undefined;
-  const copy = escalation ?? (input.type === "forbiddenZone" && input.place === "sofa" ? SOFA : COPY[input.type]);
+  const copy = escalation ?? baseCopy(input);
   const minutes = input.escalationSeconds !== undefined ? String(Math.round(input.escalationSeconds / 60)) : undefined;
   const dog = input.dogName?.trim() || null;
   const locArgs = [...(dog ? [dog] : []), ...(escalation && minutes ? [minutes] : [])];
@@ -97,5 +108,6 @@ export function buildEventPayload(input: EventPushInput): Record<string, unknown
     type: input.type,
     ...(input.snapshotKey && { snapshotKey: input.snapshotKey }),
     ...(input.snapshotUrl && { snapshotUrl: input.snapshotUrl }),
+    ...(input.type === "dailySummary" && input.hasReel && { hasReel: true }),
   };
 }
