@@ -1,7 +1,9 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
+import { eq } from "drizzle-orm";
 import { TokenVerifier } from "livekit-server-sdk";
 import type { DbHandle } from "../src/db/client.js";
+import { devices } from "../src/db/schema.js";
 import { LIVE_TOKEN_TTL_SECONDS, createLiveKitIssuer, roomForCamera } from "../src/live/livekit.js";
 import { RealtimeHub } from "../src/realtime/hub.js";
 import { TEST_NONCE } from "./helpers/apple.js";
@@ -127,6 +129,19 @@ describe.skipIf(!hasDatabase)("live token routes", () => {
     await app.inject({ method: "PATCH", url: "/household", headers: owner.auth, payload: { liveEncrypted: true } });
     expect((await viewerToken()).json().encrypted).toBe(true);
     expect((await cameraToken()).json().encrypted).toBe(true);
+  });
+
+  it("tells viewers when the camera has no live key instead of letting them wait", async () => {
+    const { owner, camera } = await setup();
+    await h.db.update(devices).set({ liveKeyMissing: true }).where(eq(devices.id, camera.id));
+    const res = await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth });
+    expect(res.statusCode).toBe(409);
+    expect(res.json()).toEqual({ error: "camera_needs_key" });
+    // The camera itself still gets its token (it checks whether it may publish).
+    expect((await app.inject({ method: "POST", url: "/device/live-token", headers: camera.auth })).statusCode).toBe(200);
+
+    await h.db.update(devices).set({ liveKeyMissing: false }).where(eq(devices.id, camera.id));
+    expect((await app.inject({ method: "POST", url: `/cameras/${camera.id}/live-token`, headers: owner.auth })).statusCode).toBe(200);
   });
 
   it("hides cameras of other households and non-camera devices", async () => {

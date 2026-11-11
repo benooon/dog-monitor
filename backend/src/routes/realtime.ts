@@ -118,6 +118,8 @@ export async function realtimeRoutes(app: FastifyInstance, opts: RealtimeOptions
             ...(message.charging !== undefined && { charging: message.charging }),
             ...(message.thermal !== undefined && { thermal: message.thermal }),
             ...(message.state !== undefined && { dogState: message.state }),
+            // Every heartbeat says it; older apps never send it, and they publish as before.
+            liveKeyMissing: message.liveKeyMissing ?? false,
           })
           .where(and(eq(devices.id, deviceId), eq(devices.status, "active")))
           .returning({ id: devices.id });

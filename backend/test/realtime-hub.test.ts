@@ -147,6 +147,8 @@ describe("protocol parsing", () => {
     expect(parseCameraMessage('{"type":"heartbeat","battery":2}')).toBeNull();
     expect(parseCameraMessage('{"type":"heartbeat","thermal":"hot"}')).toBeNull();
     expect(parseCameraMessage('{"type":"heartbeat","charging":"yes"}')).toBeNull();
+    expect(parseCameraMessage('{"type":"heartbeat","liveKeyMissing":true}')).toEqual({ type: "heartbeat", liveKeyMissing: true });
+    expect(parseCameraMessage('{"type":"heartbeat","liveKeyMissing":"yes"}')).toBeNull();
     expect(parseCameraMessage("not json")).toBeNull();
     expect(parseCameraMessage("[]")).toBeNull();
   });

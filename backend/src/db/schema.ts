@@ -173,6 +173,11 @@ export const devices = pgTable(
     thermal: text("thermal"),
     /** Camera devices: the dog's state from the latest heartbeat. */
     dogState: text("dog_state").$type<DogState>(),
+    /**
+     * Camera devices: the household's live video is end-to-end encrypted and this camera has no
+     * key (from the latest heartbeat), so it can't publish. Viewers are told instead of waiting.
+     */
+    liveKeyMissing: boolean("live_key_missing").notNull().default(false),
     /** Viewer devices: IANA time zone of the phone, for quiet hours. */
     timeZone: text("time_zone"),
     /** Viewer devices: no pushes until this time ("Mute 1h" notification action). */

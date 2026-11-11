@@ -1,0 +1,1 @@
+ALTER TABLE "devices" ADD COLUMN "live_key_missing" boolean DEFAULT false NOT NULL;

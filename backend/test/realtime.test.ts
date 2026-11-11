@@ -141,8 +141,20 @@ describe.skipIf(!hasDatabase)("realtime channel (GET /ws)", () => {
 
     await eventually(async () => {
       const [row] = await h.db.select().from(devices).where(eq(devices.id, camera.id));
-      expect(row).toMatchObject({ battery: 0.8, charging: true, thermal: "nominal", dogState: "resting" });
+      expect(row).toMatchObject({ battery: 0.8, charging: true, thermal: "nominal", dogState: "resting", liveKeyMissing: false });
       expect(row!.lastHeartbeatAt?.getTime()).toBe(clock);
+    });
+
+    // A camera without the household's live key says so; the next normal heartbeat clears it.
+    cam.send({ type: "heartbeat", liveKeyMissing: true });
+    await eventually(async () => {
+      const [row] = await h.db.select().from(devices).where(eq(devices.id, camera.id));
+      expect(row!.liveKeyMissing).toBe(true);
+    });
+    cam.send({ type: "heartbeat" });
+    await eventually(async () => {
+      const [row] = await h.db.select().from(devices).where(eq(devices.id, camera.id));
+      expect(row!.liveKeyMissing).toBe(false);
     });
 
     viewer.send({ type: "watch", cameraId: camera.id });

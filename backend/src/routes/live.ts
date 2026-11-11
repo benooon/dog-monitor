@@ -43,7 +43,7 @@ export async function viewerLiveRoutes(app: FastifyInstance, opts: ViewerLiveRou
     },
     async (request, reply) => {
       const [camera] = await db
-        .select({ id: devices.id, status: devices.status })
+        .select({ id: devices.id, status: devices.status, liveKeyMissing: devices.liveKeyMissing })
         .from(devices)
         .where(
           and(
@@ -60,6 +60,8 @@ export async function viewerLiveRoutes(app: FastifyInstance, opts: ViewerLiveRou
         return reply.code(409).send({ error: "viewer_limit_reached", limit: LIMITS.viewersPerCamera });
       }
       if (!opts.live) return notConfigured(reply);
+      // The camera can't publish without the household's key; say so instead of a silent wait.
+      if (camera.liveKeyMissing) return reply.code(409).send({ error: "camera_needs_key" });
 
       const [user] = await db.select({ name: users.name }).from(users).where(eq(users.id, userId));
       const token = await opts.live.viewerToken({ deviceId: camera.id, userId, name: user?.name });

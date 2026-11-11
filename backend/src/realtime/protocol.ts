@@ -2,7 +2,7 @@
  * WebSocket protocol on `GET /ws` (SPEC §6 Realtime). Every message is one JSON object with a `type`.
  *
  * Camera (Authorization: Device <id>:<secret>):
- *   → { type: "heartbeat", battery?: 0...1, charging?: bool, thermal?: "nominal"|"fair"|"serious"|"critical", state?: DogState }
+ *   → { type: "heartbeat", battery?: 0...1, charging?: bool, thermal?: "nominal"|"fair"|"serious"|"critical", state?: DogState, liveKeyMissing?: bool }
  *   ← { type: "viewers", count: n, change: "joined" | "left" }   (count 0 = all viewers left)
  *
  * Viewer (Authorization: Bearer <JWT>):
@@ -26,6 +26,8 @@ export interface HeartbeatMessage {
   charging?: boolean;
   thermal?: ThermalState;
   state?: DogState;
+  /** The household's video is end-to-end encrypted and the camera has no key. Absent = false. */
+  liveKeyMissing?: boolean;
 }
 
 export type CameraInbound = HeartbeatMessage;
@@ -68,6 +70,10 @@ export function parseCameraMessage(raw: string): CameraInbound | null {
   if (msg.state !== undefined) {
     if (!DOG_STATES.includes(msg.state as DogState)) return null;
     out.state = msg.state as DogState;
+  }
+  if (msg.liveKeyMissing !== undefined) {
+    if (typeof msg.liveKeyMissing !== "boolean") return null;
+    out.liveKeyMissing = msg.liveKeyMissing;
   }
   return out;
 }
