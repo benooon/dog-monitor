@@ -14,9 +14,12 @@ public enum HouseholdPlan: String, Codable, Sendable, Hashable {
 public struct SubscriptionDTO: Codable, Sendable, Hashable {
     public struct Counts: Codable, Sendable, Hashable {
         public let cameras: Int
+        /// People in the household, owner included (nil from an older server).
+        public let members: Int?
 
-        public init(cameras: Int) {
+        public init(cameras: Int, members: Int? = nil) {
             self.cameras = cameras
+            self.members = members
         }
     }
 
@@ -36,6 +39,9 @@ public struct SubscriptionDTO: Codable, Sendable, Hashable {
     }
 
     public var isPremium: Bool { plan == .premium }
+
+    /// What the household's plan includes.
+    public var features: PlanFeatures { .for(plan) }
 
     /// How many more cameras the household can pair.
     public var camerasLeft: Int { max(0, limits.cameras - usage.cameras) }
