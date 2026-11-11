@@ -12,6 +12,7 @@ import { DEFAULT_RETENTION_DAYS, scheduleRetention } from "./storage/retention.j
 import { EventNotifier, recordCameraOffline } from "./notifications/notifier.js";
 import type { AttemptLimiter } from "./pairing/attempt-limiter.js";
 import { RealtimeHub } from "./realtime/hub.js";
+import { accountRoutes } from "./routes/account.js";
 import { authRoutes } from "./routes/auth.js";
 import { deviceSelfRoutes } from "./routes/device-self.js";
 import { deviceRoutes } from "./routes/devices.js";
@@ -83,6 +84,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(authPlugin, { jwt: services.jwt });
     await app.register(deviceAuthPlugin, { db: services.db });
     await app.register(authRoutes, services);
+    await app.register(accountRoutes, { db: services.db, storage: services.storage });
     await app.register(householdRoutes, { db: services.db });
     await app.register(dogRoutes, { db: services.db });
     const enforcePlanLimits = services.enforcePlanLimits ?? false;
