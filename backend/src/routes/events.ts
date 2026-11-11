@@ -4,6 +4,7 @@ import type { Database } from "../db/client.js";
 import { DOG_STATES, events, zones, type DogState, type EventPlace, type EventType } from "../db/schema.js";
 import type { EventNotifier } from "../notifications/notifier.js";
 import { eventMediaPrefix } from "../storage/storage.js";
+import { RateLimiter } from "../limits/rate-limiter.js";
 
 /** Event types a camera may report; cameraOffline and dailySummary are created by the server. */
 export const CAMERA_EVENT_TYPES = [
@@ -77,9 +78,31 @@ function keysBelongToEvent(prefix: string, ...keys: (string | null | undefined)[
 }
 
 /** Camera-reported events (device auth): `POST /events`, `PATCH /events/:id`. */
-export async function cameraEventRoutes(app: FastifyInstance, opts: { db: Database; notifier: EventNotifier }): Promise<void> {
+/** Per camera: new events, and updates (end time, media keys, escalations). Real cameras stay far below. */
+export const EVENT_CREATES_PER_MINUTE = 30;
+export const EVENT_UPDATES_PER_MINUTE = 60;
+
+export async function cameraEventRoutes(
+  app: FastifyInstance,
+  opts: { db: Database; notifier: EventNotifier; createLimiter?: RateLimiter; updateLimiter?: RateLimiter },
+): Promise<void> {
   const { db, notifier } = opts;
+  // A camera flooding events would grow the table and send a push to every member each time
+  // (security audit 2026-11, run 2). The camera's upload queue retries on 429.
+  const createLimiter = opts.createLimiter ?? new RateLimiter(EVENT_CREATES_PER_MINUTE, 60_000);
+  const updateLimiter = opts.updateLimiter ?? new RateLimiter(EVENT_UPDATES_PER_MINUTE, 60_000);
   app.addHook("preHandler", app.authenticateDevice);
+  app.addHook("preHandler", async (request, reply) => {
+    if (!request.device) return;
+    const limiter = request.method === "POST" ? createLimiter : updateLimiter;
+    const deviceId = request.device.deviceId;
+    if (!limiter.tryTake(deviceId)) {
+      return reply
+        .code(429)
+        .header("retry-after", String(Math.max(1, limiter.retryAfterSeconds(deviceId))))
+        .send({ error: "rate_limited" });
+    }
+  });
 
   app.post<{ Body: CreateBody }>(
     "/events",

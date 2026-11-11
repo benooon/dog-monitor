@@ -9,6 +9,7 @@ import { buildTestApp } from "./helpers/app.js";
 import { hasDatabase, openTestDb, truncateAll } from "./helpers/db.js";
 import { FakeStorage } from "./helpers/storage.js";
 import { eventMediaKey } from "../src/storage/storage.js";
+import { EVENT_CREATES_PER_MINUTE } from "../src/routes/events.js";
 
 class FakeApns implements ApnsSender {
   sent: ApnsNotification[] = [];
@@ -109,6 +110,21 @@ describe.skipIf(!hasDatabase)("camera events and push fan-out", () => {
       snapshotKey,
       snapshotUrl: `https://bucket.test/${snapshotKey}?get&ttl=21600`,
     });
+  });
+
+  // Security audit 2026-11, run 2: a camera cannot flood events (DB rows + a push per member each).
+  it("rate-limits a camera's new events with 429 and Retry-After", async () => {
+    const { camera } = await setup();
+    const codes: number[] = [];
+    for (let i = 0; i < EVENT_CREATES_PER_MINUTE + 1; i++) {
+      const id = `33333333-3333-4333-8333-${String(i).padStart(12, "0")}`;
+      codes.push((await postEvent(camera.auth, { id })).statusCode);
+    }
+    expect(codes.slice(0, EVENT_CREATES_PER_MINUTE).every((c) => c === 201)).toBe(true);
+    const last = await postEvent(camera.auth, { id: "44444444-4444-4444-8444-444444444444" });
+    expect(last.statusCode).toBe(429);
+    expect(last.json()).toEqual({ error: "rate_limited" });
+    expect(Number(last.headers["retry-after"])).toBeGreaterThanOrEqual(1);
   });
 
   it("is idempotent on the event id (offline queue retries)", async () => {
