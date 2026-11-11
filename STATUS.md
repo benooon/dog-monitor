@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 1c7eb0648ba578bf3edb5b798c957f69572b17ea
-- message: docs: progress (growth plan, first reel)
-- time (UTC): 2026-11-11T04:15:05Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42957809565
+- commit: aa8a6009264d24b90bcaef7b73968972571f537e
+- message: marketing: reel 2 "door" (Rex at the door at 17:29), Hebrew + English
+- time (UTC): 2026-11-11T04:39:52Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42960526000
 
 | job | result | log |
 |---|---|---|
