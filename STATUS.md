@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: d54e39ca7f7b80fc189c83f7767cf055a298be10
-- message: docs: vendor security-audit and Instagram content skills (MIT)
-- time (UTC): 2026-11-11T04:06:59Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42956811580
+- commit: b01977f440fc9ad41b2108e4cd9e2fd794e70fd9
+- message: marketing: reel engine and first reel (sofa, Hebrew + English), voice file, sofa push copy task
+- time (UTC): 2026-11-11T04:12:58Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42957623181
 
 | job | result | log |
 |---|---|---|
