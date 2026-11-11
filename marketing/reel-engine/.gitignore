@@ -1,0 +1,5 @@
+node_modules/
+*.part.mp4
+still-*.jpg
+*.wav
+v-*.mp4

@@ -1,0 +1,6 @@
+{
+  "name": "dog-monitor-reels",
+  "private": true,
+  "description": "Renders Dog Monitor's Instagram reels (canvas scenes -> ffmpeg).",
+  "dependencies": { "@fontsource/rubik": "5.1.0" }
+}
