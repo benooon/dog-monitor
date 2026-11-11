@@ -13,6 +13,8 @@ All are MIT-licensed; each folder keeps its original LICENSE. Source list: https
 | `writing-for-interfaces` | UI copy: voice, errors, empty states, buttons | Andrew Gleave, andrewgleave/skills |
 | `swift-concurrency-pro` | Swift 6 concurrency review | Paul Hudson, twostraws/Swift-Concurrency-Agent-Skill |
 | `security-audit` | Multi-phase security audit with verified, machine-readable findings (backend + core) | Cloudflare, cloudflare/security-audit-skill |
+| `legal` | Contract review (only for reviewing third-party terms: vendors, DPAs) | evolsb/claude-legal-skill |
+| `gdpr-compliant` | GDPR engineering rules: retention, logging, rights endpoints, security | github/awesome-copilot |
 | `ig-reel`, `ig-caption`, `ig-human`, `ig-plan`, `ig-carousel`, `ig-story`, `ig-repurpose`, `ig-audit`, `ig-profile`, `ig-viral`, `ig-comment`, `ig-reply`, `ig-dm` | Instagram content for marketing (reel scripts, hooks, captions, weekly plans). They write content only; nothing posts. Their voice file is `marketing/voice.md` (use it wherever a skill says `~/.claude/instagram/voice.md`). | Jake Schincariol, Jakeschincariol/instagram-agent-skill |
 
 Note: some skills assume iOS 26/27 and newer Xcode. This app targets iOS 17: gate newer APIs with

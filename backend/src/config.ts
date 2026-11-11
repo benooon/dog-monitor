@@ -24,6 +24,8 @@ export interface Config {
   s3?: S3Config;
   /** Days to keep clips and snapshots. */
   retentionDays: number;
+  /** Events and daily summaries are deleted after this many days (EVENT_RETENTION_DAYS). */
+  recordRetentionDays: number;
   /** "<team id>.<bundle id>" for Universal Links; empty until APPLE_TEAM_ID (or APNS_TEAM_ID) is set. */
   appLinkIds: string[];
   /** Verifying StoreKit 2 transactions for premium. */
@@ -88,6 +90,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (!Number.isInteger(retentionDays) || retentionDays < 1) {
     throw new Error(`Invalid CLIP_RETENTION_DAYS: ${env.CLIP_RETENTION_DAYS}`);
   }
+  const recordRetentionDays = Number(env.EVENT_RETENTION_DAYS ?? 365);
+  if (!Number.isInteger(recordRetentionDays) || recordRetentionDays < 30) {
+    throw new Error(`Invalid EVENT_RETENTION_DAYS (at least 30): ${env.EVENT_RETENTION_DAYS}`);
+  }
   let adminToken = env.ADMIN_TOKEN?.trim() || undefined;
   if (adminToken && adminToken.length < 32) {
     warnings.push("Admin routes are off: ADMIN_TOKEN must be at least 32 characters");
@@ -129,6 +135,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
         }
       : undefined,
     retentionDays,
+    recordRetentionDays,
     appLinkIds: appLinkIds(env),
     appStore: {
       bundleId: env.APPLE_BUNDLE_ID || "com.benooon.dogmonitor",

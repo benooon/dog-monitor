@@ -14,6 +14,7 @@ describe("loadConfig", () => {
       jwtTtlSeconds: 2592000,
       appleAudiences: ["com.benooon.dogmonitor"],
       retentionDays: 7,
+      recordRetentionDays: 365,
       appLinkIds: [],
       appStore: {
         bundleId: "com.benooon.dogmonitor",
@@ -77,6 +78,8 @@ describe("loadConfig", () => {
     expect(partial.warnings).toEqual([expect.stringMatching(/Clip storage is off: set S3_ACCESS_KEY_ID/)]);
     expect(loadConfig({ CLIP_RETENTION_DAYS: "3" }).retentionDays).toBe(3);
     expect(() => loadConfig({ CLIP_RETENTION_DAYS: "0" })).toThrow(/CLIP_RETENTION_DAYS/);
+    expect(loadConfig({ EVENT_RETENTION_DAYS: "90" }).recordRetentionDays).toBe(90);
+    expect(() => loadConfig({ EVENT_RETENTION_DAYS: "7" })).toThrow(/EVENT_RETENTION_DAYS/);
   });
 
   it("reads LiveKit credentials only when all three are set", () => {

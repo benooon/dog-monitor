@@ -8,10 +8,12 @@ import type { Database } from "./db/client.js";
 import type { LiveTokenIssuer } from "./live/livekit.js";
 import type { ApnsSender } from "./notifications/apns.js";
 import type { MediaStorage } from "./storage/storage.js";
-import { DEFAULT_RETENTION_DAYS, scheduleRetention } from "./storage/retention.js";
+import { DEFAULT_RECORD_RETENTION_DAYS, DEFAULT_RETENTION_DAYS, scheduleRecordRetention, scheduleRetention } from "./storage/retention.js";
 import { EventNotifier, recordCameraOffline } from "./notifications/notifier.js";
 import type { AttemptLimiter } from "./pairing/attempt-limiter.js";
 import { RealtimeHub } from "./realtime/hub.js";
+import { serializeRequest } from "./logging.js";
+import { accountRoutes } from "./routes/account.js";
 import { authRoutes } from "./routes/auth.js";
 import { deviceSelfRoutes } from "./routes/device-self.js";
 import { deviceRoutes } from "./routes/devices.js";
@@ -48,6 +50,8 @@ export interface AppServices {
   storage?: MediaStorage;
   /** Days to keep clips and snapshots (SPEC §10, default 7). */
   retentionDays?: number;
+  /** Events and daily summaries older than this are deleted daily (default 365; 0 turns it off, e.g. in tests). */
+  recordRetentionDays?: number;
   /** Realtime presence (tests pass their own to inspect it). */
   hub?: RealtimeHub;
   /** Clock for heartbeats and offline detection (tests). */
@@ -79,7 +83,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   const app = Fastify({
     // Railway terminates TLS in front of us; trust X-Forwarded-For so request.ip is the client.
     trustProxy: true,
-    logger: options.logLevel === "silent" ? false : { level: options.logLevel ?? "info" },
+    logger: options.logLevel === "silent" ? false : { level: options.logLevel ?? "info", serializers: { req: serializeRequest } },
   });
   await app.register(healthRoutes);
   await app.register(appLinkRoutes, { appIds: options.appLinkIds ?? [] });
@@ -90,7 +94,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(authPlugin, { jwt: services.jwt });
     await app.register(deviceAuthPlugin, { db: services.db });
     await app.register(authRoutes, services);
-    await app.register(householdRoutes, { db: services.db });
+    await app.register(accountRoutes, { db: services.db, storage: services.storage });
+    await app.register(householdRoutes, { db: services.db, storage: services.storage });
     await app.register(dogRoutes, { db: services.db });
     await app.register(waitlistRoutes, { db: services.db, adminToken: services.adminToken, limiter: services.waitlistLimiter });
     const enforcePlanLimits = services.enforcePlanLimits ?? false;
@@ -117,6 +122,11 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     await app.register(trainingRoutes, { db: services.db, storage: services.storage, jwt: services.jwt });
     if (services.storage && services.retentionDays !== 0) {
       const stop = scheduleRetention(services.db, services.storage, services.retentionDays ?? DEFAULT_RETENTION_DAYS, app.log);
+      app.addHook("onClose", async () => stop());
+    }
+
+    if (services.recordRetentionDays !== 0) {
+      const stop = scheduleRecordRetention(services.db, services.recordRetentionDays ?? DEFAULT_RECORD_RETENTION_DAYS, app.log);
       app.addHook("onClose", async () => stop());
     }
 

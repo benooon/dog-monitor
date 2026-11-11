@@ -60,7 +60,7 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         NSCameraUsageDescription: Dog Monitor uses the camera to watch your dog, share live video with your family and take your dog's photo.
-        NSMicrophoneUsageDescription: Dog Monitor uses the microphone to detect barking and to let you hear and talk to your dog.
+        NSMicrophoneUsageDescription: Dog Monitor uses the microphone to detect barking and to let you hear and talk to your dog. Clips include sound.
         NSLocalNetworkUsageDescription: Dog Monitor uses the local network to find and pair with your other devices.
     entitlements:
       path: Config/DogMonitor.entitlements

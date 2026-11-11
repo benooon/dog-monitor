@@ -121,6 +121,17 @@ public struct DogMonitorAPI: Sendable {
         try await sendWithoutResponse("DELETE", "household/members/\(Self.path(userId))")
     }
 
+    /// Permanently deletes the signed-in account. An owner living alone also loses the household, its
+    /// events and stored files. 409 `household_has_members` while an owner still has other members.
+    public func deleteAccount() async throws {
+        try await sendWithoutResponse("DELETE", "me")
+    }
+
+    /// Everything the server holds about the signed-in user, as JSON (no clips or snapshots).
+    public func exportMyData() async throws -> Data {
+        try await perform(makeRequest("GET", "me/export", body: nil))
+    }
+
     public func revokeDevice(id: UUID) async throws -> DeviceDTO {
         try await send("POST", "devices/\(Self.path(id))/revoke")
     }

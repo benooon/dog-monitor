@@ -35,6 +35,7 @@ export async function buildTestApp(
       apns: options.apns,
       storage: options.storage,
       retentionDays: 0,
+      recordRetentionDays: 0,
       now: options.now,
       transactions: options.transactions,
       enforcePlanLimits: options.enforcePlanLimits,

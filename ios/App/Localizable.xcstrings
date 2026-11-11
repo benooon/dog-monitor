@@ -3351,6 +3351,130 @@
           }
         }
       }
+    },
+    "%@ is in a forbidden zone": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ באזור אסור"
+          }
+        }
+      }
+    },
+    "In a forbidden zone": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "באזור אסור"
+          }
+        }
+      }
+    },
+    "Your dog is in a forbidden zone": {
+      "comment": "Push notification text sent by the backend as loc-key (backend/src/notifications/payload.ts).",
+      "extractionState": "manual",
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הכלב באזור אסור"
+          }
+        }
+      }
+    },
+    "Choose Forbidden, then tap the corners of the sofa.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש לבחור ״אסור״ ולהקיש על הפינות של הספה."
+          }
+        }
+      }
+    },
+    "Delete account": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחיקת חשבון"
+          }
+        }
+      }
+    },
+    "Delete your account?": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "למחוק את החשבון?"
+          }
+        }
+      }
+    },
+    "This removes your sign-in and phones. If you're the only member, it also removes your household, events, clips and snapshots. It can't be undone. Premium isn't cancelled: do that in your Apple ID subscriptions.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "זה מסיר את הכניסה והטלפונים שלכם. אם אתם החברים היחידים, זה מסיר גם את משק הבית, האירועים, הקטעים והתמונות. אי אפשר לבטל. Premium לא מתבטל: את זה עושים במנויים של מזהה Apple."
+          }
+        }
+      }
+    },
+    "Others are still in your household. Remove them first, then delete your account.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש עוד אנשים במשק הבית. הסירו אותם קודם, ואז מחקו את החשבון."
+          }
+        }
+      }
+    },
+    "Anyone the camera can see or hear should know it's there. Tell guests, your dog walker and your cleaner. Clips include sound.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל מי שהמצלמה יכולה לראות או לשמוע צריך לדעת שהיא שם. ספרו על כך לאורחים, למטיילת הכלבים ולעוזרת הבית. הקטעים כוללים צליל."
+          }
+        }
+      }
+    },
+    "Download my data": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הורדת הנתונים שלי"
+          }
+        }
+      }
+    },
+    "Share my data": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיתוף הנתונים שלי"
+          }
+        }
+      }
+    },
+    "A copy of what Dog Monitor keeps about you and your household. Clips and snapshots aren't included.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עותק של מה ש-Dog Monitor שומרת עליכם ועל משק הבית. הקטעים והתמונות לא כלולים."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

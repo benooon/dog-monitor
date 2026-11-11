@@ -120,6 +120,10 @@ struct CameraModeView: View {
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("pair-camera")
             }
+            Text("Anyone the camera can see or hear should know it's there. Tell guests, your dog walker and your cleaner. Clips include sound.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
     }

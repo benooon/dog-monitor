@@ -178,6 +178,32 @@ final class ViewerSessionModel {
         realtime.start()
     }
 
+    /// Writes the user's data export to a temporary JSON file for the share sheet (nil on failure).
+    func exportMyData() async -> URL? {
+        var file: URL?
+        await perform {
+            let data = try await api.exportMyData()
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent("dog-monitor-my-data.json")
+            try data.write(to: url, options: [.atomic, .completeFileProtection])
+            file = url
+        }
+        return file
+    }
+
+    /// Permanently deletes the account on the server, then signs out. An owner who still has other
+    /// members is asked to remove them first.
+    func deleteAccount() async {
+        await perform {
+            do {
+                try await api.deleteAccount()
+            } catch let error as APIError where error.isHouseholdHasMembers {
+                errorMessage = String(localized: "Others are still in your household. Remove them first, then delete your account.")
+                return
+            }
+            signOut()
+        }
+    }
+
     func signOut() {
         PushRegistry.shared.deactivate()
         realtime?.stop()

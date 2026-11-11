@@ -21,6 +21,9 @@ public enum APIError: Error, Equatable, Sendable {
         return nil
     }
 
+    /// The account can't be deleted yet: the owner still has other people in the household.
+    public var isHouseholdHasMembers: Bool { code == "household_has_members" }
+
     /// Pairing was refused because the household's plan has no camera slot left.
     public var isCameraLimitReached: Bool { code == "camera_limit_reached" }
 }

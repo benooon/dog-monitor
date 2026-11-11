@@ -5,9 +5,11 @@ import { devices, dogs, householdMembers, households, notificationPrefs, users, 
 import { deviceDto, dogDto } from "../households/dto.js";
 import { findMembership, requireHousehold, requireOwner } from "../households/scope.js";
 import { effectivePlan } from "../billing/plans.js";
+import { StorageUnavailableError, deleteHousehold } from "../households/delete.js";
+import type { MediaStorage } from "../storage/storage.js";
 
-export async function householdRoutes(app: FastifyInstance, opts: { db: Database }): Promise<void> {
-  const { db } = opts;
+export async function householdRoutes(app: FastifyInstance, opts: { db: Database; storage?: MediaStorage }): Promise<void> {
+  const { db, storage } = opts;
 
   app.post<{ Body: { name: string } }>(
     "/households",
@@ -122,4 +124,15 @@ export async function householdRoutes(app: FastifyInstance, opts: { db: Database
       return reply.code(204).send();
     },
   );
+
+  /** Owner only: deletes the household with its dogs, cameras, events, summaries, invites and stored files. Members keep their accounts. */
+  app.delete("/household", { preHandler: [app.authenticate, requireHousehold(db), requireOwner] }, async (request, reply) => {
+    try {
+      await deleteHousehold(db, storage, request.household!.householdId);
+    } catch (err) {
+      if (err instanceof StorageUnavailableError) return reply.code(503).send({ error: "storage_not_configured" });
+      throw err;
+    }
+    return reply.code(204).send();
+  });
 }
