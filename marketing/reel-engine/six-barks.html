@@ -1,0 +1,490 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Rubik;font-weight:500;src:url(node_modules/@fontsource/rubik/files/rubik-latin-500-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:700;src:url(node_modules/@fontsource/rubik/files/rubik-latin-700-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:800;src:url(node_modules/@fontsource/rubik/files/rubik-latin-800-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:500;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-500-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+@font-face{font-family:Rubik;font-weight:700;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-700-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+@font-face{font-family:Rubik;font-weight:800;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-800-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+html,body{margin:0;background:#000}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Reel 3, "Rex barked 6 times while you were out." Six barks, six reasons, none of them burglars.
+// The app moment is the daily summary screen ("Rex's day": Rested, Barks, activity by hour).
+const W = 1080, H = 1920;
+const CX = 460;            // text column center: keeps the right 230 px clear for Instagram's action rail
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+
+const ACCENT = '#B4541F';
+const COPY = {
+  en: {
+    hook: 'Rex barked 6 times\nwhile you were out.',
+    hookSub: 'Nobody was there.',
+    beats: ['A pigeon.', 'A leaf.', 'The neighbours.', 'Nothing.', 'His own tail.', 'You.'],
+    beatSub: (n, time) => `${n} of 6 · ${time}`,
+    lastSub: 'That one was for you.',
+    sumTitle: 'Rex’s day',
+    sumSub: 'Today · Living room',
+    rested: 'Rested', restedVal: '7 h 12 min',
+    barks: 'Barks',
+    active: 'Activity',
+    intruders: 'Intruders: 0.',
+    room: 'Living room',
+    live: 'Live',
+    end1: 'See what your dog\ndoes when you’re out.',
+    end2: 'Your old iPhone becomes the camera.',
+    end3: 'Coming soon · link in bio',
+  },
+  he: {
+    hook: 'רקס נבח 6 פעמים\nכשלא הייתם בבית.',
+    hookSub: 'לא היה שם אף אחד.',
+    beats: ['יונה.', 'עלה.', 'השכנים.', 'כלום.', 'הזנב של עצמו.', 'אתם.'],
+    beatSub: (n, time) => `${n} מתוך 6 · ${time}`,
+    lastSub: 'את זו הוא שמר לכם.',
+    sumTitle: 'היום של רקס',
+    sumSub: 'היום · סלון',
+    rested: 'מנוחה', restedVal: '7 שע׳ 12 דק׳',
+    barks: 'נביחות',
+    active: 'פעילות',
+    intruders: 'פורצים: 0.',
+    room: 'סלון',
+    live: 'בשידור',
+    end1: 'תראו מה הכלב עושה\nכשאתם לא בבית.',
+    end2: 'האייפון הישן הופך למצלמה.',
+    end3: 'בקרוב · הקישור בביו',
+  },
+};
+let LANG = 'en';
+
+// ---------- helpers ----------
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeInOut = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x * x * x;
+const backOut = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+const mix = (c1, c2, k) => `rgb(${c1.map((v, i) => Math.round(lerp(v, c2[i], k))).join(',')})`;
+
+const grain = [];
+let seed = 23;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+for (let k = 0; k < 4; k++) {
+  const g = document.createElement('canvas'); g.width = 270; g.height = 480;
+  const gx = g.getContext('2d'); const id = gx.createImageData(270, 480);
+  for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 16; }
+  gx.putImageData(id, 0, 0); grain.push(g);
+}
+
+// ---------- the timeline ----------
+const HOOK_END = 2.2;
+// six barks: start time, clock (seconds since midnight), where Rex stands
+const BEATS = [
+  { t: 2.2, clock: 9 * 3600 + 12 * 60, x: 700, facing: -1, look: -.32 },   // pigeon on the sill
+  { t: 3.55, clock: 11 * 3600 + 40 * 60, x: 700, facing: -1, look: -.22 },  // a leaf past the window
+  { t: 4.9, clock: 13 * 3600 + 5 * 60, x: 720, facing: 1, look: -.12 },    // the neighbours, through the door
+  { t: 6.25, clock: 14 * 3600 + 30 * 60, x: 330, facing: 1, look: -.05 },  // nothing at all
+  { t: 7.6, clock: 16 * 3600 + 10 * 60, x: 540, facing: 1, look: .05 },    // his own tail
+  { t: 8.95, clock: 17 * 3600 + 31 * 60, x: 720, facing: 1, look: -.15 },  // you
+];
+const SUM = 10.75;   // daily summary sheet
+const END = 12.7;    // end card
+function beatIndex(t) { let i = -1; BEATS.forEach((b, k) => { if (t >= b.t) i = k; }); return t >= SUM ? -1 : i; }
+function clockAt(t) {
+  if (t < HOOK_END) return 8 * 3600 + 41 * 60 + 5 + t;
+  const i = beatIndex(t);
+  if (i >= 0) return BEATS[i].clock + 3 + (t - BEATS[i].t);
+  return 21 * 3600 + 2 * 60 + (t - SUM);
+}
+// two or three quick barks per beat
+function barkAt(t, t0, times = [.22, .52, .82]) {
+  let v = 0;
+  for (const d of times) { const k = prog(t, t0 + d, t0 + d + .17); if (k > 0 && k < 1) v = Math.max(v, Math.sin(k * Math.PI)); }
+  return v;
+}
+
+// ---------- room (sage living room, big window, mustard door) ----------
+const COLLAR = '#B23A2E';
+function drawRoom(t, doorOpen, eve) {
+  const wall = ctx.createLinearGradient(0, 0, 0, 1240);
+  wall.addColorStop(0, '#A9B49B'); wall.addColorStop(1, '#C3CCB4');
+  ctx.fillStyle = wall; ctx.fillRect(0, 0, W, 1240);
+  // big window (left)
+  ctx.fillStyle = '#F1EEE6'; rr(70, 520, 520, 600, 12); ctx.fill();
+  const sky = ctx.createLinearGradient(0, 540, 0, 1080);
+  sky.addColorStop(0, mix([160, 198, 220], [232, 160, 104], eve)); sky.addColorStop(1, mix([226, 236, 238], [248, 216, 168], eve));
+  ctx.fillStyle = sky; ctx.fillRect(92, 542, 476, 540);
+  ctx.save(); ctx.beginPath(); ctx.rect(92, 542, 476, 540); ctx.clip();
+  // a tree across the street
+  ctx.fillStyle = mix([110, 140, 104], [120, 104, 70], eve);
+  ctx.beginPath(); ctx.arc(200, 760, 120, 0, Math.PI * 2); ctx.arc(300, 700, 110, 0, Math.PI * 2); ctx.arc(250, 840, 120, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = mix([96, 80, 64], [80, 60, 50], eve); ctx.fillRect(238, 860, 26, 240);
+  // the building opposite
+  ctx.fillStyle = mix([214, 204, 188], [210, 160, 128], eve); ctx.fillRect(400, 640, 168, 460);
+  ctx.fillStyle = mix([176, 196, 206], [255, 214, 140], eve);
+  for (let i = 0; i < 2; i++) for (let j = 0; j < 4; j++) ctx.fillRect(428 + i * 64, 676 + j * 96, 36, 54);
+  ctx.restore();
+  ctx.fillStyle = '#F1EEE6'; ctx.fillRect(322, 542, 16, 540);
+  // sill + a small plant
+  ctx.fillStyle = '#E6E1D6'; ctx.fillRect(56, 1100, 548, 26);
+  ctx.fillStyle = '#C7704B'; rr(470, 1030, 80, 72, 10); ctx.fill();
+  ctx.fillStyle = '#5E7D52';
+  for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + (i - 2) * .45; ctx.beginPath(); ctx.ellipse(510 + Math.cos(a) * 40, 1020 + Math.sin(a) * 50, 12, 36, a + Math.PI / 2, 0, Math.PI * 2); ctx.fill(); }
+  // radiator under the window
+  ctx.fillStyle = '#ECE8E0'; rr(140, 1150, 380, 76, 8); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.08)'; ctx.lineWidth = 4;
+  for (let i = 1; i < 9; i++) { ctx.beginPath(); ctx.moveTo(140 + i * 42, 1156); ctx.lineTo(140 + i * 42, 1220); ctx.stroke(); }
+  // a small frame between window and door (the empty wall Rex barks at stays empty)
+  ctx.fillStyle = '#3E3832'; ctx.fillRect(690, 580, 150, 110);
+  ctx.fillStyle = '#E9D8B8'; ctx.fillRect(702, 592, 126, 86);
+  ctx.fillStyle = '#C7704B'; ctx.beginPath(); ctx.arc(765, 638, 22, 0, Math.PI * 2); ctx.fill();
+  // floor: pale tiles
+  const floor = ctx.createLinearGradient(0, 1240, 0, H);
+  floor.addColorStop(0, '#CDBFA8'); floor.addColorStop(1, '#DED2BD');
+  ctx.fillStyle = floor; ctx.fillRect(0, 1240, W, H - 1240);
+  ctx.strokeStyle = 'rgba(80,60,40,.12)'; ctx.lineWidth = 3;
+  for (let i = -8; i < 16; i++) { ctx.beginPath(); ctx.moveTo(540 + i * 70, 1240); ctx.lineTo(540 + i * 170, H); ctx.stroke(); }
+  for (const y of [1300, 1390, 1510, 1660, 1850]) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.fillStyle = '#F2EFE8'; ctx.fillRect(0, 1226, W, 18);
+  // round mustard rug
+  ctx.fillStyle = '#D9A441'; ctx.beginPath(); ctx.ellipse(500, 1780, 360, 100, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#C38E2E'; ctx.lineWidth = 8; ctx.beginPath(); ctx.ellipse(500, 1780, 300, 78, 0, 0, Math.PI * 2); ctx.stroke();
+  // door (right), opens at 17:31
+  ctx.fillStyle = '#F2EFE8'; ctx.fillRect(930, 600, 170, 640);
+  const out = ctx.createLinearGradient(950, 0, 1100, 0);
+  out.addColorStop(0, '#FFE2B0'); out.addColorStop(1, '#F6C27E');
+  ctx.fillStyle = out; ctx.fillRect(950, 620, 150, 620);
+  const dw = 150 * (1 - doorOpen * .8);
+  ctx.fillStyle = '#C9A04A'; ctx.fillRect(950, 620, dw, 620);
+  ctx.fillStyle = 'rgba(0,0,0,.1)'; ctx.fillRect(950 + dw - 8, 620, 8, 620);
+  ctx.fillStyle = '#5A4A3A'; ctx.beginPath(); ctx.arc(950 + dw - 26, 950, 9, 0, Math.PI * 2); ctx.fill();
+  if (doorOpen > 0) { // warm hallway light on the floor
+    ctx.save(); ctx.globalAlpha = .35 * doorOpen; ctx.fillStyle = '#FFE2B0';
+    ctx.beginPath(); ctx.moveTo(950, 1240); ctx.lineTo(1100, 1240); ctx.lineTo(1080, 1800); ctx.lineTo(640, 1800); ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+}
+
+function eveningWash(eve) {
+  if (eve <= 0) return;
+  ctx.save(); ctx.globalCompositeOperation = 'multiply';
+  ctx.fillStyle = `rgba(255,200,150,${.45 * eve})`; ctx.fillRect(0, 0, W, H); ctx.restore();
+}
+
+// ---------- the pigeon and the leaf ----------
+function pigeon(t, t0) {
+  const k = t - t0; if (k < 0 || k > 1.35) return;
+  const fly = easeIn(prog(k, 1.0, 1.35));
+  const x = 200 + fly * 260, y = 1062 - fly * 420, bob = Math.abs(Math.sin(k * 9)) * 8 * (1 - fly);
+  ctx.save(); ctx.beginPath(); ctx.rect(92, 542, 476, 540); ctx.clip();
+  ctx.translate(x, y - bob);
+  ctx.fillStyle = '#8D929B'; ctx.beginPath(); ctx.ellipse(0, 0, 46, 30, -.15, 0, Math.PI * 2); ctx.fill();   // body
+  ctx.fillStyle = '#6E737C'; ctx.beginPath(); ctx.ellipse(-8, -2 - fly * 20, 30, 16 + fly * 14, -.3 - fly, 0, Math.PI * 2); ctx.fill(); // wing
+  ctx.fillStyle = '#5F6B70'; ctx.beginPath(); ctx.moveTo(-40, 4); ctx.lineTo(-74, 14); ctx.lineTo(-40, 16); ctx.fill(); // tail
+  ctx.fillStyle = '#7F8890'; ctx.beginPath(); ctx.arc(40, -26, 18, 0, Math.PI * 2); ctx.fill();       // head
+  ctx.fillStyle = '#7FA38C'; ctx.beginPath(); ctx.ellipse(34, -8, 14, 9, 0, 0, Math.PI * 2); ctx.fill(); // green neck
+  ctx.fillStyle = '#E39A3B'; ctx.beginPath(); ctx.arc(46, -30, 4.5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#3B3532'; ctx.beginPath(); ctx.moveTo(56, -26); ctx.lineTo(70, -22); ctx.lineTo(56, -19); ctx.fill();
+  ctx.strokeStyle = '#C9675A'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-4, 28); ctx.lineTo(-6, 40 * (1 - fly)); ctx.moveTo(12, 28); ctx.lineTo(12, 40 * (1 - fly)); ctx.stroke();
+  ctx.restore();
+}
+function leaf(t, t0) {
+  const k = prog(t, t0, t0 + 1.35); if (k <= 0 || k >= 1) return;
+  const x = 180 + Math.sin(k * 7) * 70 + k * 120, y = 560 + k * 520;
+  ctx.save(); ctx.beginPath(); ctx.rect(92, 542, 476, 540); ctx.clip();
+  ctx.translate(x, y); ctx.rotate(Math.sin(k * 7) * .9);
+  ctx.fillStyle = '#D7782F'; ctx.beginPath(); ctx.ellipse(0, 0, 34, 16, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#9C4E1C'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-34, 0); ctx.lineTo(44, 0); ctx.stroke();
+  ctx.restore();
+}
+
+// ---------- dog (black and tan, red collar) ----------
+// pose: {legPhase, tail, earUp, eyes, lying, tilt, facing, headTilt, bark}
+function drawDog(x, y, s, p) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * p.facing, s);
+  const lying = p.lying || 0;
+  const legLen = lerp(82, 12, lying);
+  const bodyY = -legLen - 58;
+  ctx.save(); ctx.fillStyle = 'rgba(30,20,10,.22)'; ctx.beginPath(); ctx.ellipse(0, 4, 170, 22, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  ctx.rotate(p.tilt || 0);
+  const COAT = '#2E2724', FAR = '#1E1917', TAN = '#C68A4E', CHEST = '#F1E7D8', DARK = '#16110E', EAR = '#1E1917';
+  const tw = p.tail || 0;
+  ctx.strokeStyle = COAT; ctx.lineWidth = 22; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-130, bodyY - 20);
+  ctx.quadraticCurveTo(-200, bodyY - 40 + lying * 40, -205 + Math.sin(tw) * 40, bodyY - 90 + lying * 70); ctx.stroke();
+  const leg = (lx, ph, far) => {
+    const swing = Math.sin(ph) * 22 * (1 - lying);
+    ctx.strokeStyle = far ? FAR : COAT; ctx.lineWidth = 30;
+    ctx.beginPath(); ctx.moveTo(lx, bodyY + 20); ctx.lineTo(lx + swing, -8); ctx.stroke();
+    ctx.fillStyle = TAN; ctx.beginPath(); ctx.ellipse(lx + swing + 8, -6, 22, 11, 0, 0, Math.PI * 2); ctx.fill(); // tan socks
+  };
+  const lp = p.legPhase || 0;
+  leg(-95, lp + Math.PI, true); leg(80, lp, true);
+  ctx.fillStyle = COAT; rr(-150, bodyY - 62, 290, 124, 62); ctx.fill();
+  ctx.fillStyle = CHEST; ctx.beginPath(); ctx.ellipse(98, bodyY + 18, 46, 38, -.3, 0, Math.PI * 2); ctx.fill();
+  leg(-115, lp, false); leg(100, lp + Math.PI, false);
+  const hx = 150, hy = bodyY - 70 + lying * 34;
+  ctx.strokeStyle = COLLAR; ctx.lineWidth = 16;
+  ctx.beginPath(); ctx.moveTo(108, bodyY - 70 + lying * 20); ctx.lineTo(128, bodyY + 4); ctx.stroke();
+  ctx.fillStyle = '#E8B84A'; ctx.beginPath(); ctx.arc(126, bodyY + 18, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.save(); ctx.translate(hx, hy); ctx.rotate(p.headTilt || 0);
+  const bark = p.bark || 0;
+  ctx.fillStyle = COAT; ctx.beginPath(); ctx.arc(0, 0, 68, 0, Math.PI * 2); ctx.fill();
+  if (bark > 0) { // open mouth
+    ctx.fillStyle = '#4A1E18'; ctx.beginPath(); ctx.ellipse(86, 54, 34, 8 + 22 * bark, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#E07A7A'; ctx.beginPath(); ctx.ellipse(82, 60 + 12 * bark, 16, 7 * bark + 2, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.fillStyle = TAN; rr(30, 0, 92, 54 - bark * 6, 27); ctx.fill(); // tan muzzle
+  ctx.beginPath(); ctx.ellipse(4, -38, 13, 9, 0, 0, Math.PI * 2); ctx.fill(); // tan eyebrow
+  ctx.fillStyle = DARK; ctx.beginPath(); ctx.ellipse(116, 12, 15, 12, 0, 0, Math.PI * 2); ctx.fill();
+  if (!bark) { ctx.strokeStyle = DARK; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(70, 44); ctx.quadraticCurveTo(88, 54, 106, 42); ctx.stroke(); }
+  if (p.eyes === 'closed') {
+    ctx.strokeStyle = '#9A8A78'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(14, -14, 12, .2, Math.PI - .2); ctx.stroke();
+  } else {
+    const r = p.eyes === 'wide' ? 15 : 11;
+    ctx.fillStyle = '#EDE3D3'; ctx.beginPath(); ctx.arc(14, -15, r + 6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = DARK; ctx.beginPath(); ctx.arc(17, -15, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(21, -20, r * .35, 0, Math.PI * 2); ctx.fill();
+  }
+  const eu = p.earUp || 0;
+  ctx.fillStyle = EAR; ctx.save(); ctx.translate(-28, -46);
+  ctx.rotate(lerp(.55, -.5, eu));
+  ctx.beginPath(); ctx.ellipse(0, lerp(40, -30, eu), 26, 52, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  if (bark > .25) { // the "woof" lines
+    ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 9; ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8;
+    const d = 18 * bark;
+    [[-.55, 30], [0, 34], [.55, 30]].forEach(([a, len]) => {
+      const sx = 150 + Math.cos(a) * 14, sy = 30 + Math.sin(a) * 40;
+      ctx.beginPath(); ctx.moveTo(sx + Math.cos(a) * d, sy + Math.sin(a) * d); ctx.lineTo(sx + Math.cos(a) * (d + len), sy + Math.sin(a) * (d + len)); ctx.stroke();
+    });
+    ctx.shadowColor = 'transparent';
+  }
+  ctx.restore();
+  ctx.restore();
+}
+
+function zzz(x, y, t, a) {
+  if (a <= 0) return;
+  ctx.save(); ctx.direction = 'ltr'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i = 0; i < 3; i++) {
+    const k = ((t * .7 + i / 3) % 1);
+    ctx.globalAlpha = a * Math.sin(k * Math.PI);
+    font(800, 40 + i * 12); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('z', x + k * 60 + i * 10, y - k * 90);
+  }
+  ctx.restore();
+}
+
+function dogState(t) {
+  const st = { x: 500, y: 1790, s: .82, facing: 1, legPhase: 0, tail: 0, earUp: 0, eyes: 'closed', lying: 1, tilt: 0, headTilt: .12, bark: 0 };
+  if (t < HOOK_END) { // asleep on the rug; something outside
+    st.headTilt = .12 + Math.sin(t * 3) * .03;
+    if (t > 1.55) { st.eyes = 'wide'; st.earUp = easeOut(prog(t, 1.55, 1.8)); st.headTilt = -.15; st.facing = t > 1.9 ? -1 : 1; }
+    return st;
+  }
+  if (t >= SUM) { st.x = 500; st.eyes = 'closed'; st.headTilt = .15; return st; } // 21:02, out like a light
+  const i = beatIndex(t), b = BEATS[i], k = t - b.t;
+  Object.assign(st, { x: b.x, facing: b.facing, lying: 0, eyes: 'open', earUp: 1, headTilt: b.look, y: 1790 });
+  st.bark = barkAt(t, b.t);
+  st.headTilt += -st.bark * .12;
+  st.tail = t * 6;
+  if (i === 1) st.headTilt = lerp(-.38, .05, prog(k, 0, 1.3)); // follows the leaf down
+  if (i === 3) { st.eyes = 'wide'; st.tail = 0; }
+  if (i === 4) { // chasing his tail
+    const spin = Math.floor(k / .17);
+    st.facing = spin % 2 ? -1 : 1; st.x = 540 + (spin % 2 ? 40 : -40); st.legPhase = t * 26; st.tilt = Math.sin(t * 20) * .04;
+    st.bark = barkAt(t, b.t, [.3, .75]);
+  }
+  if (i === 5) { // happy bark, tail going
+    st.tail = t * 26; st.bark = barkAt(t, b.t, [.45, .8]); st.headTilt = -.15 - st.bark * .1;
+    st.y = 1790 - Math.abs(Math.sin(k * 9)) * 18 * prog(k, .3, .5);
+    st.earUp = .6;
+  }
+  return st;
+}
+
+// ---------- overlays ----------
+function font(w, px) { ctx.font = `${w} ${px}px Rubik`; }
+function setDir() { ctx.direction = LANG === 'he' ? 'rtl' : 'ltr'; }
+
+function wrapLines(text, maxW) {
+  if (text.includes('\n')) return text.split('\n');
+  const words = text.split(' '); const lines = []; let cur = '';
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+  if (cur) lines.push(cur); return lines;
+}
+
+// caption card, Instagram-native look: white card, black type
+function caption(text, sub, cy, a, scale = 1) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; setDir();
+  ctx.translate(CX, cy); ctx.scale(scale, scale);
+  font(800, 62); const lines = wrapLines(text, 600);
+  font(500, 38); const subW = sub ? ctx.measureText(sub).width : 0;
+  font(800, 62);
+  const lw = Math.max(subW, ...lines.map(l => ctx.measureText(l).width));
+  const h = lines.length * 76 + (sub ? 58 : 0) + 56;
+  ctx.fillStyle = '#FFFFFF'; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+  rr(-lw / 2 - 44, -h / 2, lw + 88, h, 34); ctx.fill(); ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#16120F'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let y = -h / 2 + 28 + 38;
+  for (const l of lines) { ctx.fillText(l, 0, y); y += 76; }
+  if (sub) { font(500, 38); ctx.fillStyle = '#6E655C'; ctx.fillText(sub, 0, y - 8); }
+  ctx.restore();
+}
+
+function pawIcon(x, y, size, bg = ACCENT, fg = '#FFF') {
+  ctx.fillStyle = bg; rr(x, y, size, size, size * .23); ctx.fill();
+  ctx.fillStyle = fg; const cx = x + size / 2, cy = y + size / 2, u = size / 100;
+  ctx.beginPath(); ctx.ellipse(cx, cy + 14 * u, 22 * u, 18 * u, 0, 0, Math.PI * 2); ctx.fill();
+  [[-27, -10], [-10, -27], [10, -27], [27, -10]].forEach(([dx, dy]) => { ctx.beginPath(); ctx.ellipse(cx + dx * u, cy + dy * u, 9 * u, 11 * u, dx * .02, 0, Math.PI * 2); ctx.fill(); });
+}
+
+function camChrome(t, clockSec) {
+  ctx.save(); setDir();
+  const rtl = LANG === 'he';
+  font(700, 34);
+  const label = `${COPY[LANG].room} · ${COPY[LANG].live}`;
+  const w = ctx.measureText(label).width + 96;
+  const x = rtl ? 850 - w : 60;
+  ctx.fillStyle = 'rgba(20,16,12,.55)'; rr(x, 1460, w, 70, 35); ctx.fill();
+  const on = Math.floor(t * 1.6) % 2 === 0;
+  ctx.fillStyle = on ? '#4CD964' : '#2F8F44';
+  ctx.beginPath(); ctx.arc(rtl ? x + w - 40 : x + 40, 1495, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textAlign = rtl ? 'right' : 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, rtl ? x + w - 66 : x + 66, 1497);
+  const hh = Math.floor(clockSec / 3600), mm = Math.floor(clockSec / 60) % 60, ss = Math.floor(clockSec) % 60;
+  const clock = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+  ctx.direction = 'ltr'; font(500, 34); ctx.textAlign = 'left';
+  const cw = ctx.measureText(clock).width + 48; const cx = rtl ? x - 16 - cw : x + w + 16;
+  ctx.fillStyle = 'rgba(20,16,12,.55)'; rr(cx, 1460, cw, 70, 35); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.fillText(clock, cx + 24, 1497);
+  ctx.restore();
+}
+
+// ---------- the app moment: daily summary ("Rex's day") ----------
+const HOURS = [0, 0, 0, 0, 0, 0, 2, 6, 9, 14, 3, 2, 10, 13, 9, 3, 8, 22, 12, 6, 4, 1, 0, 0];
+function moonIcon(x, y, col) {
+  ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, 18, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#F4F1EC'; ctx.beginPath(); ctx.arc(x + 9, y - 7, 15, 0, Math.PI * 2); ctx.fill();
+}
+function waveIcon(x, y, col) {
+  ctx.strokeStyle = col; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  [8, 18, 28, 14, 6].forEach((h, i) => { ctx.beginPath(); ctx.moveTo(x - 20 + i * 10, y - h / 2 - 2); ctx.lineTo(x - 20 + i * 10, y + h / 2 + 2); ctx.stroke(); });
+}
+function summary(t) {
+  const inP = easeOut(prog(t, SUM, SUM + .45)); if (inP <= 0) return;
+  ctx.fillStyle = `rgba(10,8,6,${.45 * inP})`; ctx.fillRect(0, 0, W, H);
+  const L = COPY[LANG], rtl = LANG === 'he';
+  const x0 = 70, w = 780, y0 = lerp(1900, 560, inP), h = 760;
+  ctx.save(); setDir();
+  ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 14;
+  ctx.fillStyle = '#F4F1EC'; rr(x0, y0, w, h, 56); ctx.fill(); ctx.shadowColor = 'transparent';
+  const pad = 50, sx = rtl ? x0 + w - pad : x0 + pad, al = rtl ? 'right' : 'left';
+  ctx.textAlign = al; ctx.textBaseline = 'alphabetic';
+  font(800, 62); ctx.fillStyle = '#16120F'; ctx.fillText(L.sumTitle, sx, y0 + 110);
+  font(500, 34); ctx.fillStyle = '#7A726A'; ctx.fillText(L.sumSub, sx, y0 + 160);
+  // two stat tiles
+  const tw = (w - pad * 2 - 24) / 2, ty = y0 + 200, th = 210;
+  const tiles = [
+    { label: L.rested, value: L.restedVal, icon: moonIcon, col: '#5856D6' },
+    { label: L.barks, value: String(Math.round(6 * easeOut(prog(t, SUM + .4, SUM + 1.1)))), icon: waveIcon, col: ACCENT, hi: true },
+  ];
+  tiles.forEach((tile, i) => {
+    const tx = rtl ? x0 + w - pad - tw - i * (tw + 24) : x0 + pad + i * (tw + 24);
+    ctx.fillStyle = '#FFFFFF'; rr(tx, ty, tw, th, 32); ctx.fill();
+    if (tile.hi) { const ring = prog(t, SUM + 1.1, SUM + 1.3); if (ring > 0) { ctx.strokeStyle = ACCENT; ctx.globalAlpha = ring; ctx.lineWidth = 6; rr(tx, ty, tw, th, 32); ctx.stroke(); ctx.globalAlpha = 1; } }
+    const ix = rtl ? tx + tw - 50 : tx + 50;
+    tile.icon(ix, ty + 56, tile.col);
+    ctx.textAlign = al; const lx = rtl ? tx + tw - 88 : tx + 88;
+    font(700, 34); ctx.fillStyle = tile.col; ctx.fillText(tile.label, lx, ty + 68);
+    const vx = rtl ? tx + tw - 34 : tx + 34;
+    let fs = tile.hi ? 92 : 56; font(800, fs); while (ctx.measureText(tile.value).width > tw - 68) font(800, --fs);
+    ctx.fillStyle = '#16120F'; ctx.fillText(tile.value, vx, ty + (tile.hi ? 172 : 160));
+  });
+  // activity by hour
+  const cy = ty + th + 40;
+  ctx.fillStyle = '#FFFFFF'; rr(x0 + pad, cy, w - pad * 2, 240, 32); ctx.fill();
+  font(700, 34); ctx.fillStyle = '#16120F'; ctx.textAlign = al; ctx.fillText(L.active, rtl ? x0 + w - pad - 34 : x0 + pad + 34, cy + 58);
+  const bw = (w - pad * 2 - 68) / 24, base = cy + 210, grow = easeOut(prog(t, SUM + .3, SUM + 1.0));
+  HOURS.forEach((v, i) => {
+    const hb = Math.max(4, v / 22 * 110 * grow);
+    const bx = rtl ? x0 + w - pad - 34 - (i + 1) * bw : x0 + pad + 34 + i * bw; // RTL charts run right to left
+    ctx.fillStyle = ACCENT; rr(bx + 3, base - hb, bw - 6, hb, 5); ctx.fill();
+  });
+  ctx.restore();
+}
+
+function endCard(a, t) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.fillStyle = '#1C1612'; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(CX, 760, 40, CX, 760, 700);
+  g.addColorStop(0, 'rgba(180,84,31,.35)'); g.addColorStop(1, 'rgba(180,84,31,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const k = backOut(prog(t, 12.75, 13.25));
+  ctx.save(); ctx.translate(CX, 640); ctx.scale(k, k); pawIcon(-90, -90, 180); ctx.restore();
+  setDir(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const a1 = easeOut(prog(t, 12.95, 13.4)), a2 = easeOut(prog(t, 13.3, 13.75)), a3 = easeOut(prog(t, 13.65, 14.1));
+  font(800, 72); ctx.fillStyle = `rgba(255,248,240,${a1})`;
+  const l1 = wrapLines(COPY[LANG].end1, 720); l1.forEach((l, i) => ctx.fillText(l, CX, 860 + i * 88 + (1 - a1) * 30));
+  const y2 = 860 + l1.length * 88 + 40;
+  font(500, 40); ctx.fillStyle = `rgba(232,214,196,${a2})`;
+  wrapLines(COPY[LANG].end2, 800).forEach((l, i) => ctx.fillText(l, CX, y2 + i * 56 + (1 - a2) * 24));
+  const y3 = y2 + wrapLines(COPY[LANG].end2, 800).length * 56;
+  ctx.direction = 'ltr'; font(800, 52); ctx.fillStyle = `rgba(255,248,240,${a3})`; ctx.fillText('Dog Monitor', CX, y3 + 100);
+  setDir(); font(500, 38); ctx.fillStyle = `rgba(224,123,69,${a3})`; ctx.fillText(COPY[LANG].end3, CX, y3 + 164);
+  ctx.restore();
+}
+
+function draw(t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const d = dogState(t);
+  ctx.save();
+  const shake = d.bark * 7;
+  ctx.translate(Math.sin(t * 90) * shake, Math.cos(t * 77) * shake);
+  const clock = clockAt(t);
+  const eve = prog(clock, 14 * 3600, 18 * 3600);
+  const i = beatIndex(t);
+  const door = i === 5 ? easeOut(prog(t, BEATS[5].t, BEATS[5].t + .3)) : 0;
+  drawRoom(t, door, eve);
+  if (i === 0) pigeon(t, BEATS[0].t);
+  if (t < HOOK_END && t > 1.4) pigeon(t, 1.4 - .2); // the pigeon lands during the hook
+  if (i === 1) leaf(t, BEATS[1].t);
+  drawDog(d.x, d.y, d.s, d);
+  eveningWash(t >= SUM ? .6 : eve);
+  ctx.restore();
+  zzz(d.x + 170, d.y - 80, t, (1 - prog(t, 1.45, 1.55)) + prog(t, SUM + .2, SUM + .5) * (t < END ? 1 : 0));
+
+  const v = ctx.createRadialGradient(540, 960, 500, 540, 960, 1250);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.45)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(grain[Math.floor(t * 30) % 4], 0, 0, W, H);
+  camChrome(t, clock);
+
+  const L = COPY[LANG];
+  caption(L.hook, L.hookSub, 380, prog(t, 0, .12) * (1 - prog(t, HOOK_END - .12, HOOK_END)), lerp(.92, 1, easeOut(prog(t, 0, .3))));
+  if (i >= 0) {
+    const b = BEATS[i], hh = Math.floor(b.clock / 3600), mm = Math.floor(b.clock / 60) % 60;
+    const time = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+    const pop = lerp(.9, 1, backOut(prog(t, b.t, b.t + .2)));
+    const last = i === 5;
+    caption(L.beats[i], last && t > b.t + .75 ? L.lastSub : L.beatSub(i + 1, time), 340, 1, pop);
+  }
+  summary(t);
+  caption(L.intruders, null, 360, prog(t, SUM + 1.3, SUM + 1.45), lerp(.9, 1, backOut(prog(t, SUM + 1.3, SUM + 1.5))));
+  endCard(easeInOut(prog(t, END, END + .35)), t);
+}
+
+window.setLang = l => { LANG = l; };
+window.draw = draw;
+window.frame = (t, q) => { draw(t); return c.toDataURL('image/jpeg', q || .92); };
+window.ready = document.fonts.load('800 40px Rubik').then(() => Promise.all([
+  document.fonts.load('500 40px Rubik'), document.fonts.load('700 40px Rubik'),
+  document.fonts.load('800 40px Rubik', 'אב'), document.fonts.load('500 40px Rubik', 'אב'), document.fonts.load('700 40px Rubik', 'אב')]));
+</script></body></html>
