@@ -1,0 +1,434 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Rubik;font-weight:500;src:url(node_modules/@fontsource/rubik/files/rubik-latin-500-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:700;src:url(node_modules/@fontsource/rubik/files/rubik-latin-700-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:800;src:url(node_modules/@fontsource/rubik/files/rubik-latin-800-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:500;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-500-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+@font-face{font-family:Rubik;font-weight:700;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-700-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+@font-face{font-family:Rubik;font-weight:800;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-800-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+html,body{margin:0;background:#000}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const W = 1080, H = 1920;
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+
+const ACCENT = '#B4541F';
+const COPY = {
+  en: {
+    hook: '“Rex can’t read\na clock.”',
+    hookSub: 'me, leaving for work',
+    allDay: 'All day:',
+    time: '17:29',
+    notifTitle: 'Rex is waiting at the door.',
+    notifSub: 'Living room',
+    leave: 'I leave work at 17:30.',
+    every: 'Every day.\nTo the minute.',
+    loop: '“Rex can’t read\na clock.”',
+    room: 'Living room',
+    live: 'Live',
+    end1: 'See what your dog does when you’re out.',
+    end2: 'Your old iPhone becomes the camera.',
+    end3: 'Coming soon · link in bio',
+    now: 'now',
+  },
+  he: {
+    hook: '״רקס לא יודע לקרוא שעון.״',
+    hookSub: 'אני, בדרך לעבודה',
+    allDay: 'כל היום:',
+    time: '17:29',
+    notifTitle: 'רקס ליד הדלת.',
+    notifSub: 'סלון',
+    leave: 'העבודה נגמרת לי ב־17:30.',
+    every: 'כל יום. על הדקה.',
+    loop: '״רקס לא יודע לקרוא שעון.״',
+    room: 'סלון',
+    live: 'בשידור',
+    end1: 'תראו מה הכלב עושה כשאתם לא בבית.',
+    end2: 'האייפון הישן הופך למצלמה.',
+    end3: 'בקרוב · הקישור בביו',
+    now: 'עכשיו',
+  },
+};
+let LANG = 'en';
+
+// ---------- helpers ----------
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeInOut = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x * x * x;
+const backOut = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+
+// deterministic noise tiles for film grain
+const grain = [];
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+for (let k = 0; k < 4; k++) {
+  const g = document.createElement('canvas'); g.width = 270; g.height = 480;
+  const gx = g.getContext('2d'); const id = gx.createImageData(270, 480);
+  for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 16; }
+  gx.putImageData(id, 0, 0); grain.push(g);
+}
+
+// ---------- room (evening hallway corner: door, leash hook, dog bed) ----------
+const COLLAR = '#2F6F73';
+function drawRoom(t, doorOpen, eve) {
+  // wall: dusty blue
+  const wall = ctx.createLinearGradient(0, 0, 0, 1240);
+  wall.addColorStop(0, '#AEB9BF'); wall.addColorStop(1, '#C9D0D2');
+  ctx.fillStyle = wall; ctx.fillRect(0, 0, W, 1240);
+  // window: morning blue -> evening gold
+  ctx.fillStyle = '#EEF0EE'; rr(90, 380, 360, 520, 10); ctx.fill();
+  const sky = ctx.createLinearGradient(0, 400, 0, 880);
+  const mix = (c1, c2, k) => `rgb(${c1.map((v, i) => Math.round(lerp(v, c2[i], k))).join(',')})`;
+  sky.addColorStop(0, mix([150, 190, 214], [236, 150, 92], eve)); sky.addColorStop(1, mix([228, 238, 236], [250, 214, 160], eve));
+  ctx.fillStyle = sky; ctx.fillRect(110, 400, 320, 480);
+  ctx.save(); ctx.beginPath(); ctx.rect(110, 400, 320, 480); ctx.clip();
+  // rooftops across the street
+  ctx.fillStyle = mix([150, 160, 170], [120, 92, 90], eve);
+  ctx.fillRect(110, 760, 120, 120); ctx.fillRect(250, 720, 90, 160); ctx.fillRect(350, 790, 80, 90);
+  ctx.fillStyle = mix([235, 230, 210], [255, 214, 120], eve);
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) ctx.fillRect(268 + i * 24, 740 + j * 36, 12, 18);
+  ctx.restore();
+  ctx.fillStyle = '#EEF0EE'; ctx.fillRect(262, 400, 16, 480); ctx.fillRect(110, 630, 320, 14);
+  // wall clock (it really is 17:29)
+  const cx0 = 660, cy0 = 850;
+  ctx.fillStyle = '#F7F4EE'; ctx.beginPath(); ctx.arc(cx0, cy0, 74, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#3B342D'; ctx.lineWidth = 9; ctx.stroke();
+  window.__clockAngle && (() => {
+    const [ha, ma] = window.__clockAngle;
+    ctx.strokeStyle = '#2A2019'; ctx.lineCap = 'round';
+    ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(cx0, cy0); ctx.lineTo(cx0 + Math.sin(ha) * 38, cy0 - Math.cos(ha) * 38); ctx.stroke();
+    ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(cx0, cy0); ctx.lineTo(cx0 + Math.sin(ma) * 56, cy0 - Math.cos(ma) * 56); ctx.stroke();
+  })();
+  ctx.fillStyle = '#2A2019'; ctx.beginPath(); ctx.arc(cx0, cy0, 7, 0, Math.PI * 2); ctx.fill();
+  // floor: lighter oak
+  const floor = ctx.createLinearGradient(0, 1240, 0, H);
+  floor.addColorStop(0, '#B0916C'); floor.addColorStop(1, '#C8A982');
+  ctx.fillStyle = floor; ctx.fillRect(0, 1240, W, H - 1240);
+  ctx.strokeStyle = 'rgba(70,45,25,.15)'; ctx.lineWidth = 3;
+  for (let i = -6; i < 14; i++) { ctx.beginPath(); ctx.moveTo(540 + i * 60, 1240); ctx.lineTo(540 + i * 150, H); ctx.stroke(); }
+  ctx.fillStyle = '#F2F1EC'; ctx.fillRect(0, 1226, W, 18);
+  // doormat by the door
+  ctx.fillStyle = '#A88E6C'; rr(660, 1560, 400, 110, 22); ctx.fill(); ctx.strokeStyle = '#8E7556'; ctx.lineWidth = 8; rr(680, 1576, 360, 78, 16); ctx.stroke();
+  // shoe rack + one pair of shoes
+  ctx.fillStyle = '#5A4A3A'; ctx.fillRect(560, 1150, 260, 16); ctx.fillRect(570, 1166, 12, 70); ctx.fillRect(798, 1166, 12, 70);
+  ctx.fillStyle = '#E8E2D6'; rr(600, 1104, 80, 46, 18); ctx.fill(); rr(690, 1104, 80, 46, 18); ctx.fill();
+  ctx.fillStyle = '#C24E3A'; ctx.fillRect(600, 1136, 80, 14); ctx.fillRect(690, 1136, 80, 14);
+  // leash on a hook
+  ctx.fillStyle = '#3B342D'; ctx.beginPath(); ctx.arc(860, 760, 10, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = COLLAR; ctx.lineWidth = 12; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(860, 760); ctx.bezierCurveTo(820, 900, 900, 960, 850, 1060); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(860, 790, 22, 34, 0, 0, Math.PI * 2); ctx.stroke();
+  // door (right)
+  ctx.fillStyle = '#F2F1EC'; ctx.fillRect(930, 620, 170, 620);
+  ctx.fillStyle = '#F3EEDF'; ctx.fillRect(950, 640, 150, 600);
+  const dw = 150 * (1 - doorOpen * .82);
+  ctx.fillStyle = '#5E7C86'; ctx.fillRect(950, 640, dw, 600);
+  ctx.fillStyle = 'rgba(0,0,0,.1)'; ctx.fillRect(950 + dw - 8, 640, 8, 600);
+  ctx.fillStyle = '#D8C27A'; ctx.beginPath(); ctx.arc(950 + dw - 26, 960, 9, 0, Math.PI * 2); ctx.fill();
+  // plant on the left
+  ctx.fillStyle = '#E9E4DA'; rr(40, 1300, 130, 150, 18); ctx.fill();
+  ctx.fillStyle = '#4F6B4A';
+  for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i - 3) * .35; ctx.beginPath(); ctx.ellipse(105 + Math.cos(a) * 90, 1290 + Math.sin(a) * 120, 26, 80, a + Math.PI / 2, 0, Math.PI * 2); ctx.fill(); }
+}
+
+function drawBed() {
+  ctx.fillStyle = 'rgba(40,25,10,.22)'; ctx.beginPath(); ctx.ellipse(400, 1640, 270, 50, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#8C5A6B'; ctx.beginPath(); ctx.ellipse(400, 1600, 260, 90, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#B98A97'; ctx.beginPath(); ctx.ellipse(400, 1595, 205, 58, 0, 0, Math.PI * 2); ctx.fill();
+}
+
+// evening light over everything in the room
+function eveningWash(eve) {
+  if (eve <= 0) return;
+  ctx.save(); ctx.globalCompositeOperation = 'multiply';
+  ctx.fillStyle = `rgba(255,196,140,${.55 * eve})`; ctx.fillRect(0, 0, W, H); ctx.restore();
+  // long sunbeam across the floor
+  ctx.save(); ctx.globalAlpha = .16 * eve; ctx.fillStyle = '#FFD9A0';
+  ctx.beginPath(); ctx.moveTo(110, 900); ctx.lineTo(430, 900); ctx.lineTo(1000, 1760); ctx.lineTo(560, 1760); ctx.closePath(); ctx.fill(); ctx.restore();
+}
+
+// ---------- dog (ginger, white blaze) ----------
+// pose: {legPhase, tail, earUp, eyes, lying, sit, tilt, facing, sweat, headTilt}
+function drawDog(x, y, s, p) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * p.facing, s);
+  const lying = p.lying || 0, sit = p.sit || 0;
+  const legLen = lerp(82, 12, lying);
+  const bodyY = -legLen - 58;
+  ctx.save(); ctx.fillStyle = 'rgba(30,20,10,.22)'; ctx.beginPath(); ctx.ellipse(0, 4, 170, 22, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  ctx.rotate(p.tilt || 0);
+  // sitting: pivot the body up around the hind paws
+  ctx.translate(-115, 0); ctx.rotate(-.42 * sit); ctx.translate(115, 0);
+  const COAT = '#D39556', FAR = '#B97D45', PATCH = '#FFF6EA', DARK = '#2A2019', EAR = '#9A5F2E';
+  const tw = p.tail || 0;
+  ctx.strokeStyle = COAT; ctx.lineWidth = 22; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-130, bodyY - 20 + sit * 60);
+  ctx.quadraticCurveTo(-200, lerp(bodyY - 40 + lying * 40, -20, sit), lerp(-205, -250, sit) + Math.sin(tw) * 40, lerp(bodyY - 90 + lying * 70, -60, sit)); ctx.stroke();
+  const leg = (lx, ph, far, front) => {
+    const swing = Math.sin(ph) * 22 * (1 - lying) * (1 - sit);
+    const ext = front ? sit * (lx + 115) * Math.tan(.42) : 0; // front legs reach the floor while sitting
+    const hind = front ? 0 : sit * 30;
+    ctx.strokeStyle = far ? FAR : COAT; ctx.lineWidth = 30;
+    ctx.beginPath(); ctx.moveTo(lx, bodyY + 20); ctx.lineTo(lx + swing + hind, -8 + ext); ctx.stroke();
+    ctx.fillStyle = far ? FAR : COAT; ctx.beginPath(); ctx.ellipse(lx + swing + hind + 8, -6 + ext, 22, 11, 0, 0, Math.PI * 2); ctx.fill();
+  };
+  const lp = p.legPhase || 0;
+  leg(-95, lp + Math.PI, true, false); leg(80, lp, true, true);
+  ctx.fillStyle = COAT; rr(-150, bodyY - 62, 290, 124, 62); ctx.fill();
+  ctx.fillStyle = PATCH; ctx.beginPath(); ctx.ellipse(95, bodyY + 18, 50, 40, -.3, 0, Math.PI * 2); ctx.fill(); // white chest
+  if (sit > 0) { ctx.fillStyle = COAT; ctx.beginPath(); ctx.ellipse(-95, bodyY + 30 * sit, 85, lerp(50, 80, sit), 0, 0, Math.PI * 2); ctx.fill(); } // haunch
+  leg(-115, lp, false, false); leg(100, lp + Math.PI, false, true);
+  const hx = 150, hy = bodyY - 70 + lying * 34;
+  ctx.strokeStyle = COLLAR; ctx.lineWidth = 16;
+  ctx.beginPath(); ctx.moveTo(108, bodyY - 70 + lying * 20); ctx.lineTo(128, bodyY + 4); ctx.stroke();
+  ctx.fillStyle = '#E8B84A'; ctx.beginPath(); ctx.arc(126, bodyY + 18, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.save(); ctx.translate(hx, hy); ctx.rotate(p.headTilt || 0);
+  ctx.fillStyle = COAT; ctx.beginPath(); ctx.arc(0, 0, 68, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = PATCH; rr(30, 0, 92, 54, 27); ctx.fill(); // white muzzle
+  ctx.beginPath(); ctx.ellipse(36, -30, 12, 34, -.5, 0, Math.PI * 2); ctx.fill(); // blaze
+  ctx.fillStyle = DARK; ctx.beginPath(); ctx.ellipse(116, 12, 15, 12, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = DARK; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(70, 44); ctx.quadraticCurveTo(88, 54, 106, 42); ctx.stroke();
+  if (p.eyes === 'closed') {
+    ctx.strokeStyle = DARK; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(14, -14, 12, .2, Math.PI - .2); ctx.stroke();
+  } else {
+    const r = p.eyes === 'wide' ? 17 : 11;
+    if (p.eyes === 'wide') { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(14, -16, r + 7, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = DARK; ctx.beginPath(); ctx.arc(16, -16, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(20, -21, r * .35, 0, Math.PI * 2); ctx.fill();
+  }
+  const eu = p.earUp || 0;
+  ctx.fillStyle = EAR; ctx.save(); ctx.translate(-28, -46);
+  ctx.rotate(lerp(.55, -.5, eu));
+  ctx.beginPath(); ctx.ellipse(0, lerp(40, -30, eu), 26, 52, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  ctx.restore();
+  ctx.restore();
+}
+
+function zzz(x, y, t, a) {
+  if (a <= 0) return;
+  ctx.save(); ctx.direction = 'ltr'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i = 0; i < 3; i++) {
+    const k = ((t * .7 + i / 3) % 1);
+    ctx.globalAlpha = a * Math.sin(k * Math.PI);
+    font(800, 40 + i * 12); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('z', x + k * 70 + i * 10, y - k * 160);
+  }
+  ctx.restore();
+}
+
+// ---------- overlays ----------
+function font(w, px) { ctx.font = `${w} ${px}px Rubik`; }
+function setDir() { ctx.direction = LANG === 'he' ? 'rtl' : 'ltr'; }
+
+function wrapLines(text, maxW) {
+  if (text.includes('\n')) return text.split('\n');
+  const words = text.split(' '); const lines = []; let cur = '';
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+  if (cur) lines.push(cur); return lines;
+}
+
+// caption card, Instagram-native look: white card, black type, centered
+function caption(text, sub, cy, a, scale = 1) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; setDir();
+  ctx.translate(W / 2, cy); ctx.scale(scale, scale);
+  font(800, 62); const lines = wrapLines(text, 760);
+  font(500, 38); const subW = sub ? ctx.measureText(sub).width : 0;
+  font(800, 62);
+  const lw = Math.max(subW, ...lines.map(l => ctx.measureText(l).width));
+  const h = lines.length * 76 + (sub ? 58 : 0) + 56;
+  ctx.fillStyle = '#FFFFFF'; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+  rr(-lw / 2 - 44, -h / 2, lw + 88, h, 34); ctx.fill(); ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#16120F'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let y = -h / 2 + 28 + 38;
+  for (const l of lines) { ctx.fillText(l, 0, y); y += 76; }
+  if (sub) { font(500, 38); ctx.fillStyle = '#6E655C'; ctx.fillText(sub, 0, y - 8); }
+  ctx.restore();
+}
+
+function pawIcon(x, y, size, bg = ACCENT, fg = '#FFF') {
+  ctx.fillStyle = bg; rr(x, y, size, size, size * .23); ctx.fill();
+  ctx.fillStyle = fg; const cx = x + size / 2, cy = y + size / 2, u = size / 100;
+  ctx.beginPath(); ctx.ellipse(cx, cy + 14 * u, 22 * u, 18 * u, 0, 0, Math.PI * 2); ctx.fill();
+  [[-27, -10], [-10, -27], [10, -27], [27, -10]].forEach(([dx, dy]) => { ctx.beginPath(); ctx.ellipse(cx + dx * u, cy + dy * u, 9 * u, 11 * u, dx * .02, 0, Math.PI * 2); ctx.fill(); });
+}
+
+function notification(t0, t1, t) {
+  const inP = easeOut(prog(t, t0, t0 + .45)), outP = easeIn(prog(t, t1 - .35, t1));
+  if (inP <= 0 || outP >= 1) return;
+  const y = lerp(-260, 250, inP) - outP * 520;
+  ctx.save(); setDir();
+  ctx.shadowColor = 'rgba(0,0,0,.28)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 14;
+  ctx.fillStyle = 'rgba(250,247,243,.96)'; rr(50, y, 980, 210, 56); ctx.fill(); ctx.shadowColor = 'transparent';
+  const rtl = LANG === 'he';
+  const iconX = rtl ? 1030 - 36 - 112 : 86;
+  pawIcon(iconX, y + 49, 112);
+  ctx.textBaseline = 'alphabetic';
+  const tx = rtl ? iconX - 32 : iconX + 112 + 32;
+  ctx.textAlign = rtl ? 'right' : 'left';
+  font(500, 32); ctx.fillStyle = '#7A726A'; ctx.fillText('Dog Monitor', tx, y + 78);
+  ctx.textAlign = rtl ? 'left' : 'right'; ctx.fillText(COPY[LANG].now, rtl ? 86 : 994, y + 78);
+  ctx.textAlign = rtl ? 'right' : 'left';
+  font(700, 46); ctx.fillStyle = '#16120F'; ctx.fillText(COPY[LANG].notifTitle, tx, y + 132);
+  font(500, 36); ctx.fillStyle = '#5C544C'; ctx.fillText(COPY[LANG].notifSub, tx, y + 176);
+  ctx.restore();
+}
+
+function camChrome(t, clockSec) {
+  // app-style status pill + clock: what the old iPhone on the shelf sees
+  ctx.save(); setDir();
+  const rtl = LANG === 'he';
+  font(700, 34);
+  const label = `${COPY[LANG].room} · ${COPY[LANG].live}`;
+  const w = ctx.measureText(label).width + 96;
+  const x = rtl ? W - 60 - w : 60;
+  ctx.fillStyle = 'rgba(20,16,12,.55)'; rr(x, 1460, w, 70, 35); ctx.fill();
+  const on = Math.floor(t * 1.6) % 2 === 0;
+  ctx.fillStyle = on ? '#4CD964' : '#2F8F44';
+  ctx.beginPath(); ctx.arc(rtl ? x + w - 40 : x + 40, 1495, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textAlign = rtl ? 'right' : 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, rtl ? x + w - 66 : x + 66, 1497);
+  // clock
+  const hh = Math.floor(clockSec / 3600), mm = Math.floor(clockSec / 60) % 60, ss = Math.floor(clockSec) % 60;
+  const clock = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+  ctx.direction = 'ltr'; font(500, 34); ctx.textAlign = rtl ? 'left' : 'left';
+  const cw = ctx.measureText(clock).width + 48; const cx = rtl ? 60 : x + w + 16;
+  ctx.fillStyle = 'rgba(20,16,12,.55)'; rr(cx, 1460, cw, 70, 35); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.fillText(clock, cx + 24, 1497);
+  ctx.restore();
+}
+
+function speechBubble(text, cy, a, sc) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; setDir(); ctx.translate(W / 2, cy); ctx.scale(sc, sc);
+  font(800, 96); const tw = ctx.measureText(text).width; const w = tw + 220, h = 170;
+  ctx.fillStyle = ACCENT; ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
+  rr(-w / 2, -h / 2, w, h, 85); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-20, h / 2 - 4); ctx.lineTo(30, h / 2 - 4); ctx.lineTo(-10, h / 2 + 46); ctx.closePath(); ctx.fill();
+  ctx.shadowColor = 'transparent';
+  // speaker glyph (Talk button in live view)
+  const gx = LANG === 'he' ? w / 2 - 100 : -w / 2 + 60;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.moveTo(gx, -16); ctx.lineTo(gx + 16, -16); ctx.lineTo(gx + 36, -34); ctx.lineTo(gx + 36, 34); ctx.lineTo(gx + 16, 16); ctx.lineTo(gx, 16); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.arc(gx + 40, 0, 18, -.9, .9); ctx.stroke();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, LANG === 'he' ? -40 : 40, 6);
+  ctx.restore();
+}
+
+function endCard(a, t) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.fillStyle = '#1C1612'; ctx.fillRect(0, 0, W, H);
+  // warm glow
+  const g = ctx.createRadialGradient(540, 760, 40, 540, 760, 700);
+  g.addColorStop(0, 'rgba(180,84,31,.35)'); g.addColorStop(1, 'rgba(180,84,31,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const k = backOut(prog(t, 12.75, 13.25));
+  ctx.save(); ctx.translate(540, 640); ctx.scale(k, k); pawIcon(-90, -90, 180); ctx.restore();
+  setDir(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const a1 = easeOut(prog(t, 12.95, 13.4)), a2 = easeOut(prog(t, 13.3, 13.75)), a3 = easeOut(prog(t, 13.65, 14.1));
+  font(800, 72); ctx.fillStyle = `rgba(255,248,240,${a1})`;
+  const l1 = wrapLines(COPY[LANG].end1, 820); l1.forEach((l, i) => ctx.fillText(l, 540, 860 + i * 88 + (1 - a1) * 30));
+  const y2 = 860 + l1.length * 88 + 40;
+  font(500, 44); ctx.fillStyle = `rgba(232,214,196,${a2})`;
+  ctx.fillText(COPY[LANG].end2, 540, y2 + (1 - a2) * 24);
+  ctx.direction = 'ltr'; font(800, 52); ctx.fillStyle = `rgba(255,248,240,${a3})`; ctx.fillText('Dog Monitor', 540, y2 + 150);
+  setDir(); font(500, 38); ctx.fillStyle = `rgba(224,123,69,${a3})`; ctx.fillText(COPY[LANG].end3, 540, y2 + 214);
+  ctx.restore();
+}
+
+// ---------- the timeline (15 s) ----------
+const T_UP = 3.95;           // 17:29:00, the moment he knows
+const END = 12.7;            // end card starts
+function dogState(t) {
+  const st = { x: 400, y: 1600, s: .9, facing: 1, legPhase: 0, tail: 0, earUp: 0, eyes: 'closed', lying: 1, sit: 0, tilt: 0, headTilt: .12 };
+  if (t < 1.4) { // watches the door close, then sighs into the bed
+    st.eyes = 'open'; st.earUp = .5; st.headTilt = -.05; st.lying = 1;
+    if (t > 1.0) st.eyes = (t > 1.25) ? 'closed' : 'open';
+    return st;
+  }
+  if (t < T_UP) { // asleep all day; rolls over once mid-afternoon
+    st.facing = (t > 2.75 && t < 3.3) ? -1 : 1;
+    st.headTilt = .12 + Math.sin(t * 3) * .03;
+    return st;
+  }
+  if (t < 4.35) { st.eyes = 'wide'; st.earUp = easeOut(prog(t, T_UP, 4.1)); st.headTilt = -.1; return st; } // awake. instantly.
+  if (t < 4.7) { // up
+    const k = easeOut(prog(t, 4.35, 4.7)); st.lying = 1 - k; st.eyes = 'open'; st.earUp = 1; st.tail = t * 16; st.headTilt = 0;
+    return st;
+  }
+  if (t < 5.5) { // trots to the door
+    const k = easeInOut(prog(t, 4.7, 5.5));
+    st.lying = 0; st.eyes = 'open'; st.earUp = 1; st.x = lerp(400, 760, k); st.legPhase = t * 22; st.tail = t * 16; st.headTilt = 0;
+    return st;
+  }
+  // sits at the door, facing it, tail sweeping the floor
+  st.lying = 0; st.eyes = 'open'; st.earUp = 1; st.x = 760; st.headTilt = -.2;
+  st.sit = easeOut(prog(t, 5.5, 5.8)); st.tail = t * (t > 6 && t < 9.4 ? 9 : 14);
+  if (t > 9.5 && t < 10.5) { st.facing = -1; st.x = 760; st.headTilt = -.32; st.tail = 0; } // checks the wall clock
+  if (t > 9.95 && t < 10.07) st.eyes = 'closed';
+  return st;
+}
+
+function draw(t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  const shake = t > 1.25 && t < 1.55 ? (1.55 - t) * 40 : 0;
+  ctx.translate(Math.sin(t * 90) * shake, Math.cos(t * 77) * shake);
+  const door = 1 - easeIn(prog(t, .7, 1.25));
+  // clock: 08:03:20, then the day flies by to 17:29:00
+  const lapse = easeInOut(prog(t, 2.2, T_UP));
+  const start = 8 * 3600 + 3 * 60 + 20;
+  const clock = t < 2.2 ? start + t : (t < T_UP ? lerp(start + 2.2, 17 * 3600 + 29 * 60, lapse) : 17 * 3600 + 29 * 60 + (t - T_UP));
+  window.__clockAngle = [((clock / 3600) % 12) / 12 * Math.PI * 2, ((clock / 60) % 60) / 60 * Math.PI * 2];
+  const eve = lapse;
+  drawRoom(t, door, eve);
+  drawBed();
+  const d = dogState(t);
+  drawDog(d.x, d.y, d.s, d);
+  eveningWash(eve);
+  ctx.restore();
+  zzz(d.x + 190, d.y - 200, t, prog(t, 1.5, 1.8) * (1 - prog(t, T_UP - .1, T_UP)));
+
+  const v = ctx.createRadialGradient(540, 960, 500, 540, 960, 1250);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.45)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(grain[Math.floor(t * 30) % 4], 0, 0, W, H);
+  camChrome(t, clock);
+
+  const L = COPY[LANG];
+  caption(L.hook, L.hookSub, 470, prog(t, 0, .12) * (1 - prog(t, 2.05, 2.3)), lerp(.92, 1, easeOut(prog(t, 0, .3))));
+  caption(L.allDay, null, 470, prog(t, 2.25, 2.4) * (1 - prog(t, 3.6, 3.8)), 1);
+  // 17:29, big, the second he wakes up
+  const ta = prog(t, T_UP, T_UP + .08) * (1 - prog(t, 5.5, 5.7));
+  if (ta > 0) {
+    ctx.save(); ctx.globalAlpha = ta; ctx.translate(W / 2, 470); const k = backOut(prog(t, T_UP, T_UP + .35)); ctx.scale(k, k);
+    ctx.direction = 'ltr'; font(800, 150); const tw = ctx.measureText(L.time).width;
+    ctx.fillStyle = '#FFFFFF'; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+    rr(-tw / 2 - 60, -110, tw + 120, 220, 50); ctx.fill(); ctx.shadowColor = 'transparent';
+    ctx.fillStyle = '#16120F'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(L.time, 0, 8);
+    ctx.restore();
+  }
+  notification(5.8, 8.6, t);
+  caption(L.leave, null, 470, prog(t, 8.65, 8.8) * (1 - prog(t, 10.45, 10.6)), 1);
+  caption(L.every, null, 470, prog(t, 10.6, 10.75) * (1 - prog(t, 11.65, 11.8)), 1);
+  caption(L.loop, null, 470, prog(t, 11.8, 11.95) * (1 - prog(t, END - .1, END + .05)), 1);
+  endCard(easeInOut(prog(t, END, END + .35)), t - (END - 12.5));
+}
+
+window.setLang = l => { LANG = l; };
+window.draw = draw;
+window.frame = (t, q) => { draw(t); return c.toDataURL('image/jpeg', q || .92); };
+window.ready = document.fonts.load('800 40px Rubik').then(() => Promise.all([
+  document.fonts.load('500 40px Rubik'), document.fonts.load('700 40px Rubik'),
+  document.fonts.load('800 40px Rubik', 'אב'), document.fonts.load('500 40px Rubik', 'אב'), document.fonts.load('700 40px Rubik', 'אב')]));
+</script></body></html>

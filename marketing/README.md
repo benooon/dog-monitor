@@ -11,6 +11,7 @@ marketing/
   voice.md                      voice file for the ig-* skills
   reel-engine/                  renders reels: one HTML canvas scene per reel + render.js (pipes frames into ffmpeg)
     sofa.html                   reel 1, "He never gets on the sofa"
+    door.html, sfx-door.py      reel 2, "Rex can't read a clock" (17:29 at the door)
     sfx.py                      original sound effects (no licensed music)
   reels/YYYY-MM-DD-<slug>/      one folder per reel, ready to post
     reel-en.mp4, reel-he.mp4    1080x1920, 30 fps, 15 s, H.264 + AAC
@@ -46,3 +47,4 @@ Until the Meta Graph API token exists (docs/HUMAN_TODO.md), the owner posts by h
 | Date | Slug | Hook | Gag | App moment |
 |---|---|---|---|---|
 | 2026-11-11 | sofa | "He never gets on the sofa." | Dog sneaks onto the sofa a minute after you leave, gets caught, slides off | Sofa alert + talk from live view |
+| 2026-11-11 | door | "Rex can't read a clock." | Sleeps all day, wakes at exactly 17:29 and sits at the door; checks the wall clock | Door alert ("Rex is waiting at the door") |
