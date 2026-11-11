@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 9ee0fa87e5992cbf3d9ce76896c091814df03d75
-- message: docs: claim live key rotation
-- time (UTC): 2026-11-11T13:48:17Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43032144894
+- commit: ff52f5fb3b4108a82e63efbdc2e1ddbcc917bd96
+- message: backend: live key ids and rotation requests
+- time (UTC): 2026-11-11T13:54:16Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43033115399
 
 | job | result | log |
 |---|---|---|
