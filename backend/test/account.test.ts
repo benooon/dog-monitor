@@ -49,6 +49,30 @@ describe.skipIf(!hasDatabase)("DELETE /me", () => {
     expect((await app.inject({ method: "DELETE", url: "/me" })).statusCode).toBe(401);
   });
 
+  it("exports the caller's data without secrets or file keys", async () => {
+    const { userId, auth, householdId } = await ownerWithHousehold();
+    await h.db.insert(devices).values({ householdId, name: "Kitchen", role: "camera", apnsToken: "a".repeat(64), deviceSecretHash: "hash" });
+    await h.db.insert(events).values({ householdId, type: "whining", startedAt: new Date(), clipKey: "secret-key" });
+
+    const res = await app.inject({ method: "GET", url: "/me/export", headers: auth });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.user.id).toBe(userId);
+    expect(body.household).toMatchObject({ name: "Home", role: "owner" });
+    expect(body.devices).toHaveLength(1);
+    expect(body.events).toHaveLength(1);
+    const text = res.body;
+    expect(text).not.toContain("secret-key");
+    expect(text).not.toContain("hash");
+    expect(text).not.toContain("a".repeat(64));
+  });
+
+  it("exports a user without a household, and requires sign-in", async () => {
+    const { auth } = await signIn("lonely");
+    expect((await app.inject({ method: "GET", url: "/me/export", headers: auth })).json().household).toBeNull();
+    expect((await app.inject({ method: "GET", url: "/me/export" })).statusCode).toBe(401);
+  });
+
   it("deletes a user who has no household", async () => {
     const { userId, auth } = await signIn("lonely");
     expect((await app.inject({ method: "DELETE", url: "/me", headers: auth })).statusCode).toBe(204);

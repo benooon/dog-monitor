@@ -52,4 +52,4 @@ A camera can see and hear guests, dog walkers and cleaners. Today: the camera sc
 - **A specific server region.** Railway, the bucket and LiveKit Cloud regions are not pinned or documented. Data may be processed outside the EU and Israel.
 - **Encryption of the database or bucket beyond what the providers do by default.**
 - **Revocation of the Sign in with Apple token on account deletion.**
-- **An in-app data export.**
+- **An in-app data export button.** The server side exists (`GET /me/export`); users can also write to the privacy email.

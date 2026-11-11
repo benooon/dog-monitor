@@ -30,3 +30,5 @@ Fixed: events and daily summaries now expire after 365 days (`EVENT_RETENTION_DA
 Still open: in-app delete-account and notices (iOS), publishing the texts (owner details), regions and DPAs, Apple token revocation, data export. Medium risks "events never expire" and "logs contain tokens" are closed.
 
 Also done: "Delete account" in the app (Household settings and the create-household screen), with confirmation, both languages, and `DogMonitorAPI.deleteAccount()` with tests. The High risk "no in-app account deletion" is closed once CI confirms the Swift builds (no Swift toolchain in this environment).
+
+Also done: camera-setup notice about guests and sound (both languages); `GET /me/export` (JSON of the account, household, dogs, devices, events, summaries; no clips, secrets or keys), tested. Open and now only waiting on you or on the pages going live: publishing the texts, regions and DPAs, Apple token revocation, sign-in footer links, export button in the app.

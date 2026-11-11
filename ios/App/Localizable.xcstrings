@@ -3337,6 +3337,16 @@
           }
         }
       }
+    },
+    "Anyone the camera can see or hear should know it's there. Tell guests, your dog walker and your cleaner. Clips include sound.": {
+      "localizations": {
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל מי שהמצלמה יכולה לראות או לשמוע צריך לדעת שהיא שם. ספרו על כך לאורחים, למטיילת הכלבים ולעוזרת הבית. הקטעים כוללים צליל."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import type { Database } from "../db/client.js";
-import { devices, householdMembers, users } from "../db/schema.js";
+import { dailySummaries, devices, dogs, events, householdMembers, households, notificationPrefs, users } from "../db/schema.js";
 import { StorageUnavailableError, deleteHousehold } from "../households/delete.js";
 import type { MediaStorage } from "../storage/storage.js";
 
@@ -18,6 +18,57 @@ import type { MediaStorage } from "../storage/storage.js";
  */
 export async function accountRoutes(app: FastifyInstance, opts: { db: Database; storage?: MediaStorage }): Promise<void> {
   const { db, storage } = opts;
+
+  /**
+   * `GET /me/export`: everything we hold about the caller as JSON (GDPR Art. 15 and 20, Israeli right of access).
+   * Includes the household's dogs, cameras, events and daily summaries, without clips, snapshots or secrets.
+   */
+  app.get("/me/export", { preHandler: app.authenticate }, async (request, reply) => {
+    const userId = request.user!.userId;
+    const [user] = await db.select({ id: users.id, name: users.name, createdAt: users.createdAt }).from(users).where(eq(users.id, userId));
+    if (!user) return reply.code(401).send({ error: "unauthorized" });
+    const [membership] = await db
+      .select({ householdId: householdMembers.householdId, role: householdMembers.role })
+      .from(householdMembers)
+      .where(eq(householdMembers.userId, userId));
+    const prefs = await db
+      .select({ deviceId: notificationPrefs.deviceId, eventType: notificationPrefs.eventType, enabled: notificationPrefs.enabled, quietStart: notificationPrefs.quietStart, quietEnd: notificationPrefs.quietEnd })
+      .from(notificationPrefs)
+      .where(eq(notificationPrefs.userId, userId));
+    const base = { exportedAt: new Date().toISOString(), user, notificationPrefs: prefs };
+    if (!membership) return { ...base, household: null };
+
+    const hid = membership.householdId;
+    const [household] = await db
+      .select({ id: households.id, name: households.name, plan: households.plan, planExpiresAt: households.planExpiresAt, shareTrainingData: households.shareTrainingData, createdAt: households.createdAt })
+      .from(households)
+      .where(eq(households.id, hid));
+    const members = await db
+      .select({ userId: householdMembers.userId, name: users.name, role: householdMembers.role })
+      .from(householdMembers)
+      .innerJoin(users, eq(users.id, householdMembers.userId))
+      .where(eq(householdMembers.householdId, hid));
+    return {
+      ...base,
+      household: { ...household, role: membership.role, members },
+      dogs: await db
+        .select({ id: dogs.id, name: dogs.name, lifeStage: dogs.lifeStage, traits: dogs.traits, alertStyle: dogs.alertStyle, createdAt: dogs.createdAt })
+        .from(dogs)
+        .where(eq(dogs.householdId, hid)),
+      devices: await db
+        .select({ id: devices.id, name: devices.name, role: devices.role, model: devices.model, appVersion: devices.appVersion, status: devices.status, timeZone: devices.timeZone, createdAt: devices.createdAt })
+        .from(devices)
+        .where(eq(devices.householdId, hid)),
+      events: await db
+        .select({ id: events.id, deviceId: events.deviceId, type: events.type, state: events.state, startedAt: events.startedAt, endedAt: events.endedAt, confidence: events.confidence, feedback: events.feedback })
+        .from(events)
+        .where(eq(events.householdId, hid)),
+      dailySummaries: await db
+        .select({ deviceId: dailySummaries.deviceId, date: dailySummaries.date, restMinutes: dailySummaries.restMinutes, barkCount: dailySummaries.barkCount, activityByHour: dailySummaries.activityByHour, stateMinutes: dailySummaries.stateMinutes })
+        .from(dailySummaries)
+        .where(eq(dailySummaries.householdId, hid)),
+    };
+  });
 
   app.delete("/me", { preHandler: app.authenticate }, async (request, reply) => {
     const userId = request.user!.userId;
