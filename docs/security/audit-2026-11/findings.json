@@ -1,0 +1,723 @@
+[
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "backend/src/app.ts:trustProxy-all-hops:client-controlled-request-ip",
+    "title": "trustProxy: true lets clients choose request.ip, which defeats the per-IP waitlist and invite-code rate limits",
+    "description": "buildApp creates Fastify with trustProxy: true, so Fastify trusts every hop and request.ip is the leftmost X-Forwarded-For entry. That entry is client-controlled whenever the edge proxy appends to an incoming X-Forwarded-For header instead of replacing it. Two in-memory AttemptLimiters key on request.ip: the waitlist sign-up limiter (5 per IP per 10 min, waitlist.ts:61/64) and the invite redemption limiter (10 failures per 10 min, invites.ts:86/87/162). The invite limiter is the only brute-force control on 6-digit pairing codes, and a successful camera redemption returns a deviceSecret for the victim's household. In an independent sandbox run with the production default limiters, rotating the leftmost XFF entry from one socket peer was never limited on /waitlist (15x 202), and invite-code guessing resumed after a block (429, then 404 for each new leftmost value). Exploitability in production depends only on how Railway's edge treats an incoming X-Forwarded-For header, which is not in the repository.",
+    "claimed_root_cause": "backend/src/app.ts:81 sets trustProxy: true, which trusts every X-Forwarded-For hop instead of only the single Railway edge hop, so request.ip can be an attacker-supplied leftmost value and the per-IP AttemptLimiter keys become attacker-chosen.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/routes/waitlist.ts",
+        "line": 61,
+        "scope": "POST /waitlist handler",
+        "description": "An anonymous client posts with an arbitrary X-Forwarded-For header; limiter.isBlocked reads request.ip."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/app.ts",
+        "line": 81,
+        "scope": "buildApp Fastify options",
+        "description": "trustProxy: true makes Fastify (getTrustProxyFn returns always-true) resolve request.ip to the leftmost X-Forwarded-For address."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/waitlist.ts",
+        "line": 64,
+        "scope": "POST /waitlist handler",
+        "description": "recordFailure is keyed on the spoofed request.ip, so each rotated value starts a fresh bucket."
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/pairing/attempt-limiter.ts",
+        "line": 14,
+        "scope": "AttemptLimiter.isBlocked",
+        "description": "The per-key window never reaches maxFailures for rotating keys, so the limit never applies."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/app.ts",
+        "line": 81,
+        "description": "trustProxy: true, with the comment 'trust X-Forwarded-For so request.ip is the client' (line 80). No other proxy configuration exists in the repo; railway.json only sets the Dockerfile build and healthcheck."
+      },
+      {
+        "file": "backend/src/routes/waitlist.ts",
+        "line": 61,
+        "description": "Waitlist limiter keyed on request.ip (production default AttemptLimiter(WAITLIST_MAX_PER_IP, WAITLIST_WINDOW_MS) at line 25). Independent run (agents/v1/artifacts/evidence/v1-xff.txt): fixed XFF '192.0.2.200, 198.51.100.20' gave 202x5 then 429x2; rotating '192.0.2.N, 198.51.100.20' from the same socket peer gave 202 on all 15; request.ip resolved to the leftmost 192.0.2.66."
+      },
+      {
+        "file": "backend/src/routes/invites.ts",
+        "line": 86,
+        "description": "Invite redemption limiter key is request.ip (default AttemptLimiter(10, 10 min) at line 31; failures recorded at line 162). Independent run: 10 bad camera code guesses with leftmost XFF 203.0.113.1 returned 404x10 then 429; new leftmost values 203.0.113.2-6 each returned 404 (guessing resumed)."
+      },
+      {
+        "file": "backend/package-lock.json",
+        "line": 3757,
+        "description": "Locked fastify 5.12.8. In this version a numeric trustProxy (e.g. 1) fails closed to the socket peer (node_modules/fastify/lib/request.js getTrustProxyFn), so the hunter's proposed 'trustProxy: 1' fix would key every client on the edge address; verified locally (request.ip = 10.1.2.3). A function trusting only the immediate peer, (addr, i) => i === 0, resolves to the edge-appended rightmost entry (198.51.100.20)."
+      }
+    ],
+    "blockers": [
+      "Not visible in source: whether Railway's edge proxy appends the connecting client's address to an incoming X-Forwarded-For header (leftmost entry stays client-controlled, so the bypass works) or replaces/strips it (request.ip is the real client and trustProxy: true is safe in this deployment). Also not visible: whether the service is reachable only through that single edge hop."
+    ],
+    "validation_plan": {
+      "local": "Done: agents/v1/artifacts/evidence/v1-xff.txt (backend/test/v1-xff.test.ts via run-backend-check.sh) shows the bypass on /waitlist and /invites/:code/accept with production default limiters. Regression after a fix: replace trustProxy: true with a function that trusts only the immediate peer, e.g. trustProxy: (_addr, i) => i === 0 (or the edge's CIDR if Railway publishes one); do not use trustProxy: 1, which fastify 5.12.8 treats as trust-nothing. Then, with remoteAddress 10.1.2.3 and 'X-Forwarded-For: 203.0.113.N, 198.51.100.9', request.ip must be 198.51.100.9 for every N, the 6th waitlist post must return 429, and the 11th bad invite code must return 429 regardless of N.",
+      "deployment": "On a staging Railway service only (never production, no brute force): the owner temporarily logs request.ip and the raw x-forwarded-for header for one request, then sends one request from their own machine with 'X-Forwarded-For: 192.0.2.1'. If the logged header is '192.0.2.1, <their public IP>' and request.ip is 192.0.2.1, the edge appends and the finding is exploitable; if the header contains only their public IP and request.ip equals it, the edge replaces the header and the finding does not apply."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "backend/src/billing/app-store.ts:transaction-environment-not-checked",
+    "title": "Sandbox (TestFlight) App Store transactions grant production Premium",
+    "description": "createAppStoreVerifier checks the x5c chain, the signature, the bundle and the product, but never the transaction's environment. AppStoreConfig and the production config have no expected-environment setting. So POST /subscription/apple and POST /app-store/notifications accept an Apple-signed transaction with environment \"Sandbox\" and give the household Premium. The environment is only stored in households.plan_environment, and nothing reads that column. A local run showed the code path: a Sandbox transaction from the test chain, sent to POST /subscription/apple, returned 200 with plan premium and limits.cameras 4, and the row was stored as plan=premium, planEnvironment=Sandbox. Some deployment facts can be read from the repository. Every build config points at the production backend (ios/project.yml API_BASE_URL in settings.base). HUMAN_TODO also tells the owner to set the sandbox notification URL to that same production host. Sandbox purchases cost nothing. So anyone who can make Apple-signed Sandbox purchases for this bundle, such as a TestFlight tester or a sandbox tester account, can turn on production Premium for free. While the plan is active they can pair up to the Premium camera limit, and those cameras keep working after it lapses (a lapsed plan blocks only new pairings).",
+    "claimed_root_cause": "parsePayload reads `environment` (and defaults it to \"Production\" when it is missing), but verify() never compares it with an expected environment, and AppStoreConfig/loadConfig has no such field. applyTransaction then applies Sandbox transactions exactly like Production ones and only records the value in planEnvironment.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/routes/subscription.ts",
+        "line": 66,
+        "scope": "POST /subscription/apple",
+        "description": "The household owner's client-supplied signedTransaction goes to verifier.verify. The notification route does the same at line 135 for data.signedTransactionInfo."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/billing/app-store.ts",
+        "line": 87,
+        "scope": "createAppStoreVerifier.verify",
+        "description": "After the chain and signature checks, only bundleId (line 89) and productId (line 90) are compared. Nothing checks environment."
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/billing/apply-transaction.ts",
+        "line": 28,
+        "scope": "applyTransaction",
+        "description": "Sets plan premium and planExpiresAt from the transaction, and stores planEnvironment = transaction.environment (line 35) without acting on it."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/billing/app-store.ts",
+        "line": 112,
+        "description": "environment is parsed and defaults to \"Production\", but nothing enforces it."
+      },
+      {
+        "file": "backend/src/config.ts",
+        "line": 133,
+        "description": "The appStore config has bundleId, productIds and rootFingerprints, with no expected environment."
+      },
+      {
+        "file": "backend/src/billing/plans.ts",
+        "line": 16,
+        "description": "effectivePlan depends only on planExpiresAt. planEnvironment is never read anywhere in backend/src."
+      },
+      {
+        "file": "ios/project.yml",
+        "line": 82,
+        "description": "API_BASE_URL is set once in settings.base to the production Railway host, so every build of this app, TestFlight builds included, talks to the production backend."
+      },
+      {
+        "file": "docs/HUMAN_TODO.md",
+        "line": 18,
+        "description": "Tells the owner to set both the production and the sandbox App Store Server Notifications URL to the same production /app-store/notifications endpoint."
+      },
+      {
+        "file": "backend/test/subscription.test.ts",
+        "line": 54,
+        "description": "The existing test fixture uses environment \"Sandbox\", and the route tests expect it to grant premium. Accepting Sandbox is the tested behavior today."
+      }
+    ],
+    "blockers": [
+      "Whether people who have not paid can get genuine Apple-signed Sandbox transactions for bundle com.benooon.dogmonitor is a distribution fact outside the repository. That would mean public-link or external TestFlight testers, or sandbox tester accounts given to non-owners. Today the TestFlight workflow is blocked in docs/BACKLOG.md, so no TestFlight build may exist yet. The repository already answers the other half: those builds would use the production backend."
+    ],
+    "validation_plan": {
+      "local": "Already run (evidence agents/v2/artifacts/evidence/sandbox-env.txt). backend/test/v2-sandbox-env.test.ts uses a verifier built like the production config (bundleId, productIds, rootFingerprints only) and a transaction from the test chain with environment \"Sandbox\" and appAccountToken = the dummy household id. POST /subscription/apple returned 200 {plan: premium, limits.cameras: 4}, and the households row showed plan=premium, planEnvironment=Sandbox. After a fix, the same test with an expected environment of Production should get 400 {error: wrong_environment} and leave the plan free.",
+      "deployment": "Owner check, read-only: (1) In App Store Connect → TestFlight, is there an external group or a public link for com.benooon.dogmonitor, and how many testers outside the household or team does it have? (2) Are sandbox tester accounts (Users and Access → Sandbox) shared with anyone besides the owner? (3) Run a read-only query on the production database: SELECT count(*) FROM households WHERE plan_environment = 'Sandbox' AND plan_expires_at > now(). Any rows mean sandbox transactions are already granting production Premium."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "fingerprint": "backend/src/billing/apply-transaction.ts:revocation-not-persisted-replay",
+    "title": "Refunded App Store subscription can be restored by replaying the pre-refund signed transaction",
+    "description": "When Apple refunds or revokes a subscription, applyTransaction sets the household to free and clears planExpiresAt, but keeps no record that the transaction was revoked. POST /subscription/apple accepts any validly signed transaction, however old. A household owner who kept the signed transaction their app posted at purchase can post it again after the refund. Premium then comes back until that transaction's original expiresDate: up to a year for the yearly product, up to a month for the monthly one.",
+    "root_cause": "The revocation branch of applyTransaction (apply-transaction.ts:12-17) only writes plan=free and planExpiresAt=null and stores neither the revocation nor its time. In the non-revoked branch, extendsPremium = !current?.expiresAt || ... (line 26) is true once planExpiresAt is null, so the guard on line 27 does not stop an older transaction from the same subscription. The verifier (app-store.ts verify/parsePayload) checks only chain, signature, bundle and product. It never reads purchaseDate or signedDate, and nothing checks revocation state, so an earlier Apple-signed JWS without revocationDate is accepted again and written as premium (lines 28-37).",
+    "intended_behavior": "Once Apple reports a subscription's transaction as refunded or revoked, the server must not grant premium again from that transaction or any earlier one of the same originalTransactionId. Only a genuinely newer purchase or renewal (purchaseDate after the revocation) may restore premium.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/routes/subscription.ts",
+        "line": 47,
+        "scope": "POST /subscription/apple (requireOwner)",
+        "description": "A signed-in household owner submits signedTransaction, which can be any Apple-signed JWS, however old"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/subscription.ts",
+        "line": 66,
+        "scope": "verifier.verify",
+        "description": "Checks the x5c chain, the signature, the bundle and the product. Nothing checks signedDate, purchaseDate or revocation state. The appAccountToken check (line 71) and the cross-household check (lines 75-86) both pass for the owner's own household."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/billing/apply-transaction.ts",
+        "line": 12,
+        "scope": "applyTransaction revocation branch",
+        "description": "An earlier REFUND notification (POST /app-store/notifications, subscription.ts:160) set plan=free and planExpiresAt=null and stored nothing about the revocation"
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/billing/apply-transaction.ts",
+        "line": 28,
+        "scope": "applyTransaction premium update",
+        "description": "Because current.expiresAt is null, extendsPremium is true (line 26), so the replayed transaction writes plan=premium and planExpiresAt = its original expiresDate"
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/billing/apply-transaction.ts",
+        "line": 15,
+        "description": "The revocation branch only sets { plan: \"free\", planExpiresAt: null }. The revoked state and its time are lost."
+      },
+      {
+        "file": "backend/src/billing/apply-transaction.ts",
+        "line": 26,
+        "description": "extendsPremium = !current?.expiresAt || transaction.expiresAt > current.expiresAt is true after a refund, so the guard on line 27 lets the replay through"
+      },
+      {
+        "file": "backend/src/billing/app-store.ts",
+        "line": 96,
+        "description": "parsePayload reads only transactionId, originalTransactionId, productId, bundleId, environment, expiresDate, revocationDate and appAccountToken. Without purchaseDate or signedDate, an old transaction cannot be told apart from a new one."
+      },
+      {
+        "file": "agents/v3/artifacts/evidence/v3-refund-replay.txt",
+        "line": 1,
+        "description": "Independent sandboxed reproduction through the real routes and verifier, for both configured products. Purchase at T0, REFUND at T0+10d, replay of the saved JWS at T0+20d: 200 and premium again, with cameras limit 4."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "authentication_level",
+        "description": "Signed-in household owner (requireOwner on POST /subscription/apple)"
+      },
+      {
+        "kind": "data_state",
+        "description": "The owner kept a copy of the signed transaction JWS their app posted at purchase, for example by capturing their own app's HTTPS traffic through a user-installed CA. Apple then refunded or revoked it, and the REFUND/REVOKE notification was applied."
+      },
+      {
+        "kind": "timing_dependency",
+        "description": "The replay must happen before the transaction's original expiresDate, and while the JWS's x5c certificates are still within their validity window (verifyPayload checks the validity window against the current time)"
+      },
+      {
+        "kind": "system_configuration",
+        "description": "Only matters when ENFORCE_PLAN_LIMITS is on. When it is off, every household gets the full camera limit anyway (plans.ts cameraLimit)."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "A household owner who bought Premium, kept the StoreKit signed transaction, and then got a refund from Apple",
+      "payloads": [
+        "POST /subscription/apple {\"signedTransaction\": \"<the same JWS posted at purchase, byte for byte>\"} sent after the REFUND notification was applied"
+      ],
+      "instructions": [
+        "Add test/v3-refund-replay.test.ts (in the evidence file) to a copy of backend/ and run it with /srv/security-audit/tools/run-backend-check.sh. It uses a private Postgres and the repo's test App Store chain fixtures, and backend/src is unmodified.",
+        "T0: sign in, create a household, and POST /subscription/apple a signed transaction (appAccountToken = household id, expiresDate = T0+365d or T0+30d). Keep the JWS.",
+        "T0+10d: POST /app-store/notifications with a REFUND notification whose signedTransactionInfo is the same transaction plus revocationDate. GET /subscription now shows free.",
+        "T0+20d: POST /subscription/apple again with the saved pre-refund JWS, then GET /subscription."
+      ],
+      "observed_result": "Yearly: purchase gave 200 premium until 2028-02-29. After the REFUND, plan was free with expiresAt null and cameras limit 1. The replay returned 200 premium until 2028-02-29 with cameras limit 4, and GET /subscription still showed premium. Monthly behaved the same: the replay restored premium until 2027-03-31."
+    },
+    "remediation": {
+      "strategy": "Persist the revocation and refuse to grant premium again from any transaction of the same subscription bought at or before it. Add a nullable households.planRevokedAt (or a revoked_transactions table keyed by originalTransactionId) with a migration. Set it in the revocation branch and keep planOriginalTransactionId. Parse purchaseDate in parsePayload and require it. In applyTransaction, when originalTransactionId matches the household's subscription and a revocation is recorded, ignore transactions whose purchaseDate is at or before planRevokedAt. Clear planRevokedAt when a genuinely newer transaction grants premium. Optionally confirm state with the App Store Server API (Get Transaction Info / Get All Subscription Statuses) before granting from a client-posted transaction. Regression test: purchase, REFUND, replay the original JWS, expect the plan to stay free; a new renewal with a later purchaseDate still grants premium.",
+      "code_changes": [
+        {
+          "file_name": "backend/src/billing/apply-transaction.ts",
+          "fixed_code": "// apply-transaction.ts\nif (transaction.revokedAt) {\n  await db\n    .update(households)\n    .set({ plan: \"free\", planExpiresAt: null, planRevokedAt: transaction.revokedAt })\n    .where(and(eq(households.id, householdId), eq(households.planOriginalTransactionId, transaction.originalTransactionId)));\n  return;\n}\n\nconst [current] = await db\n  .select({ expiresAt: households.planExpiresAt, original: households.planOriginalTransactionId, revokedAt: households.planRevokedAt })\n  .from(households)\n  .where(eq(households.id, householdId));\nconst sameSubscription = current?.original === transaction.originalTransactionId;\n// A transaction bought at or before a recorded revocation of this subscription never grants premium again.\nif (sameSubscription && current?.revokedAt && transaction.purchaseDate.getTime() <= current.revokedAt.getTime()) return;\n// ...existing extendsPremium logic; the premium update below also sets planRevokedAt: null."
+        },
+        {
+          "file_name": "backend/src/billing/app-store.ts",
+          "fixed_code": "// app-store.ts: VerifiedTransaction gains `purchaseDate: Date`; in parsePayload:\nconst purchaseDate = ms(\"purchaseDate\");\nif (!transactionId || !originalTransactionId || !productId || !bundleId || !expiresAt || !purchaseDate) {\n  throw new TransactionError(\"invalid_transaction\");\n}\n// ...return { ..., purchaseDate, ... }"
+        },
+        {
+          "file_name": "backend/src/db/schema.ts",
+          "fixed_code": "// db/schema.ts (households) + a Drizzle migration adding the nullable column\nplanRevokedAt: timestamp(\"plan_revoked_at\", { withTimezone: true }),"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "medium",
+        "reason": "Needs a paying owner who deliberately captures their own app's signed transaction (with a user-installed CA or similar), then asks Apple for a refund and reposts the JWS. No special access is needed, but it is a deliberate fraud by an authenticated customer, not something an outsider can do."
+      },
+      "impact": {
+        "score": "medium",
+        "reason": "A paid entitlement (the Premium camera limit, 4 instead of 1) is used without payment until the original transaction's expiresDate: at most one billing period per refunded purchase. No other household's data or identity is affected."
+      },
+      "overall_severity": "medium"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "The source path was checked line by line, and the result was reproduced independently in the sandbox through the real Fastify routes and the real verifier with the repo's test chain, for both products and with a moving clock"
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "backend/src/live/livekit.ts:no-participant-eviction-on-revocation",
+    "title": "Member removal and camera revocation do not evict participants already in the LiveKit room",
+    "description": "POST /cameras/:id/live-token gives a household member a 10-minute LiveKit token for room camera-<deviceId>. The token can subscribe to the camera's video and audio and publish microphone audio, which the camera plays aloud as talk-back. When the owner removes that member (DELETE /household/members/:userId) or revokes a device (POST /devices/:id/revoke), the backend only changes database rows. It never calls the LiveKit RoomService (removeParticipant, updateParticipant or deleteRoom), even though livekit-server-sdk, already a dependency, exports RoomServiceClient. The iOS viewer stays in the room while the connection is up and does not re-check membership after connecting. If LiveKit keeps a connected participant in the room past the token's expiry, or keeps refreshing that participant's token, a removed member keeps watching the household's camera and can keep talking into the home. This lasts until the connection drops and the client has to fetch a new token from the backend, which then answers 403. A revoked camera can likewise keep publishing into its room. Source alone cannot say how long this lasts. That depends on LiveKit server behavior.",
+    "claimed_root_cause": "backend/src/live/livekit.ts mints room tokens (10-minute TTL, with a comment that the SDK refreshes them in-room), but nothing in backend/src ends a live session. RoomServiceClient is never used, and DELETE /household/members/:userId (households.ts:94-122) and POST /devices/:id/revoke (devices.ts:151-163) only update database rows. Revoking access therefore relies only on token expiry, and token expiry does not cover a connection that is already established.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/routes/live.ts",
+        "line": 31,
+        "scope": "POST /cameras/:id/live-token",
+        "description": "A signed-in household member, scoped by requireHousehold to an active camera in their household, gets a viewer token for room camera-<deviceId>"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/live/livekit.ts",
+        "line": 54,
+        "scope": "viewerToken grant",
+        "description": "Grant: canSubscribe true, canPublish true with source MICROPHONE (talk-back into the home), roomJoin on the camera's room"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/live/livekit.ts",
+        "line": 21,
+        "scope": "LIVE_TOKEN_TTL_SECONDS",
+        "description": "The 10-minute TTL only limits when a client can connect. The comment on line 20 says the SDK refreshes the token in-room, so the TTL is not a session cap."
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/routes/households.ts",
+        "line": 114,
+        "scope": "DELETE /household/members/:userId",
+        "description": "In a transaction, removal deletes the membership row, revokes the member's own device rows and deletes their notification prefs. No LiveKit RoomService call removes the member's live participant."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/live/livekit.ts",
+        "line": 20,
+        "description": "Comment: \"Tokens only need to stay valid long enough to connect; the SDK refreshes them in-room.\""
+      },
+      {
+        "file": "backend/src/routes/devices.ts",
+        "line": 159,
+        "description": "POST /devices/:id/revoke sets status revoked and clears the secret hash and APNs token. It does not touch LiveKit."
+      },
+      {
+        "file": "backend/src/routes/live.ts",
+        "line": 50,
+        "description": "Revocation is only enforced when a token is minted (device_revoked 409, or 403 from requireHousehold after removal). A participant who is already connected is never re-checked."
+      },
+      {
+        "file": "ios/App/Viewer/LiveViewModel.swift",
+        "line": 168,
+        "description": "The viewer loop stays in the room while connectionState != .disconnected. It only fetches a new backend token, which is where membership gets re-checked, after a disconnect."
+      },
+      {
+        "file": "backend/package.json",
+        "line": 27,
+        "description": "livekit-server-sdk ^2.19.3 is a dependency and ships RoomServiceClient (node_modules/livekit-server-sdk/dist/RoomServiceClient.d.ts), but grep finds no use of RoomServiceClient, removeParticipant or deleteRoom anywhere in backend/src"
+      }
+    ],
+    "blockers": [
+      "How long a removed participant stays in the room depends on the LiveKit server, outside this repository: whether a connected participant is disconnected when its JWT expires, and whether LiveKit Cloud pushes refreshed tokens to that participant after the backend stops minting. The sandbox has no LiveKit server binary and no network, so this cannot be observed offline."
+    ],
+    "validation_plan": {
+      "local": "On a workstation with no external network, run a pinned LiveKit OSS server in dev mode on loopback (livekit-server --dev, keys devkey/secret). Point the backend's LIVEKIT_URL/API_KEY/API_SECRET at it and start the backend against a throwaway Postgres. Create a household with owner U1, member U2 and camera D1. With livekit-client or the Go/Node test client, connect D1 using POST /device/live-token and publish a synthetic video track. Connect U2 using POST /cameras/D1/live-token. Call DELETE /household/members/U2 as U1 and confirm that U2's next POST /cameras/D1/live-token returns 403. Then poll RoomServiceClient.listParticipants('camera-D1') every 60 s for 15 minutes, which is more than the 10-minute TTL. Record whether U2's viewer identity is still listed and still subscribed to D1's track, and whether U2 can still publish a microphone track. Repeat with POST /devices/D1/revoke and check whether D1's identity stays published. Tear everything down afterwards.",
+      "deployment": "Owner-run, in a staging LiveKit Cloud project and a staging backend only, never production: connect a test member as a viewer of a test camera, remove that member with DELETE /household/members/:userId, and watch the room's participant list in the LiveKit dashboard for more than 10 minutes to see whether the member's viewer:<userId>:* participant is still connected and subscribed. Do the same for a revoked test camera with POST /devices/:id/revoke."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "fingerprint": "backend/src/routes/invites.ts:invite-accept-limiter-check-then-record-race",
+    "title": "Invite-code brute-force limiter is check-then-record, so concurrent guesses bypass it",
+    "description": "POST /invites/:token/accept checks limiter.isBlocked(request.ip) at the start of the handler and calls limiter.recordFailure only after the database transaction has evaluated the guess and thrown a 404 AcceptError. Every request that is in flight at the same time passes the check before any failure is recorded, so one client address can evaluate far more than the intended 10 six-digit code guesses per 10-minute window by sending them concurrently. With the production-default limiter, a 101-request concurrent burst from one address had all 100 wrong codes evaluated (404, none 429) and the real code in the same burst redeemed as a camera (201 with a deviceSecret for the victim household). A correct guess of an active code gives an unauthenticated client a camera identity in the victim household, or gives any signed-in user who is not yet in a household membership with live view, timeline and media access.",
+    "root_cause": "AttemptLimiter exposes separate isBlocked() and recordFailure() calls (backend/src/pairing/attempt-limiter.ts:14 and :18), and invites.ts calls them on either side of await points (backend/src/routes/invites.ts:87 before the auth/DB awaits, :162 after the transaction rejects). The limit therefore counts completed failures instead of reserving an attempt before the code is looked up.",
+    "intended_behavior": "No client may have more than 10 invite-code guesses evaluated per 10 minutes; an attempt must be counted atomically, before the code is looked up, regardless of how many requests are in flight.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/routes/invites.ts",
+        "line": 59,
+        "scope": "POST /invites/:token/accept",
+        "description": "Public route: no auth for as=camera, any valid user JWT for as=member; the :token param may be a 6-digit code"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/invites.ts",
+        "line": 87,
+        "scope": "limiter.isBlocked(limiterKey)",
+        "description": "Synchronous read of failures recorded so far; requests already in flight all see the same pre-burst count and continue"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/invites.ts",
+        "line": 110,
+        "scope": "db.transaction: UPDATE invites SET used_at WHERE code = param AND unused AND unexpired RETURNING",
+        "description": "Each in-flight request evaluates its guess against all active invites (code param selected at line 103/115)"
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/routes/invites.ts",
+        "line": 162,
+        "scope": "limiter.recordFailure(limiterKey) on 404",
+        "description": "Failure is recorded only after the guess was evaluated; a hit instead returns 201 with deviceSecret (line 157) or 200 household membership (line 133)"
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/pairing/attempt-limiter.ts",
+        "line": 14,
+        "description": "isBlocked only reads recent failures; recordFailure (line 18) is a separate later call, there is no atomic check-and-reserve"
+      },
+      {
+        "file": "backend/src/routes/invites.ts",
+        "line": 31,
+        "description": "Production default limiter is new AttemptLimiter(10, 10 * 60 * 1000) keyed by request.ip (line 86); no other throttle is registered on this route (backend/src/app.ts:98)"
+      },
+      {
+        "file": "backend/src/pairing/secrets.ts",
+        "line": 10,
+        "description": "Invite codes are randomInt(0, 1_000_000), a 10^6 space; invites live 10 minutes (INVITE_TTL_MS line 29)"
+      },
+      {
+        "file": "backend/src/routes/invites.ts",
+        "line": 157,
+        "description": "Successful camera redemption returns a fresh device secret bound to the invite's household"
+      },
+      {
+        "file": "agents/v5/artifacts/evidence/v5-invite-limiter-race.txt",
+        "line": 1,
+        "description": "v5 independent sandboxed reproduction with the production-default limiter: 101 concurrent accepts from one address gave {404: 100, 201: 1}; the real code redeemed with a deviceSecret for the victim household; the next request got 429"
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "authentication_level",
+        "description": "None for camera redemption; for member redemption any Sign in with Apple account not already in a household"
+      },
+      {
+        "kind": "data_state",
+        "description": "At least one unused, unexpired invite code exists (10-minute TTL); each evaluated wrong guess hits with probability about (active codes)/10^6"
+      },
+      {
+        "kind": "timing_dependency",
+        "description": "Guesses must be in flight concurrently; the number evaluated per window is bounded by connection and server concurrency, not by the limiter"
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "Unauthenticated client at a single address sending many concurrent POST /invites/<6-digit code>/accept requests with {\"as\":\"camera\"}",
+      "payloads": [
+        "101 concurrent POST /invites/<code>/accept {\"as\":\"camera\",\"deviceName\":\"attacker\"}: codes 000000..000100 excluding the real code, plus the real active code last"
+      ],
+      "instructions": [
+        "In the sandbox, build the app with buildTestApp(h) and no inviteLimiter override, so the production default AttemptLimiter(10, 600000) is used",
+        "Sign in a victim owner, create a household, and POST /invites to get an active 6-digit code",
+        "Send the 101 accepts at once with Promise.all(app.inject(...)) from the same client address (no X-Forwarded-For)",
+        "Count status codes, check the real-code response for deviceSecret and householdId, then send one more bad guess"
+      ],
+      "observed_result": "V5_BURST {\"burst\":101,\"statusCounts\":{\"201\":1,\"404\":100},\"realCodeStatus\":201,\"realCodeHousehold\":true,\"deviceSecretReturned\":true,\"afterBurstStatus\":429} - 100 wrong guesses were evaluated under a 10-failure limit and the real code redeemed as a camera in the victim household; only the request after the burst was blocked."
+    },
+    "remediation": {
+      "strategy": "Count the attempt atomically before evaluating the guess: replace isBlocked/recordFailure with a synchronous tryAcquire that checks and records in one step (no await between them), call it before authentication and the DB transaction for code-shaped params, and drop the later recordFailure. Because the limiter is per-process and per-address, also add a global cap on failed code redemptions across all clients (or persist attempts in Postgres) so throughput cannot be scaled by instances or addresses. The X-Forwarded-For keying issue noted by the hunter is a separate root cause and is not fixed by this change.",
+      "code_changes": [
+        {
+          "file_name": "backend/src/pairing/attempt-limiter.ts",
+          "fixed_code": "/** Atomically checks and records one attempt; returns false when the key is already at the limit. */\ntryAcquire(key: string): boolean {\n  const list = this.recent(key);\n  if (list.length >= this.maxFailures) return false;\n  list.push(this.now());\n  this.failures.set(key, list);\n  return true;\n}"
+        },
+        {
+          "file_name": "backend/src/routes/invites.ts",
+          "fixed_code": "const limiterKey = request.ip;\nconst byCode = /^\\d{6}$/.test(request.params.token);\n// Reserve the attempt before any await so concurrent requests cannot all pass the check.\nif (byCode && !limiter.tryAcquire(limiterKey)) {\n  return reply.code(429).send({ error: \"too_many_attempts\" });\n}\n// ...and remove `if (err.status === 404) limiter.recordFailure(limiterKey);` in the catch block."
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "low",
+        "reason": "Needs an active invite inside its 10-minute window and sustained large concurrent bursts; each evaluated guess has roughly (active codes)/10^6 chance, so a hit needs on the order of hundreds of thousands of requests per active code, which the limiter no longer caps but connection/server capacity still does"
+      },
+      "impact": {
+        "score": "high",
+        "reason": "Demonstrated: a hit returns a camera device secret in the victim household (can post events, media and pushes, join realtime). By the same code path, as=member grants membership with live video, timeline and media"
+      },
+      "overall_severity": "medium"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "Source shows the check and record split across awaits with no other throttle on the route, and an independent sandboxed run with the production-default limiter evaluated 100 wrong guesses and redeemed the real code in one burst from one address"
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "fingerprint": "backend/src/routes/realtime.ts:ws-authorization-only-at-upgrade",
+    "title": "Realtime WebSocket keeps household access after member removal or camera revocation",
+    "description": "GET /ws checks the viewer's household and the camera's identity once, at upgrade, and never again. A removed member's open socket keeps getting the former household's camera presence and dog state (for example barking), and its watch messages still reach the camera as viewer joins. A revoked camera's open socket keeps writing heartbeats, battery and dog state to its revoked device row and pushing cameraState to the household's viewers and to the state/presence listeners (live activities). Server pings every 30 s keep these sockets alive, so access lasts until the client disconnects.",
+    "root_cause": "setUpViewer (backend/src/routes/realtime.ts) resolves householdId from findMembership once at connect and reuses it for watch checks and for hub.toHousehold broadcasts. setUpCamera trusts request.device from the upgrade, and its heartbeat UPDATE is keyed only by deviceId, with no status = 'active' filter. DELETE /household/members/:userId and POST /devices/:id/revoke only update the database. RealtimeHub keeps no socket references and has no way to drop a user's or device's peers, and nothing else calls into the hub on removal or revocation.",
+    "intended_behavior": "Removing a member or revoking a camera ends that principal's realtime session right away, or at the latest on its next message: close its sockets, stop sending household data to it, and stop accepting state from it.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/routes/realtime.ts",
+        "line": 40,
+        "scope": "GET /ws upgrade",
+        "description": "The Bearer JWT or Device credential is checked once in preValidation (authenticateEither). The device check needs status active only at this point."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/realtime.ts",
+        "line": 99,
+        "scope": "setUpViewer",
+        "description": "householdId comes from findMembership at connect and is captured for the life of the socket. It is registered in the hub through viewerConnected."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/households.ts",
+        "line": 114,
+        "scope": "DELETE /household/members/:userId",
+        "description": "Deletes the membership row and revokes the member's devices inside a DB transaction. Nothing touches the hub or open sockets."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/devices.ts",
+        "line": 159,
+        "scope": "POST /devices/:id/revoke",
+        "description": "Sets status revoked and clears the secret hash in the DB only. The camera's open socket is untouched."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/realtime.ts",
+        "line": 82,
+        "scope": "setUpCamera onMessage",
+        "description": "A revoked camera's heartbeat still goes to hub.heartbeat and to an UPDATE of its device row"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/realtime/hub.ts",
+        "line": 193,
+        "scope": "RealtimeHub.toHousehold",
+        "description": "presence and cameraState go to every viewer peer whose stored householdId matches, including the removed member's peer"
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/realtime/hub.ts",
+        "line": 143,
+        "scope": "RealtimeHub.watch",
+        "description": "The removed member's watch is added to the watchers and the camera gets a viewers joined message"
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/routes/realtime.ts",
+        "line": 113,
+        "description": "The viewer onMessage checks cameraId against the captured householdId and never re-checks membership"
+      },
+      {
+        "file": "backend/src/routes/realtime.ts",
+        "line": 92,
+        "description": "The camera heartbeat UPDATE is keyed only by deviceId (no status = active filter)"
+      },
+      {
+        "file": "backend/src/auth/device-plugin.ts",
+        "line": 47,
+        "description": "Device auth requires status active and a matching secret hash, but runs only at upgrade for /ws"
+      },
+      {
+        "file": "backend/src/app.ts",
+        "line": 134,
+        "description": "Hub state and presence changes, including those from a revoked camera, feed LiveActivityNotifier (APNs live activity updates)"
+      },
+      {
+        "file": "agents/v6/artifacts/evidence/v6-ws-revocation.txt",
+        "line": 1,
+        "description": "Independent sandboxed reproduction (test/v6-ws-revocation.test.ts). Case 1: after DELETE /household/members (204, then GET /household returns 403), the removed member's socket received presence online:true and cameraState barking, and its watch made the camera receive viewers count 1 joined. Case 2: after POST /devices/:id/revoke (old secret now gets 401 on HTTP), the revoked camera's heartbeat reached the owner's viewer as cameraState barking, and the device row read {battery:0.07, status:revoked, dogState:barking}."
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "authentication_level",
+        "description": "The principal had a valid session (member JWT or camera device secret) and opened /ws before the removal or revocation"
+      },
+      {
+        "kind": "timing_dependency",
+        "description": "The socket stays open across the owner's removal or revocation. Server pings every 30 s keep it alive, so access lasts until the client disconnects."
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "A household member the owner then removed, or a camera (for example a lost or handed-off phone) the owner then revoked, each holding an already-open /ws socket",
+      "payloads": [
+        "removed member socket: {\"type\":\"watch\",\"cameraId\":\"<household camera id>\"}",
+        "revoked camera socket: {\"type\":\"heartbeat\",\"battery\":0.07,\"state\":\"barking\"}"
+      ],
+      "instructions": [
+        "Run test/v6-ws-revocation.test.ts with /srv/security-audit/tools/run-backend-check.sh (sandboxed backend copy, app.injectWS, private loopback Postgres, no external network)",
+        "Case 1: the owner creates a household and pairs a camera, and a member joins with an invite. The camera and the member connect to /ws. The owner calls DELETE /household/members/<member>, and the member's GET /household now returns 403. The camera sends a heartbeat with state barking, then the removed member sends watch for the camera.",
+        "Case 2: the owner's viewer and the camera connect to /ws. The owner calls POST /devices/<camera>/revoke, and the old secret now gets 401 on GET /device/me. The camera sends a heartbeat with battery 0.07 and state barking over the open socket. Read the device row."
+      ],
+      "observed_result": "Case 1: the removed member's socket received {type:presence, online:true} and {type:cameraState, state:barking} for the former household's camera. After its watch, the camera received {type:viewers, count:1, change:joined}, and hub.isWatching(camera, removedMember) was true. Case 2: the owner's viewer received presence online:true and cameraState barking from the revoked camera. The device row read {battery:0.07, status:revoked, dogState:barking}."
+    },
+    "remediation": {
+      "strategy": "Bind realtime sessions to current authorization. (1) Keep the socket (or a close callback) in each hub peer, along with the userId and deviceId. Add RealtimeHub.disconnectUser(userId) and disconnectDevice(deviceId), which close those peers with 4003 and remove them from viewers, watchers and camera peers. Call them after the DB commit in DELETE /household/members/:userId (for the user and each revoked device), POST /devices/:id/revoke, and household deletion. (2) Defense in depth for multi-instance deployments: add eq(devices.status, 'active') to the camera heartbeat UPDATE and close the socket when no row is updated. Re-run findMembership before each viewer watch and close if the household changed. Optionally re-validate periodically on the ping timer, so broadcasts to an idle removed viewer also stop. Regression tests: both cases above should end with the socket closed with code 4003 and no further household messages.",
+      "code_changes": [
+        {
+          "file_name": "backend/src/routes/realtime.ts",
+          "fixed_code": "// setUpCamera onMessage: only apply heartbeats from a still-active device\nconst updated = await db\n  .update(devices)\n  .set({\n    lastHeartbeatAt: new Date(at),\n    ...(message.battery !== undefined && { battery: message.battery }),\n    ...(message.charging !== undefined && { charging: message.charging }),\n    ...(message.thermal !== undefined && { thermal: message.thermal }),\n    ...(message.state !== undefined && { dogState: message.state }),\n  })\n  .where(and(eq(devices.id, deviceId), eq(devices.status, \"active\")))\n  .returning({ id: devices.id });\nif (updated.length === 0) return reject(\"device_revoked\");\nhub.heartbeat(deviceId, at, message.state); // moved after the DB check\n\n// setUpViewer onMessage, before handling watch:\nconst current = await findMembership(db, request.user!.userId);\nif (current?.householdId !== householdId) return reject(\"no_household\");"
+        },
+        {
+          "file_name": "backend/src/realtime/hub.ts",
+          "fixed_code": "export interface Peer {\n  send(message: ServerMessage): void;\n  close(code: number, reason: string): void;\n}\n\n/** Closes every viewer connection of `userId` (member removed). */\ndisconnectUser(userId: string): void {\n  for (const [peer, viewer] of [...this.viewers]) {\n    if (viewer.userId !== userId) continue;\n    this.viewerDisconnected(peer);\n    peer.close(4003, \"no_household\");\n  }\n}\n\n/** Closes every connection of a revoked camera. */\ndisconnectDevice(deviceId: string): void {\n  const state = this.cameras.get(deviceId);\n  for (const peer of [...(state?.peers ?? [])]) {\n    state!.peers.delete(peer);\n    peer.close(4003, \"device_revoked\");\n  }\n}"
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "medium",
+        "reason": "Needs a socket that is already open when the owner acts. Cameras hold /ws continuously and viewers hold it while in the foreground, so a revoked camera or a removed member who is still connected is a realistic case. No privilege beyond the prior legitimate session is needed."
+      },
+      "impact": {
+        "score": "low",
+        "reason": "Ongoing disclosure of camera presence and dog-state metadata to a removed member, viewer-join signals to the camera, and injection of false dog state, battery and presence into a household by a revoked device (shown to viewers, stored in the device row, sent to live activities). No video, media or timeline access was shown. The live-token HTTP route re-checks membership and device status."
+      },
+      "overall_severity": "low"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "Reproduced independently through the real /ws, member-removal and revoke routes against a local Postgres. The source shows no hub teardown path."
+    }
+  },
+  {
+    "verdict": "confirmed",
+    "fingerprint": "backend/src/routes/training.ts:export-token-unscoped-session-jwt",
+    "title": "Training export key is a full owner session token that can add members and renew itself",
+    "description": "POST /training/export-token is meant to give out a one-hour key that only reads labeled training clips, 'so the app's long-lived session never leaves the phone'. The app puts the key on the general pasteboard (UIPasteboard.general), and docs/TRAINING.md tells the owner to paste it into DOGMONITOR_TOKEN on a Mac for scripts/export-training-data.mjs. But the key comes from the same JwtService.issue call as the 30-day session, with only a shorter TTL. It has the same sub, iss and aud and no scope claim, so app.authenticate cannot tell it apart from a session. Anyone who gets the key within its hour (pasteboard or Universal Clipboard, shell history or environment, the machine running the script) has the owner's full API rights. They can create an invite and join the household as a member with their own Apple account, which keeps live view, timeline and media access after the key expires. They can also change household state (shown here: rename) and mint new export keys with the export key, as long as training sharing stays on.",
+    "root_cause": "JwtService.issue(claims, ttlSeconds) (backend/src/auth/jwt.ts:22) takes no audience or scope, so the export token (training.ts:34) and the session token (auth.ts:64) differ only in exp. JwtService.verify (jwt.ts:34) checks only iss, aud and HS256, and the authPlugin (plugin.ts:22) accepts any verified token on every route. That includes POST /training/export-token, so an export key can mint another one.",
+    "intended_behavior": "An export key works only on GET /training/labeled for the household it was issued for, using its own audience (for example 'dog-monitor-training-export') or a scope claim. app.authenticate rejects it on every other route, including POST /training/export-token.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/routes/training.ts",
+        "line": 32,
+        "scope": "POST /training/export-token",
+        "description": "An owner session (or an existing export key) asks for a one-hour export key"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/routes/training.ts",
+        "line": 34,
+        "scope": "POST /training/export-token",
+        "description": "opts.jwt.issue({ userId }, EXPORT_TOKEN_TTL_SECONDS): only the TTL changes, no scope or audience"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/auth/jwt.ts",
+        "line": 22,
+        "scope": "JwtService.issue",
+        "description": "Signs an empty payload with the same sub, iss 'dog-monitor' and aud 'dog-monitor-app' as the session token"
+      },
+      {
+        "kind": "propagation",
+        "file": "ios/App/Household/HouseholdView.swift",
+        "line": 201,
+        "scope": "HouseholdView training section",
+        "description": "The key goes on UIPasteboard.general. docs/TRAINING.md says to paste it into DOGMONITOR_TOKEN on a Mac"
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/auth/plugin.ts",
+        "line": 22,
+        "scope": "app.authenticate",
+        "description": "Any token that passes JwtService.verify becomes request.user, with no scope check"
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/routes/invites.ts",
+        "line": 36,
+        "scope": "POST /invites",
+        "description": "authenticate + requireHousehold + requireOwner accept the export key. The invite it creates lets an outsider join as a persistent member"
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/auth/jwt.ts",
+        "line": 34,
+        "description": "verify checks only iss, aud and HS256 and returns { userId: sub }. Nothing tells an export key from a session"
+      },
+      {
+        "file": "backend/src/routes/training.ts",
+        "line": 31,
+        "description": "The comment says the key exists so the long-lived session never leaves the phone, which means it should be narrower"
+      },
+      {
+        "file": "backend/src/routes/auth.ts",
+        "line": 64,
+        "description": "The session token comes from the same jwt.issue call, with the default TTL (JWT_TTL_SECONDS, 30 days, config.ts:65)"
+      },
+      {
+        "file": "scripts/export-training-data.mjs",
+        "line": 17,
+        "description": "The key is read from the DOGMONITOR_TOKEN env var on a desktop machine and is only needed for GET /training/labeled"
+      },
+      {
+        "file": "agents/v7/artifacts/evidence/v7-export-token-scope.txt",
+        "line": 1,
+        "description": "Independent local reproduction: the decoded export token has the same claim set, aud, iss and sub as a session. Using only the export key, GET /me returned 200 with role owner, POST /invites 201, PATCH /household rename 200 and POST /training/export-token 200. An outsider accepted the invite as a member (200) and could then read the household (200, 2 members)"
+      }
+    ],
+    "conditions": [
+      {
+        "kind": "data_state",
+        "description": "The household owner has turned on training data sharing (shareTrainingData) and generated an export key"
+      },
+      {
+        "kind": "user_interaction",
+        "description": "The attacker gets the export key within its one-hour lifetime, for example from the general pasteboard or Universal Clipboard, shell history or environment, or a compromised machine running the export script"
+      },
+      {
+        "kind": "authentication_level",
+        "description": "The attacker needs only the export key, plus any Apple account to accept the invite and keep access"
+      }
+    ],
+    "execution": {
+      "attacker_perspective": "Someone who holds only the owner's one-hour training export key",
+      "payloads": [
+        "Authorization: Bearer <export token from POST /training/export-token>; GET /me; POST /invites; PATCH /household {\"name\":\"Renamed by export key\"}; POST /training/export-token",
+        "Attacker's own session: POST /invites/<token>/accept {\"as\":\"member\"}; GET /household"
+      ],
+      "instructions": [
+        "Run test/v7-export-token.test.ts against a disposable copy of backend/ with a private loopback Postgres (run-backend-check.sh sandbox, no external network)",
+        "Sign in as the owner, POST /households, PATCH /household {shareTrainingData:true}, POST /training/export-token, and decode the session and export JWTs",
+        "With only the export token: GET /me, POST /invites, PATCH /household (rename), POST /training/export-token",
+        "Sign in as a second user, accept the invite as a member, then GET /household"
+      ],
+      "observed_result": "Both JWTs have the claim set aud,exp,iat,iss,sub with aud=dog-monitor-app, iss=dog-monitor and the same sub. With the export token: GET /me 200 (role owner), POST /invites 201, PATCH /household 200 (name changed), POST /training/export-token 200. The outsider's accept returned 200 {role: member}, and their GET /household returned 200 with the renamed household and 2 members."
+    },
+    "remediation": {
+      "strategy": "Give export keys their own audience (or a scope claim). app.authenticate verifies the session audience only. Only GET /training/labeled accepts the export audience, and it still applies requireHousehold, requireOwner and the opt-in check. POST /training/export-token requires a real session, so an export key cannot mint another one. Add regression tests that an export key gets 401 on GET /me, POST /invites, PATCH /household and POST /training/export-token.",
+      "code_changes": [
+        {
+          "file_name": "backend/src/auth/jwt.ts",
+          "fixed_code": "export const SESSION_AUD = \"dog-monitor-app\";\nexport const EXPORT_AUD = \"dog-monitor-training-export\";\nasync issue(claims: UserClaims, ttlSeconds = this.ttlSeconds, audience = SESSION_AUD) { /* ...setAudience(audience)... */ }\nasync verify(token: string, audience = SESSION_AUD) { /* jwtVerify(token, this.key, { issuer: ISSUER, audience, algorithms: [\"HS256\"] }) */ }"
+        },
+        {
+          "file_name": "backend/src/routes/training.ts",
+          "fixed_code": "// POST /training/export-token: behind session-only app.authenticate; opts.jwt.issue({ userId }, EXPORT_TOKEN_TTL_SECONDS, EXPORT_AUD).\n// GET /training/labeled: a route-level auth preHandler that accepts verify(token, EXPORT_AUD) (or a session), then requireHousehold + requireOwner + optedIn.\n// Move the plugin-wide app.authenticate hook to per-route preHandlers so the two routes can use different verifiers."
+        }
+      ]
+    },
+    "severity": {
+      "likelihood": {
+        "score": "low",
+        "reason": "The key has to leak within one hour, and only after the owner opts in and generates one. But the intended flow puts it on the general pasteboard and in a shell env var off the phone."
+      },
+      "impact": {
+        "score": "high",
+        "reason": "The holder gets the owner's API rights over the household. The repro shows a one-hour key turned into a lasting household membership (live view, timeline and clips through the member role), a change to household state, and a self-renewing export key."
+      },
+      "overall_severity": "medium"
+    },
+    "confidence": {
+      "score": "high",
+      "reason": "Every trace line was checked in source at the target commit, and an independent sandboxed test showed each out-of-scope use accepted and an outsider joining as a member"
+    }
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "run_id": "run-1",
+  "repo": "benooon/dog-monitor",
+  "target": "/home/claude/dog-monitor",
+  "source_ref": {
+    "commit": "cd2dc61761954e000d37346d791893fdaafbce1a",
+    "dirty": false
+  },
+  "profile": "quick",
+  "scope_paths": [
+    "backend/",
+    "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API",
+    "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session",
+    "ios/App/KeychainStore.swift"
+  ],
+  "budget": 16,
+  "execution_policy": "sandboxed-source-and-local-only",
+  "selected_companions": [
+    "DATA-ISOLATION-AND-LIFECYCLE.md",
+    "DESKTOP-MOBILE-AND-LOCAL-IPC.md",
+    "PROTOCOLS-RPC-AND-MESSAGING.md",
+    "WEB-PROTOCOL-AND-AUTH.md"
+  ],
+  "prior_runs": [],
+  "shared_file_owners": {
+    "all": "parent"
+  },
+  "run_status": "complete",
+  "notes": "Reconnaissance was done by the parent directly (no recon agents) to fit the budget; hunters x5, one final critic, verifiers.",
+  "agents_spent": 13
+}

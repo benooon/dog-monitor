@@ -1,0 +1,1607 @@
+[
+  {
+    "coverage_id": ".github%2Fworkflows%2Fci.yml%23GitHub%20Actions%20CI%20%28.github%2Fworkflows%2Fci.yml%29%20and%20the%20ci-results%20branch%20consumed%20by%20autonomous%20agents::.github%2Fworkflows%2Fci.yml%23Repository%20write%20token%20and%20published%20logs%20feeding%20agents%20that%20push%20straight%20to%20main::profile%2Fquick%2Fall-in-scope-subsystems::SUPPLY-CHAIN-AND-RELEASE.md%23Untrusted%20code%20in%20a%20privileged%20workflow",
+    "canonical_refs": {
+      "surface": ".github/workflows/ci.yml#GitHub Actions CI (.github/workflows/ci.yml) and the ci-results branch consumed by autonomous agents",
+      "boundary": ".github/workflows/ci.yml#Repository write token and published logs feeding agents that push straight to main",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "SUPPLY-CHAIN-AND-RELEASE.md#Untrusted code in a privileged workflow"
+    },
+    "surface": "GitHub Actions CI (.github/workflows/ci.yml) and the ci-results branch consumed by autonomous agents",
+    "boundary": "Repository write token and published logs feeding agents that push straight to main",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Untrusted code in a privileged workflow",
+    "starting_paths": [
+      ".github/workflows/ci.yml",
+      "backend/package-lock.json",
+      "backend/railway.json",
+      "backend/Dockerfile",
+      "CLAUDE.md"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "SUPPLY-CHAIN-AND-RELEASE.md#Core discipline",
+      "SUPPLY-CHAIN-AND-RELEASE.md#Untrusted code in a privileged workflow",
+      "SUPPLY-CHAIN-AND-RELEASE.md#Workflow command and expression confusion",
+      "SUPPLY-CHAIN-AND-RELEASE.md#Universal moves",
+      "SUPPLY-CHAIN-AND-RELEASE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "CLOUD-AND-DEPLOYMENT.md#Core discipline",
+        "reason": "Railway platform configuration is not visible in source beyond railway.json"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic: Reported for out_of_scope recording, since architecture puts CI and Railway out of scope for this run. ci.yml runs on push to main with permissions: contents: write and embeds secrets.GITHUB_TOKEN in a clone URL (ci.yml:218) to push logs to ci-results. CLAUDE.md tells the autonomous agents to read those logs and act on them. No unit reviewed this workflow, and the dependency CVE audit was not run because the network is blocked."
+    ]
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Fapp.ts%23Pre-auth%20and%20low-privilege%20request%20processing%20across%20the%20API%20and%20WebSocket%20%28%2Fauth%2Fapple%2C%20%2Fapp-store%2Fnotifications%2C%20%2Fwaitlist%2C%20%2Fws%2C%20%2Fdogs%2F%3Aid%2Fphoto%2C%20camera%20POST%20%2Fevents%29::backend%2Fsrc%2Fapp.ts%23Work%20and%20storage%20an%20anonymous%20client%2C%20a%20member%20or%20a%20paired%20camera%20can%20make%20the%20server%20and%20APNs%20do::profile%2Fquick%2Fall-in-scope-subsystems::RESOURCE-EXHAUSTION-AND-AVAILABILITY.md%23Pre-authentication%20work%20imbalance",
+    "canonical_refs": {
+      "surface": "backend/src/app.ts#Pre-auth and low-privilege request processing across the API and WebSocket (/auth/apple, /app-store/notifications, /waitlist, /ws, /dogs/:id/photo, camera POST /events)",
+      "boundary": "backend/src/app.ts#Work and storage an anonymous client, a member or a paired camera can make the server and APNs do",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Pre-authentication work imbalance"
+    },
+    "surface": "Pre-auth and low-privilege request processing across the API and WebSocket (/auth/apple, /app-store/notifications, /waitlist, /ws, /dogs/:id/photo, camera POST /events)",
+    "boundary": "Work and storage an anonymous client, a member or a paired camera can make the server and APNs do",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Pre-authentication work imbalance",
+    "starting_paths": [
+      "backend/src/app.ts",
+      "backend/src/routes/auth.ts",
+      "backend/src/auth/apple.ts",
+      "backend/src/routes/subscription.ts",
+      "backend/src/billing/app-store.ts",
+      "backend/src/routes/realtime.ts",
+      "backend/src/realtime/hub.ts",
+      "backend/src/routes/dogs.ts",
+      "backend/src/routes/events.ts",
+      "backend/src/notifications/notifier.ts",
+      "backend/src/notifications/apns.ts",
+      "backend/src/routes/waitlist.ts"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Pre-authentication work imbalance",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Unbounded buffering and cardinality",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Database and downstream query amplification",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Universal moves",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript only"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "server-side availability only"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic: Architecture leaves RESOURCE-EXHAUSTION out because there is 'no unit in quick profile'. That is a budget reason, not a reason found in source. Public routes do real work before auth: the Apple JWKS fetch and verify, x5c chain verification on POST /app-store/notifications, and waitlist inserts keyed on the spoofable request.ip. dogs.ts:100 accepts image/jpeg bodies up to DOG_PHOTO_MAX_BYTES and stores them in Postgres (dog_photos). A paired camera's POST /events fans out to APNs for every household device (notifier.ts) with no visible per-camera rate limit. /ws sockets and the hub keep per-connection state with no visible message rate limit. No unit owns these paths for this class, and notifications/apns.ts was not reviewed by any unit."
+    ]
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Fapp.ts%23unauthenticated%20routes::backend%2Fsrc%2Froutes%2Fwaitlist.ts%23GET%20%2Fwaitlist%2Fstats::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Obvious%20things",
+    "canonical_refs": {
+      "surface": "backend/src/app.ts#unauthenticated routes",
+      "boundary": "backend/src/routes/waitlist.ts#GET /waitlist/stats",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Obvious things"
+    },
+    "surface": "Unauthenticated public surfaces (health, landing, waitlist, app links, invite page)",
+    "boundary": "Public surface exposure and admin token",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Obvious things",
+    "starting_paths": [
+      "backend/src/app.ts",
+      "backend/src/routes/health.ts",
+      "backend/src/routes/landing.ts",
+      "backend/src/landing/render.ts",
+      "backend/src/landing/static.ts",
+      "backend/src/routes/waitlist.ts",
+      "backend/src/routes/app-links.ts",
+      "backend/Dockerfile",
+      "backend/.env.example"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Obvious things",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h5-public-client",
+    "reviewed_paths": [
+      ".gitignore",
+      "backend/.env.example",
+      "backend/.gitignore",
+      "backend/Dockerfile",
+      "backend/package-lock.json",
+      "backend/package.json",
+      "backend/src/app.ts",
+      "backend/src/config.ts",
+      "backend/src/landing/render.ts",
+      "backend/src/landing/static.ts",
+      "backend/src/pairing/attempt-limiter.ts",
+      "backend/src/routes/app-links.ts",
+      "backend/src/routes/health.ts",
+      "backend/src/routes/invites.ts",
+      "backend/src/routes/landing.ts",
+      "backend/src/routes/waitlist.ts",
+      "backend/src/server.ts",
+      "backend/src/waitlist/email.ts",
+      "backend/src/waitlist/tokens.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "backend/src/app.ts",
+          "backend/src/routes/waitlist.ts",
+          "backend/src/pairing/attempt-limiter.ts"
+        ],
+        "invariant": "Per-IP rate limiting on public routes must key on an address the client cannot choose; trustProxy must trust only the known edge hop.",
+        "method": "local",
+        "result": "buildApp sets trustProxy: true, so request.ip is the leftmost X-Forwarded-For entry. In the sandboxed test with the production default waitlist limiter (5 per 10 min), one socket peer sending a fixed real-client XFF got 202x5 then 429. The same peer rotating a client-supplied leftmost XFF entry ('203.0.113.N, 198.51.100.9') got 202 on all 20 attempts, and request.ip came back as the spoofed 203.0.113.77. Whether this can be exploited in production depends on whether Railway's edge appends to or overwrites an incoming X-Forwarded-For header, and source does not show that.",
+        "artifact": "agents/h5-public-client/artifacts/evidence/xff-limiter.txt"
+      },
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "backend/src/routes/waitlist.ts",
+          "backend/src/waitlist/tokens.ts",
+          "backend/src/config.ts"
+        ],
+        "invariant": "GET /waitlist/stats requires a strong admin bearer token compared in constant time, and is hidden when unset.",
+        "method": "source",
+        "result": "Returns 404 when ADMIN_TOKEN is unset. The config rejects tokens under 32 characters. tokenMatches compares SHA-256 digests with timingSafeEqual. The route returns only aggregate counts, no emails. No default or hard-coded admin token exists.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "backend/src/routes/waitlist.ts",
+          "backend/src/waitlist/email.ts",
+          "backend/src/routes/landing.ts",
+          "backend/src/landing/render.ts"
+        ],
+        "invariant": "No open redirect, reflected markup or enumeration on the waitlist and landing routes.",
+        "method": "source",
+        "result": "The waitlist form redirect target is fixed to /join or /he/join. Source is regex-limited to [A-Za-z0-9._-]{1,64} and URLSearchParams-encoded. GET / redirects to the fixed /join or /he/join plus the original query string, so no host or path is under attacker control. renderLandingPage HTML-escapes every placeholder and validates source. A strict CSP is set (no inline script, frame-ancestors 'none'). POST /waitlist answers the same way for new and existing emails. Unsubscribe uses 192-bit random tokens of at most 128 characters and shows the same page for unknown tokens.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "backend/src/routes/health.ts",
+          "backend/src/routes/app-links.ts",
+          "backend/src/landing/static.ts",
+          "backend/src/app.ts"
+        ],
+        "invariant": "Unauthenticated health, app-link and static routes expose no secrets, debug state or filesystem paths.",
+        "method": "source",
+        "result": "/health returns status, uptime and package version only. There are no /debug, /admin, /metrics, /env or /config routes. The AASA file lists only the configured appIDs. The GET /invite/:token page is static HTML that ignores the token. Static files come from a fixed allowlist read at startup, so there is no path traversal. parseRange bounds start and end to the buffer.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          ".gitignore",
+          "backend/.gitignore",
+          "backend/.env.example",
+          "backend/Dockerfile",
+          "backend/package.json",
+          "backend/src/config.ts",
+          "backend/src/server.ts"
+        ],
+        "invariant": "No committed secrets, no prod-usable defaults, debug not toggleable, safe container and error behaviour.",
+        "method": "source",
+        "result": "Both .gitignore files cover .env. .env.example has every secret blank (DATABASE_URL is a localhost dev default only). The tracked *.pem/*.key files are under backend/test/fixtures/app-store, and production pins Apple Root CA G3 by default (APPLE_ROOT_CA_SHA256 fallback). JWT_SECRET is required and must be at least 32 characters. Grep found no eval, child_process or new Function in src, no CORS plugin, no cookies, and no security TODO/FIXME comments. Fastify's default error handler is in use (no stack traces). The Dockerfile runs as USER node with NODE_ENV=production. Dependencies are locked via package-lock.json. A CVE audit was not run because the network is blocked.",
+        "artifact": null
+      },
+      {
+        "agent_id": "v1",
+        "reviewed_paths": [
+          "backend/package-lock.json",
+          "backend/src/app.ts",
+          "backend/src/pairing/attempt-limiter.ts",
+          "backend/src/routes/invites.ts",
+          "backend/src/routes/waitlist.ts"
+        ],
+        "invariant": "Independent verification of backend/src/app.ts:trustProxy-all-hops:client-controlled-request-ip",
+        "method": "local",
+        "result": "Verifier decision: needs_validation",
+        "artifact": "agents/v1/artifacts/evidence/v1-xff.txt"
+      }
+    ],
+    "result_fingerprints": [
+      "backend/src/app.ts:trustProxy-all-hops:client-controlled-request-ip"
+    ],
+    "unresolved": [],
+    "x_hardening": [
+      "backend/src/routes/landing.ts:89 publicOrigin uses request.host, which trustProxy: true takes from X-Forwarded-Host. The value is regex-limited to hostname characters, HTML-escaped, and the page is served with cache-control: no-cache, so it only spoofs OG/canonical URLs in the attacker's own response. A configured PUBLIC_ORIGIN would remove this.",
+      "ios/App/Household/HouseholdView.swift:201 copies the 1-hour export JWT to UIPasteboard.general without an expiry. setItems with an .expirationDate matching the token TTL would limit how long it stays on the clipboard and in Universal Clipboard.",
+      "backend/src/pairing/attempt-limiter.ts is per-process memory: limits reset on every deploy or restart and are not shared across replicas."
+    ],
+    "x_decisions": {
+      "backend/src/app.ts:trustProxy-all-hops:client-controlled-request-ip": "needs_validation"
+    }
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Fauth%2Fdevice-plugin.ts%23Authorization%3A%20Device::backend%2Fsrc%2Fauth%2Fdevice-plugin.ts%23authenticateDevice::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Access%20control",
+    "canonical_refs": {
+      "surface": "backend/src/auth/device-plugin.ts#Authorization: Device",
+      "boundary": "backend/src/auth/device-plugin.ts#authenticateDevice",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Access control"
+    },
+    "surface": "Camera device routes (Authorization: Device id:secret)",
+    "boundary": "Device secret authentication and per-device scope",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Access control",
+    "starting_paths": [
+      "backend/src/auth/device-plugin.ts",
+      "backend/src/pairing/secrets.ts",
+      "backend/src/routes/events.ts",
+      "backend/src/routes/zones.ts",
+      "backend/src/routes/media.ts",
+      "backend/src/routes/summaries.ts",
+      "backend/src/routes/live.ts",
+      "backend/src/routes/device-self.ts"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Access control",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h2-device",
+    "reviewed_paths": [
+      "backend/src/auth/device-plugin.ts",
+      "backend/src/live/livekit.ts",
+      "backend/src/pairing/secrets.ts",
+      "backend/src/routes/device-self.ts",
+      "backend/src/routes/devices.ts",
+      "backend/src/routes/events.ts",
+      "backend/src/routes/live.ts",
+      "backend/src/routes/media.ts",
+      "backend/src/routes/summaries.ts",
+      "backend/src/routes/zones.ts",
+      "backend/src/storage/storage.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h2-device",
+        "reviewed_paths": [
+          "backend/src/auth/device-plugin.ts",
+          "backend/src/pairing/secrets.ts",
+          "backend/src/routes/devices.ts"
+        ],
+        "invariant": "Device auth accepts only an active device whose stored SHA-256 secret hash matches in constant time; revoked devices and devices without a secret are rejected",
+        "method": "source",
+        "result": "parseDeviceAuthorization requires a UUID id and non-empty secret; authenticateDevice loads by id and requires status==='active', non-null hash and secretMatches (timingSafeEqual after equal-length check). Revoke paths (devices.ts, households.ts) set status revoked and null the hash. POST /devices creates camera rows with no secret hash, so they cannot authenticate. request.device is taken only from the DB row.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-device",
+        "reviewed_paths": [
+          "backend/src/routes/events.ts",
+          "backend/src/routes/zones.ts",
+          "backend/src/routes/summaries.ts",
+          "backend/src/routes/device-self.ts"
+        ],
+        "invariant": "Device routes scope every read/write to request.device.deviceId/householdId and cannot touch another camera's or household's records",
+        "method": "source",
+        "result": "POST /events writes householdId/deviceId from the device; the onConflict id path re-reads with deviceId filter and returns 409 for foreign ids (no leak). PATCH /events/:id filters by id AND deviceId. Zones, summaries (upsert target deviceId+date with householdId from device) and /device/me all key on the authenticated device. Body schemas use additionalProperties:false, so no householdId/deviceId override.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-device",
+        "reviewed_paths": [
+          "backend/src/routes/events.ts",
+          "backend/src/routes/media.ts",
+          "backend/src/storage/storage.ts"
+        ],
+        "invariant": "Camera can only presign uploads and attach media keys under its own households/<h>/cameras/<d>/events/<e>/ prefix",
+        "method": "source",
+        "result": "POST /device/uploads builds keys from device claims plus a UUID eventId; keysBelongToEvent requires startsWith(eventMediaPrefix(...)) ending in '/' and rejects '..'. A camera cannot point an event at another household's object.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-device",
+        "reviewed_paths": [
+          "backend/src/routes/live.ts",
+          "backend/src/live/livekit.ts"
+        ],
+        "invariant": "Camera LiveKit token is limited to its own room",
+        "method": "source",
+        "result": "POST /device/live-token requires role camera and mints a token for roomForCamera(own deviceId) only; no room selector from input.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "x_hardening": [
+      "Camera and member limit checks in invites.ts (count then insert) and POST /devices run under READ COMMITTED without a lock, so concurrent redemptions of several owner-issued invites can exceed LIMITS/plan camera limits; owner-controlled, low impact. A row lock on the household or a unique-constrained counter would close it.",
+      "AttemptLimiter is in-memory per process; scaling Railway to more than one instance multiplies the guess budget and restarts reset it. Move it to Postgres or a shared store if replicas are added.",
+      "Camera redemption by 6-digit code needs no authentication at all; requiring the 192-bit token for camera pairing (QR) and keeping codes only for signed-in members would remove the unauthenticated guessing surface."
+    ]
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Fhouseholds%2Fscope.ts%23Household%20membership%20creation%20%28POST%20%2Fhouseholds%2C%20POST%20%2Finvites%2F%3Atoken%2Faccept%20as%20member%29::backend%2Fsrc%2Fhouseholds%2Fscope.ts%23One-household-per-user%20invariant%20that%20requireHousehold%20and%20member%20removal%20depend%20on::profile%2Fquick%2Fall-in-scope-subsystems::DATA-ISOLATION-AND-LIFECYCLE.md%23Missing%20tenant%20or%20owner%20enforcement",
+    "canonical_refs": {
+      "surface": "backend/src/households/scope.ts#Household membership creation (POST /households, POST /invites/:token/accept as member)",
+      "boundary": "backend/src/households/scope.ts#One-household-per-user invariant that requireHousehold and member removal depend on",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DATA-ISOLATION-AND-LIFECYCLE.md#Missing tenant or owner enforcement"
+    },
+    "surface": "Household membership creation (POST /households, POST /invites/:token/accept as member)",
+    "boundary": "One-household-per-user invariant that requireHousehold and member removal depend on",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Race conditions with business impact",
+    "starting_paths": [
+      "backend/src/households/scope.ts",
+      "backend/src/routes/households.ts",
+      "backend/src/routes/invites.ts",
+      "backend/src/db/schema.ts",
+      "backend/drizzle/0000_init.sql"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Missing tenant or owner enforcement",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Composite-key and namespace collision",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Universal moves",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "JWT verification covered by the auth unit; this unit is about the membership data invariant"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "no message channel involved"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "server-side invariant only"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "separate resource-exhaustion unit proposed"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic: household_members has PK (household_id, user_id) and only a non-unique index on user_id (schema.ts:103). POST /households (households.ts:26-33) and member accept (invites.ts:~98 then insert at :132) both call findMembership before writing, outside any lock, so concurrent requests can give one user two memberships. findMembership (scope.ts) then picks one row with LIMIT 1 and no ORDER BY, so the household and role used for each request are not fixed. The tenant unit's checks assumed this invariant holds ('deletes notification_prefs by userId (safe because a user has at most one household)'), and the invite unit's hardening note covers only the count-based plan limits. No unit checked that the one-household invariant holds under concurrency, or what an owner/member split across households can reach."
+    ]
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Fhouseholds%2Fscope.ts%23requireHousehold::backend%2Fsrc%2Fhouseholds%2Fscope.ts%23requireHousehold::profile%2Fquick%2Fall-in-scope-subsystems::DATA-ISOLATION-AND-LIFECYCLE.md%23Missing%20tenant%20or%20owner%20enforcement",
+    "canonical_refs": {
+      "surface": "backend/src/households/scope.ts#requireHousehold",
+      "boundary": "backend/src/households/scope.ts#requireHousehold",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DATA-ISOLATION-AND-LIFECYCLE.md#Missing tenant or owner enforcement"
+    },
+    "surface": "Signed-in viewer routes scoped to a household",
+    "boundary": "Household tenant isolation and owner-only actions",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Missing tenant or owner enforcement",
+    "starting_paths": [
+      "backend/src/households/scope.ts",
+      "backend/src/routes/households.ts",
+      "backend/src/routes/dogs.ts",
+      "backend/src/routes/devices.ts",
+      "backend/src/routes/timeline.ts",
+      "backend/src/routes/notification-prefs.ts",
+      "backend/src/routes/live-activities.ts",
+      "backend/src/routes/summaries.ts",
+      "backend/src/households/dto.ts"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Missing tenant or owner enforcement",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Universal moves",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h3-tenant",
+    "reviewed_paths": [
+      "backend/src/households/dto.ts",
+      "backend/src/households/scope.ts",
+      "backend/src/notifications/live-activity.ts",
+      "backend/src/routes/devices.ts",
+      "backend/src/routes/dogs.ts",
+      "backend/src/routes/households.ts",
+      "backend/src/routes/live-activities.ts",
+      "backend/src/routes/notification-prefs.ts",
+      "backend/src/routes/summaries.ts",
+      "backend/src/routes/timeline.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/households/scope.ts"
+        ],
+        "invariant": "requireHousehold derives the household only from the authenticated user's household_members row on every request (never from params/body), and requireOwner checks that row's role",
+        "method": "source",
+        "result": "findMembership queries household_members by request.user.userId (JWT subject) per request and sets request.household; no request field influences householdId; requireOwner checks role === 'owner'. Membership removal takes effect immediately because the row is re-read on every request.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/routes/households.ts",
+          "backend/src/households/dto.ts"
+        ],
+        "invariant": "GET/PATCH /household and DELETE /household/members/:userId bind every read/write to request.household.householdId; mutations are owner-only; member removal only affects that household's rows",
+        "method": "source",
+        "result": "All selects filter by householdId (zones joined through devices.householdId). PATCH and member DELETE use requireOwner; DELETE looks up the target with householdId+userId, refuses owner removal, deletes membership scoped by household, revokes devices scoped by householdId+userId, and deletes notification_prefs by userId (safe because a user has at most one household). DTOs omit secret hash and raw APNs token.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/routes/dogs.ts"
+        ],
+        "invariant": "Every dog read/update/delete and photo read/write/delete is bound to the caller's household",
+        "method": "source",
+        "result": "All by-id operations use scoped(householdId,id); GET /dogs/:id/photo joins dogs and applies the scope; photo PUT updates the scoped dog in a transaction before writing dog_photos by that dog's id; photo DELETE deletes dog_photos only for the dog returned by the scoped update. No cross-household path.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/routes/devices.ts"
+        ],
+        "invariant": "Device list/patch/revoke are household-scoped; patch is limited to own device or owner; revoke is owner-only",
+        "method": "source",
+        "result": "loadDevice filters id+householdId; PATCH checks device.userId === caller or role owner and refuses revoked devices; revoke has requireOwner; POST inserts with householdId from scope and userId from JWT. Body cannot set householdId/userId/status (additionalProperties:false).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/routes/timeline.ts",
+          "backend/src/routes/summaries.ts"
+        ],
+        "invariant": "Timeline, feedback and summaries queries always include the household filter, and optional cameraId/cursor filters are ANDed with it",
+        "method": "source",
+        "result": "GET /events starts filters with events.householdId and ANDs cameraId/types/cursor; PUT /events/:id/feedback updates with id AND householdId; GET /summaries filters dailySummaries.householdId first and ANDs cameraId/date range. Camera summary upsert uses device-auth deviceId/householdId with conflict target (deviceId,date).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/routes/notification-prefs.ts",
+          "backend/src/routes/live-activities.ts",
+          "backend/src/notifications/live-activity.ts"
+        ],
+        "invariant": "Per-user prefs and Live Activity registrations reference only cameras of the caller's household, and removed members stop receiving camera-derived pushes",
+        "method": "source",
+        "result": "PUT /notification-prefs validates every cameraId is a camera in the caller's household and replaces only the caller's rows; PUT /live-activities requires an active camera in the caller's household; DELETE is bound to userId; LiveActivityNotifier.send inner-joins household_members on (householdId,userId), so a removed member's stale registration is not pushed.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "x_hardening": [
+      "backend/src/routes/dogs.ts: create/patch/delete dog and photo upload/delete have no requireOwner, so any household member can edit or delete the household's dog profiles. SPEC/DECISIONS do not state dogs are owner-only (only revoke, invites, household settings and billing are), so this is a policy choice to confirm rather than a finding.",
+      "Presigned download URLs are bearer links not revocable on ACL change: 10 min for timeline/snapshot media and 6 h for the push snapshot URL (SNAPSHOT_URL_TTL_SECONDS). A member removed via DELETE /household/members/:userId keeps any URL already issued until it expires; retention purge also leaves links working until the object is deleted. Bounded by TTL; consider a shorter push TTL.",
+      "backend/src/routes/live-activities.ts: the upsert on push_token conflict reassigns an existing row's householdId/userId/cameraId to the latest caller. That is only exploitable with another user's ActivityKit push token (not exposed by the API), but binding the conflict update to the same userId would close it.",
+      "backend/src/routes/media.ts POST /device/uploads does not check that the eventId exists or belongs to the camera, and a revoked camera's already-issued PUT URLs stay valid for up to 15 min. Writes are limited to the camera's own prefix, but objects uploaded for events that never get a DB row are never removed by the DB-driven retention job (storage lifecycle gap, not cross-tenant).",
+      "dogs.photoKey is a free-form string up to 500 chars that any member can set, with no prefix validation. Nothing presigns it today; if it is ever signed, bind it to a household prefix the way events.ts does for media keys.",
+      "backend/src/routes/devices.ts POST /devices lets any member register a role=camera row with no secret. It cannot authenticate, but it uses up the household's camera limit slots until the owner revokes it."
+    ]
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Froutes%2Fauth.ts%23POST%20%2Fauth%2Fapple::backend%2Fsrc%2Fauth%2Fapple.ts%23createAppleTokenVerifier::profile%2Fquick%2Fall-in-scope-subsystems::WEB-PROTOCOL-AND-AUTH.md%23JWT%20verification%20and%20claim%20binding",
+    "canonical_refs": {
+      "surface": "backend/src/routes/auth.ts#POST /auth/apple",
+      "boundary": "backend/src/auth/apple.ts#createAppleTokenVerifier",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "WEB-PROTOCOL-AND-AUTH.md#JWT verification and claim binding"
+    },
+    "surface": "POST /auth/apple and bearer JWTs",
+    "boundary": "Sign in with Apple verification and our HS256 session JWT",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "JWT verification and claim binding",
+    "starting_paths": [
+      "backend/src/routes/auth.ts",
+      "backend/src/auth/apple.ts",
+      "backend/src/auth/jwt.ts",
+      "backend/src/auth/plugin.ts",
+      "backend/src/config.ts"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#JWT verification and claim binding",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h1-auth",
+    "reviewed_paths": [
+      "backend/src/auth/apple.ts",
+      "backend/src/auth/jwt.ts",
+      "backend/src/auth/plugin.ts",
+      "backend/src/config.ts",
+      "backend/src/routes/auth.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h1-auth",
+        "reviewed_paths": [
+          "backend/src/auth/apple.ts",
+          "backend/src/routes/auth.ts"
+        ],
+        "invariant": "Apple identity tokens are accepted only with a signature from Apple's JWKS, a pinned RS256 algorithm, issuer https://appleid.apple.com, an audience in APPLE_AUDIENCES, a non-empty sub, and nonce == sha256(raw nonce); the user is keyed only by the verified sub",
+        "method": "source",
+        "result": "jose jwtVerify gets the remote JWKS (kid selects only within Apple's set, no jku/x5u), algorithms ['RS256'], issuer and audience pinned, exp/nbf checked by jose by default. sub type and nonce are checked after verification. All other errors become InvalidAppleTokenError and a 401. The upsert keys on identity.sub only, and the client name cannot change identity. No decode-without-verify path.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth",
+        "reviewed_paths": [
+          "backend/src/auth/jwt.ts",
+          "backend/src/auth/plugin.ts",
+          "backend/src/config.ts"
+        ],
+        "invariant": "Session JWTs verify with an HS256-only, server-held secret of at least 32 characters and a pinned issuer and audience; a missing or invalid bearer gives a 401",
+        "method": "source",
+        "result": "JwtService.verify pins algorithms ['HS256'], issuer 'dog-monitor', audience 'dog-monitor-app'. jose enforces exp. requireServerConfig rejects a missing JWT_SECRET or one under 32 chars. The plugin accepts only 'Bearer ' and returns 401 when claims are null. Apple tokens (RS256, a different iss and aud) cannot pass. No alg-none or key-confusion path.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "x_hardening": [
+      "Session JWTs (30-day default) have no revocation or jti. Removing a member is enforced by requireHousehold's membership lookup, not by token invalidation, so a leaked session stays valid for /me and household creation until exp.",
+      "The Apple sign-in nonce is generated by the client and not recorded as used on the server. A captured (identityToken, rawNonce) pair can be replayed within the Apple token's lifetime. Getting the pair requires the TLS request body, so this is not a finding."
+    ]
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Froutes%2Finvites.ts%23POST%20%2Finvites%2F%3Atoken%2Faccept::backend%2Fsrc%2Fpairing%2Fattempt-limiter.ts%23AttemptLimiter::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Business%20logic",
+    "canonical_refs": {
+      "surface": "backend/src/routes/invites.ts#POST /invites/:token/accept",
+      "boundary": "backend/src/pairing/attempt-limiter.ts#AttemptLimiter",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Business logic"
+    },
+    "surface": "Invite creation and redemption (token / 6-digit code)",
+    "boundary": "Invite secrecy, expiry, single use and brute-force limiter",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Business logic",
+    "starting_paths": [
+      "backend/src/routes/invites.ts",
+      "backend/src/pairing/secrets.ts",
+      "backend/src/pairing/attempt-limiter.ts",
+      "backend/src/billing/camera-limit.ts",
+      "backend/src/households/limits.ts",
+      "backend/src/routes/app-links.ts"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Business logic",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h2-device",
+    "reviewed_paths": [
+      "agents/v5/artifacts/evidence/v5-invite-limiter-race.txt",
+      "backend/package-lock.json",
+      "backend/src/app.ts",
+      "backend/src/billing/camera-limit.ts",
+      "backend/src/households/limits.ts",
+      "backend/src/pairing/attempt-limiter.ts",
+      "backend/src/pairing/secrets.ts",
+      "backend/src/routes/app-links.ts",
+      "backend/src/routes/invites.ts",
+      "backend/src/routes/waitlist.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h2-device",
+        "reviewed_paths": [
+          "backend/src/routes/invites.ts",
+          "backend/src/pairing/secrets.ts",
+          "backend/src/billing/camera-limit.ts",
+          "backend/src/households/limits.ts",
+          "backend/src/routes/app-links.ts"
+        ],
+        "invariant": "Invites are single-use, expire after 10 minutes, are consumed atomically, and are not consumed when a limit check fails",
+        "method": "source",
+        "result": "Consumption is a single UPDATE ... WHERE code/token AND usedAt IS NULL AND expiresAt > now RETURNING inside a transaction; member/camera limit AcceptErrors throw inside the transaction so usedAt is rolled back. Token is 192-bit random, code 6 digits via randomInt; owner-only creation. GET /invite/:token is static HTML with no token lookup. Single-use/expiry hold.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-device",
+        "reviewed_paths": [
+          "backend/src/routes/invites.ts",
+          "backend/src/pairing/attempt-limiter.ts",
+          "backend/src/app.ts"
+        ],
+        "invariant": "The 10-failures/10-min limiter bounds 6-digit code guesses per client",
+        "method": "local",
+        "result": "With AttemptLimiter(3, 60s): 50 concurrent bad guesses from one client all returned 404 (none 429) because isBlocked runs before any recordFailure; and after a block, rotating X-Forwarded-For (leftmost entry, even with a trailing proxy hop) returned 404 again, then a real code redeemed as camera from another spoofed XFF returned 201 with a deviceSecret.",
+        "artifact": "agents/h2-device/artifacts/evidence/h2-invite-limiter.txt"
+      },
+      {
+        "agent_id": "v1",
+        "reviewed_paths": [
+          "backend/package-lock.json",
+          "backend/src/app.ts",
+          "backend/src/pairing/attempt-limiter.ts",
+          "backend/src/routes/invites.ts",
+          "backend/src/routes/waitlist.ts"
+        ],
+        "invariant": "Independent verification of backend/src/app.ts:trustProxy-all-hops:client-controlled-request-ip",
+        "method": "local",
+        "result": "Verifier decision: needs_validation",
+        "artifact": "agents/v1/artifacts/evidence/v1-xff.txt"
+      },
+      {
+        "agent_id": "v5",
+        "reviewed_paths": [
+          "agents/v5/artifacts/evidence/v5-invite-limiter-race.txt",
+          "backend/src/pairing/attempt-limiter.ts",
+          "backend/src/pairing/secrets.ts",
+          "backend/src/routes/invites.ts"
+        ],
+        "invariant": "Independent verification of backend/src/routes/invites.ts:invite-accept-limiter-check-then-record-race",
+        "method": "local",
+        "result": "Verifier decision: confirmed, severity medium",
+        "artifact": "agents/v5/artifacts/evidence/v5-invite-limiter-race.txt"
+      }
+    ],
+    "result_fingerprints": [
+      "backend/src/app.ts:trustProxy-all-hops:client-controlled-request-ip",
+      "backend/src/routes/invites.ts:invite-accept-limiter-check-then-record-race"
+    ],
+    "unresolved": [],
+    "x_hardening": [
+      "Camera and member limit checks in invites.ts (count then insert) and POST /devices run under READ COMMITTED without a lock, so concurrent redemptions of several owner-issued invites can exceed LIMITS/plan camera limits; owner-controlled, low impact. A row lock on the household or a unique-constrained counter would close it.",
+      "AttemptLimiter is in-memory per process; scaling Railway to more than one instance multiplies the guess budget and restarts reset it. Move it to Postgres or a shared store if replicas are added.",
+      "Camera redemption by 6-digit code needs no authentication at all; requiring the 192-bit token for camera pairing (QR) and keeping codes only for signed-in members would remove the unauthenticated guessing surface."
+    ],
+    "x_duplicate_fingerprints": [
+      "backend/src/routes/invites.ts:invite-accept-limiter-keyed-on-spoofable-xff"
+    ],
+    "x_decisions": {
+      "backend/src/app.ts:trustProxy-all-hops:client-controlled-request-ip": "needs_validation",
+      "backend/src/routes/invites.ts:invite-accept-limiter-check-then-record-race": "confirmed"
+    }
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Froutes%2Fmedia.ts%23GET%20%2Fevents%2F%3Aid%2Fmedia::backend%2Fsrc%2Fstorage%2Fstorage.ts%23presignDownload::profile%2Fquick%2Fall-in-scope-subsystems::DATA-ISOLATION-AND-LIFECYCLE.md%23Blob%20and%20signed-reference%20overreach",
+    "canonical_refs": {
+      "surface": "backend/src/routes/media.ts#GET /events/:id/media",
+      "boundary": "backend/src/storage/storage.ts#presignDownload",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DATA-ISOLATION-AND-LIFECYCLE.md#Blob and signed-reference overreach"
+    },
+    "surface": "Event media, uploads and presigned storage URLs",
+    "boundary": "Presigned URL scope and media key ownership",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Blob and signed-reference overreach",
+    "starting_paths": [
+      "backend/src/routes/media.ts",
+      "backend/src/storage/storage.ts",
+      "backend/src/storage/retention.ts",
+      "backend/src/routes/events.ts",
+      "backend/src/notifications/notifier.ts"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Blob and signed-reference overreach",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Universal moves",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h3-tenant",
+    "reviewed_paths": [
+      "backend/src/notifications/notifier.ts",
+      "backend/src/routes/events.ts",
+      "backend/src/routes/media.ts",
+      "backend/src/routes/training.ts",
+      "backend/src/storage/retention.ts",
+      "backend/src/storage/storage.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/routes/media.ts",
+          "backend/src/storage/storage.ts"
+        ],
+        "invariant": "Viewer presigned GETs are issued only for keys stored on events of the caller's household; presigned PUTs only for the calling camera's own key namespace",
+        "method": "source",
+        "result": "GET /events/:id/media selects the event by id AND householdId before signing its stored keys; GET /cameras/snapshots filters events.householdId. POST /device/uploads builds keys server-side via eventMediaKey(device.householdId, device.deviceId, eventId, kind) with a fixed content type and 15 min TTL, so a camera can only sign PUTs under households/<own h>/cameras/<own c>/. presignDownload/presignUpload sign a single exact Key with GET/PUT respectively.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/routes/events.ts"
+        ],
+        "invariant": "clipKey/snapshotKey written by a camera (the source of every later presign and deletion) must lie in that camera's own event prefix",
+        "method": "source",
+        "result": "POST /events and PATCH /events/:id call keysBelongToEvent(eventMediaPrefix(device.householdId, device.deviceId, eventId), ...) requiring startsWith(prefix) and no '..'; PATCH also binds the row to deviceId. These are the only writers of clipKey/snapshotKey (retention only nulls them). A camera therefore cannot plant a key pointing at another household's object to get it signed or deleted.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "backend/src/notifications/notifier.ts",
+          "backend/src/storage/retention.ts",
+          "backend/src/routes/training.ts"
+        ],
+        "invariant": "Derived signed references (push snapshot URL, training export, retention deletes) use only household-bound stored keys and reach only that household",
+        "method": "source",
+        "result": "Notifier presigns event.snapshotKey (validated at write) and sends only to active viewer devices of event.householdId; training export filters events.householdId; retention deletes the stored (prefix-validated) keys via DB lookup, not bucket listing, so cannot delete another tenant's objects.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "x_hardening": [
+      "backend/src/routes/dogs.ts: create/patch/delete dog and photo upload/delete have no requireOwner, so any household member can edit or delete the household's dog profiles. SPEC/DECISIONS do not state dogs are owner-only (only revoke, invites, household settings and billing are), so this is a policy choice to confirm rather than a finding.",
+      "Presigned download URLs are bearer links not revocable on ACL change: 10 min for timeline/snapshot media and 6 h for the push snapshot URL (SNAPSHOT_URL_TTL_SECONDS). A member removed via DELETE /household/members/:userId keeps any URL already issued until it expires; retention purge also leaves links working until the object is deleted. Bounded by TTL; consider a shorter push TTL.",
+      "backend/src/routes/live-activities.ts: the upsert on push_token conflict reassigns an existing row's householdId/userId/cameraId to the latest caller. That is only exploitable with another user's ActivityKit push token (not exposed by the API), but binding the conflict update to the same userId would close it.",
+      "backend/src/routes/media.ts POST /device/uploads does not check that the eventId exists or belongs to the camera, and a revoked camera's already-issued PUT URLs stay valid for up to 15 min. Writes are limited to the camera's own prefix, but objects uploaded for events that never get a DB row are never removed by the DB-driven retention job (storage lifecycle gap, not cross-tenant).",
+      "dogs.photoKey is a free-form string up to 500 chars that any member can set, with no prefix validation. Nothing presigns it today; if it is ever signed, bind it to a household prefix the way events.ts does for media keys.",
+      "backend/src/routes/devices.ts POST /devices lets any member register a role=camera row with no secret. It cannot authenticate, but it uses up the household's camera limit slots until the owner revokes it."
+    ]
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Froutes%2Frealtime.ts%23GET%20%2Fws::backend%2Fsrc%2Frealtime%2Fhub.ts%23RealtimeHub::profile%2Fquick%2Fall-in-scope-subsystems::PROTOCOLS-RPC-AND-MESSAGING.md%23Peer%20identity%20to%20application-principal%20confusion",
+    "canonical_refs": {
+      "surface": "backend/src/routes/realtime.ts#GET /ws",
+      "boundary": "backend/src/realtime/hub.ts#RealtimeHub",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "PROTOCOLS-RPC-AND-MESSAGING.md#Peer identity to application-principal confusion"
+    },
+    "surface": "Realtime WebSocket and LiveKit room tokens",
+    "boundary": "Channel identity and per-household room grants",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Peer identity to application-principal confusion",
+    "starting_paths": [
+      "backend/src/routes/realtime.ts",
+      "backend/src/realtime/hub.ts",
+      "backend/src/realtime/protocol.ts",
+      "backend/src/routes/live.ts",
+      "backend/src/live/livekit.ts"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+      "PROTOCOLS-RPC-AND-MESSAGING.md#Peer identity to application-principal confusion",
+      "PROTOCOLS-RPC-AND-MESSAGING.md#Universal moves",
+      "PROTOCOLS-RPC-AND-MESSAGING.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h4-live-billing",
+    "reviewed_paths": [
+      "agents/v6/artifacts/evidence/v6-ws-revocation.txt",
+      "backend/package.json",
+      "backend/src/app.ts",
+      "backend/src/auth/device-plugin.ts",
+      "backend/src/live/livekit.ts",
+      "backend/src/realtime/hub.ts",
+      "backend/src/realtime/protocol.ts",
+      "backend/src/routes/devices.ts",
+      "backend/src/routes/households.ts",
+      "backend/src/routes/live.ts",
+      "backend/src/routes/realtime.ts",
+      "ios/App/Viewer/LiveViewModel.swift"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h4-live-billing",
+        "reviewed_paths": [
+          "backend/src/routes/realtime.ts",
+          "backend/src/realtime/hub.ts",
+          "backend/src/realtime/protocol.ts",
+          "backend/src/auth/device-plugin.ts"
+        ],
+        "invariant": "WebSocket principal binding: camera identity comes only from the authenticated device row (deviceId, householdId from DB), viewer household comes only from findMembership(userId); no message field selects another device, user or household",
+        "method": "source",
+        "result": "Holds at connect time. Camera messages carry no device or household selector (heartbeat only, keyed by request.device.deviceId). Viewer watch/unwatch cameraId is checked against the household resolved at setup, role camera and status active. Broadcasts (toHousehold) use the stored householdId. Channel identity and application principal are bound deterministically at upgrade.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-live-billing",
+        "reviewed_paths": [
+          "backend/src/routes/realtime.ts",
+          "backend/src/realtime/hub.ts",
+          "backend/src/routes/households.ts",
+          "backend/src/routes/devices.ts"
+        ],
+        "invariant": "Removing a member or revoking a camera ends that principal's realtime access",
+        "method": "local",
+        "result": "Fails. After DELETE /household/members/:id (HTTP then returns 403), the removed member's open socket still received presence and cameraState=barking for the old household, and its watch message still reached the camera as viewers joined count 1. After POST /devices/:id/revoke, the revoked camera's open socket still pushed cameraState to the owner's viewer and wrote battery=0.11 to the revoked device row.",
+        "artifact": "agents/h4-live-billing/artifacts/evidence/ws-revocation.txt"
+      },
+      {
+        "agent_id": "h4-live-billing",
+        "reviewed_paths": [
+          "backend/src/routes/live.ts",
+          "backend/src/live/livekit.ts"
+        ],
+        "invariant": "LiveKit grants are per camera room, only for cameras in the caller's household (viewer) or the caller's own device (camera); revocation evicts live participants",
+        "method": "source",
+        "result": "Token minting is scoped correctly: the viewer route filters by request.household.householdId, role camera, status active; the camera route uses request.device.deviceId with a role check; device auth requires status active. The room name comes from the server-side deviceId. No RoomServiceClient/removeParticipant call exists anywhere, so revocation or member removal never evicts a participant who is already connected. Whether LiveKit keeps refreshing that participant's token is outside the repo (needs_validation).",
+        "artifact": null
+      },
+      {
+        "agent_id": "v4",
+        "reviewed_paths": [
+          "backend/package.json",
+          "backend/src/live/livekit.ts",
+          "backend/src/routes/devices.ts",
+          "backend/src/routes/households.ts",
+          "backend/src/routes/live.ts",
+          "ios/App/Viewer/LiveViewModel.swift"
+        ],
+        "invariant": "Independent verification of backend/src/live/livekit.ts:no-participant-eviction-on-revocation",
+        "method": "source",
+        "result": "Verifier decision: needs_validation",
+        "artifact": null
+      },
+      {
+        "agent_id": "v6",
+        "reviewed_paths": [
+          "agents/v6/artifacts/evidence/v6-ws-revocation.txt",
+          "backend/src/app.ts",
+          "backend/src/auth/device-plugin.ts",
+          "backend/src/realtime/hub.ts",
+          "backend/src/routes/devices.ts",
+          "backend/src/routes/households.ts",
+          "backend/src/routes/realtime.ts"
+        ],
+        "invariant": "Independent verification of backend/src/routes/realtime.ts:ws-authorization-only-at-upgrade",
+        "method": "local",
+        "result": "Verifier decision: confirmed, severity low",
+        "artifact": "agents/v6/artifacts/evidence/v6-ws-revocation.txt"
+      }
+    ],
+    "result_fingerprints": [
+      "backend/src/live/livekit.ts:no-participant-eviction-on-revocation",
+      "backend/src/routes/realtime.ts:ws-authorization-only-at-upgrade"
+    ],
+    "unresolved": [],
+    "x_hardening": [
+      "Viewer limit: POST /cameras/:id/live-token counts only /ws watchers (hub.viewerCount), so a member can mint LiveKit viewer tokens without registering a watch, and the viewers-per-camera limit is advisory. It is a same-household quota, not an isolation break.",
+      "App Store notifications are not deduplicated by notificationUUID and signedDate is not checked. Out-of-order handling depends only on expiresAt comparisons in applyTransaction.",
+      "The camera limit is enforced only at pairing (invites route), so any short Premium window (refund replay, sandbox transaction) leaves extra cameras paired after it lapses. This is documented behavior, but it amplifies both billing candidates."
+    ],
+    "x_decisions": {
+      "backend/src/live/livekit.ts:no-participant-eviction-on-revocation": "needs_validation",
+      "backend/src/routes/realtime.ts:ws-authorization-only-at-upgrade": "confirmed"
+    }
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Froutes%2Fsubscription.ts%23POST%20%2Fapp-store%2Fnotifications::backend%2Fsrc%2Fbilling%2Fapp-store.ts%23createAppStoreVerifier::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Cryptography%20and%20secrets",
+    "canonical_refs": {
+      "surface": "backend/src/routes/subscription.ts#POST /app-store/notifications",
+      "boundary": "backend/src/billing/app-store.ts#createAppStoreVerifier",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Cryptography and secrets"
+    },
+    "surface": "StoreKit transactions and App Store server notifications",
+    "boundary": "Signed transaction verification and premium binding to one household",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Cryptography and secrets",
+    "starting_paths": [
+      "backend/src/routes/subscription.ts",
+      "backend/src/billing/app-store.ts",
+      "backend/src/billing/apply-transaction.ts",
+      "backend/src/billing/plans.ts"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Cryptography and secrets",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h4-live-billing",
+    "reviewed_paths": [
+      "agents/v3/artifacts/evidence/v3-refund-replay.txt",
+      "backend/src/billing/app-store.ts",
+      "backend/src/billing/apply-transaction.ts",
+      "backend/src/billing/plans.ts",
+      "backend/src/config.ts",
+      "backend/src/routes/subscription.ts",
+      "backend/test/subscription.test.ts",
+      "docs/HUMAN_TODO.md",
+      "ios/project.yml"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h4-live-billing",
+        "reviewed_paths": [
+          "backend/src/billing/app-store.ts",
+          "backend/src/config.ts"
+        ],
+        "invariant": "Signed transaction and notification verification: ES256 only, 3-cert x5c chain to a pinned Apple root fingerprint, Apple OID extensions, validity window, signature checked by the leaf key, and no fallback that skips verification on error",
+        "method": "source",
+        "result": "Holds. alg is pinned to ES256 in both the header check and compactVerify. Root pinning goes by SHA-256 fingerprint, with a full signature/issuer chain check and leaf/intermediate OID checks. Every failure throws TransactionError (400) and nothing falls back to unverified data. Bundle and product are checked in verify(). Gaps: the transaction environment (Sandbox vs Production) is never checked, and nothing checks signedDate freshness or revocation state (see candidates).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-live-billing",
+        "reviewed_paths": [
+          "backend/src/routes/subscription.ts",
+          "backend/src/billing/apply-transaction.ts"
+        ],
+        "invariant": "A refunded/revoked subscription cannot be restored by resubmitting an earlier Apple-signed transaction",
+        "method": "local",
+        "result": "Fails. Purchase gave premium until 2028-05-30. The REFUND notification set plan free with expiresAt null. Replaying the original pre-refund JWS to POST /subscription/apple returned 200 and premium until 2028-05-30 again.",
+        "artifact": "agents/h4-live-billing/artifacts/evidence/refund-replay.txt"
+      },
+      {
+        "agent_id": "h4-live-billing",
+        "reviewed_paths": [
+          "backend/src/routes/subscription.ts",
+          "backend/src/billing/apply-transaction.ts"
+        ],
+        "invariant": "One originalTransactionId unlocks at most one household; appAccountToken binds to the household",
+        "method": "source",
+        "result": "Holds for active plans. The route rejects a mismatched appAccountToken (409) and an originalTransactionId active in another household (409). The notification path resolves the household by the stored originalTransactionId first, then by appAccountToken. The iOS app sets appAccountToken to householdId (ios/App/Subscription/PremiumView.swift).",
+        "artifact": null
+      },
+      {
+        "agent_id": "v2",
+        "reviewed_paths": [
+          "backend/src/billing/app-store.ts",
+          "backend/src/billing/apply-transaction.ts",
+          "backend/src/billing/plans.ts",
+          "backend/src/config.ts",
+          "backend/src/routes/subscription.ts",
+          "backend/test/subscription.test.ts",
+          "docs/HUMAN_TODO.md",
+          "ios/project.yml"
+        ],
+        "invariant": "Independent verification of backend/src/billing/app-store.ts:transaction-environment-not-checked",
+        "method": "local",
+        "result": "Verifier decision: needs_validation",
+        "artifact": "agents/v2/artifacts/evidence/sandbox-env.txt"
+      },
+      {
+        "agent_id": "v3",
+        "reviewed_paths": [
+          "agents/v3/artifacts/evidence/v3-refund-replay.txt",
+          "backend/src/billing/app-store.ts",
+          "backend/src/billing/apply-transaction.ts",
+          "backend/src/routes/subscription.ts"
+        ],
+        "invariant": "Independent verification of backend/src/billing/apply-transaction.ts:revocation-not-persisted-replay",
+        "method": "local",
+        "result": "Verifier decision: confirmed, severity medium",
+        "artifact": "agents/v3/artifacts/evidence/v3-refund-replay.txt"
+      }
+    ],
+    "result_fingerprints": [
+      "backend/src/billing/app-store.ts:transaction-environment-not-checked",
+      "backend/src/billing/apply-transaction.ts:revocation-not-persisted-replay"
+    ],
+    "unresolved": [],
+    "x_hardening": [
+      "Viewer limit: POST /cameras/:id/live-token counts only /ws watchers (hub.viewerCount), so a member can mint LiveKit viewer tokens without registering a watch, and the viewers-per-camera limit is advisory. It is a same-household quota, not an isolation break.",
+      "App Store notifications are not deduplicated by notificationUUID and signedDate is not checked. Out-of-order handling depends only on expiresAt comparisons in applyTransaction.",
+      "The camera limit is enforced only at pairing (invites route), so any short Premium window (refund replay, sandbox transaction) leaves extra cameras paired after it lapses. This is documented behavior, but it amplifies both billing candidates."
+    ],
+    "x_decisions": {
+      "backend/src/billing/app-store.ts:transaction-environment-not-checked": "needs_validation",
+      "backend/src/billing/apply-transaction.ts:revocation-not-persisted-replay": "confirmed"
+    }
+  },
+  {
+    "coverage_id": "backend%2Fsrc%2Froutes%2Ftraining.ts%23POST%20%2Ftraining%2Fexport-token::backend%2Fsrc%2Fauth%2Fjwt.ts%23JwtService.verify::profile%2Fquick%2Fall-in-scope-subsystems::WEB-PROTOCOL-AND-AUTH.md%23API-key%20scope%20and%20resource%20binding",
+    "canonical_refs": {
+      "surface": "backend/src/routes/training.ts#POST /training/export-token",
+      "boundary": "backend/src/auth/jwt.ts#JwtService.verify",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "WEB-PROTOCOL-AND-AUTH.md#API-key scope and resource binding"
+    },
+    "surface": "Training export token and GET training export",
+    "boundary": "Short-lived export tokens vs session tokens",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "API-key scope and resource binding",
+    "starting_paths": [
+      "backend/src/routes/training.ts",
+      "backend/src/auth/jwt.ts",
+      "backend/src/auth/plugin.ts"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#API-key scope and resource binding",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+        "reason": "not the boundary of this unit (iOS app credential storage is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h1-auth",
+    "reviewed_paths": [
+      "agents/v7/artifacts/evidence/v7-export-token-scope.txt",
+      "backend/src/auth/jwt.ts",
+      "backend/src/auth/plugin.ts",
+      "backend/src/routes/auth.ts",
+      "backend/src/routes/households.ts",
+      "backend/src/routes/invites.ts",
+      "backend/src/routes/training.ts",
+      "ios/App/Household/HouseholdView.swift",
+      "scripts/export-training-data.mjs"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h1-auth",
+        "reviewed_paths": [
+          "backend/src/routes/training.ts",
+          "backend/src/auth/jwt.ts",
+          "backend/src/auth/plugin.ts",
+          "backend/src/routes/invites.ts",
+          "backend/src/routes/households.ts",
+          "ios/App/Household/HouseholdView.swift",
+          "scripts/export-training-data.mjs"
+        ],
+        "invariant": "The one-hour training export key can only read GET /training/labeled for its household. It must not act as a general owner session or mint new credentials.",
+        "method": "local",
+        "result": "The export key is the same JWT as a session (same sub, iss and aud, no scope claim). In a local test it was accepted by GET /me (200), POST /invites (201), PATCH /household rename (200) and POST /training/export-token (200, so it renews itself). An invite created with it let a second user join the household as a persistent member (200, members: 2).",
+        "artifact": "agents/h1-auth/artifacts/evidence/export-token-scope.txt"
+      },
+      {
+        "agent_id": "v7",
+        "reviewed_paths": [
+          "agents/v7/artifacts/evidence/v7-export-token-scope.txt",
+          "backend/src/auth/jwt.ts",
+          "backend/src/auth/plugin.ts",
+          "backend/src/routes/auth.ts",
+          "backend/src/routes/invites.ts",
+          "backend/src/routes/training.ts",
+          "ios/App/Household/HouseholdView.swift",
+          "scripts/export-training-data.mjs"
+        ],
+        "invariant": "Independent verification of backend/src/routes/training.ts:export-token-unscoped-session-jwt",
+        "method": "local",
+        "result": "Verifier decision: confirmed, severity medium",
+        "artifact": "agents/v7/artifacts/evidence/v7-export-token-scope.txt"
+      }
+    ],
+    "result_fingerprints": [
+      "backend/src/routes/training.ts:export-token-unscoped-session-jwt"
+    ],
+    "unresolved": [],
+    "x_hardening": [
+      "Session JWTs (30-day default) have no revocation or jti. Removing a member is enforced by requireHousehold's membership lookup, not by token invalidation, so a leaked session stays valid for /me and household creation until exp.",
+      "The Apple sign-in nonce is generated by the client and not recorded as used on the server. A captured (identityToken, rawNonce) pair can be replayed within the Apple token's lifetime. Getting the pair requires the TLS request body, so this is not a finding."
+    ],
+    "x_decisions": {
+      "backend/src/routes/training.ts:export-token-unscoped-session-jwt": "confirmed"
+    }
+  },
+  {
+    "coverage_id": "ios%2FApp%2FDogMonitorApp.swift%23iOS%20inbound%20untrusted%20inputs%3A%20Universal%20Links%20and%20the%20dogmonitor%3A%2F%2F%20scheme%2C%20rich-push%20snapshot%20download%2C%20push%20userInfo%20routing::ios%2FApp%2FDogMonitorApp.swift%23External%20link%20or%20push%20payload%20to%20app%20state%20and%20network%20fetches::profile%2Fquick%2Fall-in-scope-subsystems::DESKTOP-MOBILE-AND-LOCAL-IPC.md%23Custom-scheme%20and%20deep-link%20ambiguity",
+    "canonical_refs": {
+      "surface": "ios/App/DogMonitorApp.swift#iOS inbound untrusted inputs: Universal Links and the dogmonitor:// scheme, rich-push snapshot download, push userInfo routing",
+      "boundary": "ios/App/DogMonitorApp.swift#External link or push payload to app state and network fetches",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Custom-scheme and deep-link ambiguity"
+    },
+    "surface": "iOS inbound untrusted inputs: Universal Links and the dogmonitor:// scheme, rich-push snapshot download, push userInfo routing",
+    "boundary": "External link or push payload to app state and network fetches",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Custom-scheme and deep-link ambiguity",
+    "starting_paths": [
+      "ios/App/DogMonitorApp.swift",
+      "ios/App/Push/DeepLinkRouter.swift",
+      "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Pairing/PairingCode.swift",
+      "ios/App/CreateHouseholdView.swift",
+      "ios/App/Pairing",
+      "ios/NotificationService/NotificationService.swift",
+      "ios/App/Push",
+      "ios/project.yml"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Custom-scheme and deep-link ambiguity",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#App and account handoff confusion",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Universal moves",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Credential-store and local-secret boundary mismatch",
+        "reason": "covered by the iOS credential storage unit (h5-public-client)"
+      },
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "server auth covered by other units"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "out_of_scope",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "out of this run's scope_paths; critic: The only iOS unit was scoped to credential storage. The onOpenURL handler (DogMonitorApp.swift:10) sends any URL to DeepLinkRouter.handle, which goes through PairingCode.parse. That parser accepts https paths under the invite path, any https URL whose path ends in /pair, and dogmonitor://pair (PairingCode.swift:40-46). The result fills a pending invite consumed by CreateHouseholdView. No unit checked whether a link sent by another app or page can make the phone join an attacker's household, or pair it as a camera that streams the victim's home. Separately, NotificationService.swift:21-30 downloads PushPayload.snapshotURL from userInfo with URLSession.shared, and no unit checked that path's host or scheme handling."
+    ]
+  },
+  {
+    "coverage_id": "ios%2FPackages%2FDogMonitorCore%2FSources%2FDogMonitorCore%2FAPI%2FDogMonitorAPI.swift%23DogMonitorAPI::ios%2FPackages%2FDogMonitorCore%2FSources%2FDogMonitorCore%2FSession%2FSecureStore.swift%23SecureStore::profile%2Fquick%2Fall-in-scope-subsystems::DESKTOP-MOBILE-AND-LOCAL-IPC.md%23Credential-store%20and%20local-secret%20boundary%20mismatch",
+    "canonical_refs": {
+      "surface": "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/DogMonitorAPI.swift#DogMonitorAPI",
+      "boundary": "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/SecureStore.swift#SecureStore",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Credential-store and local-secret boundary mismatch"
+    },
+    "surface": "iOS API client and credential storage",
+    "boundary": "Session token and device secret storage on the phone",
+    "subsystem": "All in-scope subsystems (quick profile)",
+    "attack_class": "Credential-store and local-secret boundary mismatch",
+    "starting_paths": [
+      "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API",
+      "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/SecureStore.swift",
+      "ios/App/KeychainStore.swift",
+      "ios/App/ViewerSessionModel.swift",
+      "ios/App/Camera/CameraModeModel.swift",
+      "ios/App/Pairing/CameraPairingView.swift"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Core discipline",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Credential-store and local-secret boundary mismatch",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Universal moves",
+      "DESKTOP-MOBILE-AND-LOCAL-IPC.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+        "reason": "not the boundary of this unit (HTTP/JWT/API-key boundaries is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+        "reason": "not the boundary of this unit (household tenancy, media blobs, retention is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "PROTOCOLS-RPC-AND-MESSAGING.md#Core discipline",
+        "reason": "not the boundary of this unit (WebSocket realtime channel is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+        "reason": "not the boundary of this unit (pre-auth work on public endpoints is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "CLIENT-SIDE.md#Core discipline",
+        "reason": "not the boundary of this unit (landing page script is covered by another unit or out of this unit's surface)"
+      },
+      {
+        "block": "MEMORY-SAFETY-AND-BINARY.md#Core discipline",
+        "reason": "TypeScript/Swift only; no native code, parsers or FFI in scope"
+      },
+      {
+        "block": "AI-AND-LLM.md#Core discipline",
+        "reason": "no model, prompt or agent surface in the product"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h5-public-client",
+    "reviewed_paths": [
+      "ios/App/AppConfig.swift",
+      "ios/App/Camera/CameraModeModel.swift",
+      "ios/App/Household/HouseholdView.swift",
+      "ios/App/KeychainStore.swift",
+      "ios/App/Pairing/CameraPairingView.swift",
+      "ios/App/Push/PushRegistry.swift",
+      "ios/App/ViewerSessionModel.swift",
+      "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/APICredential.swift",
+      "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/DogMonitorAPI.swift",
+      "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/CredentialStore.swift",
+      "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/SecureStore.swift",
+      "ios/Shared/DogStatusStore.swift",
+      "ios/project.yml"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "ios/App/KeychainStore.swift",
+          "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/CredentialStore.swift",
+          "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/Session/SecureStore.swift",
+          "ios/project.yml"
+        ],
+        "invariant": "The session JWT and the device secret are stored only in a Keychain item that other apps, backups or other devices cannot read.",
+        "method": "source",
+        "result": "Both credentials go to a kSecClassGenericPassword item (service com.benooon.dogmonitor, account dogmonitor.credential) with kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly, so the item is excluded from backups and device migration. No kSecAttrAccessGroup is set. project.yml declares only application-groups and no keychain-access-groups, so the item stays in the app's default access group. InMemorySecureStore appears only in previews and tests. Swift is source-only (no toolchain); the final entitlements match the source declarations.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "ios/App/ViewerSessionModel.swift",
+          "ios/App/Camera/CameraModeModel.swift",
+          "ios/App/Pairing/CameraPairingView.swift",
+          "ios/App/Push/PushRegistry.swift",
+          "ios/Shared/DogStatusStore.swift"
+        ],
+        "invariant": "Credentials are never copied to UserDefaults, the App Group container, logs or other lower-trust stores.",
+        "method": "source",
+        "result": "Grep found UserDefaults and App Group usage only for non-secret state: role, zones, the push device id, and dog status snapshots/photos in group.com.benooon.dogmonitor. Logger calls never interpolate the token, the secret or the Authorization header. signOut clears the Keychain item.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/DogMonitorAPI.swift",
+          "ios/Packages/DogMonitorCore/Sources/DogMonitorCore/API/APICredential.swift",
+          "ios/App/AppConfig.swift",
+          "ios/project.yml"
+        ],
+        "invariant": "The Authorization credential is sent only to the configured HTTPS API origin, and never to presigned storage URLs.",
+        "method": "source",
+        "result": "makeRequest and realtimeRequest attach Authorization only to baseURL-derived URLs. The presigned-PUT upload sends no credential. API_BASE_URL is https://dog-monitor-production.up.railway.app in project.yml. The http://localhost:3000 fallback applies only when the Info.plist key is missing, and the realtime socket uses wss when the base URL is https.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h5-public-client",
+        "reviewed_paths": [
+          "ios/App/Household/HouseholdView.swift",
+          "ios/App/ViewerSessionModel.swift"
+        ],
+        "invariant": "Credentials placed on the general pasteboard are bounded in lifetime and readable only with user consent.",
+        "method": "source",
+        "result": "The owner's 'Copy export key' button places the 1-hour training export JWT on UIPasteboard.general without an expirationDate or localOnly option. On iOS 17+ another app needs the system paste-consent prompt to read it, and Universal Clipboard reaches only the same Apple ID. The user copies it on purpose to paste on a computer. Not a boundary violation (recorded as hardening). The token's full session power is a separate issue owned by the training export-token unit.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "x_hardening": [
+      "backend/src/routes/landing.ts:89 publicOrigin uses request.host, which trustProxy: true takes from X-Forwarded-Host. The value is regex-limited to hostname characters, HTML-escaped, and the page is served with cache-control: no-cache, so it only spoofs OG/canonical URLs in the attacker's own response. A configured PUBLIC_ORIGIN would remove this.",
+      "ios/App/Household/HouseholdView.swift:201 copies the 1-hour export JWT to UIPasteboard.general without an expiry. setItems with an .expirationDate matching the token TTL would limit how long it stays on the clipboard and in Universal Clipboard.",
+      "backend/src/pairing/attempt-limiter.ts is per-process memory: limits reset on every deploy or restart and are not shared across replicas."
+    ]
+  }
+]
