@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: 35a29284a9fadd5383643136b3094716ccad11e2
-- message: docs: Premium store fallback done (CI green on 000657e), progress
-- time (UTC): 2026-11-11T01:29:15Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42939155113
+- commit: 7d8eaa6b5005df5acae6463ed9e6bfbdc400bcca
+- message: docs: claim Premium store single product load
+- time (UTC): 2026-11-11T01:49:31Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/42941568559
 
 | job | result | log |
 |---|---|---|
