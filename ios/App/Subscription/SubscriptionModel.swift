@@ -16,11 +16,20 @@ final class SubscriptionModel {
         case unavailable
     }
 
-    /// Asks the App Store how many of the given product ids it sells.
-    typealias ProductLoader = @Sendable ([String]) async throws -> Int
+    /// What the App Store returned for the Premium ids. `products` can stay empty in tests,
+    /// which only need `count`; the store view then loads by id itself.
+    struct LoadedProducts: Sendable {
+        var count: Int
+        var products: [Product] = []
+    }
+
+    /// Asks the App Store for the given product ids.
+    typealias ProductLoader = @Sendable ([String]) async throws -> LoadedProducts
 
     private(set) var status: SubscriptionDTO?
     private(set) var storeState: StoreState = .loading
+    /// The plans from the last successful load, handed to the store view so it doesn't load them again.
+    private(set) var products: [Product] = []
     private(set) var isRestoring = false
     var errorMessage: String?
 
@@ -33,7 +42,10 @@ final class SubscriptionModel {
     init(
         api: DogMonitorAPI,
         householdId: UUID,
-        productLoader: @escaping ProductLoader = { try await Product.products(for: $0).count }
+        productLoader: @escaping ProductLoader = { ids in
+            let products = try await Product.products(for: ids)
+            return LoadedProducts(count: products.count, products: products)
+        }
     ) {
         self.api = api
         self.householdId = householdId
@@ -44,8 +56,9 @@ final class SubscriptionModel {
     /// none come back, so the view shows "not available" with Try again instead.
     func loadProducts() async {
         storeState = .loading
-        let count = (try? await productLoader(SubscriptionProducts.all)) ?? 0
-        storeState = count > 0 ? .ready : .unavailable
+        let loaded = (try? await productLoader(SubscriptionProducts.all)) ?? LoadedProducts(count: 0)
+        products = loaded.products
+        storeState = loaded.count > 0 ? .ready : .unavailable
     }
 
     /// Listens for renewals and purchases made elsewhere, and reports what the Apple ID already owns.

@@ -26,7 +26,7 @@ final class PremiumAppTests: XCTestCase {
     }
 
     func testStoreIsReadyWhenTheAppStoreReturnsProducts() async {
-        let model = makeModel { ids in ids.count }
+        let model = makeModel { ids in .init(count: ids.count) }
         XCTAssertEqual(model.storeState, .loading)
         await model.loadProducts()
         XCTAssertEqual(model.storeState, .ready)
@@ -42,7 +42,7 @@ final class PremiumAppTests: XCTestCase {
         let attempts = Attempts()
         let model = makeModel { ids in
             if await attempts.next() == 1 { throw URLError(.notConnectedToInternet) }
-            return ids.count
+            return .init(count: ids.count)
         }
         await model.loadProducts()
         XCTAssertEqual(model.storeState, .unavailable)
@@ -54,7 +54,7 @@ final class PremiumAppTests: XCTestCase {
         let asked = Asked()
         let model = makeModel { ids in
             await asked.set(ids)
-            return ids.count
+            return .init(count: ids.count)
         }
         await model.loadProducts()
         let ids = await asked.ids

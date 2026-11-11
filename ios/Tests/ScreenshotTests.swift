@@ -83,7 +83,7 @@ final class ScreenshotTests: XCTestCase {
                 AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID())))
             },
             Screen(name: "13a-premium-unavailable") {
-                AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID()) { _ in 0 }))
+                AnyView(PremiumView(model: SubscriptionModel(api: sampleAPI, householdId: UUID()) { _ in .init(count: 0) }))
             },
         ]
     }

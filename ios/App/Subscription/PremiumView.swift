@@ -45,16 +45,28 @@ struct PremiumView: View {
     private var store: some View {
         let model = model
         let householdId = model.householdId
-        return SubscriptionStoreView(productIDs: SubscriptionProducts.all) {
-            PremiumHeader()
+        return storeView
+            .storeButton(.hidden, for: .restorePurchases)
+            .storeButton(.visible, for: .policies)
+            .inAppPurchaseOptions { _ in [.appAccountToken(householdId)] }
+            .onInAppPurchaseCompletion { _, result in
+                await model.handlePurchase(result)
+            }
+            .safeAreaInset(edge: .bottom) { restoreButton }
+    }
+
+    /// Uses the plans the model already loaded, so StoreKit doesn't show its own loading state again.
+    @ViewBuilder
+    private var storeView: some View {
+        if model.products.isEmpty {
+            SubscriptionStoreView(productIDs: SubscriptionProducts.all) {
+                PremiumHeader()
+            }
+        } else {
+            SubscriptionStoreView(subscriptions: model.products) {
+                PremiumHeader()
+            }
         }
-        .storeButton(.hidden, for: .restorePurchases)
-        .storeButton(.visible, for: .policies)
-        .inAppPurchaseOptions { _ in [.appAccountToken(householdId)] }
-        .onInAppPurchaseCompletion { _, result in
-            await model.handlePurchase(result)
-        }
-        .safeAreaInset(edge: .bottom) { restoreButton }
     }
 
     /// The App Store didn't return the plans. Restore stays reachable for people who already paid.
