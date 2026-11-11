@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: f73831129ec71a39f7131bd122df00695abb3fcb
-- message: docs: Lifetime Premium done, highlight reel in progress, decisions, owner check
-- time (UTC): 2026-11-11T10:39:45Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/43001106776
+- commit: 79d154588be7faa27435c51763ea213c1e3d1dd4
+- message: ios: bar background behind the lifetime offer so plans don't show through
+- time (UTC): 2026-11-11T10:59:00Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43003465174
 
 | job | result | log |
 |---|---|---|
