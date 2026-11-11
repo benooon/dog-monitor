@@ -1,9 +1,9 @@
 # CI status: GREEN
 
-- commit: d0d4990edcb8d991282f3a2fd3ffa7bdcfdcf134
-- message: core+ios: Lifetime Premium shown last in the store; "Premium for good" on the plan screen
-- time (UTC): 2026-11-11T10:20:06Z
-- run: https://github.com/benooon/dog-monitor/actions/runs/42999747258
+- commit: f73831129ec71a39f7131bd122df00695abb3fcb
+- message: docs: Lifetime Premium done, highlight reel in progress, decisions, owner check
+- time (UTC): 2026-11-11T10:39:45Z
+- run: https://github.com/benooon/dog-monitor/actions/runs/43001106776
 
 | job | result | log |
 |---|---|---|
