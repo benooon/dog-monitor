@@ -32,8 +32,9 @@ export async function truncateAll(handle: DbHandle): Promise<void> {
       });
       return;
     } catch (error) {
+      // Drizzle wraps the pg error, so the SQLSTATE lives on this error or somewhere up its cause chain.
       // 40P01 = deadlock_detected, 55P03 = lock_not_available (lock_timeout fired).
-      const code = (error as { code?: string } | undefined)?.code;
+      const code = pgErrorCode(error);
       if ((code === "40P01" || code === "55P03") && attempt < maxAttempts) {
         await new Promise((resolve) => setTimeout(resolve, 50 * attempt));
         continue;
@@ -41,4 +42,14 @@ export async function truncateAll(handle: DbHandle): Promise<void> {
       throw error;
     }
   }
+}
+
+/** Finds a Postgres SQLSTATE on an error or anywhere up its `cause` chain (drizzle wraps pg errors). */
+function pgErrorCode(error: unknown): string | undefined {
+  for (let cur = error, depth = 0; cur && depth < 10; depth++) {
+    const code = (cur as { code?: unknown }).code;
+    if (typeof code === "string") return code;
+    cur = (cur as { cause?: unknown }).cause;
+  }
+  return undefined;
 }
