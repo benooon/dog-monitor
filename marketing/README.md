@@ -14,6 +14,7 @@ marketing/
     door.html, sfx-door.py      reel 2, "Rex can't read a clock" (17:29 at the door)
     six-barks.html, sfx-six-barks.py  reel 3, "Rex barked 6 times while you were out"
     courier.html, sfx-courier.py      reel 4, "Rex has hated the courier for 3 years"
+    sock.html, sfx-sock.py            reel 5, "I've lost 11 socks since March"
     sfx.py                      original sound effects (no licensed music)
     hero.js, og.js              landing page hero loop, share images and touch icon -> backend/public/media
   reels/YYYY-MM-DD-<slug>/      one folder per reel, ready to post
@@ -53,3 +54,4 @@ Until the Meta Graph API token exists (docs/HUMAN_TODO.md), the owner posts by h
 | 2026-11-11 | door | "Rex can't read a clock." | Sleeps all day, wakes at exactly 17:29 and sits at the door; checks the wall clock | Door alert ("Rex is waiting at the door") |
 | 2026-11-11 | six-barks | "Rex barked 6 times while you were out." | Six barks, six reasons: a pigeon, a leaf, the neighbours, nothing, his own tail, and you at 17:31. Black-and-tan dog, sage room | Daily summary ("Rex's day": Rested 7 h 12 min, Barks 6) |
 | 2026-11-12 | courier | "Rex has hated the courier for 3 years." | Bell at 11:40, four minutes of full alarm at the door, a parcel drops through the mail slot and he lies on it: it was his food. Grey dog, dusty-rose hallway, checker floor | Calmed-down push ("Rex has calmed down" / "רקס: חזר השקט") |
+| 2026-11-13 | sock | "I've lost 11 socks since March." | 10:14, laundry day: takes one sock (never two), shoves it under the dresser, then can't reach it. Under the dresser: 12 socks, not one pair. Chocolate dog, teal bedroom, oak herringbone | Whining push ("Rex is whining or howling" / "רקס: יבבות או יללות") |

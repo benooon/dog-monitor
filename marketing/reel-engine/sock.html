@@ -1,0 +1,479 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Rubik;font-weight:500;src:url(node_modules/@fontsource/rubik/files/rubik-latin-500-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:700;src:url(node_modules/@fontsource/rubik/files/rubik-latin-700-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:800;src:url(node_modules/@fontsource/rubik/files/rubik-latin-800-normal.woff2)}
+@font-face{font-family:Rubik;font-weight:500;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-500-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+@font-face{font-family:Rubik;font-weight:700;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-700-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+@font-face{font-family:Rubik;font-weight:800;src:url(node_modules/@fontsource/rubik/files/rubik-hebrew-800-normal.woff2);unicode-range:U+0590-05FF,U+FB1D-FB4F}
+html,body{margin:0;background:#000}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Reel 5, "I've lost 11 socks since March." 10:14, laundry day: Rex takes one sock from the basket,
+// pushes it under the dresser, then can't get it back out. Under the dresser: twelve socks, not one pair.
+// The app moment is one real push: "Rex is whining or howling" (he: "רקס: יבבות או יללות"), the whining event.
+const W = 1080, H = 1920;
+const CX = 460;            // text column center: keeps the right 230 px clear for Instagram's action rail
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+
+const ACCENT = '#B4541F';
+const COPY = {
+  en: {
+    hook: 'I’ve lost 11 socks\nsince March.',
+    hookSub: 'Rex knows where.',
+    grab: '10:14', grabSub: 'Laundry day.',
+    carry: 'One sock.', carrySub: 'Never two.',
+    stash: 'Under the dresser.', stashSub: 'Sock number 12.',
+    want: 'Now he wants\nit back.', wantSub: 'His leg is too short.',
+    notifTitle: 'Rex is whining or howling',
+    notifSub: 'Bedroom',
+    reveal: 'So that’s where\nthey go.', revealSub: '12 socks. Not one pair.',
+    room: 'Bedroom',
+    live: 'Live',
+    now: 'now',
+    end1: 'See what your dog\ndoes when you’re out.',
+    end2: 'Your old iPhone becomes the camera.',
+    end3: 'Coming soon · link in bio',
+  },
+  he: {
+    hook: 'מאז מרץ נעלמו לי\n11 גרביים.',
+    hookSub: 'רקס יודע איפה.',
+    grab: '10:14', grabSub: 'יום כביסה.',
+    carry: 'גרב אחת.', carrySub: 'אף פעם לא שתיים.',
+    stash: 'מתחת לשידה.', stashSub: 'גרב מספר 12.',
+    want: 'עכשיו הוא רוצה אותה.', wantSub: 'הרגל קצרה מדי.',
+    notifTitle: 'רקס: יבבות או יללות',
+    notifSub: 'חדר שינה',
+    reveal: 'אז לשם הן נעלמות.', revealSub: '12 גרביים. אף זוג.',
+    room: 'חדר שינה',
+    live: 'בשידור',
+    now: 'עכשיו',
+    end1: 'תראו מה הכלב עושה\nכשאתם לא בבית.',
+    end2: 'האייפון הישן הופך למצלמה.',
+    end3: 'בקרוב · הקישור בביו',
+  },
+};
+let LANG = 'en';
+
+// ---------- helpers ----------
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeInOut = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const easeIn = x => x * x * x;
+const backOut = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+
+const grain = [];
+let seed = 41;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+for (let k = 0; k < 4; k++) {
+  const g = document.createElement('canvas'); g.width = 270; g.height = 480;
+  const gx = g.getContext('2d'); const id = gx.createImageData(270, 480);
+  for (let i = 0; i < id.data.length; i += 4) { const v = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 16; }
+  gx.putImageData(id, 0, 0); grain.push(g);
+}
+
+
+// ---------- the timeline (15 s) ----------
+const GRAB = 2.2;      // up, nose in the laundry basket
+const CARRY = 3.6;     // trots to the dresser with the sock
+const STASH = 5.1;     // pushes it underneath
+const WANT = 6.9;      // lies down, paw under the dresser, can't reach
+const NOTIF = 8.7;     // "Rex is whining or howling"
+const REVEAL = 10.8;   // what's under the dresser
+const END = 12.7;      // end card
+function clockAt(t) {
+  const start = 10 * 3600 + 13 * 60 + 52;
+  if (t < WANT) return start + t * 3;
+  if (t < NOTIF) return lerp(start + WANT * 3, 10 * 3600 + 31 * 60 + 10, prog(t, WANT, NOTIF)); // eighteen minutes of trying
+  return 10 * 3600 + 31 * 60 + 10 + (t - NOTIF);
+}
+
+// ---------- room: a teal-blue bedroom, oak herringbone floor, a low dresser on legs, a wicker basket ----------
+const FLOOR_Y = 1010;
+const DR = { x: 690, y: 820, w: 420, h: 440, gapTop: 1260, gapBot: 1332 }; // dresser; the gap under it is the hiding place
+function drawRoom(t) {
+  const wall = ctx.createLinearGradient(0, 0, 0, FLOOR_Y);
+  wall.addColorStop(0, '#3E6170'); wall.addColorStop(1, '#55798A');
+  ctx.fillStyle = wall; ctx.fillRect(0, 0, W, FLOOR_Y);
+  // window with morning light and linen curtains
+  ctx.fillStyle = '#EFE6D6'; ctx.fillRect(250, 210, 330, 470);
+  const sky = ctx.createLinearGradient(0, 230, 0, 660); sky.addColorStop(0, '#CFE3EA'); sky.addColorStop(1, '#F4E7CF');
+  ctx.fillStyle = sky; ctx.fillRect(268, 228, 294, 434);
+  ctx.fillStyle = '#EFE6D6'; ctx.fillRect(408, 228, 14, 434); ctx.fillRect(268, 438, 294, 14);
+  ctx.fillStyle = '#9DB37A'; ctx.beginPath(); ctx.ellipse(330, 650, 70, 40, 0, Math.PI, 0); ctx.fill(); // a tree top outside
+  ctx.fillStyle = '#E3D3BA';
+  ctx.beginPath(); ctx.moveTo(220, 190); ctx.lineTo(300, 190); ctx.quadraticCurveTo(280, 450, 310, 720); ctx.lineTo(200, 720); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(610, 190); ctx.lineTo(530, 190); ctx.quadraticCurveTo(550, 450, 520, 720); ctx.lineTo(630, 720); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#B08A5A'; rr(190, 176, 450, 18, 9); ctx.fill();
+  // soft light patch on the floor from the window
+  // skirting board
+  ctx.fillStyle = '#E9E1D3'; ctx.fillRect(0, FLOOR_Y - 26, W, 26);
+  // floor: oak herringbone
+  ctx.fillStyle = '#C79A66'; ctx.fillRect(0, FLOOR_Y, W, H - FLOOR_Y);
+  ctx.save(); ctx.beginPath(); ctx.rect(0, FLOOR_Y, W, H - FLOOR_Y); ctx.clip();
+  ctx.strokeStyle = 'rgba(110,70,35,.28)'; ctx.lineWidth = 3;
+  for (let r = 0; r < 12; r++) {
+    const y0 = FLOOR_Y + r * r * 7 + r * 30, y1 = FLOOR_Y + (r + 1) * (r + 1) * 7 + (r + 1) * 30;
+    ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(W, y0); ctx.stroke();
+    const step = lerp(60, 170, r / 11);
+    for (let x = (r % 2) * step / 2 - step; x < W + step; x += step) {
+      ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x + step / 2, y1); ctx.stroke();
+    }
+  }
+  ctx.restore();
+  ctx.fillStyle = 'rgba(255,236,190,.16)';
+  ctx.beginPath(); ctx.moveTo(300, FLOOR_Y); ctx.lineTo(560, FLOOR_Y); ctx.lineTo(720, 1260); ctx.lineTo(280, 1260); ctx.closePath(); ctx.fill();
+  // round rug
+  ctx.fillStyle = '#D9C7A7'; ctx.beginPath(); ctx.ellipse(430, 1420, 380, 120, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#C2AC86'; ctx.lineWidth = 8; ctx.beginPath(); ctx.ellipse(430, 1420, 330, 96, 0, 0, Math.PI * 2); ctx.stroke();
+  // framed print above the dresser
+  ctx.fillStyle = '#2B2622'; rr(770, 330, 220, 280, 6); ctx.fill();
+  ctx.fillStyle = '#F2EBDD'; ctx.fillRect(790, 350, 180, 240);
+  ctx.fillStyle = '#E07B45'; ctx.beginPath(); ctx.arc(880, 440, 46, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#3E6170'; ctx.fillRect(810, 500, 140, 60);
+}
+
+function drawDresser(t, peek) {
+  // the dark gap first, with whatever lives in it
+  ctx.fillStyle = '#1A1411'; ctx.fillRect(DR.x + 10, DR.gapTop, DR.w, DR.gapBot - DR.gapTop);
+  if (peek > 0) drawStash(peek);
+  // legs
+  ctx.fillStyle = '#7A5232';
+  ctx.fillRect(DR.x + 16, DR.gapTop - 4, 22, DR.gapBot - DR.gapTop + 4);
+  ctx.fillRect(DR.x + DR.w - 60, DR.gapTop - 4, 22, DR.gapBot - DR.gapTop + 4);
+  // body
+  ctx.fillStyle = '#A8754A'; rr(DR.x, DR.y, DR.w, DR.gapTop - DR.y, 10); ctx.fill();
+  ctx.fillStyle = '#B98656'; ctx.fillRect(DR.x - 10, DR.y - 18, DR.w + 20, 26);
+  ctx.strokeStyle = 'rgba(60,30,10,.28)'; ctx.lineWidth = 5;
+  for (let i = 0; i < 3; i++) {
+    const y = DR.y + 30 + i * 135;
+    rr(DR.x + 22, y, DR.w - 44, 118, 6); ctx.stroke();
+    ctx.fillStyle = '#E2C48C'; rr(DR.x + 130, y + 52, 70, 14, 7); ctx.fill();
+  }
+  // on top: a lamp and a little plant
+  ctx.fillStyle = '#E8D9BE'; ctx.beginPath(); ctx.moveTo(760, 660); ctx.lineTo(860, 660); ctx.lineTo(840, 590); ctx.lineTo(780, 590); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#6E5A48'; ctx.fillRect(805, 660, 10, 130); ctx.fillRect(780, 790, 60, 12);
+  ctx.fillStyle = '#C46A3C'; rr(930, 740, 60, 62, 8); ctx.fill();
+  ctx.fillStyle = '#5E8A54'; for (const [dx, dy, r] of [[-14, -14, 26], [16, -22, 24], [2, -40, 22]]) { ctx.beginPath(); ctx.ellipse(960 + dx, 740 + dy, r * .6, r, dx * .03, 0, Math.PI * 2); ctx.fill(); }
+}
+
+// ---------- socks ----------
+function drawSock(x, y, s, rot, base, stripe, alpha = 1) {
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+  ctx.fillStyle = base;
+  ctx.beginPath(); // leg tube down, foot to the right
+  ctx.moveTo(-22, -70); ctx.lineTo(22, -70); ctx.lineTo(22, 10); ctx.quadraticCurveTo(22, 20, 40, 20); ctx.lineTo(62, 20);
+  ctx.arc(62, 40, 20, -Math.PI / 2, Math.PI / 2); ctx.lineTo(0, 60); ctx.quadraticCurveTo(-22, 60, -22, 36); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = stripe;
+  ctx.fillRect(-22, -70, 44, 12); ctx.fillRect(-22, -44, 44, 10); ctx.fillRect(-22, -20, 44, 10);
+  ctx.beginPath(); ctx.arc(62, 40, 20, -Math.PI / 2, Math.PI / 2); ctx.closePath(); ctx.fill(); // toe
+  ctx.restore();
+}
+const SOCK_A = ['#E1A93A', '#2E7C7A']; // the one he takes today
+const PILE = [ // twelve socks, no two alike
+  [742, 1306, -1.2, '#C0392B', '#F4F1EC'], [790, 1318, -1.5, '#3C5A8A', '#E8E1D3'], [838, 1300, -1.1, '#F2F2F2', '#9AA0A6'],
+  [884, 1314, -1.6, '#7FA36B', '#2B2622'], [930, 1304, -1.3, '#E07B45', '#3E6170'], [976, 1320, -1.45, '#2B2622', '#E1A93A'],
+  [1024, 1306, -1.25, '#B06A9C', '#F4F1EC'], [765, 1288, -1.7, '#9C958C', '#C0392B'], [860, 1286, -1.0, '#F4D35E', '#3C5A8A'],
+  [952, 1290, -1.8, '#5B8DB8', '#F2F2F2'], [1000, 1284, -1.05, '#8A5A32', '#F4D35E'], [716, 1322, -1.4, SOCK_A[0], SOCK_A[1]],
+];
+function drawStash(peek) { // the gap lights up like a torch is on it
+  ctx.save(); ctx.beginPath(); ctx.rect(DR.x + 10, DR.gapTop, DR.w, DR.gapBot - DR.gapTop); ctx.clip();
+  const g = ctx.createRadialGradient(880, 1300, 10, 880, 1300, 300);
+  g.addColorStop(0, `rgba(255,232,180,${.55 * peek})`); g.addColorStop(1, 'rgba(255,232,180,0)');
+  ctx.fillStyle = g; ctx.fillRect(DR.x, DR.gapTop, DR.w + 20, 80);
+  PILE.forEach(([x, y, r, b, s], i) => drawSock(x, y, .42, r, b, s, peek * clamp(peek * 12 - i * .5)));
+  ctx.restore();
+}
+
+// ---------- the basket ----------
+function drawBasket(t, tug) {
+  const bx = 70, by = 1060, bw = 230, bh = 230;
+  // clothes on top, a sock hanging over the rim (the twin of today's)
+  ctx.fillStyle = '#F2EBDD'; ctx.beginPath(); ctx.ellipse(bx + 80, by + 6 - tug * 6, 70, 36, -.2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#7FA6C9'; ctx.beginPath(); ctx.ellipse(bx + 160, by + 2 - tug * 4, 64, 32, .3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#C9A26B'; rr(bx, by + 12, bw, bh, 22); ctx.fill();
+  ctx.strokeStyle = 'rgba(110,75,35,.45)'; ctx.lineWidth = 6;
+  for (let y = by + 40; y < by + bh; y += 34) { ctx.beginPath(); ctx.moveTo(bx + 8, y); ctx.lineTo(bx + bw - 8, y); ctx.stroke(); }
+  for (let x = bx + 30; x < bx + bw; x += 40) { ctx.beginPath(); ctx.moveTo(x, by + 14); ctx.lineTo(x, by + bh + 10); ctx.stroke(); }
+  ctx.fillStyle = '#B38C55'; rr(bx - 8, by + 4, bw + 16, 26, 13); ctx.fill();
+  ctx.fillStyle = 'rgba(30,20,10,.2)'; ctx.beginPath(); ctx.ellipse(bx + bw / 2, by + bh + 16, 130, 16, 0, 0, Math.PI * 2); ctx.fill();
+  drawSock(bx + 70, by + 60, .7, .1, SOCK_A[0], SOCK_A[1]); // the twin hangs over the rim: he only ever takes one
+}
+
+// ---------- dog (chocolate brown, cream chest and paws, red collar) ----------
+const COLLAR = '#C0392B';
+function drawDog(x, y, s, p) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * p.facing, s);
+  const lying = p.lying || 0;
+  const hop = p.hop || 0;
+  const legLen = lerp(82, 12, lying);
+  const bodyY = -legLen - 58 - hop;
+  ctx.save(); ctx.fillStyle = 'rgba(30,20,10,.22)'; ctx.beginPath(); ctx.ellipse(0, 4, 170 - hop * .5, 22, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  ctx.rotate(p.tilt || 0);
+  const COAT = '#6E4630', FAR = '#56351F', SOCK = '#F2E6D6', CHEST = '#F2E6D6', DARK = '#1E1612', EAR = '#4A2D1A';
+  const tw = p.tail || 0;
+  ctx.strokeStyle = COAT; ctx.lineWidth = 22; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-130, bodyY - 20);
+  ctx.quadraticCurveTo(-200, bodyY - 40 + lying * 40, -205 + Math.sin(tw) * 40, bodyY - 90 + lying * 70); ctx.stroke();
+  const leg = (lx, ph, far) => {
+    const swing = Math.sin(ph) * 22 * (1 - lying);
+    ctx.strokeStyle = far ? FAR : COAT; ctx.lineWidth = 30;
+    ctx.beginPath(); ctx.moveTo(lx, bodyY + 20); ctx.lineTo(lx + swing, -8 - hop); ctx.stroke();
+    ctx.fillStyle = SOCK; ctx.beginPath(); ctx.ellipse(lx + swing + 8, -6 - hop, 22, 11, 0, 0, Math.PI * 2); ctx.fill();
+  };
+  const lp = p.legPhase || 0;
+  leg(-95, lp + Math.PI, true); leg(80, lp, true);
+  ctx.fillStyle = COAT; rr(-150, bodyY - 62, 290, 124, 62); ctx.fill();
+  ctx.fillStyle = CHEST; ctx.beginPath(); ctx.ellipse(98, bodyY + 18, 46, 38, -.3, 0, Math.PI * 2); ctx.fill();
+  leg(-115, lp, false);
+  if (p.reach > 0) { // the near front leg stretched out flat, under the dresser
+    const r = p.reach;
+    ctx.strokeStyle = COAT; ctx.lineWidth = 30;
+    ctx.beginPath(); ctx.moveTo(100, bodyY + 20); ctx.lineTo(100 + 330 * r, -14); ctx.stroke();
+    ctx.fillStyle = SOCK; ctx.beginPath(); ctx.ellipse(112 + 330 * r, -12, 24, 12, 0, 0, Math.PI * 2); ctx.fill();
+  } else leg(100, lp + Math.PI, false);
+  const hx = 150, hy = bodyY - 70 + lying * 34;
+  ctx.strokeStyle = COLLAR; ctx.lineWidth = 16;
+  ctx.beginPath(); ctx.moveTo(108, bodyY - 70 + lying * 20); ctx.lineTo(128, bodyY + 4); ctx.stroke();
+  ctx.fillStyle = '#E8B84A'; ctx.beginPath(); ctx.arc(126, bodyY + 18, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.save(); ctx.translate(hx, hy); ctx.rotate(p.headTilt || 0);
+  ctx.fillStyle = COAT; ctx.beginPath(); ctx.arc(0, 0, 68, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#7E5038'; rr(30, 0, 92, 54, 27); ctx.fill();               // muzzle
+  ctx.fillStyle = DARK; ctx.beginPath(); ctx.ellipse(116, 12, 15, 12, 0, 0, Math.PI * 2); ctx.fill();
+  if (p.sock) drawSock(100, 60, .9, .15 + Math.sin(p.sockSwing || 0) * .18, SOCK_A[0], SOCK_A[1]); // in his mouth
+  ctx.strokeStyle = DARK; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(70, 44); ctx.quadraticCurveTo(88, p.sad ? 38 : 54, 106, 42); ctx.stroke();
+  if (p.eyes === 'closed') {
+    ctx.strokeStyle = '#2E2218'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(14, -14, 12, .2, Math.PI - .2); ctx.stroke();
+  } else {
+    const r = p.eyes === 'wide' ? 15 : 12;
+    ctx.fillStyle = '#EDE3D3'; ctx.beginPath(); ctx.arc(14, -15, r + 6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = DARK; ctx.beginPath(); ctx.arc(p.sad ? 20 : 17, p.sad ? -12 : -15, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.sad ? 24 : 21, p.sad ? -17 : -20, r * .35, 0, Math.PI * 2); ctx.fill();
+    if (p.sad) { ctx.strokeStyle = '#E8D3B6'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(-6, -36); ctx.lineTo(30, -50); ctx.stroke(); } // the worried eyebrow
+  }
+  const eu = p.earUp || 0;
+  ctx.fillStyle = EAR; ctx.save(); ctx.translate(-28, -46);
+  ctx.rotate(lerp(.55, -.5, eu));
+  ctx.beginPath(); ctx.ellipse(0, lerp(40, -30, eu), 26, 52, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  if (p.whine > 0) { // thin wavy lines from the nose
+    ctx.strokeStyle = `rgba(255,255,255,${.95 * p.whine})`; ctx.lineWidth = 7; ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8;
+    for (let i = 0; i < 2; i++) {
+      const ox = 150 + i * 34, oy = -10 - i * 26;
+      ctx.beginPath();
+      for (let k = 0; k <= 12; k++) { const xx = ox + k * 5, yy = oy - k * 4 + Math.sin(k * 1.3 + (p.wt || 0) * 9) * 6; k ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); }
+      ctx.stroke();
+    }
+    ctx.shadowColor = 'transparent';
+  }
+  ctx.restore();
+  ctx.restore();
+}
+
+function zzz(x, y, t, a) {
+  if (a <= 0) return;
+  ctx.save(); ctx.direction = 'ltr'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i = 0; i < 3; i++) {
+    const k = ((t * .7 + i / 3) % 1);
+    ctx.globalAlpha = a * Math.sin(k * Math.PI);
+    font(800, 40 + i * 12); ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('z', x + k * 60 + i * 10, y - k * 90);
+  }
+  ctx.restore();
+}
+
+// where the dropped sock is while it slides under the dresser
+function sockSlide(t) {
+  const k = easeIn(prog(t, STASH + .7, STASH + 1.2));
+  return { x: lerp(680, 760, k), y: lerp(1300, 1310, k), a: 1 - k, vis: t > STASH + .7 && t < STASH + 1.2 };
+}
+
+function dogState(t) {
+  const st = { x: 420, y: 1330, s: .8, facing: -1, legPhase: 0, tail: 0, earUp: 0, eyes: 'closed', lying: 1, tilt: 0, headTilt: .1, hop: 0, sock: false, reach: 0, whine: 0, sad: false };
+  if (t < GRAB) { st.headTilt = .1 + Math.sin(t * 3) * .03; return st; } // dozing next to the basket
+  if (t < CARRY) { // up, nose into the basket, out with one sock
+    st.eyes = 'open'; st.earUp = .4;
+    st.lying = 1 - easeOut(prog(t, GRAB, GRAB + .35));
+    const dip = Math.sin(prog(t, GRAB + .4, CARRY - .2) * Math.PI);
+    st.headTilt = lerp(-.1, .55, dip); st.tilt = dip * .06;
+    st.sock = t > GRAB + .9; st.sockSwing = t * 8;
+    st.tail = t * 14;
+    return st;
+  }
+  if (t < STASH) { // the proud trot to the dresser
+    const k = easeInOut(prog(t, CARRY, STASH - .1));
+    Object.assign(st, { facing: 1, lying: 0, eyes: 'open', earUp: .5, sock: true, sockSwing: t * 14, legPhase: t * 22, tail: t * 16, headTilt: -.18 });
+    st.x = lerp(420, 520, k);
+    st.hop = Math.abs(Math.sin(t * 11)) * 10 * (1 - prog(t, STASH - .3, STASH));
+    return st;
+  }
+  Object.assign(st, { facing: 1, x: 520, eyes: 'open', earUp: .4, tail: t * 10 });
+  if (t < WANT) { // head down, shove it under, a satisfied sit-back
+    const push = Math.sin(prog(t, STASH, STASH + 1.0) * Math.PI);
+    st.lying = .35 * push; st.headTilt = lerp(-.1, .7, push); st.x = 520 + push * 30;
+    st.sock = t < STASH + .7;
+    st.tail = t * 18;
+    if (t > STASH + 1.3) { st.eyes = 'closed'; st.headTilt = -.15; }
+    return st;
+  }
+  // flat on the floor, paw under the gap, sweeping; then the whining
+  st.lying = easeOut(prog(t, WANT, WANT + .3)); st.x = lerp(520, 440, st.lying); st.headTilt = .28;
+  st.reach = st.lying * (.85 + .15 * Math.sin((t - WANT) * 7));
+  st.earUp = 0; st.tail = 0;
+  if (t > NOTIF - .4) { st.sad = true; st.whine = clamp(Math.sin((t - NOTIF + .4) * 2.4) * 1.4); st.wt = t; st.reach = .8; }
+  return st;
+}
+// ---------- overlays ----------
+function font(w, px) { ctx.font = `${w} ${px}px Rubik`; }
+function setDir() { ctx.direction = LANG === 'he' ? 'rtl' : 'ltr'; }
+
+function wrapLines(text, maxW) {
+  if (text.includes('\n')) return text.split('\n');
+  const words = text.split(' '); const lines = []; let cur = '';
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+  if (cur) lines.push(cur); return lines;
+}
+
+function caption(text, sub, cy, a, scale = 1) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a; setDir();
+  ctx.translate(CX, cy); ctx.scale(scale, scale);
+  font(800, 62); const lines = wrapLines(text, 600);
+  font(500, 38); const subW = sub ? ctx.measureText(sub).width : 0;
+  font(800, 62);
+  const lw = Math.max(subW, ...lines.map(l => ctx.measureText(l).width));
+  const h = lines.length * 76 + (sub ? 58 : 0) + 56;
+  ctx.fillStyle = '#FFFFFF'; ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+  rr(-lw / 2 - 44, -h / 2, lw + 88, h, 34); ctx.fill(); ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#16120F'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let y = -h / 2 + 28 + 38;
+  for (const l of lines) { ctx.fillText(l, 0, y); y += 76; }
+  if (sub) { font(500, 38); ctx.fillStyle = '#6E655C'; ctx.fillText(sub, 0, y - 8); }
+  ctx.restore();
+}
+
+function pawIcon(x, y, size, bg = ACCENT, fg = '#FFF') {
+  ctx.fillStyle = bg; rr(x, y, size, size, size * .23); ctx.fill();
+  ctx.fillStyle = fg; const cx = x + size / 2, cy = y + size / 2, u = size / 100;
+  ctx.beginPath(); ctx.ellipse(cx, cy + 14 * u, 22 * u, 18 * u, 0, 0, Math.PI * 2); ctx.fill();
+  [[-27, -10], [-10, -27], [10, -27], [27, -10]].forEach(([dx, dy]) => { ctx.beginPath(); ctx.ellipse(cx + dx * u, cy + dy * u, 9 * u, 11 * u, dx * .02, 0, Math.PI * 2); ctx.fill(); });
+}
+
+// the push, as iOS shows it; kept left of the action rail (x 50..850)
+function notification(t0, t1, t) {
+  const inP = easeOut(prog(t, t0, t0 + .45)), outP = easeIn(prog(t, t1 - .35, t1));
+  if (inP <= 0 || outP >= 1) return;
+  const x0 = 50, w = 800, y = lerp(-260, 300, inP) - outP * 560;
+  ctx.save(); setDir();
+  ctx.shadowColor = 'rgba(0,0,0,.28)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 14;
+  ctx.fillStyle = 'rgba(250,247,243,.97)'; rr(x0, y, w, 200, 52); ctx.fill(); ctx.shadowColor = 'transparent';
+  const rtl = LANG === 'he';
+  const iconX = rtl ? x0 + w - 34 - 104 : x0 + 34;
+  pawIcon(iconX, y + 48, 104);
+  ctx.textBaseline = 'alphabetic';
+  const tx = rtl ? iconX - 30 : iconX + 104 + 30;
+  ctx.textAlign = rtl ? 'right' : 'left';
+  font(500, 32); ctx.fillStyle = '#7A726A'; ctx.fillText('Dog Monitor', tx, y + 74);
+  ctx.textAlign = rtl ? 'left' : 'right'; ctx.fillText(COPY[LANG].now, rtl ? x0 + 34 : x0 + w - 34, y + 74);
+  ctx.textAlign = rtl ? 'right' : 'left';
+  font(700, 46); ctx.fillStyle = '#16120F'; ctx.fillText(COPY[LANG].notifTitle, tx, y + 128);
+  font(500, 36); ctx.fillStyle = '#5C544C'; ctx.fillText(COPY[LANG].notifSub, tx, y + 172);
+  ctx.restore();
+}
+
+function camChrome(t, clockSec) {
+  ctx.save(); setDir();
+  const rtl = LANG === 'he';
+  font(700, 34);
+  const label = `${COPY[LANG].room} · ${COPY[LANG].live}`;
+  const w = ctx.measureText(label).width + 96;
+  const x = rtl ? 850 - w : 60;
+  ctx.fillStyle = 'rgba(20,16,12,.55)'; rr(x, 1350, w, 70, 35); ctx.fill();
+  const on = Math.floor(t * 1.6) % 2 === 0;
+  ctx.fillStyle = on ? '#4CD964' : '#2F8F44';
+  ctx.beginPath(); ctx.arc(rtl ? x + w - 40 : x + 40, 1385, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textAlign = rtl ? 'right' : 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, rtl ? x + w - 66 : x + 66, 1387);
+  const hh = Math.floor(clockSec / 3600), mm = Math.floor(clockSec / 60) % 60, ss = Math.floor(clockSec) % 60;
+  const clock = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+  ctx.direction = 'ltr'; font(500, 34); ctx.textAlign = 'left';
+  const cw = ctx.measureText(clock).width + 48; const cx = rtl ? x - 16 - cw : x + w + 16;
+  ctx.fillStyle = 'rgba(20,16,12,.55)'; rr(cx, 1350, cw, 70, 35); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.fillText(clock, cx + 24, 1387);
+  ctx.restore();
+}
+
+function endCard(a, t) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.fillStyle = '#1C1612'; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(CX, 760, 40, CX, 760, 700);
+  g.addColorStop(0, 'rgba(180,84,31,.35)'); g.addColorStop(1, 'rgba(180,84,31,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const k = backOut(prog(t, 12.75, 13.25));
+  ctx.save(); ctx.translate(CX, 640); ctx.scale(k, k); pawIcon(-90, -90, 180); ctx.restore();
+  setDir(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const a1 = easeOut(prog(t, 12.95, 13.4)), a2 = easeOut(prog(t, 13.3, 13.75)), a3 = easeOut(prog(t, 13.65, 14.1));
+  font(800, 72); ctx.fillStyle = `rgba(255,248,240,${a1})`;
+  const l1 = wrapLines(COPY[LANG].end1, 720); l1.forEach((l, i) => ctx.fillText(l, CX, 860 + i * 88 + (1 - a1) * 30));
+  const y2 = 860 + l1.length * 88 + 40;
+  font(500, 40); ctx.fillStyle = `rgba(232,214,196,${a2})`;
+  wrapLines(COPY[LANG].end2, 800).forEach((l, i) => ctx.fillText(l, CX, y2 + i * 56 + (1 - a2) * 24));
+  const y3 = y2 + wrapLines(COPY[LANG].end2, 800).length * 56;
+  ctx.direction = 'ltr'; font(800, 52); ctx.fillStyle = `rgba(255,248,240,${a3})`; ctx.fillText('Dog Monitor', CX, y3 + 100);
+  setDir(); font(500, 38); ctx.fillStyle = `rgba(224,123,69,${a3})`; ctx.fillText(COPY[LANG].end3, CX, y3 + 164);
+  ctx.restore();
+}
+
+
+function draw(t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const d = dogState(t);
+  // the reveal: the camera leans in on the gap under the dresser
+  const z = easeInOut(prog(t, REVEAL - .15, REVEAL + .45)) * (1 - easeInOut(prog(t, END - .1, END + .3)));
+  const peek = easeOut(prog(t, REVEAL + .15, REVEAL + .75));
+  ctx.save();
+  const sc = lerp(1, 1.75, z);
+  ctx.translate(lerp(0, 540 - 760 * sc, z), lerp(0, 960 - 1290 * sc, z)); ctx.scale(sc, sc);
+  drawRoom(t);
+  drawBasket(t, Math.sin(prog(t, GRAB + .4, CARRY - .2) * Math.PI));
+  drawDresser(t, peek);
+  const ss = sockSlide(t);
+  if (ss.vis) drawSock(ss.x, ss.y, .5, -1.4, SOCK_A[0], SOCK_A[1], ss.a);
+  drawDog(d.x, d.y, d.s, d);
+  ctx.restore();
+  zzz(d.x - 170, d.y - 90, t, 1 - prog(t, GRAB - .1, GRAB));
+
+  const v = ctx.createRadialGradient(540, 960, 500, 540, 960, 1250);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.45)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(grain[Math.floor(t * 30) % 4], 0, 0, W, H);
+  camChrome(t, clockAt(t));
+
+  const L = COPY[LANG];
+  const pop = t0 => lerp(.9, 1, backOut(prog(t, t0, t0 + .2)));
+  const span = (a, b) => prog(t, a, a + .12) * (1 - prog(t, b - .12, b));
+  caption(L.hook, L.hookSub, 400, span(-1, GRAB + .15), lerp(.92, 1, easeOut(prog(t, 0, .3))));
+  caption(L.grab, L.grabSub, 360, span(GRAB + .15, CARRY), pop(GRAB + .15));
+  caption(L.carry, L.carrySub, 360, span(CARRY, STASH), pop(CARRY));
+  caption(L.stash, L.stashSub, 360, span(STASH, WANT), pop(STASH));
+  caption(L.want, L.wantSub, 360, span(WANT, NOTIF + .1), pop(WANT));
+  notification(NOTIF, REVEAL, t);
+  caption(L.reveal, L.revealSub, 380, span(REVEAL + .3, END + .1), pop(REVEAL + .3));
+  endCard(easeInOut(prog(t, END, END + .35)), t);
+}
+
+window.setLang = l => { LANG = l; };
+window.draw = draw;
+window.frame = (t, q) => { draw(t); return c.toDataURL('image/jpeg', q || .92); };
+window.ready = document.fonts.load('800 40px Rubik').then(() => Promise.all([
+  document.fonts.load('500 40px Rubik'), document.fonts.load('700 40px Rubik'),
+  document.fonts.load('800 40px Rubik', 'אב'), document.fonts.load('500 40px Rubik', 'אב'), document.fonts.load('700 40px Rubik', 'אב')]));
+</script></body></html>
