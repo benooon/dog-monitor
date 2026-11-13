@@ -2,7 +2,7 @@ npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.
 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.hirok.io
 npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
 
-added 270 packages, and audited 271 packages in 38s
+added 270 packages, and audited 271 packages in 39s
 
 77 packages are looking for funding
   run `npm fund` for details
@@ -27,44 +27,89 @@ Run `npm audit` for details.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/home/runner/work/dog-monitor/dog-monitor/backend[39m
 
- [32m✓[39m test/households.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1192[2mms[22m[39m
- [32m✓[39m test/subscription.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 928[2mms[22m[39m
- [32m✓[39m test/invites.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 1601[2mms[22m[39m
- [32m✓[39m test/events.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1421[2mms[22m[39m
- [32m✓[39m test/media.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 758[2mms[22m[39m
- [32m✓[39m test/live.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 874[2mms[22m[39m
- [32m✓[39m test/realtime.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1992[2mms[22m[39m
- [32m✓[39m test/account.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 702[2mms[22m[39m
- [32m✓[39m test/live-activities.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1580[2mms[22m[39m
+ [32m✓[39m test/households.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1273[2mms[22m[39m
+ [32m✓[39m test/subscription.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 917[2mms[22m[39m
+ [32m✓[39m test/invites.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 1633[2mms[22m[39m
+ [32m✓[39m test/events.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1377[2mms[22m[39m
+ [32m✓[39m test/media.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 802[2mms[22m[39m
+ [32m✓[39m test/live.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 925[2mms[22m[39m
+ [31m❯[39m test/realtime.test.ts [2m([22m[2m12 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 3050[2mms[22m[39m
+   [31m❯[39m realtime channel (GET /ws) [2m(12)[22m
+     [33m[2m✓[22m[39m rejects unauthenticated upgrades[33m 312[2mms[22m[39m
+     [32m✓[39m closes viewer connections without a household[32m 170[2mms[22m[39m
+     [32m✓[39m relays presence, heartbeats and viewer joins between camera and viewers[32m 223[2mms[22m[39m
+     [32m✓[39m marks the camera offline 3 minutes after its last heartbeat[32m 159[2mms[22m[39m
+[31m     [31m×[31m refuses a sixth viewer[39m[33m 1007[2mms[22m[39m
+     [32m✓[39m refuses to watch cameras outside the household and bad messages[32m 151[2mms[22m[39m
+     [32m✓[39m closes a socket that floods messages[32m 252[2mms[22m[39m
+     [32m✓[39m refuses frames larger than the payload limit[32m 164[2mms[22m[39m
+     [32m✓[39m does not leak a session when the socket closes during setup[32m 148[2mms[22m[39m
+     [32m✓[39m closes a removed member's socket[32m 203[2mms[22m[39m
+     [32m✓[39m closes a revoked camera's socket and ignores its heartbeats[32m 125[2mms[22m[39m
+     [32m✓[39m closes everyone's sockets when the household is deleted[32m 129[2mms[22m[39m
+ [32m✓[39m test/account.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 748[2mms[22m[39m
+ [32m✓[39m test/live-activities.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1427[2mms[22m[39m
    [32m✓[39m live activities [2m(6)[22m
-     [33m[2m✓[22m[39m registers a push token for a camera in the household[33m 323[2mms[22m[39m
-     [33m[2m✓[22m[39m skips members who left, drops dead tokens and forgets ended activities[33m 325[2mms[22m[39m
- [32m✓[39m test/apns.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 41[2mms[22m[39m
- [32m✓[39m test/landing.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 398[2mms[22m[39m
- [32m✓[39m test/timeline.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 573[2mms[22m[39m
+     [33m[2m✓[22m[39m registers a push token for a camera in the household[33m 331[2mms[22m[39m
+ [32m✓[39m test/apns.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m test/landing.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 389[2mms[22m[39m
+ [32m✓[39m test/timeline.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 570[2mms[22m[39m
  [32m✓[39m test/realtime-hub.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 9[2mms[22m[39m
- [32m✓[39m test/waitlist.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 754[2mms[22m[39m
- [32m✓[39m test/reels.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 737[2mms[22m[39m
+ [32m✓[39m test/waitlist.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 786[2mms[22m[39m
+ [32m✓[39m test/reels.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 694[2mms[22m[39m
  [32m✓[39m test/config.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 11[2mms[22m[39m
- [32m✓[39m test/summaries.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 514[2mms[22m[39m
- [32m✓[39m test/zones.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 587[2mms[22m[39m
- [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2681[2mms[22m[39m
+ [32m✓[39m test/summaries.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 518[2mms[22m[39m
+ [32m✓[39m test/zones.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 615[2mms[22m[39m
+ [32m✓[39m test/auth.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2684[2mms[22m[39m
    [32m✓[39m JwtService [2m(2)[22m
      [33m[2m✓[22m[39m rejects expired tokens[33m 2104[2mms[22m[39m
- [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 218[2mms[22m[39m
- [32m✓[39m test/notification-prefs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 454[2mms[22m[39m
- [32m✓[39m test/invite-codes.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 354[2mms[22m[39m
+ [32m✓[39m test/db-schema.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 235[2mms[22m[39m
+ [32m✓[39m test/notification-prefs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 451[2mms[22m[39m
+ [32m✓[39m test/invite-codes.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 428[2mms[22m[39m
  [32m✓[39m test/quiet-hours.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 20[2mms[22m[39m
- [32m✓[39m test/app-links.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 81[2mms[22m[39m
+ [32m✓[39m test/app-links.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 83[2mms[22m[39m
  [32m✓[39m test/rate-limiter.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
  [32m✓[39m test/logging.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
  [32m✓[39m test/health.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 75[2mms[22m[39m
 
-[2m Test Files [22m [1m[32m27 passed[39m[22m[90m (27)[39m
-[2m      Tests [22m [1m[32m238 passed[39m[22m[90m (238)[39m
-[2m   Start at [22m 08:47:00
-[2m   Duration [22m 35.91s[2m (tests 57%, import 41%, transform 2%)[22m
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
 
-[2m    Isolate [22m [33m27 workers spawned[39m[2m · ~97ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~2.51s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[41m[1m FAIL [22m[49m test/realtime.test.ts[2m > [22mrealtime channel (GET /ws)[2m > [22mrefuses a sixth viewer
+[31m[1mError[22m: Failed query: 
+    TRUNCATE users, households, household_members, dogs, devices, zones, events,
+      daily_summaries, notification_prefs, invites, live_activities, dog_photos, waitlist, media_tombstones RESTART IDENTITY CASCADE
+  
+params: [39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/src/pg-core/session.ts:[2m73:11[22m[39m
+[36m [2m❯[22m truncateAll test/helpers/db.ts:[2m14:3[22m[39m
+    [90m 12|[39m [90m/** Empties every app table (keeps the migrations table). */[39m
+    [90m 13|[39m [35mexport[39m [35masync[39m [35mfunction[39m [34mtruncateAll[39m(handle[33m:[39m [33mDbHandle[39m)[33m:[39m [33mPromise[39m[33m<[39m[35mvoid[39m[33m>[39m {
+    [90m 14|[39m   [35mawait[39m handle[33m.[39mdb[33m.[39m[34mexecute[39m(sql[32m`
+    [90m   |[39m   [31m^[39m
+    [90m 15|[39m     TRUNCATE users, households, household_members, dogs, devices, zone…
+    [90m 16|[39m       daily_summaries, notification_prefs, invites, live_activities, d…
+[90m [2m❯[22m test/realtime.test.ts:[2m35:5[22m[39m
 
+[31m[1mCaused by: error[22m: deadlock detected[39m
+[90m [2m❯[22m node_modules/pg-pool/index.js:[2m45:11[22m[39m
+[90m [2m❯[22m node_modules/drizzle-orm/node-postgres/session.js:[2m113:20[22m[39m
+[90m [2m❯[22m NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:[2m39:16[22m[39m
+[36m [2m❯[22m truncateAll test/helpers/db.ts:[2m14:3[22m[39m
+[90m [2m❯[22m test/realtime.test.ts:[2m35:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ length: 314, severity: 'ERROR', code: '40P01', detail: 'Process 215 waits for AccessExclusiveLock on relation 16462 of database 16384; blocked by process 216.
+Process 216 waits for RowShareLock on relation 16478 of database 16384; blocked by process 215.', hint: 'See server log for query details.', position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'deadlock.c', routine: 'DeadLockReport' }[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m26 passed[39m[22m[90m (27)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m237 passed[39m[22m[90m (238)[39m
+[2m   Start at [22m 08:49:01
+[2m   Duration [22m 37.42s[2m (tests 58%, import 40%, transform 2%)[22m
+
+[2m    Isolate [22m [33m27 workers spawned[39m[2m · ~99ms startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~2.56s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+
+
+::error file=/home/runner/work/dog-monitor/dog-monitor/backend/test/helpers/db.ts,title=test/realtime.test.ts > realtime channel (GET /ws) > refuses a sixth viewer,line=14,column=3::Error: Failed query: %0A    TRUNCATE users, households, household_members, dogs, devices, zones, events,%0A      daily_summaries, notification_prefs, invites, live_activities, dog_photos, waitlist, media_tombstones RESTART IDENTITY CASCADE%0A  %0Aparams: %0A ❯ NodePgPreparedQuery.queryWithCache node_modules/src/pg-core/session.ts:73:11%0A ❯ truncateAll test/helpers/db.ts:14:3%0A ❯ test/realtime.test.ts:35:5%0A%0A⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯%0ASerialized Error: { query: '%0A    TRUNCATE users, households, household_members, dogs, devices, zones, events,%0A      daily_summaries, notification_prefs, invites, live_activities, dog_photos, waitlist, media_tombstones RESTART IDENTITY CASCADE%0A  ', params: [] }%0ACaused by: Caused by: error: deadlock detected%0A ❯ node_modules/pg-pool/index.js:45:11%0A ❯ node_modules/drizzle-orm/node-postgres/session.js:113:20%0A ❯ NodePgPreparedQuery.queryWithCache node_modules/drizzle-orm/pg-core/session.js:39:16%0A ❯ truncateAll test/helpers/db.ts:14:3%0A ❯ test/realtime.test.ts:35:5%0A%0A⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯%0ASerialized Error: { length: 314, severity: 'ERROR', code: '40P01', detail: 'Process 215 waits for AccessExclusiveLock on relation 16462 of database 16384; blocked by process 216.%0AProcess 216 waits for RowShareLock on relation 16478 of database 16384; blocked by process 215.', hint: 'See server log for query details.', position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'deadlock.c', routine: 'DeadLockReport' }%0A
